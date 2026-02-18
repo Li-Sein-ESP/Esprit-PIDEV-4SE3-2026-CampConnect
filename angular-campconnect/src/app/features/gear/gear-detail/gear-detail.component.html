@@ -1,0 +1,294 @@
+<div class="min-h-screen bg-[var(--color-background)] pb-12">
+    <!-- Header -->
+    <div class="border-b border-[var(--color-border-light)] bg-white">
+        <div class="container py-4">
+            <button (click)="navigate('/gear')"
+                class="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
+                <lucide-icon [name]="ChevronLeft" class="w-5 h-5"></lucide-icon>
+                Back to Gear
+            </button>
+        </div>
+    </div>
+
+    <div class="container py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- Left Column - Images -->
+            <div>
+                <!-- Main Image -->
+                <div class="relative aspect-square bg-[var(--color-neutral-100)] rounded-lg overflow-hidden mb-4 group">
+                    <img [src]="gear.images[currentImageIndex]" [alt]="gear.name" class="w-full h-full object-cover" />
+                    <ng-container *ngIf="gear.images.length > 1">
+                        <button (click)="prevImage()"
+                            class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                            <lucide-icon [name]="ChevronLeft" class="w-5 h-5"></lucide-icon>
+                        </button>
+                        <button (click)="nextImage()"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                            <lucide-icon [name]="ChevronRight" class="w-5 h-5"></lucide-icon>
+                        </button>
+                    </ng-container>
+                </div>
+
+                <!-- Thumbnail Gallery -->
+                <div class="grid grid-cols-4 gap-2">
+                    <button *ngFor="let img of gear.images; let i = index" (click)="currentImageIndex = i"
+                        class="aspect-square rounded-lg overflow-hidden border-2 transition-all"
+                        [class.border-[var(--color-primary-600)]]="currentImageIndex === i"
+                        [class.border-transparent]="currentImageIndex !== i">
+                        <img [src]="img" [alt]="gear.name + ' ' + (i + 1)" class="w-full h-full object-cover" />
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Column - Details -->
+            <div>
+                <div class="mb-6">
+                    <app-badge variant="primary" customClass="mb-3">{{ gear.category }}</app-badge>
+                    <h1 class="mb-2">{{ gear.name }}</h1>
+                    <p class="text-[var(--color-text-secondary)] mb-4">by {{ gear.brand }}</p>
+
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="flex items-center gap-1">
+                            <lucide-icon [name]="Star" class="w-5 h-5 text-amber-500 fill-current"></lucide-icon>
+                            <span class="font-bold text-lg">{{ gear.rating }}</span>
+                            <span class="text-[var(--color-text-secondary)]">({{ gear.reviewCount }} reviews)</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <app-button variant="ghost" size="sm">
+                                <lucide-icon [name]="Share2" class="w-5 h-5"></lucide-icon>
+                            </app-button>
+                            <app-button variant="ghost" size="sm">
+                                <lucide-icon [name]="Heart" class="w-5 h-5"></lucide-icon>
+                            </app-button>
+                        </div>
+                    </div>
+
+                    <!-- Rent/Buy Toggle -->
+                    <div class="flex gap-2 mb-6">
+                        <button (click)="selectedOption = 'rent'"
+                            class="flex-1 px-6 py-3 rounded-lg font-medium transition-all"
+                            [class.bg-[var(--color-primary-600)]]="selectedOption === 'rent'"
+                            [class.text-white]="selectedOption === 'rent'"
+                            [class.bg-[var(--color-neutral-100)]]="selectedOption !== 'rent'"
+                            [class.text-[var(--color-text-primary)]]="selectedOption !== 'rent'">
+                            Rent
+                        </button>
+                        <button (click)="selectedOption = 'buy'"
+                            class="flex-1 px-6 py-3 rounded-lg font-medium transition-all"
+                            [class.bg-[var(--color-primary-600)]]="selectedOption === 'buy'"
+                            [class.text-white]="selectedOption === 'buy'"
+                            [class.bg-[var(--color-neutral-100)]]="selectedOption !== 'buy'"
+                            [class.text-[var(--color-text-primary)]]="selectedOption !== 'buy'">
+                            Buy
+                        </button>
+                    </div>
+
+                    <!-- Pricing -->
+                    <div class="mb-6 p-6 bg-[var(--color-primary-50)] rounded-lg">
+                        <div *ngIf="selectedOption === 'rent'">
+                            <div class="flex items-baseline gap-2 mb-4">
+                                <span class="text-3xl font-bold text-[var(--color-primary-600)]">
+                                    {{ gear.rentalPrice | currency:'USD' }}
+                                </span>
+                                <span class="text-[var(--color-text-secondary)]">/day</span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">Rental Duration</label>
+                                <select [(ngModel)]="selectedDuration"
+                                    class="w-full px-4 py-2.5 rounded-lg bg-white border-2 border-[var(--color-border-light)] focus:outline-none focus:border-[var(--color-primary-500)]">
+                                    <option [value]="1">1 day</option>
+                                    <option [value]="3">3 days</option>
+                                    <option [value]="7">1 week</option>
+                                    <option [value]="14">2 weeks</option>
+                                    <option [value]="30">1 month</option>
+                                </select>
+                            </div>
+
+                            <div
+                                class="flex items-center justify-between pt-4 border-t border-[var(--color-primary-200)]">
+                                <span class="font-medium">Total</span>
+                                <span class="text-2xl font-bold text-[var(--color-primary-600)]">
+                                    {{ totalPrice | currency:'USD' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div *ngIf="selectedOption === 'buy'">
+                            <div class="flex items-baseline gap-2 mb-4">
+                                <span class="text-3xl font-bold text-[var(--color-primary-600)]">
+                                    {{ gear.purchasePrice | currency:'USD' }}
+                                </span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">Quantity</label>
+                                <input type="number" [(ngModel)]="quantity" min="1" max="10"
+                                    class="w-full px-4 py-2.5 rounded-lg bg-white border-2 border-[var(--color-border-light)] focus:outline-none focus:border-[var(--color-primary-500)]" />
+                            </div>
+
+                            <div
+                                class="flex items-center justify-between pt-4 border-t border-[var(--color-primary-200)]">
+                                <span class="font-medium">Total</span>
+                                <span class="text-2xl font-bold text-[var(--color-primary-600)]">
+                                    {{ totalPrice | currency:'USD' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="space-y-3 mb-6">
+                        <app-button size="lg" [fullWidth]="true">
+                            <lucide-icon *ngIf="selectedOption === 'rent'" [name]="Calendar"
+                                class="w-5 h-5"></lucide-icon>
+                            <lucide-icon *ngIf="selectedOption === 'buy'" [name]="ShoppingCart"
+                                class="w-5 h-5"></lucide-icon>
+                            {{ selectedOption === 'rent' ? 'Reserve Now' : 'Add to Cart' }}
+                        </app-button>
+                        <app-button variant="outline" size="lg" [fullWidth]="true">
+                            Contact Seller
+                        </app-button>
+                    </div>
+
+                    <!-- Benefits -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex items-center gap-2 text-sm">
+                            <lucide-icon [name]="Shield" class="w-5 h-5 text-[var(--color-primary-600)]"></lucide-icon>
+                            <span>Damage Protection</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <lucide-icon [name]="Truck" class="w-5 h-5 text-[var(--color-primary-600)]"></lucide-icon>
+                            <span>Free Delivery</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <lucide-icon [name]="RotateCcw"
+                                class="w-5 h-5 text-[var(--color-primary-600)]"></lucide-icon>
+                            <span>Easy Returns</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <lucide-icon [name]="CheckCircle" class="w-5 h-5 text-green-600"></lucide-icon>
+                            <span>Quality Guaranteed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Section -->
+        <div class="mt-12">
+            <app-card variant="elevated">
+                <!-- Description -->
+                <app-card-header>
+                    <app-card-title>Description</app-card-title>
+                </app-card-header>
+                <app-card-content>
+                    <p class="text-[var(--color-text-secondary)] leading-relaxed mb-6">
+                        {{ gear.description }}
+                    </p>
+
+                    <h5 class="mb-3">Key Features</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div *ngFor="let feature of gear.features" class="flex items-center gap-2">
+                            <lucide-icon [name]="CheckCircle"
+                                class="w-5 h-5 text-green-600 flex-shrink-0"></lucide-icon>
+                            <span class="text-sm text-[var(--color-text-secondary)]">{{ feature }}</span>
+                        </div>
+                    </div>
+                </app-card-content>
+            </app-card>
+
+            <!-- Specifications -->
+            <app-card variant="elevated" customClass="mt-6">
+                <app-card-header>
+                    <app-card-title>Specifications</app-card-title>
+                </app-card-header>
+                <app-card-content>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div *ngFor="let spec of gear.specifications | keyvalue"
+                            class="flex items-center justify-between py-3 border-b border-[var(--color-border-light)] last:border-0">
+                            <span class="text-sm text-[var(--color-text-tertiary)] capitalize">{{ spec.key }}</span>
+                            <span class="font-medium">{{ spec.value }}</span>
+                        </div>
+                    </div>
+                </app-card-content>
+            </app-card>
+
+            <!-- Location -->
+            <app-card variant="elevated" customClass="mt-6">
+                <app-card-header>
+                    <app-card-title customClass="flex items-center gap-2">
+                        <lucide-icon [name]="MapPin" class="w-5 h-5"></lucide-icon>
+                        Pickup Location
+                    </app-card-title>
+                    <app-card-description>{{ gear.location }}</app-card-description>
+                </app-card-header>
+                <app-card-content>
+                    <app-map-view [markers]="mapMarkers" [center]="{ lat: 37.7749, lng: -122.4194 }" [zoom]="12"
+                        [selectedMarkerId]="gear.id" height="300px"></app-map-view>
+                </app-card-content>
+            </app-card>
+
+            <!-- Reviews -->
+            <app-card variant="elevated" customClass="mt-6">
+                <app-card-header>
+                    <app-card-title customClass="flex items-center gap-2">
+                        <lucide-icon [name]="Star" class="w-5 h-5 text-amber-500 fill-current"></lucide-icon>
+                        {{ gear.rating }} • {{ gear.reviewCount }} Reviews
+                    </app-card-title>
+                </app-card-header>
+                <app-card-content>
+                    <div class="space-y-6">
+                        <div *ngFor="let review of mockReviews"
+                            class="pb-6 border-b border-[var(--color-border-light)] last:border-0 last:pb-0">
+                            <div class="flex items-start gap-4 mb-4">
+                                <img [src]="review.userAvatar" [alt]="review.userName"
+                                    class="w-12 h-12 rounded-full object-cover" />
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h6>{{ review.userName }}</h6>
+                                        <app-badge *ngIf="review.verifiedPurchase" variant="success" size="sm">
+                                            <lucide-icon [name]="CheckCircle" class="w-3 h-3"></lucide-icon>
+                                            Verified Purchase
+                                        </app-badge>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex items-center gap-1">
+                                            <lucide-icon *ngFor="let i of range(5)" [name]="Star" class="w-4 h-4"
+                                                [class.text-amber-500]="i < review.rating"
+                                                [class.fill-current]="i < review.rating"
+                                                [class.text-[var(--color-neutral-200)]]="i >= review.rating"></lucide-icon>
+                                        </div>
+                                        <span class="text-sm text-[var(--color-text-tertiary)]">
+                                            {{ review.createdAt | date:'longDate' }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h6 class="mb-2">{{ review.title }}</h6>
+                                <p class="text-[var(--color-text-secondary)] leading-relaxed">
+                                    {{ review.content }}
+                                </p>
+                            </div>
+
+                            <div class="flex items-center gap-4">
+                                <button
+                                    class="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
+                                    <lucide-icon [name]="ThumbsUp" class="w-4 h-4"></lucide-icon>
+                                    Helpful ({{ review.helpful }})
+                                </button>
+                                <button
+                                    class="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
+                                    <lucide-icon [name]="MessageSquare" class="w-4 h-4"></lucide-icon>
+                                    Reply
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </app-card-content>
+            </app-card>
+        </div>
+    </div>
+</div>

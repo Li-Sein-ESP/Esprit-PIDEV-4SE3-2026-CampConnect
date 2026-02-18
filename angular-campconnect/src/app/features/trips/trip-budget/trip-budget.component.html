@@ -1,0 +1,59 @@
+<div class="min-h-screen bg-[var(--color-background)] py-12">
+  <div class="container max-w-4xl">
+    <h2 class="mb-8">Trip Budget</h2>
+
+    @if (budget(); as b) {
+    <div class="grid grid-cols-3 gap-4 mb-8">
+      <app-card variant="elevated">
+        <app-card-content class="p-6 text-center">
+          <div class="text-sm text-[var(--color-text-secondary)] mb-1">Total Budget</div>
+          <div class="text-3xl font-bold text-[var(--color-primary-600)]">\${{ b.total }}</div>
+        </app-card-content>
+      </app-card>
+      <app-card variant="elevated">
+        <app-card-content class="p-6 text-center">
+          <div class="text-sm text-[var(--color-text-secondary)] mb-1">Spent</div>
+          <div class="text-3xl font-bold text-red-600">\${{ b.spent }}</div>
+        </app-card-content>
+      </app-card>
+      <app-card variant="elevated">
+        <app-card-content class="p-6 text-center">
+          <div class="text-sm text-[var(--color-text-secondary)] mb-1">Remaining</div>
+          <div class="text-3xl font-bold text-green-600">\${{ b.remaining }}</div>
+        </app-card-content>
+      </app-card>
+    </div>
+
+    <div class="space-y-6">
+      @for (category of b.categories; track category.name) {
+      <app-card variant="elevated">
+        <app-card-header>
+          <app-card-title>{{ category.name }}</app-card-title>
+        </app-card-header>
+        <app-card-content>
+          <div class="mb-4">
+            <div class="flex justify-between text-sm mb-2">
+              <span>Planned: \${{ category.planned }}</span>
+              <span>Actual: \${{ category.actual }}</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-[var(--color-primary-600)] h-2 rounded-full"
+                [style.width.%]="(category.actual / category.planned) * 100"></div>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            @for (item of category.items; track item.description) {
+            <div class="flex items-center justify-between p-3 bg-[var(--color-background)] rounded-lg">
+              <span class="text-sm">{{ item.description }}</span>
+              <span class="font-medium">\${{ item.amount }}</span>
+            </div>
+            }
+          </div>
+        </app-card-content>
+      </app-card>
+      }
+    </div>
+    }
+  </div>
+</div>

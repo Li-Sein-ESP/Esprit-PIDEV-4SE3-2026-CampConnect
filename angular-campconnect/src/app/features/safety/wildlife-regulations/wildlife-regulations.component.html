@@ -1,0 +1,271 @@
+<div class="min-h-screen bg-[var(--color-background)] pb-12">
+  <!-- Back Navigation -->
+  <div class="border-b border-[var(--color-border-light)] bg-white">
+    <div class="container py-4">
+      <button (click)="navigate('/safety')"
+        class="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
+        <lucide-icon [img]="ChevronLeftIcon" [size]="20"></lucide-icon>
+        Back to Safety Overview
+      </button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="bg-gradient-to-br from-amber-700 to-amber-900 text-white">
+    <div class="container py-12">
+      <div class="flex items-center gap-3 mb-4">
+        <lucide-icon [img]="BinocularsIcon" [size]="32" class="text-white"></lucide-icon>
+        <h1 class="text-3xl font-bold text-white">Wildlife & Hunting Regulations</h1>
+      </div>
+      <p class="text-xl text-white/90 max-w-3xl">
+        Species information, viewing guidelines, conservation status, and hunting regulations by area.
+      </p>
+    </div>
+  </div>
+
+  <div class="container py-12">
+    <!-- Filters -->
+    <div class="flex gap-2 mb-8 overflow-x-auto pb-2">
+      <button (click)="setFilterCategory('all')"
+        class="px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all"
+        [ngClass]="filterCategory === 'all' ? 'bg-[var(--color-primary-600)] text-white' : 'bg-[var(--color-neutral-100)] text-[var(--color-text-secondary)] hover:bg-[var(--color-neutral-200)]'">
+        All Species
+      </button>
+      <button (click)="setFilterCategory('big-game')"
+        class="px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all"
+        [ngClass]="filterCategory === 'big-game' ? 'bg-[var(--color-primary-600)] text-white' : 'bg-[var(--color-neutral-100)] text-[var(--color-text-secondary)] hover:bg-[var(--color-neutral-200)]'">
+        Big Game
+      </button>
+      <button (click)="setFilterCategory('small-game')"
+        class="px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all"
+        [ngClass]="filterCategory === 'small-game' ? 'bg-[var(--color-primary-600)] text-white' : 'bg-[var(--color-neutral-100)] text-[var(--color-text-secondary)] hover:bg-[var(--color-neutral-200)]'">
+        Small Game
+      </button>
+      <button (click)="setFilterCategory('protected')"
+        class="px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all"
+        [ngClass]="filterCategory === 'protected' ? 'bg-[var(--color-primary-600)] text-white' : 'bg-[var(--color-neutral-100)] text-[var(--color-text-secondary)] hover:bg-[var(--color-neutral-200)]'">
+        Protected
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Species List -->
+      <div class="lg:col-span-1">
+        <h3 class="text-xl font-bold mb-4 text-[var(--color-text-heading)]">Species ({{ filteredSpecies.length }})</h3>
+        <div class="space-y-3">
+          <app-card *ngFor="let sp of filteredSpecies"
+            [variant]="selectedSpecies?.id === sp.id ? 'elevated' : 'bordered'"
+            [customClass]="'cursor-pointer transition-all ' + (selectedSpecies?.id === sp.id ? 'ring-2 ring-[var(--color-primary-600)] shadow-lg' : 'hover:shadow-md')"
+            (click)="selectSpecies(sp)">
+            <app-card-content customClass="p-4">
+              <div class="mb-3">
+                <h6 class="mb-1 font-semibold text-[var(--color-text-heading)]">{{ sp.name }}</h6>
+                <p class="text-xs text-[var(--color-text-tertiary)] italic">
+                  {{ sp.scientificName }}
+                </p>
+              </div>
+              <div class="flex gap-2">
+                <app-badge variant="default" [customClass]="statusColors[sp.conservationStatus]" size="sm">
+                  {{ sp.conservationStatus }}
+                </app-badge>
+                <app-badge *ngIf="sp.huntingRegulations?.allowed" variant="default"
+                  customClass="bg-amber-100 text-amber-700" size="sm">
+                  Huntable
+                </app-badge>
+              </div>
+            </app-card-content>
+          </app-card>
+        </div>
+      </div>
+
+      <!-- Species Details -->
+      <div class="lg:col-span-2">
+        <div *ngIf="selectedSpecies; else noSelection" class="space-y-6">
+          <!-- Header -->
+          <app-card variant="elevated">
+            <app-card-content customClass="p-6">
+              <div class="flex items-start justify-between mb-4">
+                <div>
+                  <h2 class="text-2xl font-bold mb-2 text-[var(--color-text-heading)]">{{ selectedSpecies.name }}</h2>
+                  <p class="text-[var(--color-text-secondary)] italic mb-3">
+                    {{ selectedSpecies.scientificName }}
+                  </p>
+                  <div class="flex gap-2">
+                    <app-badge variant="default" [customClass]="statusColors[selectedSpecies.conservationStatus]">
+                      {{ selectedSpecies.conservationStatus }}
+                    </app-badge>
+                    <app-badge variant="default" customClass="capitalize">
+                      {{ selectedSpecies.category.replace('-', ' ') }}
+                    </app-badge>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h6 class="mb-2 font-semibold text-[var(--color-text-heading)]">Found In:</h6>
+                <div class="flex flex-wrap gap-2">
+                  <div *ngFor="let area of selectedSpecies.areas"
+                    class="flex items-center gap-1 px-3 py-1 bg-[var(--color-neutral-100)] rounded-full text-sm text-[var(--color-text-secondary)]">
+                    <lucide-icon [img]="MapPinIcon" [size]="12"></lucide-icon>
+                    {{ area }}
+                  </div>
+                </div>
+              </div>
+            </app-card-content>
+          </app-card>
+
+          <!-- Viewing Guidelines -->
+          <app-card variant="elevated">
+            <app-card-header>
+              <app-card-title>Wildlife Viewing Guidelines</app-card-title>
+              <app-card-description>Safe and responsible viewing practices</app-card-description>
+            </app-card-header>
+            <app-card-content>
+              <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                      <lucide-icon [img]="ShieldIcon" [size]="20" class="text-blue-600"></lucide-icon>
+                      <h6 class="text-blue-900 font-semibold">Minimum Distance</h6>
+                    </div>
+                    <p class="text-sm text-blue-800 font-medium">
+                      {{ selectedSpecies.viewingGuidelines.minDistance }}
+                    </p>
+                  </div>
+                  <div class="p-4 bg-green-50 border-2 border-green-200 rounded-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                      <lucide-icon [img]="CalendarIcon" [size]="20" class="text-green-600"></lucide-icon>
+                      <h6 class="text-green-900 font-semibold">Best Viewing Time</h6>
+                    </div>
+                    <p class="text-sm text-green-800 font-medium">
+                      {{ selectedSpecies.viewingGuidelines.bestTime }}
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <h6 class="mb-3 font-semibold text-[var(--color-text-heading)]">Safety Precautions</h6>
+                  <ul class="space-y-2">
+                    <li *ngFor="let item of selectedSpecies.viewingGuidelines.safety"
+                      class="flex items-start gap-2 text-sm text-[var(--color-text-secondary)]">
+                      <lucide-icon [img]="AlertTriangleIcon" [size]="16"
+                        class="text-orange-600 flex-shrink-0 mt-0.5"></lucide-icon>
+                      <span>{{ item }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </app-card-content>
+          </app-card>
+
+          <!-- Hunting Regulations -->
+          <app-card variant="elevated">
+            <app-card-header>
+              <app-card-title>Hunting Regulations</app-card-title>
+            </app-card-header>
+            <app-card-content>
+              <div *ngIf="selectedSpecies.huntingRegulations?.allowed; else prohibited" class="space-y-6">
+                <!-- Seasons -->
+                <div *ngIf="selectedSpecies.huntingRegulations?.seasons">
+                  <h6 class="mb-4 font-semibold text-[var(--color-text-heading)]">Hunting Seasons</h6>
+                  <div class="space-y-4">
+                    <div *ngFor="let season of selectedSpecies.huntingRegulations?.seasons"
+                      class="p-4 border-2 border-[var(--color-border-light)] rounded-lg">
+                      <div class="flex items-center justify-between mb-3">
+                        <h6 class="font-semibold text-[var(--color-text-heading)]">{{ season.type }}</h6>
+                        <app-badge variant="default" customClass="bg-green-600 text-white flex items-center gap-1">
+                          <lucide-icon [img]="CalendarIcon" [size]="12"></lucide-icon>
+                          {{ season.dates }}
+                        </app-badge>
+                      </div>
+                      <ul class="space-y-1">
+                        <li *ngFor="let restriction of season.restrictions"
+                          class="flex items-start gap-2 text-sm text-[var(--color-text-secondary)]">
+                          <lucide-icon [img]="InfoIcon" [size]="16"
+                            class="text-blue-600 flex-shrink-0 mt-0.5"></lucide-icon>
+                          <span>{{ restriction }}</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Permits -->
+                <div *ngIf="selectedSpecies.huntingRegulations?.permits"
+                  class="p-4 bg-amber-50 border-2 border-amber-200 rounded-lg">
+                  <div class="flex items-center gap-2 mb-3">
+                    <lucide-icon [img]="FileTextIcon" [size]="24" class="text-amber-600"></lucide-icon>
+                    <h6 class="text-amber-900 font-semibold">Permit Requirements</h6>
+                  </div>
+                  <div class="space-y-2 text-sm">
+                    <div class="flex justify-between text-amber-800">
+                      <span>Type:</span>
+                      <span class="font-medium">{{ selectedSpecies.huntingRegulations?.permits?.type }}</span>
+                    </div>
+                    <div class="flex justify-between text-amber-800">
+                      <span>Cost:</span>
+                      <span class="font-medium">{{ selectedSpecies.huntingRegulations?.permits?.cost }}</span>
+                    </div>
+                    <div *ngIf="selectedSpecies.huntingRegulations?.permits?.quota"
+                      class="flex justify-between text-amber-800">
+                      <span>Quota:</span>
+                      <span class="font-medium">{{ selectedSpecies.huntingRegulations?.permits?.quota }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Methods & Bag Limits -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div *ngIf="selectedSpecies.huntingRegulations?.methods">
+                    <h6 class="mb-3 font-semibold text-[var(--color-text-heading)]">Legal Methods</h6>
+                    <div class="space-y-2">
+                      <div *ngFor="let method of selectedSpecies.huntingRegulations?.methods"
+                        class="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
+                        <lucide-icon [img]="CheckCircleIcon" [size]="16" class="text-green-600"></lucide-icon>
+                        <span>{{ method }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="selectedSpecies.huntingRegulations?.bagLimits">
+                    <h6 class="mb-3 font-semibold text-[var(--color-text-heading)]">Bag Limits</h6>
+                    <p class="text-sm text-[var(--color-text-secondary)]">
+                      {{ selectedSpecies.huntingRegulations?.bagLimits }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <ng-template #prohibited>
+                <div class="text-center py-8">
+                  <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <lucide-icon [img]="BanIcon" [size]="32" class="text-red-600"></lucide-icon>
+                  </div>
+                  <h4 class="mb-2 text-red-900 font-bold">Hunting Prohibited</h4>
+                  <p class="text-red-700 mb-4">
+                    This species is protected and may not be hunted or harvested.
+                  </p>
+                  <app-badge variant="default" customClass="bg-red-600 text-white">
+                    {{ selectedSpecies.conservationStatus }}
+                  </app-badge>
+                </div>
+              </ng-template>
+            </app-card-content>
+          </app-card>
+        </div>
+        <ng-template #noSelection>
+          <app-card variant="bordered" customClass="text-center py-16">
+            <app-card-content>
+              <div class="max-w-md mx-auto">
+                <lucide-icon [img]="BinocularsIcon" [size]="64"
+                  class="text-[var(--color-text-tertiary)] mx-auto mb-4"></lucide-icon>
+                <h3 class="mb-2 text-xl font-bold text-[var(--color-text-heading)]">Select a Species</h3>
+                <p class="text-[var(--color-text-secondary)]">
+                  Choose a wildlife species from the list to view viewing guidelines and hunting regulations.
+                </p>
+              </div>
+            </app-card-content>
+          </app-card>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>
