@@ -23,12 +23,30 @@ export class ReservationCreateComponent {
   readonly AlertCircle = AlertCircle;
   readonly ChevronRight = ChevronRight;
 
-  basePrice = 315;
+  basePrice = 0;
+  nights = 0;
+  startDate: Date | null = null;
+  endDate: Date | null = null;
   guestInfo = { firstName: '', lastName: '', email: '', phone: '' };
   addOns = { firewood: false, earlyCheckIn: false };
   agreedToTerms = false;
 
-  constructor(private route: ActivatedRoute, private router: Router) { }
+  constructor(private route: ActivatedRoute, private router: Router) {
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras.state) {
+      this.basePrice = navigation.extras.state['totalPrice'] || 315;
+      this.nights = navigation.extras.state['nights'] || 0;
+      this.startDate = navigation.extras.state['startDate'] || null;
+      this.endDate = navigation.extras.state['endDate'] || null;
+    } else {
+      // Fallback if accessed directly
+      const state = history.state;
+      this.basePrice = state.totalPrice || 315;
+      this.nights = state.nights || 0;
+      this.startDate = state.startDate || null;
+      this.endDate = state.endDate || null;
+    }
+  }
 
   calculateTotal(): number {
     let total = this.basePrice;
@@ -38,12 +56,12 @@ export class ReservationCreateComponent {
   }
 
   canProceed(): boolean {
-    return !!(this.guestInfo.firstName && this.guestInfo.email && this.agreedToTerms);
+    return !!(this.guestInfo.firstName && this.guestInfo.email && this.agreedToTerms && this.startDate && this.endDate);
   }
 
   continueToPayment() {
     if (this.canProceed()) {
-      this.router.navigate(['/booking/payment', this.route.snapshot.paramMap.get('id')]);
+      this.router.navigate(['/booking/payment', this.route.snapshot.paramMap.get('siteId') || this.route.snapshot.paramMap.get('id')]);
     }
   }
 

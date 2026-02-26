@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Search, Calendar, Users, MapPin, Star, Wifi, Zap, Droplets, Car, TreePine, Tent, Info, ChevronRight, Filter } from 'lucide-angular';
+import { LucideAngularModule, Search, Calendar, Users, MapPin, Star, Wifi, Zap, Droplets, Car, TreePine, Tent, Info, ChevronRight, Filter, Bell, CheckCircle } from 'lucide-angular';
 import { ButtonComponent } from '../../../shared/components/button.component';
 import { BadgeComponent } from '../../../shared/components/badge.component';
 import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
@@ -64,6 +64,8 @@ export class AvailabilitySearchComponent {
   readonly Info = Info;
   readonly ChevronRight = ChevronRight;
   readonly Filter = Filter;
+  readonly Bell = Bell;
+  readonly CheckCircle = CheckCircle;
 
   searchParams = signal<SearchParams>({
     startDate: '',
@@ -74,6 +76,10 @@ export class AvailabilitySearchComponent {
   isSearching = signal(false);
   showResults = signal(false);
   minDate = new Date().toISOString().split('T')[0];
+
+  // Waitlist State
+  joinedWaitlists = signal<string[]>([]);
+  showNotification = signal<{ site: Campsite | null }>({ site: null });
 
   mockCampsites: Campsite[] = [
     {
@@ -218,7 +224,7 @@ export class AvailabilitySearchComponent {
   }
 
   reserveSite(site: Campsite) {
-    this.router.navigate([`/booking/reserve/${site.id}`], {
+    this.router.navigate([`/booking/dates/${site.id}`], {
       state: {
         campsite: site,
         searchParams: this.searchParams(),
@@ -226,5 +232,29 @@ export class AvailabilitySearchComponent {
         totalPrice: this.getTotalPrice(site.basePrice),
       },
     });
+  }
+
+  joinWaitlist(site: Campsite) {
+    if (this.isOnWaitlist(site.id)) return;
+
+    this.joinedWaitlists.update(list => [...list, site.id]);
+
+    // Simulate someone canceling 8 seconds later
+    setTimeout(() => {
+      this.showNotification.set({ site });
+    }, 8000);
+  }
+
+  isOnWaitlist(siteId: string): boolean {
+    return this.joinedWaitlists().includes(siteId);
+  }
+
+  dismissNotification() {
+    this.showNotification.set({ site: null });
+  }
+
+  bookFromWaitlist(site: Campsite) {
+    this.dismissNotification();
+    this.reserveSite(site);
   }
 }

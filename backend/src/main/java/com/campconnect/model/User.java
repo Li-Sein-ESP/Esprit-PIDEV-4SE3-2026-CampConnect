@@ -14,24 +14,24 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class User {
-	@Id
-	private String id;
+    @Id
+    private String id;
 
-	private String username;
+    private String username;
 
-	private String email;
+    private String email;
 
-	private String password;
+    private String password;
 
-	private String name;
+    private String name;
 
-	@DBRef
-	private Set<Role> roles = new HashSet<>();
+    @DBRef
+    private Set<Role> roles = new HashSet<>();
 
-	public User(String username, String email, String password, String name) {
-		this.username = username;
-		this.email = email;
-		this.password = password;
-		this.name = name;
-	}
+    public User(String username, String email, String password, String name) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.name = name;
+    }
 }

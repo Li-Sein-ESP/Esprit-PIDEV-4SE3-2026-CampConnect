@@ -76,7 +76,20 @@
           </app-card-header>
           <app-card-content>
             <div class="space-y-3 mb-6">
-              <div class="flex justify-between"><span>Base Price</span><span>\${{ basePrice }}</span></div>
+              @if (startDate && endDate) {
+              <div class="bg-[var(--color-primary-50)] p-4 rounded-lg mb-4">
+                <div class="text-sm text-[var(--color-text-secondary)] mb-1">Selected Dates</div>
+                <div class="font-medium text-[var(--color-primary-600)] flex justify-between">
+                  <span>{{ startDate | date:'mediumDate' }}</span>
+                  <span>-</span>
+                  <span>{{ endDate | date:'mediumDate' }}</span>
+                </div>
+              </div>
+              }
+              <div class="flex justify-between">
+                <span>Base Price @if (nights > 0) { ({{ nights }} nights) }</span>
+                <span>\${{ basePrice }}</span>
+              </div>
               @if (addOns.firewood) {
               <div class="flex justify-between"><span>Firewood</span><span>\$25</span></div>
               }

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, HostListener, Inject, Renderer2, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges, HostListener, Inject, Renderer2, ElementRef } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { LucideAngularModule, X } from 'lucide-angular';
 
@@ -27,7 +27,7 @@ import { LucideAngularModule, X } from 'lucide-angular';
     }
   `]
 })
-export class ModalComponent implements OnInit, OnDestroy {
+export class ModalComponent implements OnInit, OnDestroy, OnChanges {
     @Input() isOpen = false;
     @Input() title = '';
     @Input() size: 'sm' | 'md' | 'lg' | 'xl' = 'md';

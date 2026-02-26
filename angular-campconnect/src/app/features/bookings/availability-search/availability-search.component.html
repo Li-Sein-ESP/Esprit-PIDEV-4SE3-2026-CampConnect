@@ -1,7 +1,33 @@
 <div class="min-h-screen bg-[var(--color-background)] py-12">
-  <div class="container max-w-7xl">
+  <div class="container max-w-7xl relative">
+
+    <!-- Waitlist Notification -->
+    <div *ngIf="showNotification().site as site" class="absolute top-0 left-0 right-0 z-50 animate-slide-down">
+      <div
+        class="bg-gradient-to-r from-teal-600 to-teal-800 text-white p-4 rounded-xl shadow-2xl flex items-center justify-between border border-teal-500/30">
+        <div class="flex items-start gap-4">
+          <div class="bg-white/20 p-2 rounded-full">
+            <lucide-icon [img]="Bell" class="w-6 h-6"></lucide-icon>
+          </div>
+          <div>
+            <h4 class="text-white mb-1">A Spot Opened Up!</h4>
+            <p class="text-teal-50 text-sm">Great news! Someone just canceled their reservation at <strong>{{ site.name
+                }}</strong>. You have 15 minutes to secure this spot.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <button (click)="dismissNotification()"
+            class="text-teal-200 hover:text-white transition-colors text-sm font-medium">Dismiss</button>
+          <button (click)="bookFromWaitlist(site)"
+            class="bg-white text-teal-900 hover:bg-teal-50 px-6 py-2 rounded-lg font-bold shadow-sm transition-colors cursor-pointer">
+            Book Now
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Header -->
-    <div class="mb-8">
+    <div class="mb-8 mt-16">
       <h2 class="mb-2">Find Your Perfect Campsite</h2>
       <p class="text-[var(--color-text-secondary)]">
         Search for available campsites and book your next outdoor adventure
@@ -175,8 +201,11 @@
               </div>
 
               @if (site.availability === 'full') {
-              <app-button variant="outline" [disabled]="true">
-                Fully Booked
+              <app-button variant="outline" (click)="joinWaitlist(site)" [disabled]="isOnWaitlist(site.id)">
+                <lucide-icon *ngIf="isOnWaitlist(site.id)" [img]="CheckCircle"
+                  class="w-4 h-4 mr-2 text-green-600"></lucide-icon>
+                <lucide-icon *ngIf="!isOnWaitlist(site.id)" [img]="Bell" class="w-4 h-4 mr-2"></lucide-icon>
+                {{ isOnWaitlist(site.id) ? 'On Waitlist' : 'Join Waitlist' }}
               </app-button>
               } @else {
               <app-button (click)="reserveSite(site)">

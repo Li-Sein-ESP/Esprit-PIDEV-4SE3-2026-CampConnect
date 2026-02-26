@@ -76,6 +76,10 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/bookings/booking-management/booking-management.component').then(m => m.BookingManagementComponent)
             },
             {
+                path: 'booking/dates/:siteId',
+                loadComponent: () => import('./features/bookings/dynamic-calendar/dynamic-calendar').then(m => m.DynamicCalendar)
+            },
+            {
                 path: 'discover',
                 loadComponent: () => import('./features/bookings/availability-search/availability-search.component').then(m => m.AvailabilitySearchComponent)
             },
@@ -94,6 +98,25 @@ export const routes: Routes = [
             {
                 path: 'booking/cancel/:bookingId',
                 loadComponent: () => import('./features/bookings/booking-cancel/booking-cancel.component').then(m => m.BookingCancelComponent)
+            },
+            // Companion Matching
+            {
+                path: 'companions',
+                loadComponent: () => import('./features/companions/companions-layout/companions-layout').then(m => m.CompanionsLayout),
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('./features/companions/companion-discovery/companion-discovery').then(m => m.CompanionDiscovery)
+                    },
+                    {
+                        path: 'profile',
+                        loadComponent: () => import('./features/companions/companion-profile-form/companion-profile-form').then(m => m.CompanionProfileForm)
+                    },
+                    {
+                        path: 'connections',
+                        loadComponent: () => import('./features/companions/companion-connections/companion-connections').then(m => m.CompanionConnections)
+                    }
+                ]
             },
             // Trip Planning Extended
             {
