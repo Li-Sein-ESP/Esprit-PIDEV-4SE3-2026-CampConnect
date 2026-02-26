@@ -1,8 +1,9 @@
 package com.campconnect.model;
 
-public enum ConnectionRequestStatus {
+public enum GroupInviteStatus {
     PENDING,
     ACCEPTED,
     DECLINED,
+    EXPIRED,
     CANCELLED
 }
