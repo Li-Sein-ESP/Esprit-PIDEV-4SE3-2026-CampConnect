@@ -1,0 +1,396 @@
+<div class="min-h-screen bg-[var(--color-background)] pb-12">
+  <!-- Header -->
+  <div class="bg-[var(--color-nav-background)] text-white">
+    <div class="container py-10">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center">
+          <lucide-icon [img]="LeafIcon" [size]="28" class="text-white"></lucide-icon>
+        </div>
+        <h1 class="text-3xl font-bold text-white">Environmental & Legal Compliance</h1>
+      </div>
+      <p class="text-xl text-white/90 max-w-2xl">
+        Regulations, restrictions, and permit requirements to protect nature and ensure legal outdoor recreation.
+      </p>
+    </div>
+  </div>
+
+  <div class="container py-8">
+    <!-- Quick Navigation -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <button (click)="navigate('/safety/zones')"
+        class="p-6 bg-[var(--color-surface)] border-2 border-[var(--color-border-light)] rounded-xl hover:border-[var(--color-primary-500)] hover:shadow-lg transition-all text-left group">
+        <lucide-icon [img]="MapPinIcon" [size]="32"
+          class="text-blue-600 mb-3 group-hover:scale-110 transition-transform"></lucide-icon>
+        <h5 class="mb-1 text-lg font-semibold text-[var(--color-text-heading)]">Environmental Zones</h5>
+        <p class="text-sm text-[var(--color-text-secondary)]">
+          {{ environmentalZones.length }} zones with rules
+        </p>
+      </button>
+
+      <button (click)="navigate('/safety/zones')"
+        class="p-6 bg-[var(--color-surface)] border-2 border-[var(--color-border-light)] rounded-xl hover:border-[var(--color-primary-500)] hover:shadow-lg transition-all text-left group">
+        <div class="flex items-start justify-between mb-3">
+          <lucide-icon [img]="FlameIcon" [size]="32"
+            class="text-orange-600 group-hover:scale-110 transition-transform"></lucide-icon>
+          <app-badge *ngIf="hasHighSeverityBan()" variant="default"
+            customClass="bg-orange-50 text-orange-700 border-orange-200">
+            Stage 2
+          </app-badge>
+        </div>
+        <h5 class="mb-1 text-lg font-semibold text-[var(--color-text-heading)]">Fire Restrictions</h5>
+        <p class="text-sm text-[var(--color-text-secondary)]">
+          {{ fireBans.length }} active ban{{ fireBans.length !== 1 ? 's' : '' }}
+        </p>
+      </button>
+
+      <button (click)="navigate('/safety/wildlife')"
+        class="p-6 bg-[var(--color-surface)] border-2 border-[var(--color-border-light)] rounded-xl hover:border-[var(--color-primary-500)] hover:shadow-lg transition-all text-left group">
+        <lucide-icon [img]="BinocularsIcon" [size]="32"
+          class="text-green-600 mb-3 group-hover:scale-110 transition-transform"></lucide-icon>
+        <h5 class="mb-1 text-lg font-semibold text-[var(--color-text-heading)]">Wildlife & Hunting</h5>
+        <p class="text-sm text-[var(--color-text-secondary)]">
+          Regulations & seasons
+        </p>
+      </button>
+
+      <button (click)="navigate('/plan-trip')"
+        class="p-6 bg-[var(--color-surface)] border-2 border-[var(--color-border-light)] rounded-xl hover:border-[var(--color-primary-500)] hover:shadow-lg transition-all text-left group">
+        <lucide-icon [img]="FileTextIcon" [size]="32"
+          class="text-purple-600 mb-3 group-hover:scale-110 transition-transform"></lucide-icon>
+        <h5 class="mb-1 text-lg font-semibold text-[var(--color-text-heading)]">My Trip Compliance</h5>
+        <p class="text-sm text-[var(--color-text-secondary)]">
+          Check trip status
+        </p>
+      </button>
+    </div>
+
+    <!-- Cross-reference to Safety -->
+    <app-card variant="bordered" customClass="bg-orange-50 border-orange-200 mb-8">
+      <app-card-content customClass="p-4">
+        <div class="flex items-start gap-3">
+          <lucide-icon [img]="InfoIcon" [size]="20" class="text-orange-600 flex-shrink-0 mt-0.5"></lucide-icon>
+          <div class="flex-1">
+            <p class="text-sm text-orange-800">
+              <strong>Looking for safety alerts?</strong> Real-time weather warnings, wildlife dangers, and emergency
+              check-in are on the
+              <button (click)="navigate('/safety')" class="text-orange-600 hover:text-orange-800 underline font-medium">
+                Safety page
+              </button>
+            </p>
+          </div>
+        </div>
+      </app-card-content>
+    </app-card>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Main Content -->
+      <div class="lg:col-span-2 space-y-8">
+        <!-- Environmental Zones -->
+        <div>
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="mb-1 text-2xl font-bold text-[var(--color-text-heading)]">Environmental Zones</h2>
+              <p class="text-sm text-[var(--color-text-secondary)]">
+                Protected areas with specific regulations
+              </p>
+            </div>
+            <app-button variant="outline" (click)="navigate('/safety/zones')">
+              <div class="flex items-center gap-2">
+                View All
+                <lucide-icon [img]="ArrowRightIcon" [size]="16"></lucide-icon>
+              </div>
+            </app-button>
+          </div>
+
+          <div class="space-y-4">
+            <app-card *ngFor="let zone of environmentalZones" variant="elevated"
+              customClass="hover:shadow-lg transition-shadow cursor-pointer" (click)="navigate('/safety/zones')">
+              <app-card-content customClass="p-6">
+                <div class="flex items-start gap-4">
+                  <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <lucide-icon [img]="getZoneIcon(zone.type)" [size]="24" class="text-green-600"></lucide-icon>
+                  </div>
+
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-start justify-between gap-4 mb-3">
+                      <h5 class="text-lg font-semibold text-[var(--color-text-heading)]">{{ zone.name }}</h5>
+                      <app-badge variant="default"
+                        [customClass]="getZoneStatusConfig(zone.status).color + ' border-2 flex-shrink-0 flex items-center gap-1'">
+                        <lucide-icon [img]="getZoneStatusConfig(zone.status).icon" [size]="12"></lucide-icon>
+                        {{ getZoneStatusConfig(zone.status).label }}
+                      </app-badge>
+                    </div>
+
+                    <app-badge *ngIf="zone.permitRequired" variant="default"
+                      customClass="bg-blue-50 text-blue-700 border-blue-200 mb-3 flex items-center gap-1 w-fit">
+                      <lucide-icon [img]="FileTextIcon" [size]="12"></lucide-icon>
+                      Permit Required
+                    </app-badge>
+
+                    <div class="space-y-2">
+                      <h6 class="text-sm font-semibold text-[var(--color-text-primary)]">
+                        Restrictions:
+                      </h6>
+                      <ul class="space-y-1">
+                        <li *ngFor="let restriction of zone.restrictions"
+                          class="text-sm text-[var(--color-text-secondary)] flex items-start gap-2">
+                          <span class="text-[var(--color-primary-500)] mt-1">•</span>
+                          <span>{{ restriction }}</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </app-card-content>
+            </app-card>
+          </div>
+        </div>
+
+        <!-- Fire Bans & Restrictions -->
+        <div>
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="mb-1 text-2xl font-bold text-[var(--color-text-heading)]">Fire Bans & Restrictions</h2>
+              <p class="text-sm text-[var(--color-text-secondary)]">
+                Current fire restrictions by location
+              </p>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <app-card *ngFor="let ban of fireBans" variant="elevated"
+              [customClass]="'border-l-4 ' + (ban.severity === 'high' ? 'border-l-orange-600' : 'border-l-yellow-600')">
+              <app-card-content customClass="p-6">
+                <div class="flex items-start gap-4">
+                  <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                    [class.bg-orange-50]="ban.severity === 'high'" [class.bg-yellow-50]="ban.severity !== 'high'">
+                    <lucide-icon [img]="FlameIcon" [size]="24" [class.text-orange-600]="ban.severity === 'high'"
+                      [class.text-yellow-600]="ban.severity !== 'high'"></lucide-icon>
+                  </div>
+
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-start justify-between gap-4 mb-2">
+                      <div>
+                        <h5 class="mb-1 text-lg font-semibold text-[var(--color-text-heading)]">{{ ban.location }}</h5>
+                        <app-badge variant="default"
+                          [customClass]="(ban.severity === 'high' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200')">
+                          {{ ban.level }} Fire Ban
+                        </app-badge>
+                      </div>
+                    </div>
+
+                    <div class="mb-3 text-sm text-[var(--color-text-tertiary)]">
+                      <div class="flex items-center gap-1">
+                        <lucide-icon [img]="CalendarIcon" [size]="16"></lucide-icon>
+                        Valid until {{ ban.expires }}
+                      </div>
+                    </div>
+
+                    <div class="space-y-1">
+                      <div *ngFor="let restriction of ban.restrictions"
+                        class="text-sm text-[var(--color-text-secondary)] flex items-start gap-2">
+                        <lucide-icon [img]="BanIcon" [size]="16"
+                          class="text-red-600 mt-0.5 flex-shrink-0"></lucide-icon>
+                        <span>{{ restriction }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </app-card-content>
+            </app-card>
+          </div>
+        </div>
+
+        <!-- Trip Compliance Status -->
+        <div>
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="mb-1 text-2xl font-bold text-[var(--color-text-heading)]">My Trip Compliance</h2>
+              <p class="text-sm text-[var(--color-text-secondary)]">
+                Environmental and legal status for upcoming trips
+              </p>
+            </div>
+            <app-button variant="outline" (click)="navigate('/plan-trip')">
+              <div class="flex items-center gap-2">
+                View All Trips
+                <lucide-icon [img]="ArrowRightIcon" [size]="16"></lucide-icon>
+              </div>
+            </app-button>
+          </div>
+
+          <div class="space-y-4">
+            <app-card *ngFor="let trip of tripCompliance" variant="elevated"
+              customClass="hover:shadow-lg transition-shadow cursor-pointer"
+              (click)="navigate('/safety/compliance/' + trip.tripId)">
+              <app-card-content customClass="p-6">
+                <div class="flex items-start justify-between gap-4 mb-4">
+                  <div class="flex-1">
+                    <h5 class="mb-2 text-lg font-semibold text-[var(--color-text-heading)]">{{ trip.tripName }}</h5>
+                    <div class="flex items-center gap-4 text-sm text-[var(--color-text-tertiary)]">
+                      <div class="flex items-center gap-1">
+                        <lucide-icon [img]="MapPinIcon" [size]="16"></lucide-icon>
+                        {{ trip.destination }}
+                      </div>
+                      <div class="flex items-center gap-1">
+                        <lucide-icon [img]="CalendarIcon" [size]="16"></lucide-icon>
+                        {{ trip.dates }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <app-badge variant="default"
+                    [customClass]="getComplianceConfig(trip.overallStatus).color + ' border-2 flex items-center gap-1'">
+                    <lucide-icon [img]="getComplianceConfig(trip.overallStatus).icon" [size]="16"></lucide-icon>
+                    {{ getComplianceConfig(trip.overallStatus).label }}
+                  </app-badge>
+                </div>
+
+                <div *ngIf="trip.issues.length > 0" class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4 mb-4">
+                  <h6 class="text-yellow-900 mb-2 font-medium">
+                    {{ trip.issues.length }} Compliance {{ trip.issues.length === 1 ? 'Issue' : 'Issues' }}
+                  </h6>
+                  <ul class="space-y-1">
+                    <li *ngFor="let issue of trip.issues" class="text-sm text-yellow-800 flex items-start gap-2">
+                      <lucide-icon [img]="AlertTriangleIcon" [size]="16" class="flex-shrink-0 mt-0.5"></lucide-icon>
+                      <span>{{ issue }}</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div *ngIf="trip.issues.length === 0" class="bg-green-50 border-2 border-green-200 rounded-lg p-4 mb-4">
+                  <div class="flex items-start gap-3">
+                    <lucide-icon [img]="CheckCircleIcon" [size]="20"
+                      class="text-green-600 flex-shrink-0 mt-0.5"></lucide-icon>
+                    <div class="flex-1">
+                      <h6 class="text-green-900 mb-1 font-medium">All Requirements Met</h6>
+                      <p class="text-sm text-green-700">
+                        Your trip complies with all current environmental regulations.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex justify-between items-center pt-4 border-t border-[var(--color-border-light)]">
+                  <span class="text-sm text-[var(--color-text-tertiary)]">
+                    Last checked: {{ trip.lastChecked }}
+                  </span>
+                  <app-button variant="outline" size="sm">
+                    <div class="flex items-center gap-2">
+                      <lucide-icon [img]="FileTextIcon" [size]="16"></lucide-icon>
+                      View Details
+                    </div>
+                  </app-button>
+                </div>
+              </app-card-content>
+            </app-card>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="lg:col-span-1">
+        <div class="sticky top-24 space-y-6">
+          <!-- Hunting & Fishing Seasons -->
+          <app-card variant="elevated">
+            <app-card-header>
+              <app-card-title>Hunting Seasons</app-card-title>
+              <app-card-description>Current and upcoming seasons</app-card-description>
+            </app-card-header>
+            <app-card-content>
+              <div class="space-y-3">
+                <div *ngFor="let season of huntingSeasons" class="p-3 bg-[var(--color-neutral-50)] rounded-lg">
+                  <div class="flex items-start justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <lucide-icon [img]="FishIcon" [size]="16" class="text-[var(--color-text-tertiary)]"></lucide-icon>
+                      <span class="font-medium text-sm text-[var(--color-text-primary)]">{{ season.species }}</span>
+                    </div>
+                    <app-badge *ngIf="season.status === 'active'" variant="default"
+                      customClass="bg-green-50 text-green-700 border-green-200 text-xs">
+                      Active
+                    </app-badge>
+                  </div>
+                  <div class="text-xs text-[var(--color-text-secondary)] space-y-1">
+                    <div class="flex items-center gap-1">
+                      <lucide-icon [img]="CalendarIcon" [size]="12"></lucide-icon>
+                      {{ season.season }}
+                    </div>
+                    <div *ngIf="season.permitRequired" class="flex items-center gap-1 text-blue-600">
+                      <lucide-icon [img]="FileTextIcon" [size]="12"></lucide-icon>
+                      Permit required
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <app-button variant="outline" [fullWidth]="true" customClass="mt-4 flex justify-center items-center gap-2"
+                (click)="navigate('/safety/wildlife')">
+                View All Regulations
+                <lucide-icon [img]="ChevronRightIcon" [size]="16"></lucide-icon>
+              </app-button>
+            </app-card-content>
+          </app-card>
+
+          <!-- Leave No Trace -->
+          <app-card variant="bordered" customClass="bg-green-50 border-green-200">
+            <app-card-content customClass="p-4">
+              <h6 class="text-green-900 mb-3 font-semibold flex items-center gap-2">
+                <lucide-icon [img]="TreePineIcon" [size]="20"></lucide-icon>
+                Leave No Trace
+              </h6>
+              <ul class="space-y-2 text-sm text-green-800">
+                <li class="flex items-start gap-2">
+                  <lucide-icon [img]="CheckCircleIcon" [size]="16" class="flex-shrink-0 mt-0.5"></lucide-icon>
+                  <span>Plan ahead and prepare</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <lucide-icon [img]="CheckCircleIcon" [size]="16" class="flex-shrink-0 mt-0.5"></lucide-icon>
+                  <span>Travel on durable surfaces</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <lucide-icon [img]="CheckCircleIcon" [size]="16" class="flex-shrink-0 mt-0.5"></lucide-icon>
+                  <span>Dispose of waste properly</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <lucide-icon [img]="CheckCircleIcon" [size]="16" class="flex-shrink-0 mt-0.5"></lucide-icon>
+                  <span>Minimize campfire impact</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <lucide-icon [img]="CheckCircleIcon" [size]="16" class="flex-shrink-0 mt-0.5"></lucide-icon>
+                  <span>Respect wildlife</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <lucide-icon [img]="CheckCircleIcon" [size]="16" class="flex-shrink-0 mt-0.5"></lucide-icon>
+                  <span>Be considerate of others</span>
+                </li>
+              </ul>
+            </app-card-content>
+          </app-card>
+
+          <!-- Resources -->
+          <app-card variant="bordered" customClass="bg-blue-50 border-blue-200">
+            <app-card-content customClass="p-4">
+              <h6 class="text-blue-900 mb-3 font-semibold">Compliance Resources</h6>
+              <div class="space-y-2">
+                <a href="#"
+                  class="block text-sm text-blue-700 hover:text-blue-900 py-2 px-3 rounded-lg hover:bg-blue-100 transition-colors">
+                  → Wilderness Permit Information
+                </a>
+                <a href="#"
+                  class="block text-sm text-blue-700 hover:text-blue-900 py-2 px-3 rounded-lg hover:bg-blue-100 transition-colors">
+                  → Fire Restriction Map
+                </a>
+                <a href="#"
+                  class="block text-sm text-blue-700 hover:text-blue-900 py-2 px-3 rounded-lg hover:bg-blue-100 transition-colors">
+                  → Wildlife Protection Guidelines
+                </a>
+                <button (click)="navigate('/safety')"
+                  class="w-full text-left block text-sm text-blue-700 hover:text-blue-900 py-2 px-3 rounded-lg hover:bg-blue-100 transition-colors">
+                  → Safety Alerts & Emergency Info
+                </button>
+              </div>
+            </app-card-content>
+          </app-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

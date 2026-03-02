@@ -1,0 +1,276 @@
+<!-- cc-reports: Angular-ready component wrapper -->
+<main class="cc-reports" id="ccReports">
+    <div class="cc-reports__container">
+
+        <!-- Brand -->
+        <a class="cc-reports__brand" routerLink="/" aria-label="CampConnect Home">
+            <span class="cc-reports__brand-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 20L12 4l9 16H3z" />
+                    <path d="M12 16v.01" />
+                </svg>
+            </span>
+            <span class="cc-reports__brand-name">CampConnect</span>
+        </a>
+
+        <!-- Page Header -->
+        <header class="cc-reports__header">
+            <h1 class="cc-reports__title">My Reports</h1>
+            <p class="cc-reports__subtitle">Track the status of your submitted issues</p>
+        </header>
+
+        <!-- Filters -->
+        <nav class="cc-reports__filters" role="tablist" aria-label="Filter reports by status">
+            <button class="cc-reports__filter-btn" [class.cc-reports__filter-btn--active]="activeFilter === 'all'"
+                (click)="setFilter('all')" role="tab">
+                All<span class="cc-reports__filter-count">{{ filterCounts['all'] || 0 }}</span>
+            </button>
+            <button class="cc-reports__filter-btn" [class.cc-reports__filter-btn--active]="activeFilter === 'pending'"
+                (click)="setFilter('pending')" role="tab">
+                Pending<span class="cc-reports__filter-count">{{ filterCounts['pending'] || 0 }}</span>
+            </button>
+            <button class="cc-reports__filter-btn" [class.cc-reports__filter-btn--active]="activeFilter === 'review'"
+                (click)="setFilter('review')" role="tab">
+                Under Review<span class="cc-reports__filter-count">{{ filterCounts['review'] || 0 }}</span>
+            </button>
+            <button class="cc-reports__filter-btn" [class.cc-reports__filter-btn--active]="activeFilter === 'resolved'"
+                (click)="setFilter('resolved')" role="tab">
+                Resolved<span class="cc-reports__filter-count">{{ filterCounts['resolved'] || 0 }}</span>
+            </button>
+            <button class="cc-reports__filter-btn" [class.cc-reports__filter-btn--active]="activeFilter === 'rejected'"
+                (click)="setFilter('rejected')" role="tab">
+                Rejected<span class="cc-reports__filter-count">{{ filterCounts['rejected'] || 0 }}</span>
+            </button>
+        </nav>
+
+        <!-- Report Cards List -->
+        <section class="cc-reports__list" aria-label="Reports list" *ngIf="filteredReports.length > 0">
+            <article class="cc-reports__card" *ngFor="let r of filteredReports" tabindex="0" role="button"
+                [attr.aria-label]="'View report ' + r.id" (click)="openModal(r)" (keydown.enter)="openModal(r)">
+                <div class="cc-reports__card-top">
+                    <div class="cc-reports__card-left">
+                        <p class="cc-reports__card-id">{{ r.id }}</p>
+                        <h3 class="cc-reports__card-issue">{{ r.issueType }}</h3>
+                        <p class="cc-reports__card-ref">
+                            <span class="cc-reports__card-ref-icon">
+                                <svg *ngIf="r.refType === 'Post'" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                    <line x1="16" y1="13" x2="8" y2="13" />
+                                    <line x1="16" y1="17" x2="8" y2="17" />
+                                </svg>
+                                <svg *ngIf="r.refType === 'Product'" width="14" height="14" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path
+                                        d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+                                </svg>
+                                <svg *ngIf="r.refType === 'Order'" width="14" height="14" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="1" y="3" width="15" height="13" rx="2" />
+                                    <path d="M16 8h4l3 3v5a2 2 0 01-2 2h-1" />
+                                    <circle cx="5.5" cy="18.5" r="2.5" />
+                                    <circle cx="18.5" cy="18.5" r="2.5" />
+                                </svg>
+                            </span>
+                            {{ r.refType }}: {{ r.refName }}
+                        </p>
+                    </div>
+                    <span class="cc-reports__status" [ngClass]="'cc-reports__status--' + r.status">
+                        <span class="cc-reports__status-dot"></span>
+                        {{ getStatusLabel(r.status) }}
+                    </span>
+                </div>
+                <div class="cc-reports__card-bottom">
+                    <div class="cc-reports__card-meta">
+                        <span class="cc-reports__card-date">
+                            <svg class="cc-reports__card-date-icon" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                            </svg>
+                            {{ r.dateSubmitted | date:'mediumDate' }}
+                        </span>
+                        <span class="cc-reports__card-admin-msg" *ngIf="r.adminMessage">"{{ r.adminMessage }}"</span>
+                    </div>
+                    <button class="cc-reports__view-btn" type="button">
+                        View Details
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                    </button>
+                </div>
+            </article>
+        </section>
+
+        <!-- Empty State -->
+        <section class="cc-reports__empty" *ngIf="filteredReports.length === 0" aria-label="No reports found">
+            <div class="cc-reports__empty-illustration">
+                <svg class="cc-reports__empty-svg" viewBox="0 0 200 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Clipboard background -->
+                    <rect x="50" y="20" width="100" height="130" rx="12" fill="#f3f4f6" stroke="#e5e7eb"
+                        stroke-width="1.5" />
+                    <rect x="72" y="12" width="56" height="18" rx="9" fill="#e5e7eb" stroke="#d1d5db"
+                        stroke-width="1" />
+                    <circle cx="100" cy="21" r="4" fill="#d1d5db" />
+                    <!-- Lines -->
+                    <rect x="68" y="48" width="64" height="6" rx="3" fill="#e5e7eb" />
+                    <rect x="68" y="62" width="48" height="6" rx="3" fill="#e5e7eb" />
+                    <rect x="68" y="76" width="56" height="6" rx="3" fill="#e5e7eb" />
+                    <rect x="68" y="96" width="64" height="6" rx="3" fill="#e5e7eb" />
+                    <rect x="68" y="110" width="40" height="6" rx="3" fill="#e5e7eb" />
+                    <!-- Check circle -->
+                    <circle cx="148" cy="128" r="24" fill="#e8f5f1" stroke="#2a7d6e" stroke-width="1.5" />
+                    <path d="M138 128l6 6 12-12" stroke="#2a7d6e" stroke-width="2.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    <!-- Magnifier -->
+                    <circle cx="52" cy="52" r="16" fill="#fff" stroke="#d1d5db" stroke-width="1.5" />
+                    <line x1="63" y1="63" x2="72" y2="72" stroke="#d1d5db" stroke-width="2.5" stroke-linecap="round" />
+                    <circle cx="52" cy="52" r="6" stroke="#e5e7eb" stroke-width="1" />
+                </svg>
+            </div>
+            <h2 class="cc-reports__empty-title">No reports found</h2>
+            <p class="cc-reports__empty-text" *ngIf="activeFilter === 'all'">You haven't submitted any reports. If you
+                encounter any issues, we're here to help.</p>
+            <p class="cc-reports__empty-text" *ngIf="activeFilter !== 'all'">You have no {{ getStatusLabel(activeFilter)
+                | lowercase }} reports at the moment.</p>
+            <button class="cc-reports__empty-btn" type="button" routerLink="/safety/report">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="16" />
+                    <line x1="8" y1="12" x2="16" y2="12" />
+                </svg>
+                Report an Issue
+            </button>
+        </section>
+
+    </div>
+
+    <!-- Details Modal -->
+    <div class="cc-reports__modal-overlay" [class.cc-reports__modal-overlay--open]="isModalOpen" role="dialog"
+        aria-modal="true" aria-labelledby="modalTitle" (click)="closeModal()">
+        <div class="cc-reports__modal" (click)="$event.stopPropagation()" *ngIf="selectedReport">
+            <div class="cc-reports__modal-header">
+                <div class="cc-reports__modal-title-group">
+                    <p class="cc-reports__modal-id">{{ selectedReport.id }}</p>
+                    <h2 class="cc-reports__modal-title" id="modalTitle">{{ selectedReport.issueType }}</h2>
+                    <p class="cc-reports__modal-ref">
+                        <svg *ngIf="selectedReport.refType === 'Post'" width="14" height="14" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                        </svg>
+                        <svg *ngIf="selectedReport.refType === 'Product'" width="14" height="14" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path
+                                d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+                        </svg>
+                        <svg *ngIf="selectedReport.refType === 'Order'" width="14" height="14" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <rect x="1" y="3" width="15" height="13" rx="2" />
+                            <path d="M16 8h4l3 3v5a2 2 0 01-2 2h-1" />
+                            <circle cx="5.5" cy="18.5" r="2.5" />
+                            <circle cx="18.5" cy="18.5" r="2.5" />
+                        </svg>
+                        {{ selectedReport.refType }}: {{ selectedReport.refName }}
+                    </p>
+                </div>
+                <button class="cc-reports__modal-close" aria-label="Close details" type="button" (click)="closeModal()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="cc-reports__modal-body">
+
+                <div style="margin-bottom:20px;">
+                    <span class="cc-reports__status" [ngClass]="'cc-reports__status--' + selectedReport.status">
+                        <span class="cc-reports__status-dot"></span>
+                        {{ getStatusLabel(selectedReport.status) }}
+                    </span>
+                    <span style="margin-left:14px;font-size:13px;color:#9ca3af;">Submitted {{
+                        selectedReport.dateSubmitted | date:'mediumDate' }}</span>
+                </div>
+
+                <section class="cc-reports__modal-section">
+                    <h3 class="cc-reports__modal-section-title">Description</h3>
+                    <div class="cc-reports__modal-description">{{ selectedReport.description }}</div>
+                </section>
+
+                <section class="cc-reports__modal-section"
+                    *ngIf="selectedReport.evidence && selectedReport.evidence.length > 0">
+                    <h3 class="cc-reports__modal-section-title">Evidence ({{ selectedReport.evidence.length }})</h3>
+                    <div class="cc-reports__evidence-grid">
+                        <div class="cc-reports__evidence-item" *ngFor="let file of selectedReport.evidence"
+                            [title]="file">
+                            <span class="cc-reports__evidence-icon">
+                                <svg *ngIf="isImageEvi(file)" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                                    <circle cx="8.5" cy="8.5" r="1.5" />
+                                    <polyline points="21 15 16 10 5 21" />
+                                </svg>
+                                <svg *ngIf="!isImageEvi(file)" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                </svg>
+                            </span>
+                            <span class="cc-reports__evidence-label">{{ file }}</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="cc-reports__modal-section">
+                    <h3 class="cc-reports__modal-section-title">Timeline</h3>
+                    <div class="cc-reports__timeline">
+                        <div class="cc-reports__timeline-item" *ngFor="let t of selectedReport.timeline">
+                            <span class="cc-reports__timeline-dot" [class.cc-reports__timeline-dot--active]="t.active"
+                                [class.cc-reports__timeline-dot--pending]="!t.active"></span>
+                            <p class="cc-reports__timeline-label"
+                                [class.cc-reports__timeline-label--pending]="!t.active">{{ t.step }}</p>
+                            <p class="cc-reports__timeline-date">{{ t.date || 'Awaiting' }}</p>
+                            <div class="cc-reports__timeline-message" *ngIf="t.message"
+                                [class.cc-reports__timeline-message--rejected]="t.rejected">
+                                {{ t.message }}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="cc-reports__modal-section" *ngIf="selectedReport.adminMessage">
+                    <h3 class="cc-reports__modal-section-title">Admin Response</h3>
+                    <div class="cc-reports__admin-response">
+                        <div class="cc-reports__admin-header">
+                            <span class="cc-reports__admin-avatar">CC</span>
+                            <div>
+                                <p class="cc-reports__admin-name">CampConnect Support</p>
+                                <p class="cc-reports__admin-role">Trust & Safety Team</p>
+                            </div>
+                        </div>
+                        <p class="cc-reports__admin-text">{{ selectedReport.adminMessage }}</p>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </div>
+</main>

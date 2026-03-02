@@ -1,0 +1,54 @@
+<div class="emergency-contacts-container">
+
+    <!-- Header -->
+    <header class="emergency-header">
+        <div class="emergency-header-badge">
+            <span class="emergency-badge-dot"></span>
+            <span class="emergency-badge-label">Emergency Response</span>
+        </div>
+        <h1 class="emergency-title">Emergency Contacts</h1>
+        <p class="emergency-subtitle">Quick access to essential services and rescue teams based on your region.</p>
+    </header>
+
+    <!-- Body -->
+    <main class="emergency-body">
+
+        <!-- Controls -->
+        <div class="emergency-controls">
+            <div class="emergency-searchbar">
+                <lucide-icon [img]="SearchIcon" class="search-icon"></lucide-icon>
+                <select class="region-select" [(ngModel)]="selectedRegion" (change)="onRegionChange()">
+                    <option *ngFor="let region of regions" [value]="region">{{ region }}</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Contacts Grid -->
+        <div class="contacts-grid">
+            <div class="contact-card" *ngFor="let contact of filteredContacts"
+                [ngClass]="{'primary-card': contact.phoneNumber === '911'}">
+                <div class="contact-card-header">
+                    <div class="icon-wrapper" [ngClass]="getCategoryColor(contact.category)">
+                        <lucide-icon [img]="getCategoryIcon(contact.category)" [size]="24"></lucide-icon>
+                    </div>
+                    <div class="contact-info">
+                        <h3 class="contact-name">{{ contact.serviceName }}</h3>
+                        <span class="contact-region">
+                            <lucide-icon [img]="MapPinIcon" [size]="14"></lucide-icon>
+                            {{ contact.region }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="contact-card-footer">
+                    <a [href]="'tel:' + contact.phoneNumber" class="call-btn"
+                        [ngClass]="contact.phoneNumber === '911' ? 'emergency-btn' : 'standard-btn'">
+                        <lucide-icon [img]="PhoneIcon" [size]="18"></lucide-icon>
+                        {{ contact.phoneNumber === '911' ? 'CALL 911 NOW' : 'Call ' + contact.phoneNumber }}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>

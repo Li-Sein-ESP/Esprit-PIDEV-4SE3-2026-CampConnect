@@ -1,0 +1,265 @@
+<div class="min-h-screen bg-[var(--color-background)] pb-12">
+  <!-- Back Navigation -->
+  <div class="border-b border-[var(--color-border-light)] bg-white">
+    <div class="container py-4">
+      <button (click)="navigate('/safety')"
+        class="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
+        <lucide-icon [img]="ChevronLeftIcon" [size]="20"></lucide-icon>
+        Back to Safety Overview
+      </button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="bg-gradient-to-br from-green-700 to-green-900 text-white">
+    <div class="container py-12">
+      <div class="flex items-center gap-3 mb-4">
+        <lucide-icon [img]="TreePineIcon" [size]="32"></lucide-icon>
+        <h1 class="text-3xl font-bold text-white">Environmental Protection Zones</h1>
+      </div>
+      <p class="text-xl text-white/90 max-w-3xl">
+        Understand environmental regulations, protected species, and seasonal restrictions for your destination.
+      </p>
+    </div>
+  </div>
+
+  <div class="container py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Zone List -->
+      <div class="lg:col-span-1">
+        <h3 class="text-xl font-bold mb-4 text-[var(--color-text-heading)]">Select a Zone</h3>
+        <div class="space-y-4">
+          <app-card *ngFor="let zone of zones" [variant]="selectedZone?.id === zone.id ? 'elevated' : 'bordered'"
+            [customClass]="'cursor-pointer transition-all ' + (selectedZone?.id === zone.id ? 'ring-2 ring-[var(--color-primary-600)] shadow-lg' : 'hover:shadow-md')"
+            (click)="selectZone(zone)">
+            <app-card-content customClass="p-4">
+              <div class="flex items-start gap-3 mb-3">
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                  [ngClass]="getProtectionLevelConfig(zone.protectionLevel).color">
+                  <lucide-icon [img]="getZoneTypeIcon(zone.type)" [size]="24" class="text-white"></lucide-icon>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h6 class="mb-1 line-clamp-2 font-semibold text-[var(--color-text-heading)]">{{ zone.name }}</h6>
+                  <p class="text-xs text-[var(--color-text-tertiary)] flex items-center gap-1">
+                    <lucide-icon [img]="MapPinIcon" [size]="12"></lucide-icon>
+                    {{ zone.location }}
+                  </p>
+                </div>
+              </div>
+              <app-badge variant="default" customClass="text-xs" size="sm">
+                {{ getProtectionLevelConfig(zone.protectionLevel).label }}
+              </app-badge>
+            </app-card-content>
+          </app-card>
+        </div>
+      </div>
+
+      <!-- Zone Details -->
+      <div class="lg:col-span-2">
+        <div *ngIf="selectedZone; else noSelection" class="space-y-6">
+          <!-- Zone Header -->
+          <app-card variant="elevated">
+            <app-card-content customClass="p-6">
+              <div class="flex items-start justify-between gap-4 mb-4">
+                <div class="flex-1">
+                  <h2 class="mb-2 text-2xl font-bold text-[var(--color-text-heading)]">{{ selectedZone.name }}</h2>
+                  <div class="flex items-center gap-2 text-sm text-[var(--color-text-tertiary)]">
+                    <lucide-icon [img]="MapPinIcon" [size]="16"></lucide-icon>
+                    {{ selectedZone.location }}
+                  </div>
+                </div>
+                <app-badge variant="default"
+                  [customClass]="getProtectionLevelConfig(selectedZone.protectionLevel).color + ' text-white'">
+                  {{ getProtectionLevelConfig(selectedZone.protectionLevel).label }}
+                </app-badge>
+              </div>
+            </app-card-content>
+          </app-card>
+
+          <!-- Protected Species -->
+          <app-card variant="elevated">
+            <app-card-header>
+              <app-card-title>Protected Species</app-card-title>
+              <app-card-description>
+                Special protections apply to these species in this zone
+              </app-card-description>
+            </app-card-header>
+            <app-card-content>
+              <div class="space-y-3">
+                <div *ngFor="let species of selectedZone.protectedSpecies"
+                  class="flex items-center justify-between p-3 bg-[var(--color-neutral-50)] rounded-lg">
+                  <div class="flex items-center gap-3">
+                    <lucide-icon [img]="getSpeciesIcon(species.type)" [size]="20"
+                      [ngClass]="getStatusColor(species.status)"></lucide-icon>
+                    <div>
+                      <div class="font-medium text-[var(--color-text-primary)]">{{ species.name }}</div>
+                      <div class="text-xs text-[var(--color-text-tertiary)] capitalize">
+                        {{ species.type }}
+                      </div>
+                    </div>
+                  </div>
+                  <app-badge variant="default" size="sm" [customClass]="getSpeciesStatusClass(species.status)">
+                    {{ species.status }}
+                  </app-badge>
+                </div>
+              </div>
+            </app-card-content>
+          </app-card>
+
+          <!-- Seasonal Restrictions -->
+          <app-card *ngIf="selectedZone.seasonalRestrictions.length > 0" variant="elevated">
+            <app-card-header>
+              <app-card-title>Seasonal Restrictions</app-card-title>
+              <app-card-description>Time-based regulations and closures</app-card-description>
+            </app-card-header>
+            <app-card-content>
+              <div class="space-y-4">
+                <div *ngFor="let restriction of selectedZone.seasonalRestrictions"
+                  class="border-l-4 border-l-orange-600 pl-4">
+                  <div class="flex items-center gap-2 mb-2">
+                    <lucide-icon [img]="CalendarIcon" [size]="20" class="text-orange-600"></lucide-icon>
+                    <h6 class="font-semibold text-[var(--color-text-heading)]">{{ restriction.period }}</h6>
+                  </div>
+                  <p class="text-sm text-[var(--color-text-secondary)] mb-3">
+                    {{ restriction.reason }}
+                  </p>
+                  <ul class="space-y-1">
+                    <li *ngFor="let item of restriction.restrictions"
+                      class="flex items-start gap-2 text-sm text-[var(--color-text-secondary)]">
+                      <lucide-icon [img]="AlertTriangleIcon" [size]="16"
+                        class="text-orange-600 flex-shrink-0 mt-0.5"></lucide-icon>
+                      <span>{{ item }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </app-card-content>
+          </app-card>
+
+          <!-- Permit Requirements -->
+          <app-card variant="elevated">
+            <app-card-header>
+              <app-card-title>Permit Requirements</app-card-title>
+            </app-card-header>
+            <app-card-content>
+              <div *ngIf="selectedZone.permitRequirements.required; else noPermit" class="space-y-4">
+                <div class="flex items-start gap-3 p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
+                  <lucide-icon [img]="LockIcon" [size]="24" class="text-blue-600 flex-shrink-0"></lucide-icon>
+                  <div class="flex-1">
+                    <h6 class="text-blue-900 mb-1 font-semibold">Permit Required</h6>
+                    <div class="text-sm text-blue-800 space-y-1">
+                      <div>
+                        <strong>Type:</strong> {{ selectedZone.permitRequirements.type }}
+                      </div>
+                      <div>
+                        <strong>Cost:</strong> {{ selectedZone.permitRequirements.cost }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div *ngIf="selectedZone.permitRequirements.limitations">
+                  <h6 class="mb-3 font-semibold text-[var(--color-text-heading)]">Permit Limitations</h6>
+                  <ul class="space-y-2">
+                    <li *ngFor="let limitation of selectedZone.permitRequirements.limitations"
+                      class="flex items-start gap-2 text-sm text-[var(--color-text-secondary)]">
+                      <lucide-icon [img]="InfoIcon" [size]="16"
+                        class="text-blue-600 flex-shrink-0 mt-0.5"></lucide-icon>
+                      <span>{{ limitation }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <ng-template #noPermit>
+                <div class="text-center py-6">
+                  <lucide-icon [img]="CheckCircleIcon" [size]="48" class="text-green-600 mx-auto mb-3"></lucide-icon>
+                  <p class="text-[var(--color-text-secondary)]">No permit required for this zone</p>
+                </div>
+              </ng-template>
+            </app-card-content>
+          </app-card>
+
+          <!-- Activity Regulations -->
+          <app-card variant="elevated">
+            <app-card-header>
+              <app-card-title>Activity Regulations</app-card-title>
+              <app-card-description>What you can and cannot do in this zone</app-card-description>
+            </app-card-header>
+            <app-card-content>
+              <div class="space-y-6">
+                <!-- Allowed -->
+                <div>
+                  <div class="flex items-center gap-2 mb-3">
+                    <div class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
+                      <lucide-icon [img]="CheckCircleIcon" [size]="16" class="text-white"></lucide-icon>
+                    </div>
+                    <h6 class="text-green-900 font-semibold">Allowed Activities</h6>
+                  </div>
+                  <ul class="space-y-2">
+                    <li *ngFor="let activity of selectedZone.allowedActivities"
+                      class="flex items-start gap-2 text-sm text-[var(--color-text-secondary)]">
+                      <lucide-icon [img]="CheckCircleIcon" [size]="16"
+                        class="text-green-600 flex-shrink-0 mt-0.5"></lucide-icon>
+                      <span>{{ activity }}</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Restricted -->
+                <div>
+                  <div class="flex items-center gap-2 mb-3">
+                    <div class="w-6 h-6 bg-yellow-600 rounded-full flex items-center justify-center">
+                      <lucide-icon [img]="AlertTriangleIcon" [size]="16" class="text-white"></lucide-icon>
+                    </div>
+                    <h6 class="text-yellow-900 font-semibold">Restricted Activities</h6>
+                  </div>
+                  <ul class="space-y-2">
+                    <li *ngFor="let activity of selectedZone.restrictedActivities"
+                      class="flex items-start gap-2 text-sm text-[var(--color-text-secondary)]">
+                      <lucide-icon [img]="AlertTriangleIcon" [size]="16"
+                        class="text-yellow-600 flex-shrink-0 mt-0.5"></lucide-icon>
+                      <span>{{ activity }}</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Prohibited -->
+                <div>
+                  <div class="flex items-center gap-2 mb-3">
+                    <div class="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
+                      <lucide-icon [img]="XCircleIcon" [size]="16" class="text-white"></lucide-icon>
+                    </div>
+                    <h6 class="text-red-900 font-semibold">Prohibited Activities</h6>
+                  </div>
+                  <ul class="space-y-2">
+                    <li *ngFor="let activity of selectedZone.prohibitedActivities"
+                      class="flex items-start gap-2 text-sm text-[var(--color-text-secondary)]">
+                      <lucide-icon [img]="XCircleIcon" [size]="16"
+                        class="text-red-600 flex-shrink-0 mt-0.5"></lucide-icon>
+                      <span>{{ activity }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </app-card-content>
+          </app-card>
+        </div>
+        <ng-template #noSelection>
+          <app-card variant="bordered" customClass="text-center py-16">
+            <app-card-content>
+              <div class="max-w-md mx-auto">
+                <lucide-icon [img]="MapPinIcon" [size]="64"
+                  class="text-[var(--color-text-tertiary)] mx-auto mb-4"></lucide-icon>
+                <h3 class="mb-2 text-xl font-bold text-[var(--color-text-heading)]">Select a Zone</h3>
+                <p class="text-[var(--color-text-secondary)]">
+                  Choose an environmental zone from the list to view detailed regulations and protected species
+                  information.
+                </p>
+              </div>
+            </app-card-content>
+          </app-card>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

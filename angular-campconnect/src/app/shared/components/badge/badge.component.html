@@ -1,0 +1,143 @@
+<div class="camp-badge" [ngClass]="[
+       sizeClass,
+       themeClass,
+       isVisible ? 'camp-badge--visible' : ''
+     ]" [attr.data-earned]="unlocked ? 'true' : 'false'" data-animate="true">
+
+    <div class="camp-badge__tooltip">
+        <div class="camp-badge__tooltip-title">{{ title }}</div>
+        <div class="camp-badge__tooltip-desc">{{ description }}</div>
+
+        <div *ngIf="unlocked" class="camp-badge__tooltip-unlock">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+            </svg>
+            Unlocked
+        </div>
+
+        <div *ngIf="!unlocked" class="camp-badge__tooltip-lock-hint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            Unlock by completing requirement
+        </div>
+    </div>
+
+    <div class="camp-badge__icon-wrap">
+        <div *ngIf="size !== 'small'" class="camp-badge__icon-ring"></div>
+        <div class="camp-badge__icon-bg"></div>
+        <div *ngIf="unlocked && size !== 'small'" class="camp-badge__icon-glow"></div>
+
+        <ng-container [ngSwitch]="icon">
+            <!-- tent -->
+            <svg *ngSwitchCase="'tent'" class="camp-badge__icon-svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 20h18L12 4 3 20z" />
+                <path d="M9.5 20V14l2.5-2 2.5 2v6" />
+            </svg>
+            <!-- first-camp -->
+            <svg *ngSwitchCase="'first-camp'" class="camp-badge__icon-svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 20h18L12 4 3 20z" />
+                <path d="M9.5 20V14l2.5-2 2.5 2v6" />
+            </svg>
+            <!-- trail -->
+            <svg *ngSwitchCase="'trail'" class="camp-badge__icon-svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 18H6a2 2 0 0 1-2-2V7l4-3 4 3 4-3 4 3" />
+                <path d="M14 18v-6" />
+                <path d="M18 18v-4" />
+            </svg>
+            <!-- fire -->
+            <svg *ngSwitchCase="'fire'" class="camp-badge__icon-svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                    d="M12 12c2-2.96 0-7-1-8 0 3.038-1.773 4.741-3 6-1.226 1.26-2 3.24-2 5a6 6 0 1 0 12 0c0-1.532-1.056-3.94-2-5-1.786 3-2.791 3-4 2z" />
+            </svg>
+            <!-- moon -->
+            <svg *ngSwitchCase="'moon'" class="camp-badge__icon-svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+            <!-- leaf -->
+            <svg *ngSwitchCase="'leaf'" class="camp-badge__icon-svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 17 3.5 17 3.5s1 5.5-3.5 10c-.5.5-1 1-1.5 1.5" />
+                <path d="M11 20v-5" />
+                <path d="M7 15.5s1.5-1 3.5-1" />
+            </svg>
+            <!-- binoculars / wildlife -->
+            <svg *ngSwitchCase="'binoculars'" class="camp-badge__icon-svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M22 12c-2.667 4.667-6 7-10 7s-7.333-2.333-10-7c2.667-4.667 6-7 10-7s7.333 2.333 10 7" />
+            </svg>
+            <!-- mountain / summit -->
+            <svg *ngSwitchCase="'mountain'" class="camp-badge__icon-svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
+            </svg>
+            <!-- group / community -->
+            <svg *ngSwitchCase="'group'" class="camp-badge__icon-svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <!-- storm -->
+            <svg *ngSwitchCase="'storm'" class="camp-badge__icon-svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9" />
+                <polyline points="13 11 9 17 15 17 11 23" />
+            </svg>
+            <!-- star / premium / gear master -->
+            <svg *ngSwitchCase="'star'" class="camp-badge__icon-svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+                <circle cx="12" cy="12" r="1.5" />
+            </svg>
+            <!-- chef -->
+            <svg *ngSwitchCase="'chef'" class="camp-badge__icon-svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z" />
+            </svg>
+            <!-- water -->
+            <svg *ngSwitchCase="'water'" class="camp-badge__icon-svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12h2a4 4 0 0 0 4-4V6" />
+                <path d="M22 12h-2a4 4 0 0 1-4-4V6" />
+                <path d="M2 17c2 0 3-1 5-1s3 1 5 1 3-1 5-1 3 1 5 1" />
+                <path d="M2 21c2 0 3-1 5-1s3 1 5 1 3-1 5-1 3 1 5 1" />
+            </svg>
+            <!-- default -->
+            <svg *ngSwitchDefault class="camp-badge__icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 8v4l3 3" />
+            </svg>
+        </ng-container>
+
+        <div class="camp-badge__earned-check" *ngIf="unlocked">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+            </svg>
+        </div>
+
+        <!-- Lock icon if locked -->
+        <svg *ngIf="!unlocked" class="camp-badge__lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+    </div>
+
+    <div class="camp-badge__info" *ngIf="size !== 'small'">
+        <span class="camp-badge__title">{{ title }}</span>
+    </div>
+</div>

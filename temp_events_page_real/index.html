@@ -1,0 +1,2190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampConnect — Events</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    /* ========================================
+       CampConnect Events — Component Styles
+       Scoped & Angular-ready (no global leak)
+       ======================================== */
+
+    :root {
+      --cc-forest: #2D5A3D;
+      --cc-forest-dark: #1E3F2B;
+      --cc-forest-light: #3A7350;
+      --cc-sage: #7BA seventeen;
+      --cc-sage: #8BAF7A;
+      --cc-moss: #A4BE8D;
+      --cc-sand: #E8DCC8;
+      --cc-sand-light: #F5F0E8;
+      --cc-cream: #FBF9F5;
+      --cc-bark: #5C4033;
+      --cc-bark-light: #7A5C4F;
+      --cc-ember: #D4764E;
+      --cc-ember-dark: #B85A35;
+      --cc-sunset: #E8945A;
+      --cc-stone: #9B9284;
+      --cc-charcoal: #2C2825;
+      --cc-shadow-sm: 0 2px 8px rgba(44, 40, 37, 0.06);
+      --cc-shadow-md: 0 4px 20px rgba(44, 40, 37, 0.1);
+      --cc-shadow-lg: 0 8px 40px rgba(44, 40, 37, 0.14);
+      --cc-shadow-xl: 0 16px 56px rgba(44, 40, 37, 0.18);
+      --cc-radius: 20px;
+      --cc-radius-sm: 12px;
+      --cc-radius-xs: 8px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--cc-cream);
+      color: var(--cc-charcoal);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+
+    /* ---- NAVBAR ---- */
+    .cc-navbar {
+      background: rgba(251, 249, 245, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(45, 90, 61, 0.08);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 0 2rem;
+    }
+
+    .cc-navbar__inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .cc-navbar__brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--cc-forest);
+    }
+
+    .cc-navbar__logo {
+      width: 40px;
+      height: 40px;
+      background: var(--cc-forest);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+    }
+
+    .cc-navbar__title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--cc-forest-dark);
+    }
+
+    .cc-navbar__nav {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .cc-navbar__link {
+      text-decoration: none;
+      color: var(--cc-bark-light);
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+      position: relative;
+    }
+
+    .cc-navbar__link--active {
+      color: var(--cc-forest);
+      font-weight: 600;
+    }
+
+    .cc-navbar__link--active::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--cc-forest);
+      border-radius: 2px;
+    }
+
+    .cc-navbar__link:hover {
+      color: var(--cc-forest);
+    }
+
+    .cc-navbar__actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .cc-navbar__avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cc-moss), var(--cc-forest));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border: 2px solid var(--cc-sand);
+    }
+
+    .cc-navbar__bell {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--cc-sand-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .cc-navbar__bell:hover {
+      background: var(--cc-sand);
+    }
+
+    .cc-navbar__bell-dot {
+      position: absolute;
+      top: 8px;
+      right: 9px;
+      width: 8px;
+      height: 8px;
+      background: var(--cc-ember);
+      border-radius: 50%;
+      border: 2px solid var(--cc-cream);
+    }
+
+    /* ---- PAGE HERO ---- */
+    .cc-hero {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 1rem;
+    }
+
+    .cc-hero__heading {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      color: var(--cc-forest-dark);
+      margin-bottom: 0.4rem;
+    }
+
+    .cc-hero__sub {
+      color: var(--cc-stone);
+      font-size: 1.05rem;
+      font-weight: 400;
+    }
+
+    .cc-hero__stats {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1.5rem;
+    }
+
+    .cc-hero__stat {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--cc-radius-sm);
+      box-shadow: var(--cc-shadow-sm);
+    }
+
+    .cc-hero__stat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .cc-hero__stat-icon--green {
+      background: rgba(45, 90, 61, 0.1);
+      color: var(--cc-forest);
+    }
+
+    .cc-hero__stat-icon--amber {
+      background: rgba(212, 118, 78, 0.1);
+      color: var(--cc-ember);
+    }
+
+    .cc-hero__stat-icon--brown {
+      background: rgba(92, 64, 51, 0.1);
+      color: var(--cc-bark);
+    }
+
+    .cc-hero__stat-value {
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--cc-charcoal);
+    }
+
+    .cc-hero__stat-label {
+      font-size: 0.78rem;
+      color: var(--cc-stone);
+      font-weight: 400;
+    }
+
+    /* ---- MAIN LAYOUT ---- */
+    .cc-events-layout {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem 4rem;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* ---- SIDEBAR ---- */
+    .cc-sidebar {
+      position: sticky;
+      top: 90px;
+    }
+
+    .cc-sidebar__card {
+      background: white;
+      border-radius: var(--cc-radius);
+      padding: 1.75rem;
+      box-shadow: var(--cc-shadow-sm);
+      border: 1px solid rgba(45, 90, 61, 0.06);
+    }
+
+    .cc-sidebar__section {
+      margin-bottom: 1.75rem;
+    }
+
+    .cc-sidebar__section:last-child {
+      margin-bottom: 0;
+    }
+
+    .cc-sidebar__label {
+      font-weight: 600;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--cc-stone);
+      margin-bottom: 0.85rem;
+    }
+
+    .cc-sidebar__search {
+      width: 100%;
+      padding: 0.7rem 1rem 0.7rem 2.6rem;
+      border: 1.5px solid var(--cc-sand);
+      border-radius: var(--cc-radius-sm);
+      font-family: inherit;
+      font-size: 0.9rem;
+      background: var(--cc-sand-light);
+      transition: all 0.2s;
+      outline: none;
+      color: var(--cc-charcoal);
+    }
+
+    .cc-sidebar__search:focus {
+      border-color: var(--cc-forest-light);
+      background: white;
+      box-shadow: 0 0 0 4px rgba(45, 90, 61, 0.08);
+    }
+
+    .cc-sidebar__search-wrap {
+      position: relative;
+    }
+
+    .cc-sidebar__search-icon {
+      position: absolute;
+      left: 0.9rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--cc-stone);
+      font-size: 0.9rem;
+    }
+
+    /* Category Chips */
+    .cc-categories {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .cc-category {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.7rem 1rem;
+      border-radius: var(--cc-radius-sm);
+      border: none;
+      background: var(--cc-sand-light);
+      cursor: pointer;
+      transition: all 0.25s;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--cc-bark);
+      font-weight: 500;
+      width: 100%;
+      text-align: left;
+    }
+
+    .cc-category:hover {
+      background: var(--cc-sand);
+      transform: translateX(4px);
+    }
+
+    .cc-category--active {
+      background: var(--cc-forest);
+      color: white;
+      box-shadow: 0 4px 16px rgba(45, 90, 61, 0.25);
+    }
+
+    .cc-category--active:hover {
+      background: var(--cc-forest-dark);
+    }
+
+    .cc-category__icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .cc-category:not(.cc-category--active) .cc-category__icon {
+      background: rgba(45, 90, 61, 0.08);
+    }
+
+    .cc-category--active .cc-category__icon {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .cc-category__count {
+      margin-left: auto;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.15rem 0.55rem;
+      border-radius: 20px;
+      background: rgba(0,0,0,0.06);
+    }
+
+    .cc-category--active .cc-category__count {
+      background: rgba(255,255,255,0.2);
+      color: white;
+    }
+
+    /* Date Picker */
+    .cc-datepicker {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .cc-datepicker__input {
+      flex: 1;
+      padding: 0.65rem 0.8rem;
+      border: 1.5px solid var(--cc-sand);
+      border-radius: var(--cc-radius-sm);
+      font-family: inherit;
+      font-size: 0.85rem;
+      background: var(--cc-sand-light);
+      outline: none;
+      color: var(--cc-charcoal);
+      transition: all 0.2s;
+    }
+
+    .cc-datepicker__input:focus {
+      border-color: var(--cc-forest-light);
+      background: white;
+      box-shadow: 0 0 0 4px rgba(45, 90, 61, 0.08);
+    }
+
+    /* Location Filter */
+    .cc-location-filter {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border: 1.5px solid var(--cc-sand);
+      border-radius: var(--cc-radius-sm);
+      font-family: inherit;
+      font-size: 0.88rem;
+      background: var(--cc-sand-light);
+      outline: none;
+      color: var(--cc-charcoal);
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239B9284' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.8rem center;
+      transition: all 0.2s;
+    }
+
+    .cc-location-filter:focus {
+      border-color: var(--cc-forest-light);
+      background-color: white;
+      box-shadow: 0 0 0 4px rgba(45, 90, 61, 0.08);
+    }
+
+    .cc-sidebar__divider {
+      height: 1px;
+      background: var(--cc-sand);
+      margin: 0.5rem 0;
+    }
+
+    /* Create Event Button */
+    .cc-btn-create {
+      width: 100%;
+      padding: 0.9rem;
+      border: none;
+      border-radius: var(--cc-radius-sm);
+      background: linear-gradient(135deg, var(--cc-forest) 0%, var(--cc-forest-light) 100%);
+      color: white;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      box-shadow: 0 4px 20px rgba(45, 90, 61, 0.3);
+      margin-top: 1.5rem;
+    }
+
+    .cc-btn-create:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(45, 90, 61, 0.4);
+    }
+
+    .cc-btn-create:active {
+      transform: translateY(0);
+    }
+
+    /* ---- MAIN CONTENT ---- */
+    .cc-main {
+      min-width: 0;
+    }
+
+    .cc-main__toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .cc-main__result-count {
+      font-weight: 600;
+      color: var(--cc-charcoal);
+      font-size: 1rem;
+    }
+
+    .cc-main__result-count span {
+      color: var(--cc-forest);
+    }
+
+    .cc-view-toggle {
+      display: flex;
+      background: white;
+      border-radius: var(--cc-radius-sm);
+      padding: 4px;
+      box-shadow: var(--cc-shadow-sm);
+      border: 1px solid rgba(45,90,61,0.06);
+    }
+
+    .cc-view-toggle__btn {
+      padding: 0.5rem 1.1rem;
+      border: none;
+      border-radius: var(--cc-radius-xs);
+      background: transparent;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--cc-stone);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.25s;
+    }
+
+    .cc-view-toggle__btn--active {
+      background: var(--cc-forest);
+      color: white;
+      box-shadow: 0 2px 8px rgba(45, 90, 61, 0.25);
+    }
+
+    .cc-view-toggle__btn:not(.cc-view-toggle__btn--active):hover {
+      color: var(--cc-forest);
+      background: var(--cc-sand-light);
+    }
+
+    /* ---- EVENT CARDS GRID ---- */
+    .cc-events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .cc-event-card {
+      background: white;
+      border-radius: var(--cc-radius);
+      overflow: hidden;
+      box-shadow: var(--cc-shadow-sm);
+      border: 1px solid rgba(45, 90, 61, 0.05);
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+
+    .cc-event-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--cc-shadow-lg);
+      border-color: rgba(45, 90, 61, 0.12);
+    }
+
+    .cc-event-card__cover {
+      position: relative;
+      height: 200px;
+      overflow: hidden;
+    }
+
+    .cc-event-card__img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+
+    .cc-event-card:hover .cc-event-card__img {
+      transform: scale(1.06);
+    }
+
+    .cc-event-card__badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      backdrop-filter: blur(10px);
+    }
+
+    .cc-event-card__badge--green {
+      background: rgba(45, 90, 61, 0.85);
+      color: white;
+    }
+
+    .cc-event-card__badge--amber {
+      background: rgba(212, 118, 78, 0.85);
+      color: white;
+    }
+
+    .cc-event-card__badge--brown {
+      background: rgba(92, 64, 51, 0.85);
+      color: white;
+    }
+
+    .cc-event-card__favorite {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(10px);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 16px;
+    }
+
+    .cc-event-card__favorite:hover {
+      background: white;
+      transform: scale(1.1);
+    }
+
+    .cc-event-card__favorite--liked {
+      background: rgba(212, 118, 78, 0.15);
+      color: var(--cc-ember);
+    }
+
+    .cc-event-card__date-chip {
+      position: absolute;
+      bottom: 14px;
+      right: 14px;
+      background: white;
+      border-radius: 12px;
+      padding: 0.4rem 0.65rem;
+      text-align: center;
+      box-shadow: var(--cc-shadow-md);
+      line-height: 1.1;
+    }
+
+    .cc-event-card__date-month {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--cc-ember);
+      letter-spacing: 0.05em;
+    }
+
+    .cc-event-card__date-day {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--cc-charcoal);
+    }
+
+    .cc-event-card__body {
+      padding: 1.25rem;
+    }
+
+    .cc-event-card__title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--cc-charcoal);
+      margin-bottom: 0.4rem;
+      line-height: 1.3;
+    }
+
+    .cc-event-card__meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .cc-event-card__meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.82rem;
+      color: var(--cc-stone);
+    }
+
+    .cc-event-card__meta-icon {
+      font-size: 0.82rem;
+      width: 16px;
+      text-align: center;
+    }
+
+    .cc-event-card__desc {
+      font-size: 0.85rem;
+      color: var(--cc-bark-light);
+      line-height: 1.55;
+      margin-bottom: 1rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .cc-event-card__footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 1rem;
+      border-top: 1px solid var(--cc-sand-light);
+    }
+
+    .cc-event-card__host {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .cc-event-card__host-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--cc-sand);
+    }
+
+    .cc-event-card__host-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--cc-charcoal);
+    }
+
+    .cc-event-card__host-role {
+      font-size: 0.7rem;
+      color: var(--cc-stone);
+    }
+
+    .cc-event-card__attendees {
+      display: flex;
+      align-items: center;
+    }
+
+    .cc-event-card__attendee-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid white;
+      margin-left: -8px;
+      font-size: 0.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: white;
+    }
+
+    .cc-event-card__attendee-avatar:first-child {
+      margin-left: 0;
+    }
+
+    .cc-event-card__attendee-count {
+      background: var(--cc-sand-light);
+      color: var(--cc-bark);
+    }
+
+    .cc-event-card__join {
+      padding: 0.55rem 1.2rem;
+      border: none;
+      border-radius: var(--cc-radius-xs);
+      background: linear-gradient(135deg, var(--cc-forest), var(--cc-forest-light));
+      color: white;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 2px 10px rgba(45, 90, 61, 0.2);
+    }
+
+    .cc-event-card__join:hover {
+      box-shadow: 0 4px 18px rgba(45, 90, 61, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .cc-event-card__join--joined {
+      background: var(--cc-sand-light);
+      color: var(--cc-forest);
+      box-shadow: none;
+      border: 1.5px solid var(--cc-forest);
+    }
+
+    /* ---- LIST VIEW ---- */
+    .cc-events-list {
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .cc-events-list--active {
+      display: flex;
+    }
+
+    .cc-events-grid--hidden {
+      display: none;
+    }
+
+    .cc-event-list-item {
+      background: white;
+      border-radius: var(--cc-radius);
+      overflow: hidden;
+      box-shadow: var(--cc-shadow-sm);
+      border: 1px solid rgba(45, 90, 61, 0.05);
+      display: flex;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .cc-event-list-item:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--cc-shadow-md);
+    }
+
+    .cc-event-list-item__img {
+      width: 240px;
+      min-height: 180px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .cc-event-list-item__body {
+      padding: 1.25rem 1.5rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .cc-event-list-item__top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+    }
+
+    .cc-event-list-item__title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--cc-charcoal);
+    }
+
+    .cc-event-list-item__badge {
+      padding: 0.2rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+
+    .cc-event-list-item__meta {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .cc-event-list-item__meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      color: var(--cc-stone);
+    }
+
+    .cc-event-list-item__desc {
+      font-size: 0.85rem;
+      color: var(--cc-bark-light);
+      line-height: 1.55;
+      margin-bottom: 1rem;
+    }
+
+    .cc-event-list-item__footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* ---- MAP VIEW ---- */
+    .cc-map-container {
+      display: none;
+      border-radius: var(--cc-radius);
+      overflow: hidden;
+      background: var(--cc-sand);
+      height: 600px;
+      position: relative;
+      box-shadow: var(--cc-shadow-md);
+      border: 1px solid rgba(45, 90, 61, 0.08);
+    }
+
+    .cc-map-container--active {
+      display: block;
+    }
+
+    .cc-map__canvas {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(145deg, #dae8d4 0%, #c5d8b8 30%, #b8cfa8 50%, #d4c8a0 80%, #e0d8c0 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Map terrain details */
+    .cc-map__terrain {
+      position: absolute;
+      inset: 0;
+      opacity: 0.3;
+      background-image:
+        radial-gradient(ellipse 200px 100px at 20% 30%, rgba(45,90,61,0.15) 0%, transparent 70%),
+        radial-gradient(ellipse 150px 200px at 70% 60%, rgba(45,90,61,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 300px 150px at 50% 80%, rgba(164,190,141,0.2) 0%, transparent 70%),
+        radial-gradient(circle 80px at 85% 20%, rgba(45,90,61,0.1) 0%, transparent 70%);
+    }
+
+    .cc-map__grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(45,90,61,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(45,90,61,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .cc-map__river {
+      position: absolute;
+      top: 20%;
+      left: -5%;
+      width: 110%;
+      height: 40px;
+      background: rgba(135, 180, 210, 0.25);
+      border-radius: 50%;
+      transform: rotate(-8deg);
+    }
+
+    .cc-map__label {
+      position: absolute;
+      font-size: 0.7rem;
+      color: rgba(45,90,61,0.3);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+
+    .cc-map-pin {
+      position: absolute;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.3s;
+    }
+
+    .cc-map-pin:hover {
+      z-index: 20;
+      transform: scale(1.15) translateY(-4px);
+    }
+
+    .cc-map-pin__marker {
+      width: 44px;
+      height: 44px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      border: 3px solid white;
+    }
+
+    .cc-map-pin__marker--green {
+      background: var(--cc-forest);
+    }
+
+    .cc-map-pin__marker--amber {
+      background: var(--cc-ember);
+    }
+
+    .cc-map-pin__marker--brown {
+      background: var(--cc-bark);
+    }
+
+    .cc-map-pin__icon {
+      transform: rotate(45deg);
+      font-size: 16px;
+      color: white;
+    }
+
+    .cc-map-pin__pulse {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 44px;
+      height: 44px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: rgba(45, 90, 61, 0.15);
+      animation: cc-pulse 2s ease-out infinite;
+    }
+
+    @keyframes cc-pulse {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+      100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
+    }
+
+    /* Map Preview Card */
+    .cc-map-preview {
+      position: absolute;
+      width: 300px;
+      background: white;
+      border-radius: var(--cc-radius);
+      box-shadow: var(--cc-shadow-xl);
+      overflow: hidden;
+      z-index: 30;
+      display: none;
+      animation: cc-fadeUp 0.3s ease;
+    }
+
+    .cc-map-preview--active {
+      display: block;
+    }
+
+    @keyframes cc-fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .cc-map-preview__close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.4);
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      z-index: 2;
+      backdrop-filter: blur(4px);
+    }
+
+    .cc-map-preview__img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+    }
+
+    .cc-map-preview__body {
+      padding: 1rem;
+    }
+
+    .cc-map-preview__title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.4rem;
+      color: var(--cc-charcoal);
+    }
+
+    .cc-map-preview__meta {
+      font-size: 0.8rem;
+      color: var(--cc-stone);
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .cc-map-preview__join {
+      width: 100%;
+      padding: 0.55rem;
+      border: none;
+      border-radius: var(--cc-radius-xs);
+      background: var(--cc-forest);
+      color: white;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .cc-map-preview__join:hover {
+      background: var(--cc-forest-dark);
+    }
+
+    /* ---- MODAL ---- */
+    .cc-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(44, 40, 37, 0.5);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      animation: cc-fadeIn 0.2s;
+    }
+
+    .cc-modal-overlay--active {
+      display: flex;
+    }
+
+    @keyframes cc-fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .cc-modal {
+      background: white;
+      border-radius: var(--cc-radius);
+      max-width: 580px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--cc-shadow-xl);
+      animation: cc-slideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes cc-slideUp {
+      from { opacity: 0; transform: translateY(30px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .cc-modal__header {
+      padding: 1.75rem 1.75rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cc-modal__title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: var(--cc-forest-dark);
+    }
+
+    .cc-modal__close {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--cc-sand-light);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--cc-stone);
+      transition: all 0.2s;
+    }
+
+    .cc-modal__close:hover {
+      background: var(--cc-sand);
+      color: var(--cc-charcoal);
+    }
+
+    .cc-modal__body {
+      padding: 1.5rem 1.75rem 1.75rem;
+    }
+
+    .cc-modal__field {
+      margin-bottom: 1.25rem;
+    }
+
+    .cc-modal__label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--cc-charcoal);
+      margin-bottom: 0.45rem;
+    }
+
+    .cc-modal__input,
+    .cc-modal__textarea,
+    .cc-modal__select {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 1.5px solid var(--cc-sand);
+      border-radius: var(--cc-radius-sm);
+      font-family: inherit;
+      font-size: 0.9rem;
+      background: var(--cc-sand-light);
+      outline: none;
+      color: var(--cc-charcoal);
+      transition: all 0.2s;
+    }
+
+    .cc-modal__input:focus,
+    .cc-modal__textarea:focus,
+    .cc-modal__select:focus {
+      border-color: var(--cc-forest-light);
+      background: white;
+      box-shadow: 0 0 0 4px rgba(45, 90, 61, 0.08);
+    }
+
+    .cc-modal__textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .cc-modal__row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .cc-modal__upload {
+      border: 2px dashed var(--cc-sand);
+      border-radius: var(--cc-radius-sm);
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--cc-sand-light);
+    }
+
+    .cc-modal__upload:hover {
+      border-color: var(--cc-forest-light);
+      background: rgba(45, 90, 61, 0.03);
+    }
+
+    .cc-modal__upload-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .cc-modal__upload-text {
+      font-size: 0.88rem;
+      color: var(--cc-stone);
+    }
+
+    .cc-modal__upload-text strong {
+      color: var(--cc-forest);
+    }
+
+    .cc-modal__submit {
+      width: 100%;
+      padding: 0.9rem;
+      border: none;
+      border-radius: var(--cc-radius-sm);
+      background: linear-gradient(135deg, var(--cc-forest) 0%, var(--cc-forest-light) 100%);
+      color: white;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 20px rgba(45, 90, 61, 0.3);
+      margin-top: 0.5rem;
+    }
+
+    .cc-modal__submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(45, 90, 61, 0.4);
+    }
+
+    /* ---- TOAST ---- */
+    .cc-toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--cc-forest-dark);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: var(--cc-radius-sm);
+      box-shadow: var(--cc-shadow-lg);
+      font-weight: 500;
+      font-size: 0.9rem;
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .cc-toast--visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 1024px) {
+      .cc-events-layout {
+        grid-template-columns: 280px 1fr;
+        gap: 1.5rem;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .cc-events-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .cc-sidebar {
+        position: static;
+      }
+
+      .cc-navbar__nav {
+        display: none;
+      }
+
+      .cc-event-list-item {
+        flex-direction: column;
+      }
+
+      .cc-event-list-item__img {
+        width: 100%;
+        min-height: 160px;
+      }
+
+      .cc-hero__stats {
+        flex-wrap: wrap;
+      }
+
+      .cc-hero__heading {
+        font-size: 2rem;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .cc-events-layout {
+        padding: 1rem;
+      }
+
+      .cc-hero {
+        padding: 1.5rem 1rem 0.5rem;
+      }
+
+      .cc-events-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .cc-modal__row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="cc-navbar">
+    <div class="cc-navbar__inner">
+      <a href="#" class="cc-navbar__brand">
+        <div class="cc-navbar__logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 L2 22 h20 Z"/><path d="M8 22 v-6 h8 v6"/></svg>
+        </div>
+        <span class="cc-navbar__title">CampConnect</span>
+      </a>
+
+      <ul class="cc-navbar__nav">
+        <li><a href="#" class="cc-navbar__link">Explore</a></li>
+        <li><a href="#" class="cc-navbar__link cc-navbar__link--active">Events</a></li>
+        <li><a href="#" class="cc-navbar__link">Groups</a></li>
+        <li><a href="#" class="cc-navbar__link">Trails</a></li>
+        <li><a href="#" class="cc-navbar__link">Gear</a></li>
+      </ul>
+
+      <div class="cc-navbar__actions">
+        <button class="cc-navbar__bell" aria-label="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="cc-navbar__bell-dot"></span>
+        </button>
+        <div class="cc-navbar__avatar">AW</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <header class="cc-hero">
+    <h1 class="cc-hero__heading">Upcoming Adventures</h1>
+    <p class="cc-hero__sub">Find your next outdoor experience and connect with fellow campers</p>
+    <div class="cc-hero__stats">
+      <div class="cc-hero__stat">
+        <div class="cc-hero__stat-icon cc-hero__stat-icon--green">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div>
+          <div class="cc-hero__stat-value">24</div>
+          <div class="cc-hero__stat-label">This Month</div>
+        </div>
+      </div>
+      <div class="cc-hero__stat">
+        <div class="cc-hero__stat-icon cc-hero__stat-icon--amber">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div>
+          <div class="cc-hero__stat-value">482</div>
+          <div class="cc-hero__stat-label">Campers Joined</div>
+        </div>
+      </div>
+      <div class="cc-hero__stat">
+        <div class="cc-hero__stat-icon cc-hero__stat-icon--brown">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div>
+          <div class="cc-hero__stat-value">12</div>
+          <div class="cc-hero__stat-label">Locations</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN LAYOUT ===== -->
+  <div class="cc-events-layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="cc-sidebar">
+      <div class="cc-sidebar__card">
+
+        <!-- Search -->
+        <div class="cc-sidebar__section">
+          <div class="cc-sidebar__search-wrap">
+            <span class="cc-sidebar__search-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+            <input type="text" class="cc-sidebar__search" placeholder="Search events..." id="searchInput">
+          </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="cc-sidebar__section">
+          <div class="cc-sidebar__label">Categories</div>
+          <div class="cc-categories" id="categoryFilters">
+            <button class="cc-category cc-category--active" data-category="all">
+              <span class="cc-category__icon">🏕️</span>
+              <span>All Events</span>
+              <span class="cc-category__count">8</span>
+            </button>
+            <button class="cc-category" data-category="weekend-camp">
+              <span class="cc-category__icon">⛺</span>
+              <span>Weekend Camp</span>
+              <span class="cc-category__count">3</span>
+            </button>
+            <button class="cc-category" data-category="hiking-trip">
+              <span class="cc-category__icon">🥾</span>
+              <span>Hiking Trip</span>
+              <span class="cc-category__count">2</span>
+            </button>
+            <button class="cc-category" data-category="gear-testing">
+              <span class="cc-category__icon">🎒</span>
+              <span>Gear Testing</span>
+              <span class="cc-category__count">2</span>
+            </button>
+            <button class="cc-category" data-category="survival-workshop">
+              <span class="cc-category__icon">🔥</span>
+              <span>Survival Workshop</span>
+              <span class="cc-category__count">1</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="cc-sidebar__divider"></div>
+
+        <!-- Date Filter -->
+        <div class="cc-sidebar__section">
+          <div class="cc-sidebar__label">Date Range</div>
+          <div class="cc-datepicker">
+            <input type="date" class="cc-datepicker__input" id="dateFrom" value="2025-07-01">
+            <input type="date" class="cc-datepicker__input" id="dateTo" value="2025-08-31">
+          </div>
+        </div>
+
+        <!-- Location Filter -->
+        <div class="cc-sidebar__section">
+          <div class="cc-sidebar__label">Location</div>
+          <select class="cc-location-filter" id="locationFilter">
+            <option value="all">All Locations</option>
+            <option value="yosemite">Yosemite Valley, CA</option>
+            <option value="rockies">Rocky Mountains, CO</option>
+            <option value="smoky">Smoky Mountains, TN</option>
+            <option value="cascades">North Cascades, WA</option>
+            <option value="glacier">Glacier National Park, MT</option>
+            <option value="adirondacks">Adirondacks, NY</option>
+          </select>
+        </div>
+
+        <!-- Create Event CTA -->
+        <button class="cc-btn-create" id="openModalBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Create Event
+        </button>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="cc-main">
+
+      <!-- Toolbar -->
+      <div class="cc-main__toolbar">
+        <div class="cc-main__result-count">
+          Showing <span id="resultCount">8</span> events
+        </div>
+        <div class="cc-view-toggle">
+          <button class="cc-view-toggle__btn cc-view-toggle__btn--active" data-view="grid" id="gridViewBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            Grid
+          </button>
+          <button class="cc-view-toggle__btn" data-view="list" id="listViewBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            List
+          </button>
+          <button class="cc-view-toggle__btn" data-view="map" id="mapViewBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+            Map
+          </button>
+        </div>
+      </div>
+
+      <!-- GRID VIEW -->
+      <div class="cc-events-grid" id="eventsGrid">
+        <!-- Cards are injected via JS -->
+      </div>
+
+      <!-- LIST VIEW -->
+      <div class="cc-events-list" id="eventsList">
+        <!-- List items are injected via JS -->
+      </div>
+
+      <!-- MAP VIEW -->
+      <div class="cc-map-container" id="mapContainer">
+        <div class="cc-map__canvas" id="mapCanvas">
+          <div class="cc-map__terrain"></div>
+          <div class="cc-map__grid"></div>
+          <div class="cc-map__river"></div>
+          <div class="cc-map__label" style="top:12%;left:15%;">Pine Ridge</div>
+          <div class="cc-map__label" style="top:65%;left:55%;">Eagle Valley</div>
+          <div class="cc-map__label" style="top:40%;right:12%;">Bear Creek</div>
+          <div class="cc-map__label" style="bottom:15%;left:20%;">Wildflower Meadow</div>
+          <!-- Pins injected by JS -->
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ===== CREATE EVENT MODAL ===== -->
+  <div class="cc-modal-overlay" id="modalOverlay">
+    <div class="cc-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="cc-modal__header">
+        <h2 class="cc-modal__title" id="modalTitle">Create New Event</h2>
+        <button class="cc-modal__close" id="closeModalBtn" aria-label="Close modal">✕</button>
+      </div>
+      <div class="cc-modal__body">
+        <form id="createEventForm">
+          <div class="cc-modal__field">
+            <label class="cc-modal__label" for="eventTitle">Event Title</label>
+            <input class="cc-modal__input" type="text" id="eventTitle" placeholder="e.g., Sunrise Peak Summit Hike" required>
+          </div>
+
+          <div class="cc-modal__field">
+            <label class="cc-modal__label" for="eventDesc">Description</label>
+            <textarea class="cc-modal__textarea" id="eventDesc" placeholder="Describe the adventure you're planning..." required></textarea>
+          </div>
+
+          <div class="cc-modal__row">
+            <div class="cc-modal__field">
+              <label class="cc-modal__label" for="eventDate">Date</label>
+              <input class="cc-modal__input" type="date" id="eventDate" required>
+            </div>
+            <div class="cc-modal__field">
+              <label class="cc-modal__label" for="eventTime">Time</label>
+              <input class="cc-modal__input" type="time" id="eventTime" required>
+            </div>
+          </div>
+
+          <div class="cc-modal__row">
+            <div class="cc-modal__field">
+              <label class="cc-modal__label" for="eventLocation">Location</label>
+              <select class="cc-modal__select" id="eventLocation">
+                <option value="">Select a location</option>
+                <option>Yosemite Valley, CA</option>
+                <option>Rocky Mountains, CO</option>
+                <option>Smoky Mountains, TN</option>
+                <option>North Cascades, WA</option>
+                <option>Glacier National Park, MT</option>
+                <option>Adirondacks, NY</option>
+              </select>
+            </div>
+            <div class="cc-modal__field">
+              <label class="cc-modal__label" for="eventMax">Max Attendees</label>
+              <input class="cc-modal__input" type="number" id="eventMax" min="2" max="100" value="20" required>
+            </div>
+          </div>
+
+          <div class="cc-modal__field">
+            <label class="cc-modal__label" for="eventCategory">Category</label>
+            <select class="cc-modal__select" id="eventCategory">
+              <option value="weekend-camp">Weekend Camp</option>
+              <option value="hiking-trip">Hiking Trip</option>
+              <option value="gear-testing">Gear Testing</option>
+              <option value="survival-workshop">Survival Workshop</option>
+            </select>
+          </div>
+
+          <div class="cc-modal__field">
+            <label class="cc-modal__label">Cover Image</label>
+            <div class="cc-modal__upload" id="uploadArea">
+              <span class="cc-modal__upload-icon">📸</span>
+              <div class="cc-modal__upload-text">
+                Drag & drop or <strong>browse</strong><br>
+                <small style="color: var(--cc-stone);">JPG, PNG — Max 5MB</small>
+              </div>
+            </div>
+            <input type="file" id="fileInput" accept="image/*" style="display:none">
+          </div>
+
+          <button type="submit" class="cc-modal__submit">
+            🏕️  Publish Event
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div class="cc-toast" id="toast">
+    <span>✓</span>
+    <span id="toastMsg">Event created successfully!</span>
+  </div>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    // ==============================
+    // EVENT DATA
+    // ==============================
+    const eventsData = [
+      {
+        id: 1,
+        title: "Yosemite Weekend Basecamp",
+        category: "weekend-camp",
+        badge: "Weekend Camp",
+        badgeColor: "green",
+        date: "2025-07-19",
+        dateDisplay: "Jul 19–20",
+        month: "Jul",
+        day: "19",
+        time: "8:00 AM",
+        location: "Yosemite Valley, CA",
+        host: { name: "Sarah Chen", initials: "SC", color: "#3A7350" },
+        attendees: 18,
+        maxAttendees: 25,
+        desc: "Join us for a weekend of stargazing, campfire cooking, and exploring hidden waterfalls deep in Yosemite Valley.",
+        image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600&h=400&fit=crop",
+        liked: false,
+        joined: false,
+        mapPos: { top: "28%", left: "22%" }
+      },
+      {
+        id: 2,
+        title: "Rocky Mountain Ridge Hike",
+        category: "hiking-trip",
+        badge: "Hiking Trip",
+        badgeColor: "amber",
+        date: "2025-07-26",
+        dateDisplay: "Jul 26",
+        month: "Jul",
+        day: "26",
+        time: "6:30 AM",
+        location: "Rocky Mountains, CO",
+        host: { name: "Marcus Rivera", initials: "MR", color: "#D4764E" },
+        attendees: 12,
+        maxAttendees: 15,
+        desc: "A challenging 14-mile ridge trail with breathtaking views of alpine meadows and glacial lakes above the treeline.",
+        image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&h=400&fit=crop",
+        liked: true,
+        joined: false,
+        mapPos: { top: "45%", left: "48%" }
+      },
+      {
+        id: 3,
+        title: "Ultralight Gear Field Test",
+        category: "gear-testing",
+        badge: "Gear Testing",
+        badgeColor: "brown",
+        date: "2025-08-02",
+        dateDisplay: "Aug 2",
+        month: "Aug",
+        day: "02",
+        time: "10:00 AM",
+        location: "North Cascades, WA",
+        host: { name: "Jamie Okafor", initials: "JO", color: "#5C4033" },
+        attendees: 8,
+        maxAttendees: 12,
+        desc: "Test the latest ultralight tents, sleeping bags, and cook systems in real backcountry conditions with expert feedback.",
+        image: "https://images.unsplash.com/photo-1510312305653-8ed496efae75?w=600&h=400&fit=crop",
+        liked: false,
+        joined: true,
+        mapPos: { top: "18%", left: "68%" }
+      },
+      {
+        id: 4,
+        title: "Wilderness Survival Basics",
+        category: "survival-workshop",
+        badge: "Survival Workshop",
+        badgeColor: "green",
+        date: "2025-08-09",
+        dateDisplay: "Aug 9–10",
+        month: "Aug",
+        day: "09",
+        time: "9:00 AM",
+        location: "Smoky Mountains, TN",
+        host: { name: "Bear Thompson", initials: "BT", color: "#2D5A3D" },
+        attendees: 22,
+        maxAttendees: 30,
+        desc: "Learn fire-starting, shelter building, water purification, and navigation skills from a certified wilderness guide.",
+        image: "https://images.unsplash.com/photo-1475483768296-6163e08872a1?w=600&h=400&fit=crop",
+        liked: false,
+        joined: false,
+        mapPos: { top: "62%", left: "35%" }
+      },
+      {
+        id: 5,
+        title: "Glacier Meadow Campout",
+        category: "weekend-camp",
+        badge: "Weekend Camp",
+        badgeColor: "green",
+        date: "2025-08-15",
+        dateDisplay: "Aug 15–17",
+        month: "Aug",
+        day: "15",
+        time: "2:00 PM",
+        location: "Glacier National Park, MT",
+        host: { name: "Emma Lawson", initials: "EL", color: "#8BAF7A" },
+        attendees: 14,
+        maxAttendees: 20,
+        desc: "Three days in pristine mountain meadows with guided nature walks, wildlife spotting, and group campfire storytelling.",
+        image: "https://images.unsplash.com/photo-1537905569824-f89f14cceb68?w=600&h=400&fit=crop",
+        liked: true,
+        joined: false,
+        mapPos: { top: "35%", left: "78%" }
+      },
+      {
+        id: 6,
+        title: "Adirondack Trail Running",
+        category: "hiking-trip",
+        badge: "Hiking Trip",
+        badgeColor: "amber",
+        date: "2025-08-22",
+        dateDisplay: "Aug 22",
+        month: "Aug",
+        day: "22",
+        time: "7:00 AM",
+        location: "Adirondacks, NY",
+        host: { name: "Kyle Nguyen", initials: "KN", color: "#D4764E" },
+        attendees: 10,
+        maxAttendees: 15,
+        desc: "Fast-paced trail run through ancient forests and over rocky summits. All paces welcome — just bring your trail shoes!",
+        image: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&h=400&fit=crop",
+        liked: false,
+        joined: false,
+        mapPos: { top: "52%", left: "62%" }
+      },
+      {
+        id: 7,
+        title: "Camp Stove Cook-Off",
+        category: "gear-testing",
+        badge: "Gear Testing",
+        badgeColor: "brown",
+        date: "2025-08-30",
+        dateDisplay: "Aug 30",
+        month: "Aug",
+        day: "30",
+        time: "11:00 AM",
+        location: "Rocky Mountains, CO",
+        host: { name: "Lisa Park", initials: "LP", color: "#7A5C4F" },
+        attendees: 16,
+        maxAttendees: 20,
+        desc: "Compete (or just eat!) as we put 8 popular camp stoves to the test. Gourmet trail meals, taste testing, and gear reviews.",
+        image: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=600&h=400&fit=crop",
+        liked: false,
+        joined: false,
+        mapPos: { top: "75%", left: "42%" }
+      },
+      {
+        id: 8,
+        title: "Cascade Falls Overnight Camp",
+        category: "weekend-camp",
+        badge: "Weekend Camp",
+        badgeColor: "green",
+        date: "2025-09-06",
+        dateDisplay: "Sep 6–7",
+        month: "Sep",
+        day: "06",
+        time: "3:00 PM",
+        location: "North Cascades, WA",
+        host: { name: "Tara Mendez", initials: "TM", color: "#3A7350" },
+        attendees: 9,
+        maxAttendees: 16,
+        desc: "A serene overnight at the base of Cascade Falls. Perfect for photographers, nature lovers, and those seeking stillness.",
+        image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600&h=400&fit=crop",
+        liked: false,
+        joined: false,
+        mapPos: { top: "22%", left: "45%" }
+      }
+    ];
+
+    // ==============================
+    // HELPERS
+    // ==============================
+    const avatarColors = ["#3A7350", "#D4764E", "#5C4033", "#8BAF7A", "#7A5C4F", "#B85A35"];
+
+    function getAttendeeAvatars(event) {
+      const colors = avatarColors.slice(0, Math.min(3, event.attendees));
+      const initials = ["AK", "RJ", "MP"];
+      let html = '';
+      colors.forEach((c, i) => {
+        html += `<div class="cc-event-card__attendee-avatar" style="background:${c}">${initials[i]}</div>`;
+      });
+      if (event.attendees > 3) {
+        html += `<div class="cc-event-card__attendee-avatar cc-event-card__attendee-count">+${event.attendees - 3}</div>`;
+      }
+      return html;
+    }
+
+    // ==============================
+    // RENDER GRID CARDS
+    // ==============================
+    function renderGrid(events) {
+      const grid = document.getElementById('eventsGrid');
+      grid.innerHTML = events.map(ev => `
+        <article class="cc-event-card" data-id="${ev.id}">
+          <div class="cc-event-card__cover">
+            <img class="cc-event-card__img" src="${ev.image}" alt="${ev.title}" loading="lazy">
+            <span class="cc-event-card__badge cc-event-card__badge--${ev.badgeColor}">${ev.badge}</span>
+            <button class="cc-event-card__favorite ${ev.liked ? 'cc-event-card__favorite--liked' : ''}" data-id="${ev.id}" onclick="toggleLike(${ev.id}, event)">
+              ${ev.liked ? '❤️' : '🤍'}
+            </button>
+            <div class="cc-event-card__date-chip">
+              <div class="cc-event-card__date-month">${ev.month}</div>
+              <div class="cc-event-card__date-day">${ev.day}</div>
+            </div>
+          </div>
+          <div class="cc-event-card__body">
+            <h3 class="cc-event-card__title">${ev.title}</h3>
+            <div class="cc-event-card__meta">
+              <div class="cc-event-card__meta-item">
+                <span class="cc-event-card__meta-icon">📅</span> ${ev.dateDisplay} · ${ev.time}
+              </div>
+              <div class="cc-event-card__meta-item">
+                <span class="cc-event-card__meta-icon">📍</span> ${ev.location}
+              </div>
+            </div>
+            <p class="cc-event-card__desc">${ev.desc}</p>
+            <div class="cc-event-card__footer">
+              <div class="cc-event-card__host">
+                <div class="cc-event-card__host-avatar" style="background:${ev.host.color};color:white;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;width:32px;height:32px;border-radius:50%;">
+                  ${ev.host.initials}
+                </div>
+                <div>
+                  <div class="cc-event-card__host-name">${ev.host.name}</div>
+                  <div class="cc-event-card__host-role">Host</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:0.75rem;">
+                <div class="cc-event-card__attendees">
+                  ${getAttendeeAvatars(ev)}
+                </div>
+                <button class="cc-event-card__join ${ev.joined ? 'cc-event-card__join--joined' : ''}" data-id="${ev.id}" onclick="toggleJoin(${ev.id}, event)">
+                  ${ev.joined ? '✓ Joined' : 'Join'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    // ==============================
+    // RENDER LIST VIEW
+    // ==============================
+    function renderList(events) {
+      const list = document.getElementById('eventsList');
+      list.innerHTML = events.map(ev => `
+        <article class="cc-event-list-item" data-id="${ev.id}">
+          <img class="cc-event-list-item__img" src="${ev.image}" alt="${ev.title}" loading="lazy">
+          <div class="cc-event-list-item__body">
+            <div>
+              <div class="cc-event-list-item__top">
+                <h3 class="cc-event-list-item__title">${ev.title}</h3>
+                <span class="cc-event-list-item__badge cc-event-card__badge--${ev.badgeColor}" style="padding:0.25rem 0.7rem;border-radius:20px;font-size:0.7rem;font-weight:600;color:white;">${ev.badge}</span>
+              </div>
+              <div class="cc-event-list-item__meta">
+                <span class="cc-event-list-item__meta-item">📅 ${ev.dateDisplay} · ${ev.time}</span>
+                <span class="cc-event-list-item__meta-item">📍 ${ev.location}</span>
+                <span class="cc-event-list-item__meta-item">👥 ${ev.attendees}/${ev.maxAttendees} joined</span>
+              </div>
+              <p class="cc-event-list-item__desc">${ev.desc}</p>
+            </div>
+            <div class="cc-event-list-item__footer">
+              <div class="cc-event-card__host">
+                <div style="background:${ev.host.color};color:white;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;width:32px;height:32px;border-radius:50%;">
+                  ${ev.host.initials}
+                </div>
+                <div>
+                  <div class="cc-event-card__host-name">${ev.host.name}</div>
+                  <div class="cc-event-card__host-role">Host</div>
+                </div>
+              </div>
+              <button class="cc-event-card__join ${ev.joined ? 'cc-event-card__join--joined' : ''}" data-id="${ev.id}" onclick="toggleJoin(${ev.id}, event)">
+                ${ev.joined ? '✓ Joined' : 'Join'}
+              </button>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    // ==============================
+    // RENDER MAP VIEW
+    // ==============================
+    function renderMap(events) {
+      const canvas = document.getElementById('mapCanvas');
+      // Remove existing pins and previews
+      canvas.querySelectorAll('.cc-map-pin, .cc-map-preview').forEach(el => el.remove());
+
+      events.forEach(ev => {
+        const pinColors = { green: 'green', amber: 'amber', brown: 'brown' };
+        const pin = document.createElement('div');
+        pin.className = 'cc-map-pin';
+        pin.style.top = ev.mapPos.top;
+        pin.style.left = ev.mapPos.left;
+        pin.setAttribute('data-id', ev.id);
+        pin.innerHTML = `
+          <div class="cc-map-pin__pulse"></div>
+          <div class="cc-map-pin__marker cc-map-pin__marker--${ev.badgeColor}">
+            <span class="cc-map-pin__icon">⛺</span>
+          </div>
+        `;
+        pin.addEventListener('click', () => openMapPreview(ev, pin));
+        canvas.appendChild(pin);
+      });
+    }
+
+    function openMapPreview(ev, pinEl) {
+      // Close any existing preview
+      document.querySelectorAll('.cc-map-preview').forEach(p => p.remove());
+
+      const preview = document.createElement('div');
+      preview.className = 'cc-map-preview cc-map-preview--active';
+
+      // Position near pin
+      const pinRect = pinEl.getBoundingClientRect();
+      const canvasRect = document.getElementById('mapCanvas').getBoundingClientRect();
+      let top = pinEl.offsetTop - 260;
+      let left = pinEl.offsetLeft + 50;
+      if (top < 10) top = pinEl.offsetTop + 60;
+      if (left + 300 > canvasRect.width) left = pinEl.offsetLeft - 320;
+
+      preview.style.top = top + 'px';
+      preview.style.left = left + 'px';
+
+      preview.innerHTML = `
+        <button class="cc-map-preview__close" onclick="this.parentElement.remove()">✕</button>
+        <img class="cc-map-preview__img" src="${ev.image}" alt="${ev.title}">
+        <div class="cc-map-preview__body">
+          <h4 class="cc-map-preview__title">${ev.title}</h4>
+          <div class="cc-map-preview__meta">
+            <span>📅 ${ev.dateDisplay} · ${ev.time}</span>
+            <span>📍 ${ev.location}</span>
+            <span>👥 ${ev.attendees}/${ev.maxAttendees} campers</span>
+          </div>
+          <button class="cc-map-preview__join" onclick="toggleJoin(${ev.id}, event)">
+            ${ev.joined ? '✓ Joined' : 'Join Event'}
+          </button>
+        </div>
+      `;
+
+      document.getElementById('mapCanvas').appendChild(preview);
+    }
+
+    // ==============================
+    // VIEW TOGGLING
+    // ==============================
+    let currentView = 'grid';
+    const gridBtn = document.getElementById('gridViewBtn');
+    const listBtn = document.getElementById('listViewBtn');
+    const mapBtn = document.getElementById('mapViewBtn');
+
+    function setView(view) {
+      currentView = view;
+      document.querySelectorAll('.cc-view-toggle__btn').forEach(b => b.classList.remove('cc-view-toggle__btn--active'));
+
+      const grid = document.getElementById('eventsGrid');
+      const list = document.getElementById('eventsList');
+      const map = document.getElementById('mapContainer');
+
+      grid.style.display = 'none';
+      list.style.display = 'none';
+      map.style.display = 'none';
+
+      if (view === 'grid') {
+        grid.style.display = 'grid';
+        gridBtn.classList.add('cc-view-toggle__btn--active');
+      } else if (view === 'list') {
+        list.style.display = 'flex';
+        listBtn.classList.add('cc-view-toggle__btn--active');
+      } else {
+        map.style.display = 'block';
+        mapBtn.classList.add('cc-view-toggle__btn--active');
+        renderMap(getFilteredEvents());
+      }
+    }
+
+    gridBtn.addEventListener('click', () => setView('grid'));
+    listBtn.addEventListener('click', () => setView('list'));
+    mapBtn.addEventListener('click', () => setView('map'));
+
+    // ==============================
+    // FILTERING
+    // ==============================
+    let activeCategory = 'all';
+    let searchQuery = '';
+
+    function getFilteredEvents() {
+      return eventsData.filter(ev => {
+        const catMatch = activeCategory === 'all' || ev.category === activeCategory;
+        const searchMatch = !searchQuery ||
+          ev.title.toLowerCase().includes(searchQuery) ||
+          ev.location.toLowerCase().includes(searchQuery) ||
+          ev.desc.toLowerCase().includes(searchQuery);
+        return catMatch && searchMatch;
+      });
+    }
+
+    function applyFilters() {
+      const filtered = getFilteredEvents();
+      renderGrid(filtered);
+      renderList(filtered);
+      document.getElementById('resultCount').textContent = filtered.length;
+      if (currentView === 'map') renderMap(filtered);
+    }
+
+    // Category filter
+    document.getElementById('categoryFilters').addEventListener('click', (e) => {
+      const btn = e.target.closest('.cc-category');
+      if (!btn) return;
+      document.querySelectorAll('.cc-category').forEach(b => b.classList.remove('cc-category--active'));
+      btn.classList.add('cc-category--active');
+      activeCategory = btn.dataset.category;
+      applyFilters();
+    });
+
+    // Search filter
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      searchQuery = e.target.value.toLowerCase().trim();
+      applyFilters();
+    });
+
+    // ==============================
+    // LIKE / JOIN
+    // ==============================
+    function toggleLike(id, e) {
+      e.stopPropagation();
+      const ev = eventsData.find(x => x.id === id);
+      if (ev) {
+        ev.liked = !ev.liked;
+        applyFilters();
+        showToast(ev.liked ? '❤️ Added to favorites' : 'Removed from favorites');
+      }
+    }
+
+    function toggleJoin(id, e) {
+      if (e) e.stopPropagation();
+      const ev = eventsData.find(x => x.id === id);
+      if (ev) {
+        ev.joined = !ev.joined;
+        ev.attendees += ev.joined ? 1 : -1;
+        applyFilters();
+        showToast(ev.joined ? '🏕️ You joined the event!' : 'You left the event');
+      }
+    }
+
+    // ==============================
+    // MODAL
+    // ==============================
+    const modalOverlay = document.getElementById('modalOverlay');
+
+    document.getElementById('openModalBtn').addEventListener('click', () => {
+      modalOverlay.classList.add('cc-modal-overlay--active');
+      document.body.style.overflow = 'hidden';
+    });
+
+    document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+
+    function closeModal() {
+      modalOverlay.classList.remove('cc-modal-overlay--active');
+      document.body.style.overflow = '';
+    }
+
+    // File upload
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    uploadArea.addEventListener('click', () => fileInput.click());
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.style.borderColor = 'var(--cc-forest)';
+      uploadArea.style.background = 'rgba(45,90,61,0.05)';
+    });
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.style.borderColor = '';
+      uploadArea.style.background = '';
+    });
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.style.borderColor = '';
+      uploadArea.style.background = '';
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        uploadArea.querySelector('.cc-modal__upload-text').innerHTML = `<strong>${e.dataTransfer.files[0].name}</strong> selected ✓`;
+      }
+    });
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) {
+        uploadArea.querySelector('.cc-modal__upload-text').innerHTML = `<strong>${fileInput.files[0].name}</strong> selected ✓`;
+      }
+    });
+
+    // Form submit
+    document.getElementById('createEventForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      closeModal();
+      showToast('🎉 Event published successfully!');
+      e.target.reset();
+      uploadArea.querySelector('.cc-modal__upload-text').innerHTML = 'Drag & drop or <strong>browse</strong><br><small style="color: var(--cc-stone);">JPG, PNG — Max 5MB</small>';
+    });
+
+    // Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // ==============================
+    // TOAST
+    // ==============================
+    let toastTimeout;
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.add('cc-toast--visible');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('cc-toast--visible');
+      }, 2800);
+    }
+
+    // ==============================
+    // INITIAL RENDER
+    // ==============================
+    renderGrid(eventsData);
+    renderList(eventsData);
+  </script>
+</body>
+</html>

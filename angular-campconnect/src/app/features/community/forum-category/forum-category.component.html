@@ -1,0 +1,147 @@
+<div class="cc-container">
+
+    <!-- ====== Breadcrumb ====== -->
+    <nav class="cc-breadcrumb" aria-label="Breadcrumb">
+        <button class="cc-breadcrumb__item cc-breadcrumb__item--link" routerLink="/">Home</button>
+        <span class="cc-breadcrumb__separator">›</span>
+        <button class="cc-breadcrumb__item cc-breadcrumb__item--link" (click)="navigateToForum()">Community
+            Forum</button>
+        <span class="cc-breadcrumb__separator">›</span>
+        <span class="cc-breadcrumb__item cc-breadcrumb__item--current">{{ category.name }}</span>
+    </nav>
+
+    <!-- ====== Category Header ====== -->
+    <section class="cc-category-header">
+        <div class="cc-category-header__left">
+            <div class="cc-category-header__icon">{{ category.icon }}</div>
+            <div class="cc-category-header__info">
+                <h1 class="cc-category-header__title">{{ category.name }}</h1>
+                <p class="cc-category-header__desc">{{ category.description }}</p>
+                <div class="cc-category-header__stats">
+                    <div class="cc-category-header__stat">
+                        <span class="stat-icon">💬</span>
+                        <strong>{{ category.topicsCount }}</strong> Topics
+                    </div>
+                    <div class="cc-category-header__stat">
+                        <span class="stat-icon">👥</span>
+                        <strong>{{ category.membersCount }}</strong> Members
+                    </div>
+                    <div class="cc-category-header__stat">
+                        <span class="stat-icon">🕐</span>
+                        Last active <strong>{{ category.lastActive }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="cc-category-header__actions">
+            <button class="cc-btn cc-btn--ghost" title="Subscribe">🔔</button>
+            <button *ngIf="authService.isAuthenticated() | async" class="cc-btn cc-btn--primary"
+                (click)="navigateToCreate()">
+                ➕ Start a Topic
+            </button>
+        </div>
+    </section>
+
+    <!-- ====== Filter Bar ====== -->
+    <div class="cc-filter-bar">
+        <div class="cc-filter-bar__tabs">
+            <button class="cc-filter-tab" [class.cc-filter-tab--active]="activeFilter === 'latest'"
+                (click)="setActiveFilter('latest')">Latest</button>
+            <button class="cc-filter-tab" [class.cc-filter-tab--active]="activeFilter === 'top'"
+                (click)="setActiveFilter('top')">Top</button>
+            <button class="cc-filter-tab" [class.cc-filter-tab--active]="activeFilter === 'unanswered'"
+                (click)="setActiveFilter('unanswered')">Unanswered</button>
+            <button class="cc-filter-tab" [class.cc-filter-tab--active]="activeFilter === 'hot'"
+                (click)="setActiveFilter('hot')">Hot</button>
+        </div>
+        <div class="cc-filter-bar__search">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Search topics..." [(ngModel)]="searchQuery" aria-label="Search topics">
+        </div>
+    </div>
+
+    <!-- ====== Topics List ====== -->
+    <div class="cc-topics">
+        <!-- Table Header -->
+        <div class="cc-topics__header">
+            <span>Topic</span>
+            <span style="text-align:center;">Author</span>
+            <span style="text-align:center;">Replies</span>
+            <span style="text-align:center;">Views</span>
+            <span style="text-align:right;">Activity</span>
+        </div>
+
+        <!-- Topic Rows -->
+        <div *ngFor="let topic of filteredTopics" class="cc-topic-row" [class.cc-topic-row--pinned]="topic.pinned"
+            (click)="navigateToTopic(topic.id)" role="button" [attr.aria-label]="topic.title">
+
+            <!-- Main Cell -->
+            <div class="cc-topic-row__main">
+                <img [src]="'https://api.dicebear.com/9.x/adventurer/svg?seed=' + topic.avatar + '&backgroundColor=b6e3f4'"
+                    [alt]="topic.author" class="cc-topic-row__avatar" loading="lazy">
+                <div class="cc-topic-row__content">
+                    <div class="cc-topic-row__title-row">
+                        <span class="cc-topic-row__title">{{ topic.title }}</span>
+                        <span *ngIf="topic.pinned" class="cc-topic-row__badge cc-topic-row__badge--pinned">📌
+                            Pinned</span>
+                        <span *ngIf="topic.locked" class="cc-topic-row__badge cc-topic-row__badge--locked">🔒
+                            Locked</span>
+                        <span *ngIf="topic.hot && !topic.pinned" class="cc-topic-row__badge cc-topic-row__badge--hot">🔥
+                            Hot</span>
+                    </div>
+                    <div class="cc-topic-row__meta">
+                        <span class="cc-topic-row__author">{{ topic.author }}</span>
+                        <span>·</span>
+                        <app-trust-score [score]="topic.trustScore" variant="small"></app-trust-score>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Author (hidden on mobile, shown in grid) -->
+            <div class="cc-topic-row__stat" style="display:none;"></div>
+
+            <!-- Replies -->
+            <div class="cc-topic-row__stat">
+                <span class="cc-topic-row__stat-value">{{ topic.replies }}</span>
+                <span class="cc-topic-row__stat-label">replies</span>
+            </div>
+
+            <!-- Views -->
+            <div class="cc-topic-row__stat">
+                <span class="cc-topic-row__stat-value">{{ formatNumber(topic.views) }}</span>
+                <span class="cc-topic-row__stat-label">views</span>
+            </div>
+
+            <!-- Activity -->
+            <div class="cc-topic-row__activity">
+                <span class="cc-topic-row__activity-time">{{ topic.lastActivity }}</span>
+                <span class="cc-topic-row__activity-user">by {{ topic.lastUser }}</span>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="filteredTopics.length === 0" class="cc-topics__empty">
+            <div class="empty-icon">🔍</div>
+            No topics found matching your search.
+        </div>
+    </div>
+
+    <!-- ====== Pagination ====== -->
+    <nav class="cc-pagination" aria-label="Pagination">
+        <button class="cc-pagination__btn cc-pagination__btn--nav"
+            [class.cc-pagination__btn--disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">
+            ‹ <span>Prev</span>
+        </button>
+
+        <button *ngFor="let page of getPages()" class="cc-pagination__btn"
+            [class.cc-pagination__btn--active]="page === currentPage" (click)="setPage(page)">
+            {{ page }}
+        </button>
+
+        <button class="cc-pagination__btn cc-pagination__btn--nav"
+            [class.cc-pagination__btn--disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">
+            <span>Next</span> ›
+        </button>
+    </nav>
+
+</div>

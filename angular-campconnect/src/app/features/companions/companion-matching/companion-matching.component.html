@@ -1,0 +1,297 @@
+<div class="min-h-screen bg-[var(--color-background)]">
+  <!-- Hero Section -->
+  <div class="bg-gradient-to-r from-[var(--color-primary-700)] to-[var(--color-primary-800)] text-white">
+    <div class="container py-12">
+      <div class="max-w-4xl">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+            <lucide-icon [img]="UsersIcon" [size]="32" class="text-white"></lucide-icon>
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold text-white mb-1">Companion Matching</h1>
+            <p class="text-[var(--color-primary-100)] text-lg">
+              Find compatible camping companions for safer, more enjoyable adventures
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container py-8">
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <app-card *ngFor="let stat of stats" variant="elevated" customClass="hover:shadow-lg transition-shadow">
+        <app-card-content customClass="p-6">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-[var(--color-neutral-100)] rounded-xl flex items-center justify-center">
+              <lucide-icon [img]="stat.icon" [size]="28" [class]="stat.color"></lucide-icon>
+            </div>
+            <div>
+              <div class="text-3xl font-bold text-[var(--color-text-primary)]">
+                {{ stat.value }}
+              </div>
+              <div class="text-sm text-[var(--color-text-tertiary)]">{{ stat.label }}</div>
+            </div>
+          </div>
+        </app-card-content>
+      </app-card>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Main Content -->
+      <div class="lg:col-span-2 space-y-8">
+        <!-- How It Works -->
+        <app-card variant="elevated">
+          <app-card-header>
+            <app-card-title>How Companion Matching Works</app-card-title>
+            <app-card-description>
+              Safe, intelligent pairing based on experience, interests, and trip preferences
+            </app-card-description>
+          </app-card-header>
+          <app-card-content>
+            <div class="space-y-6">
+              <div class="flex gap-4">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <lucide-icon [img]="SettingsIcon" [size]="24" class="text-blue-600"></lucide-icon>
+                </div>
+                <div>
+                  <h5 class="mb-2 font-semibold text-[var(--color-text-heading)]">1. Set Your Preferences</h5>
+                  <p class="text-sm text-[var(--color-text-secondary)]">
+                    Tell us about your experience level, preferred activities, trip style, and
+                    availability. This helps us find compatible companions.
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex gap-4">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <lucide-icon [img]="SparklesIcon" [size]="24" class="text-green-600"></lucide-icon>
+                </div>
+                <div>
+                  <h5 class="mb-2 font-semibold text-[var(--color-text-heading)]">2. Review Smart Matches</h5>
+                  <p class="text-sm text-[var(--color-text-secondary)]">
+                    Our algorithm suggests companions based on compatibility scores, shared
+                    interests, similar experience levels, and overlapping availability.
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex gap-4">
+                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <lucide-icon [img]="MessageCircleIcon" [size]="24" class="text-purple-600"></lucide-icon>
+                </div>
+                <div>
+                  <h5 class="mb-2 font-semibold text-[var(--color-text-heading)]">3. Connect & Coordinate</h5>
+                  <p class="text-sm text-[var(--color-text-secondary)]">
+                    Accept matches to connect, create group trips together, and coordinate
+                    through shared trip planning tools.
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex gap-4">
+                <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <lucide-icon [img]="ShieldIcon" [size]="24" class="text-orange-600"></lucide-icon>
+                </div>
+                <div>
+                  <h5 class="mb-2 font-semibold text-[var(--color-text-heading)]">4. Adventure Safely</h5>
+                  <p class="text-sm text-[var(--color-text-secondary)]">
+                    All users are verified through booking history and community engagement.
+                    Emergency contacts are shared within confirmed groups for safety.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8 p-4 bg-[var(--color-primary-50)] rounded-lg border-2 border-[var(--color-primary-200)]">
+              <div class="flex items-start gap-3">
+                <lucide-icon [img]="ShieldIcon" [size]="20"
+                  class="text-[var(--color-primary-600)] flex-shrink-0 mt-0.5"></lucide-icon>
+                <div>
+                  <h6 class="text-[var(--color-primary-900)] mb-1 font-semibold">Safety First</h6>
+                  <p class="text-sm text-[var(--color-primary-700)]">
+                    We verify users through trip history, reviews, and certifications. You
+                    control who you match with, and can always decline or leave groups.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </app-card-content>
+        </app-card>
+
+        <!-- Recent Matches -->
+        <div>
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-[var(--color-text-heading)]">Recent Matches</h2>
+            <app-button variant="outline" size="sm" (click)="navigate('/companions/matches')">
+              <div class="flex items-center gap-2">
+                View All
+                <lucide-icon [img]="ArrowRightIcon" [size]="16"></lucide-icon>
+              </div>
+            </app-button>
+          </div>
+
+          <div *ngIf="recentMatches.length > 0; else noMatches" class="space-y-4">
+            <app-card *ngFor="let match of recentMatches" variant="elevated"
+              customClass="hover:shadow-lg transition-shadow cursor-pointer"
+              (click)="navigate('/companions/match/' + match.id)">
+              <app-card-content customClass="p-6">
+                <div class="flex items-start justify-between">
+                  <div class="flex gap-4 flex-1">
+                    <div
+                      class="w-16 h-16 bg-[var(--color-primary-200)] rounded-full flex items-center justify-center text-[var(--color-primary-700)] font-bold text-lg flex-shrink-0">
+                      {{ match.avatar }}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-3 mb-2">
+                        <h5 class="text-lg font-semibold text-[var(--color-text-heading)]">{{ match.name }}</h5>
+                        <app-badge *ngIf="match.status === 'accepted'" variant="default"
+                          customClass="bg-green-100 text-green-700 flex items-center gap-1">
+                          <lucide-icon [img]="CheckCircleIcon" [size]="12"></lucide-icon>
+                          Connected
+                        </app-badge>
+                      </div>
+                      <div class="flex items-center gap-2 text-sm text-[var(--color-text-tertiary)] mb-3">
+                        <lucide-icon [img]="MapPinIcon" [size]="16"></lucide-icon>
+                        {{ match.location }}
+                      </div>
+                      <div class="flex items-center gap-2 mb-3">
+                        <div class="text-sm font-medium text-[var(--color-text-secondary)]">
+                          {{ match.compatibility }}% Compatible
+                        </div>
+                        <div class="flex-1 bg-[var(--color-neutral-200)] rounded-full h-2">
+                          <div
+                            class="bg-gradient-to-r from-[var(--color-primary-500)] to-[var(--color-primary-600)] h-2 rounded-full"
+                            [style.width.%]="match.compatibility"></div>
+                        </div>
+                      </div>
+                      <div class="flex gap-2 flex-wrap">
+                        <app-badge *ngFor="let interest of match.sharedInterests.slice(0, 3)" variant="default"
+                          customClass="bg-[var(--color-neutral-100)] text-[var(--color-text-secondary)]">
+                          {{ interest }}
+                        </app-badge>
+                      </div>
+                    </div>
+                  </div>
+                  <lucide-icon [img]="ArrowRightIcon" [size]="20"
+                    class="text-[var(--color-text-tertiary)] flex-shrink-0 ml-4"></lucide-icon>
+                </div>
+              </app-card-content>
+            </app-card>
+          </div>
+          <ng-template #noMatches>
+            <app-card variant="bordered">
+              <app-card-content customClass="p-12 text-center">
+                <div
+                  class="w-16 h-16 bg-[var(--color-neutral-100)] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <lucide-icon [img]="UsersIcon" [size]="32" class="text-[var(--color-text-tertiary)]"></lucide-icon>
+                </div>
+                <h5 class="mb-2 font-semibold text-[var(--color-text-heading)]">No Matches Yet</h5>
+                <p class="text-sm text-[var(--color-text-secondary)] mb-6">
+                  Set up your preferences to start finding compatible camping companions
+                </p>
+                <app-button (click)="navigate('/companions/preferences')">
+                  Set Up Preferences
+                </app-button>
+              </app-card-content>
+            </app-card>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="lg:col-span-1">
+        <div class="sticky top-24 space-y-6">
+          <!-- CTA Card -->
+          <app-card variant="elevated"
+            customClass="bg-gradient-to-br from-[var(--color-primary-600)] to-[var(--color-primary-700)] text-white">
+            <app-card-content customClass="p-6">
+              <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mb-4">
+                <lucide-icon [img]="SparklesIcon" [size]="24" class="text-white"></lucide-icon>
+              </div>
+              <h4 class="text-xl font-bold text-white mb-2">Find Your Adventure Partners</h4>
+              <p class="text-sm text-[var(--color-primary-50)] mb-6">
+                Connect with like-minded outdoor enthusiasts for safer, more enjoyable camping
+                experiences.
+              </p>
+              <app-button (click)="navigate('/companions/matches')"
+                customClass="bg-white text-[var(--color-primary-600)] hover:bg-[var(--color-primary-50)] w-full flex justify-center items-center gap-2">
+                <lucide-icon [img]="UserPlusIcon" [size]="20"></lucide-icon>
+                Find Companions
+              </app-button>
+            </app-card-content>
+          </app-card>
+
+          <!-- Quick Links -->
+          <app-card variant="elevated">
+            <app-card-header>
+              <app-card-title>Quick Actions</app-card-title>
+            </app-card-header>
+            <app-card-content>
+              <div class="space-y-2">
+                <button (click)="navigate('/companions/preferences')"
+                  class="w-full flex items-center justify-between p-3 rounded-lg hover:bg-[var(--color-neutral-100)] transition-colors text-left">
+                  <div class="flex items-center gap-3">
+                    <lucide-icon [img]="SettingsIcon" [size]="20"
+                      class="text-[var(--color-text-tertiary)]"></lucide-icon>
+                    <span class="font-medium text-[var(--color-text-primary)]">Update Preferences</span>
+                  </div>
+                  <lucide-icon [img]="ArrowRightIcon" [size]="16"
+                    class="text-[var(--color-text-tertiary)]"></lucide-icon>
+                </button>
+                <button (click)="navigate('/companions/groups')"
+                  class="w-full flex items-center justify-between p-3 rounded-lg hover:bg-[var(--color-neutral-100)] transition-colors text-left">
+                  <div class="flex items-center gap-3">
+                    <lucide-icon [img]="UsersIcon" [size]="20" class="text-[var(--color-text-tertiary)]"></lucide-icon>
+                    <span class="font-medium text-[var(--color-text-primary)]">My Groups</span>
+                  </div>
+                  <lucide-icon [img]="ArrowRightIcon" [size]="16"
+                    class="text-[var(--color-text-tertiary)]"></lucide-icon>
+                </button>
+                <button (click)="navigate('/companions/create-group')"
+                  class="w-full flex items-center justify-between p-3 rounded-lg hover:bg-[var(--color-neutral-100)] transition-colors text-left">
+                  <div class="flex items-center gap-3">
+                    <lucide-icon [img]="UserPlusIcon" [size]="20"
+                      class="text-[var(--color-text-tertiary)]"></lucide-icon>
+                    <span class="font-medium text-[var(--color-text-primary)]">Create Group Trip</span>
+                  </div>
+                  <lucide-icon [img]="ArrowRightIcon" [size]="16"
+                    class="text-[var(--color-text-tertiary)]"></lucide-icon>
+                </button>
+              </div>
+            </app-card-content>
+          </app-card>
+
+          <!-- Trust & Safety -->
+          <app-card variant="bordered" customClass="bg-green-50 border-green-200">
+            <app-card-content customClass="p-4">
+              <h6 class="text-green-900 mb-3 font-semibold flex items-center gap-2">
+                <lucide-icon [img]="ShieldIcon" [size]="20"></lucide-icon>
+                Trust & Safety
+              </h6>
+              <ul class="space-y-2 text-sm text-green-800">
+                <li class="flex items-start gap-2">
+                  <lucide-icon [img]="CheckCircleIcon" [size]="16" class="flex-shrink-0 mt-0.5"></lucide-icon>
+                  <span>All users verified through booking history</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <lucide-icon [img]="CheckCircleIcon" [size]="16" class="flex-shrink-0 mt-0.5"></lucide-icon>
+                  <span>Emergency contacts shared in confirmed groups</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <lucide-icon [img]="CheckCircleIcon" [size]="16" class="flex-shrink-0 mt-0.5"></lucide-icon>
+                  <span>Report and block features available</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <lucide-icon [img]="CheckCircleIcon" [size]="16" class="flex-shrink-0 mt-0.5"></lucide-icon>
+                  <span>Control your visibility and matching settings</span>
+                </li>
+              </ul>
+            </app-card-content>
+          </app-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

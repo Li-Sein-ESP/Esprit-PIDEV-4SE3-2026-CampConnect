@@ -1,0 +1,52 @@
+<div class="min-h-screen bg-[var(--color-background)] py-12">
+  <div class="container max-w-7xl">
+    <div class="mb-8">
+      <h2 class="mb-2">Outdoor Events & Workshops</h2>
+      <p class="text-[var(--color-text-secondary)]">
+        Join guided expeditions, workshops, and community meetups
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (event of events(); track event.id) {
+      <app-card variant="elevated" class="hover:shadow-xl transition-shadow cursor-pointer"
+        [routerLink]="['/events', event.id]">
+        <img [src]="event.imageUrl" [alt]="event.title" class="w-full h-48 object-cover rounded-t-lg" />
+        <app-card-content class="p-6">
+          <div class="flex items-center gap-2 mb-3">
+            <app-badge [variant]="event.type === 'workshop' ? 'primary' : 'success'">
+              {{ event.type }}
+            </app-badge>
+            <app-badge variant="outline">{{ event.difficulty }}</app-badge>
+          </div>
+
+          <h4 class="mb-2">{{ event.title }}</h4>
+          <p class="text-sm text-[var(--color-text-secondary)] mb-4 line-clamp-2">
+            {{ event.description }}
+          </p>
+
+          <div class="space-y-2 text-sm">
+            <div class="flex items-center gap-2 text-[var(--color-text-secondary)]">
+              <lucide-icon [img]="Calendar" class="w-4 h-4"></lucide-icon>
+              <span>{{ formatDate(event.startDate) }}</span>
+            </div>
+            <div class="flex items-center gap-2 text-[var(--color-text-secondary)]">
+              <lucide-icon [img]="MapPin" class="w-4 h-4"></lucide-icon>
+              <span>{{ event.location.name }}</span>
+            </div>
+            <div class="flex items-center gap-2 text-[var(--color-text-secondary)]">
+              <lucide-icon [img]="Users" class="w-4 h-4"></lucide-icon>
+              <span>{{ event.registered }}/{{ event.capacity }} registered</span>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-4 border-t border-[var(--color-border-light)] flex items-center justify-between">
+            <span class="text-2xl font-bold text-[var(--color-primary-600)]">\${{ event.price }}</span>
+            <app-button size="sm">View Details</app-button>
+          </div>
+        </app-card-content>
+      </app-card>
+      }
+    </div>
+  </div>
+</div>

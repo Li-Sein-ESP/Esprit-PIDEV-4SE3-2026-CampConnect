@@ -1,0 +1,488 @@
+<!-- ========================================
+     CampConnect — Post Details Component
+     Route: /community/post/:id
+     ======================================== -->
+
+<!-- Breadcrumb -->
+<nav class="cc-breadcrumb" aria-label="Breadcrumb">
+  <button class="cc-breadcrumb__link" (click)="navigateTo('/community')">Home</button>
+  <span class="cc-breadcrumb__sep">›</span>
+  <button class="cc-breadcrumb__link" (click)="navigateTo('/community')">Explore</button>
+  <span class="cc-breadcrumb__sep">›</span>
+  <button class="cc-breadcrumb__link" (click)="navigateToProfile(post.user.id)">{{ post.user.name }}</button>
+  <span class="cc-breadcrumb__sep">›</span>
+  <span class="cc-breadcrumb__current">Post</span>
+</nav>
+
+<!-- Main Content -->
+<main class="cc-post-page">
+
+  <!-- ═══════════════════════════════════
+       POST CARD
+       ═══════════════════════════════════ -->
+  <article class="cc-post">
+
+    <!-- Post Header -->
+    <div class="cc-post__header">
+      <button class="cc-post__author" (click)="navigateToProfile(post.user.id)">
+        <div class="cc-post__avatar-wrap">
+          <img
+            class="cc-post__avatar"
+            [src]="post.user.avatar"
+            [alt]="post.user.name"
+            loading="lazy"
+          >
+          <div class="cc-post__online" *ngIf="post.user.online"></div>
+        </div>
+        <div class="cc-post__author-info">
+          <div class="cc-post__author-row">
+            <span class="cc-post__author-name">{{ post.user.name }}</span>
+            <span class="cc-post__verified" *ngIf="post.user.verified">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+              </svg>
+              Verified
+            </span>
+          </div>
+          <div class="cc-post__meta-line">
+            <span class="cc-post__timestamp">{{ post.timestamp }}</span>
+            <button class="cc-post__location" (click)="onLocationClick($event)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              {{ post.location }}
+            </button>
+          </div>
+        </div>
+      </button>
+
+      <div class="cc-post__header-actions">
+        <button
+          class="cc-post__follow-btn"
+          [class.cc-post__follow-btn--following]="isFollowing"
+          (click)="toggleFollow()"
+        >
+          {{ isFollowing ? 'Following' : 'Follow' }}
+        </button>
+        <button class="cc-post__menu-btn" (click)="showToast('⚙️ Options menu opened')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Post Media Carousel -->
+    <div
+      class="cc-post__media"
+      (click)="onMediaDoubleTap($event)"
+    >
+      <img
+        class="cc-post__media-img"
+        [src]="post.media[currentSlide]"
+        [alt]="'Post image ' + (currentSlide + 1)"
+        loading="lazy"
+      >
+
+      <span class="cc-post__media-counter">
+        {{ currentSlide + 1 }} / {{ post.media.length }}
+      </span>
+
+      <!-- Nav Arrows -->
+      <button
+        class="cc-post__media-nav cc-post__media-nav--prev"
+        (click)="changeSlide(-1); $event.stopPropagation()"
+        *ngIf="post.media.length > 1"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <button
+        class="cc-post__media-nav cc-post__media-nav--next"
+        (click)="changeSlide(1); $event.stopPropagation()"
+        *ngIf="post.media.length > 1"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+
+      <!-- Dots -->
+      <div class="cc-post__media-dots" *ngIf="post.media.length > 1">
+        <button
+          *ngFor="let slide of post.media; let i = index"
+          class="cc-post__media-dot"
+          [class.cc-post__media-dot--active]="i === currentSlide"
+          (click)="goToSlide(i); $event.stopPropagation()"
+        ></button>
+      </div>
+
+      <!-- Double-Tap Heart -->
+      <div
+        class="cc-double-tap-heart"
+        [class.cc-double-tap-heart--pop]="showDoubleTapHeart"
+      >❤️</div>
+    </div>
+
+    <!-- Post Content -->
+    <div class="cc-post__content">
+      <div class="cc-post__text">
+        {{ post.content }}
+      </div>
+
+      <!-- Hashtags -->
+      <div class="cc-post__text" *ngIf="post.hashtags.length">
+        <button
+          *ngFor="let tag of post.hashtags"
+          class="cc-post__hashtag"
+          (click)="onHashtagClick(tag)"
+        >
+          #{{ tag }}
+        </button>
+      </div>
+
+      <!-- Tagged Products -->
+      <div class="cc-post__tags" *ngIf="post.taggedProducts.length">
+        <div class="cc-post__tags-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+            <line x1="7" y1="7" x2="7.01" y2="7"/>
+          </svg>
+          Tagged Gear
+        </div>
+        <button
+          *ngFor="let product of post.taggedProducts"
+          class="cc-post__tag-chip"
+          (click)="navigateToProduct(product.id)"
+        >
+          <span class="cc-post__tag-chip-icon">{{ product.icon }}</span>
+          {{ product.name }}
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════
+         ENGAGEMENT BAR
+         ═══════════════════════════════ -->
+    <div class="cc-engagement">
+      <div class="cc-engagement__counts">
+        <div class="cc-engagement__count-left">
+          <div class="cc-engagement__like-faces">
+            <div
+              *ngFor="let user of post.likedByUsers | slice:0:3"
+              class="cc-engagement__like-face"
+              [style.background]="user.color"
+            >
+              {{ user.initials }}
+            </div>
+          </div>
+          <span class="cc-engagement__like-text">
+            Liked by
+            <strong>{{ post.likedByUsers[0]?.name }}</strong>
+            and
+            <strong>{{ post.likes | number }} others</strong>
+          </span>
+        </div>
+        <div class="cc-engagement__count-right">
+          <span>{{ post.comments.length }} comments</span>
+          <span>{{ post.shares }} shares</span>
+        </div>
+      </div>
+
+      <div class="cc-engagement__actions">
+        <div class="cc-engagement__actions-left">
+          <!-- Like -->
+          <button
+            class="cc-engage-btn"
+            [class.cc-engage-btn--liked]="isLiked"
+            (click)="toggleLike()"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" [attr.fill]="isLiked ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            <span>Like</span>
+          </button>
+
+          <!-- Comment -->
+          <button class="cc-engage-btn" (click)="focusCommentInput()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <span>Comment</span>
+          </button>
+
+          <!-- Share -->
+          <button class="cc-engage-btn" (click)="onShare()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            <span>Share</span>
+          </button>
+        </div>
+
+        <div class="cc-engagement__actions-right">
+          <!-- Save -->
+          <button
+            class="cc-engage-btn"
+            [class.cc-engage-btn--saved]="isSaved"
+            (click)="toggleSave()"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" [attr.fill]="isSaved ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
+            <span>Save</span>
+          </button>
+
+          <!-- Report -->
+          <button class="cc-engage-btn cc-engage-btn--report" (click)="onReport()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+              <line x1="4" y1="22" x2="4" y2="15"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ═══════════════════════════════════
+       COMMENTS SECTION
+       ═══════════════════════════════════ -->
+  <section class="cc-comments">
+    <div class="cc-comments__header">
+      <h2 class="cc-comments__title">
+        Comments
+        <span class="cc-comments__count-badge">{{ post.comments.length }}</span>
+      </h2>
+      <button class="cc-comments__sort" (click)="toggleSort()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="4" y1="6" x2="20" y2="6"/>
+          <line x1="4" y1="12" x2="14" y2="12"/>
+          <line x1="4" y1="18" x2="8" y2="18"/>
+        </svg>
+        {{ sortLabel }}
+      </button>
+    </div>
+
+    <!-- Comment Input -->
+    <div class="cc-comment-input">
+      <div class="cc-comment-input__avatar">AW</div>
+      <div class="cc-comment-input__body">
+        <textarea
+          #commentInput
+          class="cc-comment-input__field"
+          [(ngModel)]="newCommentText"
+          placeholder="Share your thoughts..."
+          rows="1"
+          (input)="autoResizeTextarea($event)"
+          (keydown.enter)="onCommentKeydown($event)"
+        ></textarea>
+        <div class="cc-comment-input__actions">
+          <div class="cc-comment-input__tools">
+            <button class="cc-comment-input__tool-btn" title="Add emoji">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                <line x1="9" y1="9" x2="9.01" y2="9"/>
+                <line x1="15" y1="9" x2="15.01" y2="9"/>
+              </svg>
+            </button>
+            <button class="cc-comment-input__tool-btn" title="Add image">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+            </button>
+            <button class="cc-comment-input__tool-btn" title="Mention someone">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <circle cx="12" cy="12" r="4"/>
+                <path d="M16 8v5a3 3 0 0 0 6 0V12a10 10 0 1 0-3.92 7.94"/>
+              </svg>
+            </button>
+          </div>
+          <button
+            class="cc-comment-input__submit"
+            [class.cc-comment-input__submit--active]="newCommentText.trim().length > 0"
+            (click)="postComment()"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+            Post
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comments List -->
+    <div class="cc-comments__list">
+
+      <!-- Top-Level Comments -->
+      <div
+        *ngFor="let comment of post.comments; trackBy: trackByCommentId"
+        class="cc-comment"
+        [class.cc-comment--new]="comment.id === newestCommentId"
+      >
+        <div class="cc-comment__main">
+          <div class="cc-comment__avatar" [style.background]="comment.author.color">
+            {{ comment.author.initials }}
+          </div>
+          <div class="cc-comment__body">
+            <div class="cc-comment__bubble">
+              <div class="cc-comment__author-row">
+                <button class="cc-comment__author" (click)="navigateToProfile(comment.author.id)">
+                  {{ comment.author.name }}
+                </button>
+                <span class="cc-comment__author-badge" *ngIf="comment.badge">{{ comment.badge }}</span>
+              </div>
+              <p class="cc-comment__text">{{ comment.text }}</p>
+            </div>
+            <div class="cc-comment__actions">
+              <span class="cc-comment__time">{{ comment.time }}</span>
+              <button
+                class="cc-comment__action-btn"
+                [class.cc-comment__action-btn--liked]="comment.liked"
+                (click)="toggleCommentLike(comment)"
+              >
+                ♥ {{ comment.likes }}
+              </button>
+              <button class="cc-comment__action-btn" (click)="replyToComment(comment.author.name)">
+                Reply
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nested Replies -->
+        <div class="cc-comment__replies" *ngIf="comment.showReplies && comment.replies.length">
+          <div
+            *ngFor="let reply of comment.replies; trackBy: trackByCommentId"
+            class="cc-comment"
+          >
+            <div class="cc-comment__main">
+              <div class="cc-comment__avatar" [style.background]="reply.author.color">
+                {{ reply.author.initials }}
+              </div>
+              <div class="cc-comment__body">
+                <div class="cc-comment__bubble">
+                  <div class="cc-comment__author-row">
+                    <button class="cc-comment__author" (click)="navigateToProfile(reply.author.id)">
+                      {{ reply.author.name }}
+                    </button>
+                    <span class="cc-comment__author-badge" *ngIf="reply.badge">{{ reply.badge }}</span>
+                  </div>
+                  <p class="cc-comment__text">{{ reply.text }}</p>
+                </div>
+                <div class="cc-comment__actions">
+                  <span class="cc-comment__time">{{ reply.time }}</span>
+                  <button
+                    class="cc-comment__action-btn"
+                    [class.cc-comment__action-btn--liked]="reply.liked"
+                    (click)="toggleCommentLike(reply)"
+                  >
+                    ♥ {{ reply.likes }}
+                  </button>
+                  <button class="cc-comment__action-btn" (click)="replyToComment(reply.author.name)">
+                    Reply
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Toggle Replies Button -->
+        <button
+          class="cc-comment__show-replies"
+          *ngIf="comment.replies.length > 0"
+          (click)="toggleReplies(comment)"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <polyline [attr.points]="comment.showReplies ? '18 15 12 9 6 15' : '6 9 12 15 18 9'"/>
+          </svg>
+          {{ comment.showReplies ? 'Hide' : 'View' }}
+          {{ comment.replies.length }}
+          {{ comment.replies.length === 1 ? 'reply' : 'replies' }}
+        </button>
+      </div>
+    </div>
+
+    <button class="cc-comments__load-more" (click)="loadMoreComments()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <polyline points="7 13 12 18 17 13"/>
+        <polyline points="7 6 12 11 17 6"/>
+      </svg>
+      Load more comments
+    </button>
+  </section>
+
+  <!-- ═══════════════════════════════════
+       RELATED POSTS
+       ═══════════════════════════════════ -->
+  <section class="cc-related">
+    <div class="cc-related__header">
+      <h2 class="cc-related__title">More Like This</h2>
+      <button class="cc-related__see-all" (click)="navigateTo('/community')">
+        See all
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="cc-related__scroll">
+      <article
+        *ngFor="let related of post.relatedPosts"
+        class="cc-related-card"
+        (click)="navigateToPost(related.id)"
+      >
+        <div class="cc-related-card__img-wrap">
+          <img
+            class="cc-related-card__img"
+            [src]="related.image"
+            [alt]="related.caption"
+            loading="lazy"
+          >
+          <div class="cc-related-card__overlay">
+            <div class="cc-related-card__stats">
+              <span class="cc-related-card__stat">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="1">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                {{ related.likes }}
+              </span>
+              <span class="cc-related-card__stat">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                {{ related.comments }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="cc-related-card__body">
+          <div class="cc-related-card__author">
+            <div class="cc-related-card__author-avatar" [style.background]="related.author.color">
+              {{ related.author.initials }}
+            </div>
+            <span class="cc-related-card__author-name">{{ related.author.name }}</span>
+          </div>
+          <p class="cc-related-card__caption">{{ related.caption }}</p>
+          <span class="cc-related-card__tag">{{ related.tag }}</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+</main>
+
+<!-- Toast Notification -->
+<div class="cc-toast" [class.cc-toast--visible]="toastVisible">
+  <span>{{ toastMessage }}</span>
+</div>

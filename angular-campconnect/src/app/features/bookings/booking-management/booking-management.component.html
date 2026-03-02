@@ -1,0 +1,181 @@
+<div class="min-h-screen bg-[var(--color-background)] py-12">
+    <div class="container max-w-6xl">
+        <!-- Header -->
+        <div class="mb-8">
+            <h2 class="mb-2">My Bookings</h2>
+            <p class="text-[var(--color-text-secondary)]">
+                Manage your campsite reservations and view booking history
+            </p>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <app-card variant="bordered">
+                <app-card-content customClass="text-center py-4">
+                    <div class="text-3xl font-bold text-[var(--color-primary-600)] mb-1">
+                        {{ upcomingCount }}
+                    </div>
+                    <div class="text-sm text-[var(--color-text-secondary)]">Upcoming Trips</div>
+                </app-card-content>
+            </app-card>
+            <app-card variant="bordered">
+                <app-card-content customClass="text-center py-4">
+                    <div class="text-3xl font-bold text-green-600 mb-1">
+                        {{ confirmedCount }}
+                    </div>
+                    <div class="text-sm text-[var(--color-text-secondary)]">Confirmed</div>
+                </app-card-content>
+            </app-card>
+            <app-card variant="bordered">
+                <app-card-content customClass="text-center py-4">
+                    <div class="text-3xl font-bold text-amber-600 mb-1">
+                        {{ pendingCount }}
+                    </div>
+                    <div class="text-sm text-[var(--color-text-secondary)]">Pending</div>
+                </app-card-content>
+            </app-card>
+            <app-card variant="bordered">
+                <app-card-content customClass="text-center py-4">
+                    <div class="text-3xl font-bold text-[var(--color-text-secondary)] mb-1">
+                        {{ completedCount }}
+                    </div>
+                    <div class="text-sm text-[var(--color-text-secondary)]">Completed</div>
+                </app-card-content>
+            </app-card>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex items-center justify-between gap-4 mb-6">
+            <div class="flex gap-2 overflow-x-auto pb-2 flex-1">
+                <button *ngFor="let tab of [
+            { id: 'all', label: 'All Bookings' },
+            { id: 'upcoming', label: 'Upcoming' },
+            { id: 'past', label: 'Past' },
+            { id: 'cancelled', label: 'Cancelled' }
+          ]" (click)="setFilter(tab.id)"
+                    [class]="'px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all ' +
+            (filter === tab.id
+              ? 'bg-[var(--color-primary-600)] text-white'
+              : 'bg-white border border-[var(--color-border-light)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary-300)]')">
+                    {{ tab.label }}
+                </button>
+            </div>
+            <app-button variant="outline" size="sm" customClass="hidden md:flex">
+                <lucide-icon [name]="Filter" class="w-4 h-4"></lucide-icon>
+                Filter
+            </app-button>
+        </div>
+
+        <!-- Bookings List -->
+        <div *ngIf="filteredBookings.length === 0">
+            <app-card variant="elevated" customClass="text-center py-16">
+                <div class="max-w-md mx-auto">
+                    <div
+                        class="w-16 h-16 bg-[var(--color-neutral-100)] rounded-full flex items-center justify-center mx-auto mb-4">
+                        <lucide-icon [name]="Calendar" class="w-8 h-8 text-[var(--color-text-tertiary)]"></lucide-icon>
+                    </div>
+                    <h3 class="mb-2">No bookings found</h3>
+                    <p class="text-[var(--color-text-secondary)] mb-6">
+                        You don't have any {{ filter !== 'all' ? filter : '' }} bookings.
+                    </p>
+                    <app-button (click)="searchCampsites()">
+                        <lucide-icon [name]="Search" class="w-5 h-5"></lucide-icon>
+                        Search Campsites
+                    </app-button>
+                </div>
+            </app-card>
+        </div>
+
+        <div *ngIf="filteredBookings.length > 0" class="space-y-4">
+            <app-card *ngFor="let booking of filteredBookings" variant="elevated" padding="none"
+                customClass="overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-0">
+                    <!-- Image -->
+                    <div class="relative h-48 md:h-auto">
+                        <img [src]="booking.campsite.imageUrl" [alt]="booking.campsite.name"
+                            class="w-full h-full object-cover" />
+                        <div class="absolute top-4 left-4">
+                            <app-badge [variant]="statusConfig[booking.status].variant" [dot]="true">
+                                {{ statusConfig[booking.status].label }}
+                            </app-badge>
+                        </div>
+                    </div>
+
+                    <!-- Details -->
+                    <div class="md:col-span-3 p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h4>{{ booking.campsite.name }}</h4>
+                                    <app-badge
+                                        *ngIf="getDaysUntil(booking.checkIn) > 0 && getDaysUntil(booking.checkIn) <= 30 && booking.status === 'confirmed'"
+                                        variant="warning" size="sm">
+                                        {{ getDaysUntil(booking.checkIn) }} days away
+                                    </app-badge>
+                                </div>
+                                <div class="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] mb-3">
+                                    <lucide-icon [name]="MapPin" class="w-4 h-4"></lucide-icon>
+                                    <span>{{ booking.campsite.location }}</span>
+                                </div>
+                                <div class="text-xs text-[var(--color-text-tertiary)]">
+                                    Booking ID: {{ booking.id }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Booking Info Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                            <div>
+                                <div class="text-xs text-[var(--color-text-tertiary)] mb-1">Check-in</div>
+                                <div class="flex items-center gap-2">
+                                    <lucide-icon [name]="Calendar"
+                                        class="w-4 h-4 text-[var(--color-primary-600)]"></lucide-icon>
+                                    <span class="text-sm font-medium">{{ formatDate(booking.checkIn) }}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-[var(--color-text-tertiary)] mb-1">Check-out</div>
+                                <div class="flex items-center gap-2">
+                                    <lucide-icon [name]="Calendar"
+                                        class="w-4 h-4 text-[var(--color-primary-600)]"></lucide-icon>
+                                    <span class="text-sm font-medium">{{ formatDate(booking.checkOut) }}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-[var(--color-text-tertiary)] mb-1">Duration</div>
+                                <span class="text-sm font-medium">{{ booking.nights }} {{ booking.nights === 1 ? 'night'
+                                    : 'nights' }}</span>
+                            </div>
+                            <div>
+                                <div class="text-xs text-[var(--color-text-tertiary)] mb-1">Guests</div>
+                                <div class="flex items-center gap-2">
+                                    <lucide-icon [name]="Users"
+                                        class="w-4 h-4 text-[var(--color-primary-600)]"></lucide-icon>
+                                    <span class="text-sm font-medium">{{ booking.guests }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="flex items-center justify-between pt-4 border-t border-[var(--color-border-light)]">
+                            <div>
+                                <div class="text-sm text-[var(--color-text-tertiary)] mb-1">Total Paid</div>
+                                <div class="text-xl font-bold text-[var(--color-primary-600)]">
+                                    ${{ booking.total.toFixed(2) }}
+                                </div>
+                            </div>
+                            <div *ngIf="booking.refundEligible" class="flex items-center gap-2 text-sm text-green-600">
+                                <lucide-icon [name]="CheckCircle" class="w-4 h-4"></lucide-icon>
+                                <span>Refund eligible</span>
+                            </div>
+                            <app-button variant="outline" (click)="viewDetails(booking.id, booking)">
+                                View Details
+                                <lucide-icon [name]="ChevronRight" class="w-5 h-5"></lucide-icon>
+                            </app-button>
+                        </div>
+                    </div>
+                </div>
+            </app-card>
+        </div>
+    </div>
+</div>

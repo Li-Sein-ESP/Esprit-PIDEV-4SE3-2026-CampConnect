@@ -1,0 +1,134 @@
+<div class="cc-create-topic">
+    <!-- ====== Header ====== -->
+    <header class="cc-header">
+        <div class="cc-header__inner">
+            <button class="cc-back-btn" (click)="goBack()">
+                <lucide-icon [img]="ChevronLeftIcon" [size]="20"></lucide-icon>
+                <span>Back to Forum</span>
+            </button>
+            <h1 class="cc-title">Start a New Discussion</h1>
+            <p class="cc-subtitle">Join the conversation and share your outdoor wisdom with the community.</p>
+        </div>
+    </header>
+
+    <main class="cc-main">
+        <div class="cc-container">
+            <form [formGroup]="topicForm" (ngSubmit)="onSubmit()" class="cc-form">
+
+                <!-- Category Selection -->
+                <div class="cc-form-group">
+                    <label class="cc-label" for="category">Choose a Category <span class="cc-required">*</span></label>
+                    <div class="cc-select-wrapper">
+                        <select id="category" formControlName="category" class="cc-select">
+                            <option value="" disabled selected>Select a category...</option>
+                            <option *ngFor="let cat of categories" [value]="cat.id">
+                                {{ cat.icon }} {{ cat.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <p *ngIf="topicForm.get('category')?.touched && topicForm.get('category')?.invalid"
+                        class="cc-error">
+                        Please select a category for your topic.
+                    </p>
+                </div>
+
+                <!-- Title -->
+                <div class="cc-form-group">
+                    <div class="cc-label-row">
+                        <label class="cc-label" for="title">Topic Title <span class="cc-required">*</span></label>
+                        <span class="cc-counter"
+                            [class.cc-counter--limit]="topicForm.get('title')?.value?.length > 110">
+                            {{ topicForm.get('title')?.value?.length || 0 }}/120
+                        </span>
+                    </div>
+                    <input type="text" id="title" formControlName="title"
+                        placeholder="e.g., What are the best 3-season tents for high-altitude camping?"
+                        class="cc-input">
+                    <p *ngIf="topicForm.get('title')?.touched && topicForm.get('title')?.errors?.['required']"
+                        class="cc-error">
+                        A descriptive title is required.
+                    </p>
+                    <p *ngIf="topicForm.get('title')?.touched && topicForm.get('title')?.errors?.['minlength']"
+                        class="cc-error">
+                        Title must be at least 10 characters long.
+                    </p>
+                </div>
+
+                <!-- Content -->
+                <div class="cc-form-group">
+                    <div class="cc-label-row">
+                        <label class="cc-label" for="content">Description <span class="cc-required">*</span></label>
+                        <span class="cc-counter"
+                            [class.cc-counter--limit]="topicForm.get('content')?.value?.length > 1900">
+                            {{ topicForm.get('content')?.value?.length || 0 }}/2000
+                        </span>
+                    </div>
+                    <textarea id="content" formControlName="content"
+                        placeholder="Provide all details about your question or topic..." class="cc-textarea"
+                        rows="8"></textarea>
+                    <p *ngIf="topicForm.get('content')?.touched && topicForm.get('content')?.errors?.['required']"
+                        class="cc-error">
+                        Please provide more information about your topic.
+                    </p>
+                </div>
+
+                <!-- Tags -->
+                <div class="cc-form-group">
+                    <label class="cc-label">Add Tags (up to 5)</label>
+                    <div class="cc-tags-container">
+                        <div *ngFor="let tag of tags; let i = index" class="cc-tag">
+                            <span>#{{tag}}</span>
+                            <button type="button" (click)="removeTag(i)" class="cc-tag-remove">
+                                <lucide-icon [img]="XIcon" [size]="14"></lucide-icon>
+                            </button>
+                        </div>
+                        <input type="text" [(ngModel)]="tagInput" [ngModelOptions]="{standalone: true}"
+                            (keydown.enter)="addTag($event)" placeholder="Add a tag..." class="cc-tag-input"
+                            [disabled]="tags.length >= 5">
+                    </div>
+                    <p class="cc-help-text">Press Enter to add tags like #gear, #hiking, #safety.</p>
+                </div>
+
+                <!-- Media Upload -->
+                <div class="cc-form-group">
+                    <label class="cc-label">Add Media (Photos)</label>
+                    <div class="cc-media-upload">
+                        <input type="file" id="media-upload" multiple (change)="onFileSelected($event)" accept="image/*"
+                            class="cc-file-input" #fileInput>
+                        <button type="button" class="cc-upload-btn" (click)="fileInput.click()">
+                            <lucide-icon [img]="ImageIcon" [size]="24"></lucide-icon>
+                            <span>Choose Images</span>
+                        </button>
+                        <div class="cc-previews" *ngIf="previews.length > 0">
+                            <div *ngFor="let preview of previews; let i = index" class="cc-preview-card">
+                                <img [src]="preview" alt="Preview">
+                                <button type="button" (click)="removeMedia(i)" class="cc-preview-remove">
+                                    <lucide-icon [img]="XIcon" [size]="14"></lucide-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guidelines Tip -->
+                <div class="cc-tip-card">
+                    <lucide-icon [img]="InfoIcon" [size]="20" class="cc-tip-icon"></lucide-icon>
+                    <div class="cc-tip-content">
+                        <strong>Pro Tip:</strong> Clear titles and high-quality images help get more helpful responses
+                        from the community!
+                    </div>
+                </div>
+
+                <!-- Footer Actions -->
+                <div class="cc-form-footer">
+                    <button type="button" class="cc-btn cc-btn--ghost" (click)="goBack()">Cancel</button>
+                    <button type="submit" class="cc-btn cc-btn--primary" [disabled]="topicForm.invalid">
+                        <lucide-icon [img]="SendIcon" [size]="18"></lucide-icon>
+                        <span>Publish Topic</span>
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </main>
+</div>

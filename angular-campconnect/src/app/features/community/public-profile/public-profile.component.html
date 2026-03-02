@@ -1,0 +1,181 @@
+<div class="cc-profile-page" *ngIf="userProfile">
+
+    <!-- ====== Cover & Header ====== -->
+    <div class="cc-cover-wrap">
+        <div class="cc-cover-image" [style.backgroundImage]="'url(' + userProfile.banner + ')'"></div>
+        <div class="cc-header-actions cc-container">
+            <button class="cc-action-circle" (click)="goBack()" title="Go back">
+                <lucide-icon [img]="ChevronLeftIcon" [size]="20"></lucide-icon>
+            </button>
+            <div class="cc-action-group">
+                <button class="cc-action-circle" title="Share profile">
+                    <lucide-icon [img]="Share2Icon" [size]="18"></lucide-icon>
+                </button>
+                <button class="cc-action-circle" title="More options">
+                    <lucide-icon [img]="MoreHorizontalIcon" [size]="18"></lucide-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="cc-profile-main cc-container">
+        <div class="cc-profile-grid">
+
+            <!-- Left: Profile Info -->
+            <aside class="cc-profile-sidebar">
+                <div class="cc-profile-card">
+                    <div class="cc-avatar-wrap">
+                        <img [src]="userProfile.avatar" [alt]="userProfile.name" class="cc-avatar">
+                        <div class="cc-online-indicator"></div>
+                    </div>
+
+                    <div class="cc-profile-identity">
+                        <h1 class="cc-full-name">{{ userProfile.name }}</h1>
+                        <p class="cc-username">@{{ userProfile.username }}</p>
+                        <div class="cc-role-badge"
+                            [class.cc-role-badge--verified]="userProfile.role === 'Verified Camper'">
+                            <lucide-icon *ngIf="userProfile.role === 'Verified Camper'" [img]="AwardIcon"
+                                [size]="14"></lucide-icon>
+                            {{ userProfile.role }}
+                        </div>
+                    </div>
+
+                    <div class="cc-trust-wrap">
+                        <app-trust-score [score]="userProfile.trustScore"></app-trust-score>
+                    </div>
+
+                    <p class="cc-bio">{{ userProfile.bio }}</p>
+
+                    <div class="cc-info-items">
+                        <div class="cc-info-item">
+                            <lucide-icon [img]="MapPinIcon" [size]="16"></lucide-icon>
+                            <span>{{ userProfile.location }}</span>
+                        </div>
+                        <div class="cc-info-item">
+                            <lucide-icon [img]="CalendarIcon" [size]="16"></lucide-icon>
+                            <span>{{ userProfile.joinDate }}</span>
+                        </div>
+                    </div>
+
+                    <div class="cc-profile-stats">
+                        <div class="cc-stat-item">
+                            <span class="cc-stat-val">{{ userProfile.stats.followers }}</span>
+                            <span class="cc-stat-lbl">Followers</span>
+                        </div>
+                        <div class="cc-stat-item">
+                            <span class="cc-stat-val">{{ userProfile.stats.following }}</span>
+                            <span class="cc-stat-lbl">Following</span>
+                        </div>
+                    </div>
+
+                    <div class="cc-button-group">
+                        <button class="cc-btn cc-btn--primary cc-btn--full" (click)="toggleFollow()">
+                            <lucide-icon [img]="userProfile.isFollowed ? UserMinusIcon : UserPlusIcon"
+                                [size]="18"></lucide-icon>
+                            {{ userProfile.isFollowed ? 'Unfollow' : 'Follow' }}
+                        </button>
+                        <button class="cc-btn cc-btn--outline cc-btn--full" (click)="sendMessage()">
+                            <lucide-icon [img]="MessageSquareIcon" [size]="18"></lucide-icon>
+                            Message
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Badges Preview (Desktop) -->
+                <div class="cc-badges-card cc-desktop-only">
+                    <h3 class="cc-card-title">Top Badges</h3>
+                    <div class="cc-badge-grid">
+                        <app-camp-badge *ngFor="let badge of userProfile.badges.slice(0, 4)" [title]="badge.title"
+                            [description]="badge.description" [icon]="badge.icon" [unlocked]="true" size="small">
+                        </app-camp-badge>
+                    </div>
+                    <button class="cc-link-btn" (click)="setActiveTab('badges')">View all badges</button>
+                </div>
+            </aside>
+
+            <!-- Right: Content Tabs -->
+            <main class="cc-profile-content">
+                <nav class="cc-tabs">
+                    <button class="cc-tab-btn" [class.cc-tab-btn--active]="activeTab === 'posts'"
+                        (click)="setActiveTab('posts')">
+                        <lucide-icon [img]="FileTextIcon" [size]="18"></lucide-icon>
+                        Posts <span>{{ userProfile.stats.posts }}</span>
+                    </button>
+                    <button class="cc-tab-btn" [class.cc-tab-btn--active]="activeTab === 'topics'"
+                        (click)="setActiveTab('topics')">
+                        <lucide-icon [img]="BookOpenIcon" [size]="18"></lucide-icon>
+                        Topics <span>{{ userProfile.stats.topics }}</span>
+                    </button>
+                    <button class="cc-tab-btn" [class.cc-tab-btn--active]="activeTab === 'replies'"
+                        (click)="setActiveTab('replies')">
+                        <lucide-icon [img]="MessageCircleIcon" [size]="18"></lucide-icon>
+                        Replies <span>{{ userProfile.stats.replies }}</span>
+                    </button>
+                    <button class="cc-tab-btn" [class.cc-tab-btn--active]="activeTab === 'badges'"
+                        (click)="setActiveTab('badges')">
+                        <lucide-icon [img]="AwardIcon" [size]="18"></lucide-icon>
+                        Badges
+                    </button>
+                </nav>
+
+                <!-- Posts Tab -->
+                <div class="cc-tab-pane" *ngIf="activeTab === 'posts'">
+                    <div class="cc-empty-state" *ngIf="userPosts.length === 0">
+                        <p>No posts shared yet.</p>
+                    </div>
+                    <div class="cc-profile-post" *ngFor="let post of userPosts">
+                        <div class="cc-post-context">Posted {{ post.timestamp }}</div>
+                        <p class="cc-post-text">{{ post.content }}</p>
+                        <div class="cc-post-media" *ngIf="post.media">
+                            <img [src]="post.media" alt="Post media">
+                        </div>
+                        <div class="cc-post-footer">
+                            <span class="cc-post-stat">❤️ {{ post.likes }}</span>
+                            <span class="cc-post-stat">💬 {{ post.comments }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Topics Tab -->
+                <div class="cc-tab-pane" *ngIf="activeTab === 'topics'">
+                    <div class="cc-topic-list">
+                        <div class="cc-topic-item" *ngFor="let topic of userTopics">
+                            <div class="cc-topic-main">
+                                <span class="cc-topic-cat">{{ topic.category }}</span>
+                                <h4 class="cc-topic-title">{{ topic.title }}</h4>
+                                <div class="cc-topic-meta">Started on {{ topic.date }}</div>
+                            </div>
+                            <div class="cc-topic-stats">
+                                <div class="cc-tstat"><span>{{ topic.replies }}</span> replies</div>
+                                <div class="cc-tstat"><span>{{ topic.views }}</span> views</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Replies Tab -->
+                <div class="cc-tab-pane" *ngIf="activeTab === 'replies'">
+                    <div class="cc-reply-list">
+                        <div class="cc-reply-item" *ngFor="let reply of userReplies">
+                            <div class="cc-reply-context">
+                                Replied to <strong>{{ reply.topicTitle }}</strong> · {{ reply.date }}
+                            </div>
+                            <p class="cc-reply-text">{{ reply.content }}</p>
+                            <button class="cc-link-btn">View full thread</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Badges Tab -->
+                <div class="cc-tab-pane" *ngIf="activeTab === 'badges'">
+                    <div class="cc-full-badge-grid">
+                        <app-camp-badge *ngFor="let badge of userProfile.badges" [title]="badge.title"
+                            [description]="badge.description" [icon]="badge.icon" [unlocked]="true" size="large">
+                        </app-camp-badge>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+</div>

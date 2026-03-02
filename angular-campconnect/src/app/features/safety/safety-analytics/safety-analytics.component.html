@@ -1,0 +1,251 @@
+<section class="safety-analytics">
+
+    <!-- ─── Header ─── -->
+    <header class="analytics-header">
+        <div class="analytics-header__content">
+            <div class="analytics-header__icon">
+                <lucide-icon [img]="BarChartIcon" [size]="24" [strokeWidth]="2.5"></lucide-icon>
+            </div>
+            <h1 class="analytics-header__title">Risk Analytics</h1>
+            <p class="analytics-header__subtitle">Safety trends and regional insights</p>
+        </div>
+        <div class="analytics-header__meta">
+            <span class="analytics-header__dot"></span>
+            Live data — Last updated {{ mockAlerts[0]?.updatedAt | date:'mediumDate' }}
+        </div>
+    </header>
+
+    <ng-container *ngIf="totalAlerts > 0; else emptyState">
+        <!-- ─── KPI Cards ─── -->
+        <div class="kpi-grid">
+            <article class="kpi-card kpi-card--alerts">
+                <div class="kpi-card__header">
+                    <span class="kpi-card__label">Total Active Alerts</span>
+                    <span class="kpi-card__icon">
+                        <lucide-icon [img]="BellIcon" [size]="20"></lucide-icon>
+                    </span>
+                </div>
+                <div class="kpi-card__value">{{ totalAlerts }}</div>
+                <div class="kpi-card__detail">
+                    <span class="kpi-card__trend kpi-card__trend--neutral">Real Time</span>
+                    System generated
+                </div>
+            </article>
+
+            <article class="kpi-card kpi-card--critical">
+                <div class="kpi-card__header">
+                    <span class="kpi-card__label">High & Critical</span>
+                    <span class="kpi-card__icon">
+                        <lucide-icon [img]="AlertIcon" [size]="20"></lucide-icon>
+                    </span>
+                </div>
+                <div class="kpi-card__value">{{ highCriticalAlerts }}</div>
+                <div class="kpi-card__detail">
+                    <span class="kpi-card__trend" [class.kpi-card__trend--up]="highCriticalAlerts > 5"
+                        [class.kpi-card__trend--down]="highCriticalAlerts <= 5">
+                        {{ highCriticalAlerts > 5 ? 'Elevated' : 'Normal' }}
+                    </span>
+                    Currently tracking
+                </div>
+            </article>
+
+            <article class="kpi-card kpi-card--region">
+                <div class="kpi-card__header">
+                    <span class="kpi-card__label">Most Affected Region</span>
+                    <span class="kpi-card__icon">
+                        <lucide-icon [img]="MapPinIcon" [size]="20"></lucide-icon>
+                    </span>
+                </div>
+                <div class="kpi-card__value" [style.fontSize.px]="mostAffectedRegion.length > 15 ? 24 : 36">{{
+                    mostAffectedRegion }}</div>
+                <div class="kpi-card__detail">
+                    Highest incident density
+                </div>
+            </article>
+
+            <article class="kpi-card kpi-card--risk">
+                <div class="kpi-card__header">
+                    <span class="kpi-card__label">Most Frequent Risk</span>
+                    <span class="kpi-card__icon">
+                        <lucide-icon [img]="FlameIcon" [size]="20"></lucide-icon>
+                    </span>
+                </div>
+                <div class="kpi-card__value">{{ mostFrequentRisk }}</div>
+                <div class="kpi-card__detail">
+                    Dominant active category
+                </div>
+            </article>
+        </div>
+
+        <!-- ─── Charts Section ─── -->
+        <div class="charts-grid">
+            <!-- Pie Chart -->
+            <div class="chart-card">
+                <div class="chart-card__header">
+                    <div>
+                        <h2 class="chart-card__title">Risk Level Distribution</h2>
+                        <p class="chart-card__description">Breakdown by severity</p>
+                    </div>
+                    <span class="chart-card__badge">Live</span>
+                </div>
+                <div class="chart-card__body">
+                    <div class="chart-visual--pie">
+                        <div class="chart-donut" [style.background]="getPieGradient()">
+                            <div class="chart-donut__hole">
+                                <span class="chart-donut__number">{{ totalAlerts }}</span>
+                                <span class="chart-donut__text">Total</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-legend">
+                        <span class="chart-legend__item" *ngIf="riskDistribution.critical > 0">
+                            <span class="chart-legend__dot chart-legend__dot--critical"></span>
+                            Critical ({{ (riskDistribution.critical / totalAlerts * 100) | number:'1.0-0' }}%)
+                        </span>
+                        <span class="chart-legend__item" *ngIf="riskDistribution.danger > 0">
+                            <span class="chart-legend__dot chart-legend__dot--danger"></span>
+                            Danger ({{ (riskDistribution.danger / totalAlerts * 100) | number:'1.0-0' }}%)
+                        </span>
+                        <span class="chart-legend__item" *ngIf="riskDistribution.warning > 0">
+                            <span class="chart-legend__dot chart-legend__dot--warning"></span>
+                            Warning ({{ (riskDistribution.warning / totalAlerts * 100) | number:'1.0-0' }}%)
+                        </span>
+                        <span class="chart-legend__item" *ngIf="riskDistribution.info > 0">
+                            <span class="chart-legend__dot chart-legend__dot--info"></span>
+                            Info ({{ (riskDistribution.info / totalAlerts * 100) | number:'1.0-0' }}%)
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Line/Curve Chart -->
+            <div class="chart-card">
+                <div class="chart-card__header">
+                    <div>
+                        <h2 class="chart-card__title">Alerts Over Time</h2>
+                        <p class="chart-card__description">Monthly trend — past 12 months</p>
+                    </div>
+                    <span class="chart-card__badge">Trend</span>
+                </div>
+                <div class="chart-card__body">
+                    <div class="chart-line-visual">
+                        <div class="chart-line-visual__grid">
+                            <div class="chart-line-visual__grid-line"></div>
+                            <div class="chart-line-visual__grid-line"></div>
+                            <div class="chart-line-visual__grid-line"></div>
+                            <div class="chart-line-visual__grid-line"></div>
+                            <div class="chart-line-visual__grid-line"></div>
+                        </div>
+                        <!-- Hand-drawn style SVG using pre-calculated points or smooth constraints -->
+                        <svg class="chart-line-visual__svg" viewBox="0 0 600 160" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#4a6cf7" stop-opacity="0.2" />
+                                    <stop offset="100%" stop-color="#4a6cf7" stop-opacity="0.01" />
+                                </linearGradient>
+                            </defs>
+                            <path class="animated-path"
+                                d="M0,120 C50,100 80,110 120,80 C160,50 200,90 240,60 C280,30 320,70 360,40 C400,55 440,25 480,45 C520,35 560,50 600,20"
+                                fill="none" stroke="#4a6cf7" stroke-width="2.5" stroke-linecap="round" />
+                            <path
+                                d="M0,120 C50,100 80,110 120,80 C160,50 200,90 240,60 C280,30 320,70 360,40 C400,55 440,25 480,45 C520,35 560,50 600,20 L600,160 L0,160 Z"
+                                fill="url(#lineGrad)" />
+                        </svg>
+                    </div>
+                    <div class="chart-line-visual__months">
+                        <span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bar Chart -->
+            <div class="chart-card charts-grid__full-row">
+                <div class="chart-card__header">
+                    <div>
+                        <h2 class="chart-card__title">Alert Types Breakdown</h2>
+                        <p class="chart-card__description">Distribution of alerts by category</p>
+                    </div>
+                    <span class="chart-card__badge">Categories</span>
+                </div>
+                <div class="chart-card__body">
+                    <div class="chart-visual--bars">
+                        <div class="chart-bar chart-bar--wildfire" [style.height.%]="getBarHeight('wildfire')"></div>
+                        <div class="chart-bar chart-bar--flood" [style.height.%]="getBarHeight('flood')"></div>
+                        <div class="chart-bar chart-bar--wildlife" [style.height.%]="getBarHeight('wildlife')"></div>
+                        <div class="chart-bar chart-bar--weather" [style.height.%]="getBarHeight('weather')"></div>
+                        <div class="chart-bar chart-bar--closure" [style.height.%]="getBarHeight('closure')"></div>
+                        <div class="chart-bar chart-bar--advisory" [style.height.%]="getBarHeight('advisory')"></div>
+                    </div>
+                    <div class="chart-bar-labels">
+                        <span>Wildfire ({{ alertTypes.wildfire }})</span>
+                        <span>Flood ({{ alertTypes.flood }})</span>
+                        <span>Wildlife ({{ alertTypes.wildlife }})</span>
+                        <span>Weather ({{ alertTypes.weather }})</span>
+                        <span>Closure ({{ alertTypes.closure }})</span>
+                        <span>Advisory ({{ alertTypes.advisory }})</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── Top Risk Regions Table ─── -->
+        <section class="table-section">
+            <div class="table-section__header">
+                <h2 class="table-section__title">Top Risk Regions</h2>
+                <span class="table-section__count">{{ topRegions.length }} regions</span>
+            </div>
+            <div class="table-section__wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th class="data-table__head-cell">Region</th>
+                            <th class="data-table__head-cell">Active Alerts</th>
+                            <th class="data-table__head-cell">Highest Risk Level</th>
+                            <th class="data-table__head-cell">Last Incident Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="data-table__row" *ngFor="let region of topRegions | slice:0:5">
+                            <td class="data-table__cell">
+                                <div class="data-table__region">
+                                    <span class="data-table__region-icon">
+                                        <lucide-icon [img]="MapPinIcon" [size]="14"></lucide-icon>
+                                    </span>
+                                    <span class="data-table__region-name">{{ region.region }}</span>
+                                </div>
+                            </td>
+                            <td class="data-table__cell">
+                                <span class="data-table__alert-count">{{ region.count }}</span>
+                            </td>
+                            <td class="data-table__cell">
+                                <span class="risk-badge" [ngClass]="'risk-badge--' + region.highestRisk">
+                                    <span class="risk-badge__dot"></span>
+                                    {{ region.highestRisk }}
+                                </span>
+                            </td>
+                            <td class="data-table__cell">
+                                <span class="data-table__date">{{ region.lastDate | date:'mediumDate' }}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </ng-container>
+
+    <ng-template #emptyState>
+        <!-- ─── Empty State ─── -->
+        <div class="empty-state empty-state--visible">
+            <div class="empty-state__icon">📭</div>
+            <h3 class="empty-state__title">No Analytics Data Available</h3>
+            <p class="empty-state__description">
+                There are currently no safety alerts to analyze. Data will appear here once incidents are reported
+                across CampConnect regions.
+            </p>
+            <a routerLink="/safety/alerts" class="empty-state__action">
+                ← Return to Safety Dashboard
+            </a>
+        </div>
+    </ng-template>
+
+</section>

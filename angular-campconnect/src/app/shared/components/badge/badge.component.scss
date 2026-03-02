@@ -1,0 +1,609 @@
+﻿    /* --- Base Badge --- */
+    .camp-badge {
+      --cb-size: 88px;
+      --cb-icon-size: 36px;
+      --cb-radius: 16px;
+      --cb-font: 'Inter', system-ui, sans-serif;
+      --cb-bg: #ffffff;
+      --cb-shadow: 0 2px 16px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+      --cb-accent: #6b7370;
+      --cb-accent-light: #f1f3f2;
+      --cb-accent-glow: transparent;
+      --cb-title-color: #2d3331;
+      --cb-sub-color: #7d8582;
+      --cb-border: 1px solid rgba(0,0,0,0.04);
+      --cb-ring-from: var(--cb-accent);
+      --cb-ring-to: var(--cb-accent);
+
+      position: relative;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 24px 20px 18px;
+      background: var(--cb-bg);
+      border: var(--cb-border);
+      border-radius: var(--cb-radius);
+      box-shadow: var(--cb-shadow);
+      font-family: var(--cb-font);
+      cursor: default;
+      user-select: none;
+      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1),
+                  box-shadow 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .camp-badge:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    /* --- Icon Container --- */
+    .camp-badge__icon-wrap {
+      position: relative;
+      width: var(--cb-size);
+      height: var(--cb-size);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .camp-badge__icon-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(from 180deg, var(--cb-ring-from), var(--cb-ring-to), var(--cb-ring-from));
+      opacity: 0.15;
+      transition: opacity 0.3s ease;
+    }
+
+    .camp-badge:hover .camp-badge__icon-ring {
+      opacity: 0.25;
+    }
+
+    .camp-badge__icon-bg {
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: var(--cb-accent-light);
+      transition: background 0.3s ease;
+    }
+
+    .camp-badge__icon-glow {
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--cb-accent-glow) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+
+    .camp-badge:hover .camp-badge__icon-glow {
+      opacity: 1;
+    }
+
+    .camp-badge__icon-svg {
+      position: relative;
+      z-index: 1;
+      width: var(--cb-icon-size);
+      height: var(--cb-icon-size);
+      color: var(--cb-accent);
+      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .camp-badge:hover .camp-badge__icon-svg {
+      transform: scale(1.1);
+    }
+
+    /* --- Earned Checkmark --- */
+    .camp-badge__earned-check {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--cb-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      opacity: 0;
+      transform: scale(0);
+      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .camp-badge__earned-check svg {
+      width: 13px;
+      height: 13px;
+      color: #fff;
+    }
+
+    .camp-badge[data-earned="true"] .camp-badge__earned-check {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* --- Title & Description --- */
+    .camp-badge__info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .camp-badge__title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cb-title-color);
+      line-height: 1.2;
+      letter-spacing: -0.1px;
+    }
+
+    .camp-badge__subtitle {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--cb-sub-color);
+      line-height: 1.3;
+    }
+
+    /* --- Tooltip --- */
+    .camp-badge__tooltip {
+      position: absolute;
+      bottom: calc(100% + 12px);
+      left: 50%;
+      transform: translateX(-50%) translateY(6px);
+      width: 230px;
+      padding: 14px 16px;
+      background: #1a2420;
+      color: #d4dbd7;
+      border-radius: 12px;
+      font-size: 12px;
+      line-height: 1.55;
+      font-family: var(--cb-font);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+      z-index: 200;
+      pointer-events: none;
+    }
+
+    .camp-badge__tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 7px solid transparent;
+      border-top-color: #1a2420;
+    }
+
+    .camp-badge:hover .camp-badge__tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    .camp-badge__tooltip-title {
+      font-weight: 700;
+      font-size: 13px;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .camp-badge__tooltip-desc {
+      font-size: 11.5px;
+      color: #a8b2ac;
+      line-height: 1.55;
+    }
+
+    .camp-badge__tooltip-unlock {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #7ec9a0;
+    }
+
+    .camp-badge__tooltip-unlock svg {
+      width: 13px;
+      height: 13px;
+      flex-shrink: 0;
+    }
+
+    .camp-badge__tooltip-lock-hint {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 500;
+      color: #c9a86c;
+    }
+
+    .camp-badge__tooltip-lock-hint svg {
+      width: 13px;
+      height: 13px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* --- Earned Date Pill --- */
+    .camp-badge__date {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--cb-accent);
+      background: var(--cb-accent-light);
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.2px;
+      opacity: 0.85;
+    }
+
+    /* ============================================================
+       BADGE THEMES  (Earthy Palette)
+       ============================================================ */
+
+    /* --- Amber / Warm Earth --- */
+    .camp-badge--amber {
+      --cb-accent: #a67c3d;
+      --cb-accent-light: #fdf5e8;
+      --cb-accent-glow: rgba(166,124,61,0.1);
+      --cb-ring-from: #c99a4e;
+      --cb-ring-to: #8b6730;
+    }
+
+    /* --- Forest Green --- */
+    .camp-badge--forest {
+      --cb-accent: #3d7c5f;
+      --cb-accent-light: #edf6f1;
+      --cb-accent-glow: rgba(61,124,95,0.1);
+      --cb-ring-from: #4a9572;
+      --cb-ring-to: #2e6348;
+    }
+
+    /* --- Slate Blue --- */
+    .camp-badge--slate {
+      --cb-accent: #4a6b8a;
+      --cb-accent-light: #edf2f7;
+      --cb-accent-glow: rgba(74,107,138,0.1);
+      --cb-ring-from: #5a82a6;
+      --cb-ring-to: #3a5670;
+    }
+
+    /* --- Terracotta --- */
+    .camp-badge--terra {
+      --cb-accent: #b06040;
+      --cb-accent-light: #fdf0ea;
+      --cb-accent-glow: rgba(176,96,64,0.1);
+      --cb-ring-from: #c97a58;
+      --cb-ring-to: #904c32;
+    }
+
+    /* --- Deep Teal --- */
+    .camp-badge--teal {
+      --cb-accent: #2e7d7b;
+      --cb-accent-light: #eaf5f5;
+      --cb-accent-glow: rgba(46,125,123,0.1);
+      --cb-ring-from: #3a9694;
+      --cb-ring-to: #246462;
+    }
+
+    /* --- Sage --- */
+    .camp-badge--sage {
+      --cb-accent: #6b8f6b;
+      --cb-accent-light: #eff5ef;
+      --cb-accent-glow: rgba(107,143,107,0.1);
+      --cb-ring-from: #7da67d;
+      --cb-ring-to: #567856;
+    }
+
+    /* --- Dusk / Purple-Brown --- */
+    .camp-badge--dusk {
+      --cb-accent: #7a5f80;
+      --cb-accent-light: #f5eff6;
+      --cb-accent-glow: rgba(122,95,128,0.1);
+      --cb-ring-from: #937098;
+      --cb-ring-to: #634e68;
+    }
+
+    /* --- Stone / Warm Gray --- */
+    .camp-badge--stone {
+      --cb-accent: #7a7468;
+      --cb-accent-light: #f3f1ee;
+      --cb-accent-glow: rgba(122,116,104,0.08);
+      --cb-ring-from: #918a7d;
+      --cb-ring-to: #635d53;
+    }
+
+    /* --- Premium Gold --- */
+    .camp-badge--gold {
+      --cb-accent: #b8922e;
+      --cb-accent-light: #fdf8eb;
+      --cb-accent-glow: rgba(184,146,46,0.15);
+      --cb-ring-from: #d4ab3a;
+      --cb-ring-to: #96771f;
+      --cb-shadow: 0 2px 16px rgba(184,146,46,0.1), 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .camp-badge--gold::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #d4ab3a, #b8922e, #d4ab3a, transparent);
+      border-radius: var(--cb-radius) var(--cb-radius) 0 0;
+      opacity: 0.6;
+    }
+
+    .camp-badge--gold:hover {
+      box-shadow: 0 8px 36px rgba(184,146,46,0.16), 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    /* ============================================================
+       LOCKED STATE
+       ============================================================ */
+    .camp-badge--locked {
+      --cb-accent: #a3aaa7;
+      --cb-accent-light: #f4f5f4;
+      --cb-accent-glow: transparent;
+      --cb-ring-from: #c4c9c6;
+      --cb-ring-to: #c4c9c6;
+      --cb-title-color: #9ca3a0;
+      --cb-sub-color: #b8bdb9;
+    }
+
+    .camp-badge--locked .camp-badge__icon-svg {
+      filter: grayscale(1);
+      opacity: 0.4;
+    }
+
+    .camp-badge--locked .camp-badge__icon-ring {
+      opacity: 0.08;
+    }
+
+    .camp-badge--locked:hover .camp-badge__icon-ring {
+      opacity: 0.12;
+    }
+
+    .camp-badge--locked .camp-badge__icon-bg {
+      background: #f0f1f0;
+    }
+
+    .camp-badge--locked:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    }
+
+    .camp-badge--locked:hover .camp-badge__icon-svg {
+      transform: scale(1.05);
+    }
+
+    .camp-badge--locked .camp-badge__lock-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 3;
+      width: 22px;
+      height: 22px;
+      color: #9ca3a0;
+      opacity: 0.7;
+    }
+
+    /* ============================================================
+       SIZE VARIANTS
+       ============================================================ */
+
+    /* --- Small: Post Cards --- */
+    .camp-badge--sm {
+      --cb-size: 40px;
+      --cb-icon-size: 18px;
+      --cb-radius: 12px;
+      flex-direction: row;
+      gap: 10px;
+      padding: 8px 14px 8px 10px;
+    }
+
+    .camp-badge--sm .camp-badge__icon-ring { display: none; }
+    .camp-badge--sm .camp-badge__icon-glow { display: none; }
+
+    .camp-badge--sm .camp-badge__icon-bg {
+      inset: 0;
+      border-radius: 10px;
+    }
+
+    .camp-badge--sm .camp-badge__earned-check {
+      width: 16px;
+      height: 16px;
+      bottom: -2px;
+      right: -2px;
+    }
+
+    .camp-badge--sm .camp-badge__earned-check svg {
+      width: 9px;
+      height: 9px;
+    }
+
+    .camp-badge--sm .camp-badge__info {
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .camp-badge--sm .camp-badge__title {
+      font-size: 12px;
+    }
+
+    .camp-badge--sm .camp-badge__subtitle {
+      display: none;
+    }
+
+    .camp-badge--sm .camp-badge__date {
+      display: none;
+    }
+
+    .camp-badge--sm:hover {
+      transform: translateY(-2px);
+    }
+
+    .camp-badge--sm .camp-badge__tooltip {
+      width: 200px;
+      padding: 10px 12px;
+    }
+
+    .camp-badge--sm .camp-badge__lock-icon {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* --- Medium: Profile Header --- */
+    .camp-badge--md {
+      --cb-size: 64px;
+      --cb-icon-size: 28px;
+      --cb-radius: 14px;
+      padding: 18px 16px 14px;
+      gap: 10px;
+    }
+
+    .camp-badge--md .camp-badge__earned-check {
+      width: 20px;
+      height: 20px;
+      bottom: 0;
+      right: 0;
+    }
+
+    .camp-badge--md .camp-badge__earned-check svg {
+      width: 11px;
+      height: 11px;
+    }
+
+    .camp-badge--md .camp-badge__title {
+      font-size: 12px;
+    }
+
+    .camp-badge--md .camp-badge__subtitle {
+      font-size: 10.5px;
+    }
+
+    .camp-badge--md .camp-badge__date {
+      font-size: 9px;
+      padding: 2px 8px;
+    }
+
+    .camp-badge--md .camp-badge__lock-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* --- Large: Profile Badges Tab (Grid) --- */
+    .camp-badge--lg {
+      --cb-size: 100px;
+      --cb-icon-size: 42px;
+      --cb-radius: 18px;
+      padding: 28px 24px 20px;
+      gap: 14px;
+      width: 190px;
+    }
+
+    .camp-badge--lg .camp-badge__earned-check {
+      width: 28px;
+      height: 28px;
+      bottom: 4px;
+      right: 4px;
+    }
+
+    .camp-badge--lg .camp-badge__earned-check svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .camp-badge--lg .camp-badge__title {
+      font-size: 14px;
+    }
+
+    .camp-badge--lg .camp-badge__subtitle {
+      font-size: 11.5px;
+    }
+
+    /* --- Progress Bar (for partially earned) --- */
+    .camp-badge__progress {
+      width: 100%;
+      height: 4px;
+      background: #eceeed;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 2px;
+    }
+
+    .camp-badge__progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: var(--cb-accent);
+      width: 0%;
+      transition: width 1s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .camp-badge__progress-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--cb-sub-color);
+      margin-top: 1px;
+    }
+
+    /* --- Load animation --- */
+    .camp-badge[data-animate] {
+      opacity: 0;
+      transform: translateY(16px) scale(0.96);
+    }
+
+    .camp-badge[data-animate].camp-badge--visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .camp-badge[data-animate].camp-badge--visible .camp-badge__earned-check {
+      transition-delay: 0.4s;
+    }
+
+    /* ============================================================
+       BADGE GRID LAYOUT
+       ============================================================ */
+    .camp-badge-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .camp-badge-grid--lg {
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
+    }
+
+    .camp-badge-grid--lg .camp-badge--lg {
+      width: 100%;
+    }
+
+    .camp-badge-grid--md {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .camp-badge-grid--sm {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+

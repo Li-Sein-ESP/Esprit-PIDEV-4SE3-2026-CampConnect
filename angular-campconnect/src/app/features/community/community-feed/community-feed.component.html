@@ -1,0 +1,383 @@
+<div class="cc-app">
+  <div class="cc-layout">
+
+    <!-- ====== LEFT SIDEBAR ====== -->
+    <aside class="cc-sidebar-left" aria-label="Sidebar navigation">
+
+      <!-- User Mini Profile Card -->
+      <article class="cc-profile-card">
+        <div class="cc-profile-card__banner" aria-hidden="true"></div>
+        <div class="cc-profile-card__avatar-wrap">
+          <img src="https://images.unsplash.com/photo-1535930749574-1399327ce78f?w=150&h=150&fit=crop&crop=face"
+            alt="Jordan Rivers" class="cc-profile-card__avatar">
+        </div>
+        <div class="cc-profile-card__info">
+          <h2 class="cc-profile-card__name">Jordan Rivers</h2>
+          <p class="cc-profile-card__handle">@jordan_trails</p>
+          <div class="cc-profile-card__stats">
+            <div class="cc-profile-card__stat">
+              <div class="cc-profile-card__stat-value">284</div>
+              <div class="cc-profile-card__stat-label">Posts</div>
+            </div>
+            <div class="cc-profile-card__stat">
+              <div class="cc-profile-card__stat-value">1.2K</div>
+              <div class="cc-profile-card__stat-label">Followers</div>
+            </div>
+            <div class="cc-profile-card__stat">
+              <div class="cc-profile-card__stat-value">89</div>
+              <div class="cc-profile-card__stat-label">Trips</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Quick Links -->
+      <nav class="cc-quick-links" aria-label="Quick links">
+        <ul>
+          <li>
+            <a href="#" class="cc-quick-links__item cc-quick-links__item--active">
+              <span class="cc-quick-links__icon">📝</span>
+              My Posts
+            </a>
+          </li>
+          <li>
+            <a href="#" class="cc-quick-links__item">
+              <span class="cc-quick-links__icon">🔖</span>
+              Saved Posts
+            </a>
+          </li>
+          <li>
+            <a href="#" class="cc-quick-links__item">
+              <span class="cc-quick-links__icon">📅</span>
+              Events
+            </a>
+          </li>
+          <li>
+            <a href="#" class="cc-quick-links__item">
+              <span class="cc-quick-links__icon">🗺️</span>
+              Trail Maps
+            </a>
+          </li>
+          <li>
+            <a routerLink="/community/messages" class="cc-quick-links__item">
+              <span class="cc-quick-links__icon" style="background: #e1f5fe; color: #0288d1;">✉️</span>
+              Messages
+            </a>
+          </li>
+        </ul>
+        <a routerLink="/community/create" class="cc-quick-links__create-btn" aria-label="Create a new post">
+          ✏️ Create Post
+        </a>
+      </nav>
+
+      <!-- Trending Hashtags -->
+      <section class="cc-trending" aria-label="Trending hashtags">
+        <h3 class="cc-section-title">
+          <span class="cc-section-title__icon">🔥</span>
+          Trending Now
+        </h3>
+        <ul class="cc-trending__list">
+          <li class="cc-trending__item">
+            <span class="cc-trending__tag">#SunsetCamp</span>
+            <span class="cc-trending__count">2.4K</span>
+          </li>
+          <li class="cc-trending__item">
+            <span class="cc-trending__tag">#WildernessVibes</span>
+            <span class="cc-trending__count">1.8K</span>
+          </li>
+          <li class="cc-trending__item">
+            <span class="cc-trending__tag">#TrailLife</span>
+            <span class="cc-trending__count">1.3K</span>
+          </li>
+          <li class="cc-trending__item">
+            <span class="cc-trending__tag">#CampfireCooking</span>
+            <span class="cc-trending__count">987</span>
+          </li>
+          <li class="cc-trending__item">
+            <span class="cc-trending__tag">#StargazingNights</span>
+            <span class="cc-trending__count">754</span>
+          </li>
+          <li class="cc-trending__item">
+            <span class="cc-trending__tag">#OffGridLiving</span>
+            <span class="cc-trending__count">621</span>
+          </li>
+        </ul>
+      </section>
+    </aside>
+
+    <!-- ====== CENTER FEED ====== -->
+    <main class="cc-feed" role="main" aria-label="Community feed">
+
+      <!-- Create Post Box -->
+      <div class="cc-create-post">
+        <img src="https://images.unsplash.com/photo-1535930749574-1399327ce78f?w=100&h=100&fit=crop&crop=face" alt=""
+          class="cc-create-post__avatar" aria-hidden="true">
+        <input type="text" class="cc-create-post__input" placeholder="Share your latest adventure, Jordan..."
+          aria-label="Create a post">
+        <div class="cc-create-post__actions">
+          <button class="cc-create-post__action" aria-label="Add photo">📷</button>
+          <button class="cc-create-post__action" aria-label="Add location">📍</button>
+        </div>
+      </div>
+
+      <!-- Feed Tabs -->
+      <div class="cc-feed-tabs" role="tablist" aria-label="Feed filter"
+        style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
+        <button class="cc-feed-tabs__tab cc-feed-tabs__tab--active" role="tab" aria-selected="true"
+          data-tab="latest">Latest</button>
+        <button class="cc-feed-tabs__tab" role="tab" aria-selected="false" data-tab="popular">Popular</button>
+        <button class="cc-feed-tabs__tab" role="tab" aria-selected="false" data-tab="following">Following</button>
+        <button class="cc-feed-tabs__tab" role="tab" aria-selected="false" data-tab="nearby">Nearby</button>
+        <a routerLink="/community/leaderboard" class="cc-feed-tabs__tab" role="tab" aria-selected="false"
+          style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-left: 8px; border-left: 1px solid rgba(0,0,0,0.08); padding-left: 14px;">
+          🏆 Leaderboard
+        </a>
+        <a routerLink="/community/forum" class="cc-feed-tabs__tab" role="tab" aria-selected="false"
+          style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+          💬 Forum
+        </a>
+        <a routerLink="/community/messages" class="cc-feed-tabs__tab" role="tab" aria-selected="false"
+          style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+          ✉️ Messages
+        </a>
+
+      </div>
+
+
+      <!-- Dynamic Angular Posts -->
+      <article class="cc-post" *ngFor="let post of posts" [attr.aria-label]="'Post by ' + post.author.name">
+        <header class="cc-post__header">
+          <img [src]="post.author.avatar" [alt]="post.author.name" class="cc-post__avatar"
+            [routerLink]="['/community/profile', post.author.id]">
+          <div class="cc-post__user-info" style="cursor: pointer;">
+            <span class="cc-post__username" [routerLink]="['/community/profile', post.author.id]"
+              style="cursor: pointer; margin-right: 4px;">{{
+              post.author.name }}</span>
+            <span class="cc-post__badge" *ngIf="post.author.role === 'Verified Camper' || post.author.role === 'Admin'">
+              <span class="cc-post__badge-icon">✓</span>
+              Verified Camper
+            </span>
+            <ng-container *ngIf="post.author.badges?.length">
+              <app-camp-badge *ngFor="let b of post.author.badges" [title]="b.title" [description]="b.description"
+                [icon]="b.icon" [unlocked]="b.unlocked" size="small">
+              </app-camp-badge>
+            </ng-container>
+          </div>
+          <div class="cc-post__meta">
+            <span class="cc-post__location">📍 {{ post.location }}</span>
+            <span class="cc-post__meta-dot" aria-hidden="true"></span>
+            <time class="cc-post__time">{{ post.timestamp }}</time>
+          </div>
+          <app-trust-score *ngIf="post.author.trustScore !== undefined" [score]="post.author.trustScore" variant="small"
+            style="margin-left: auto; margin-right: 12px;"></app-trust-score>
+          <button class="cc-post__more-btn" aria-label="More options">⋯</button>
+        </header>
+
+        <div class="cc-post__body" (click)="goToPost(post.id)" style="cursor: pointer;">
+          <p class="cc-post__text" [innerHTML]="post.content"></p>
+        </div>
+
+        <figure class="cc-post__media" *ngIf="post.media" (click)="goToPost(post.id)">
+          <img [src]="post.media && post.media[0]" alt="Post image" class="cc-post__image">
+          <div class="cc-post__video-play" aria-label="Play video" *ngIf="post.videoLength">▶</div>
+          <span class="cc-post__media-overlay" *ngIf="post.videoLength">🎬 {{ post.videoLength }}</span>
+        </figure>
+
+        <div class="cc-post__products" *ngIf="post.products && post.products.length > 0">
+          <span class="cc-post__product-chip" *ngFor="let prod of post.products">
+            <span class="cc-post__product-icon">{{ prod.icon }}</span> {{ prod.name }}
+          </span>
+        </div>
+
+        <div class="cc-post__stats">
+          <div class="cc-post__stats-likes">
+            <span class="cc-post__stats-emoji" aria-hidden="true">
+              <span>❤️</span>
+            </span>
+            <span>{{ post.likes }} likes</span>
+          </div>
+          <span>{{ getCommentCount(post.comments) }} comments</span>
+        </div>
+
+        <div class="cc-post__actions">
+          <button class="cc-post__action-btn cc-post__action-btn--like" [class.is-liked]="post.isLiked"
+            (click)="toggleLike(post)" aria-label="Like this post">
+            <span class="cc-post__action-icon">{{ post.isLiked ? '❤️' : '♡' }}</span>
+            <span>Like</span>
+            <span *ngIf="post.isLiked" class="cc-like-burst"></span>
+          </button>
+          <button class="cc-post__action-btn cc-post__action-btn--comment" (click)="goToPost(post.id)"
+            aria-label="Comment on this post">
+            <span class="cc-post__action-icon">💬</span>
+            <span>Comment</span>
+          </button>
+          <button class="cc-post__action-btn cc-post__action-btn--share" aria-label="Share this post">
+            <span class="cc-post__action-icon">↗️</span>
+            <span>Share</span>
+          </button>
+          <button class="cc-post__action-btn cc-post__action-btn--save" [class.is-saved]="post.saved"
+            (click)="toggleSave(post)" aria-label="Save this post" [style.color]="post.saved ? '#7c5cbf' : ''">
+            <span class="cc-post__action-icon">🔖</span>
+            <span>{{ post.saved ? 'Saved' : 'Save' }}</span>
+          </button>
+        </div>
+
+        <div class="cc-post__comments" *ngIf="getCommentCount(post.comments) > 0">
+          <div class="cc-comment" *ngFor="let comment of asArray(post.comments).slice(0, 2)">
+            <img [src]="comment.author.avatar" [alt]="comment.author.name" class="cc-comment__avatar">
+            <div class="cc-comment__body">
+              <span class="cc-comment__name">{{ comment.author.name }}</span>
+              <p class="cc-comment__text">{{ comment.text }}</p>
+            </div>
+          </div>
+        </div>
+        <button class="cc-post__view-comments" *ngIf="getCommentCount(post.comments) > 2"
+          (click)="goToPost(post.id)">View all {{
+          getCommentCount(post.comments) }} comments</button>
+      </article>
+
+      <!-- Infinite Scroll Loading -->
+      <div class="cc-loading" id="feedLoader" aria-label="Loading more posts">
+        <div class="cc-loading__spinner"></div>
+        <span>Loading more adventures...</span>
+      </div>
+    </main>
+
+    <!-- ====== RIGHT SIDEBAR ====== -->
+    <aside class="cc-sidebar-right" aria-label="Community sidebar">
+
+      <!-- Upcoming Events -->
+      <section class="cc-events" aria-label="Upcoming events">
+        <h3 class="cc-section-title">
+          <span class="cc-section-title__icon">📅</span>
+          Upcoming Events
+        </h3>
+
+        <article class="cc-event-card">
+          <div class="cc-event-card__date">
+            <span class="cc-event-card__month">Jan</span>
+            <span class="cc-event-card__day">24</span>
+          </div>
+          <div class="cc-event-card__info">
+            <h4 class="cc-event-card__title">Winter Campfire Meetup</h4>
+            <span class="cc-event-card__location">📍 Big Bear Lake, CA</span>
+            <span class="cc-event-card__attendees">👥 48 going</span>
+          </div>
+        </article>
+
+        <article class="cc-event-card">
+          <div class="cc-event-card__date">
+            <span class="cc-event-card__month">Feb</span>
+            <span class="cc-event-card__day">02</span>
+          </div>
+          <div class="cc-event-card__info">
+            <h4 class="cc-event-card__title">Stargazing Night Hike</h4>
+            <span class="cc-event-card__location">📍 Joshua Tree, CA</span>
+            <span class="cc-event-card__attendees">👥 32 going</span>
+          </div>
+        </article>
+
+        <article class="cc-event-card">
+          <div class="cc-event-card__date">
+            <span class="cc-event-card__month">Feb</span>
+            <span class="cc-event-card__day">14</span>
+          </div>
+          <div class="cc-event-card__info">
+            <h4 class="cc-event-card__title">Couples Trail Adventure</h4>
+            <span class="cc-event-card__location">📍 Sedona, AZ</span>
+            <span class="cc-event-card__attendees">👥 24 going</span>
+          </div>
+        </article>
+
+        <a href="#" class="cc-events__see-all">See All Events →</a>
+      </section>
+
+      <!-- Suggested Campers -->
+      <section class="cc-suggested" aria-label="Suggested campers to follow">
+        <h3 class="cc-section-title">
+          <span class="cc-section-title__icon">🧭</span>
+          Campers to Follow
+        </h3>
+
+        <article class="cc-suggested-user">
+          <img src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&h=100&fit=crop&crop=face"
+            alt="Canyon Cole" class="cc-suggested-user__avatar">
+          <div class="cc-suggested-user__info">
+            <h4 class="cc-suggested-user__name">Canyon Cole</h4>
+            <span class="cc-suggested-user__detail">Desert explorer · 3.2K followers</span>
+          </div>
+          <button class="cc-suggested-user__follow-btn" data-user="canyon">Follow</button>
+        </article>
+
+        <article class="cc-suggested-user">
+          <img src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=100&h=100&fit=crop&crop=face"
+            alt="River Stone" class="cc-suggested-user__avatar">
+          <div class="cc-suggested-user__info">
+            <h4 class="cc-suggested-user__name">River Stone</h4>
+            <span class="cc-suggested-user__detail">Kayak camper · 1.8K followers</span>
+          </div>
+          <button class="cc-suggested-user__follow-btn" data-user="river">Follow</button>
+        </article>
+
+        <article class="cc-suggested-user">
+          <img src="https://images.unsplash.com/photo-1546961342-ea1f7a14dadb?w=100&h=100&fit=crop&crop=face"
+            alt="Sky Walker" class="cc-suggested-user__avatar">
+          <div class="cc-suggested-user__info">
+            <h4 class="cc-suggested-user__name">Sky Walker</h4>
+            <span class="cc-suggested-user__detail">Mountain climber · 5.1K followers</span>
+          </div>
+          <button class="cc-suggested-user__follow-btn" data-user="sky">Follow</button>
+        </article>
+
+        <article class="cc-suggested-user">
+          <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&h=100&fit=crop&crop=face"
+            alt="Fern Mossy" class="cc-suggested-user__avatar">
+          <div class="cc-suggested-user__info">
+            <h4 class="cc-suggested-user__name">Fern Mossy</h4>
+            <span class="cc-suggested-user__detail">Forager & hiker · 2.4K followers</span>
+          </div>
+          <button class="cc-suggested-user__follow-btn" data-user="fern">Follow</button>
+        </article>
+      </section>
+
+      <!-- Community Stats -->
+      <section class="cc-community-stats" aria-label="Community statistics">
+        <h3 class="cc-section-title">
+          <span class="cc-section-title__icon">📊</span>
+          Community Pulse
+        </h3>
+        <div class="cc-community-stats__grid">
+          <div class="cc-stat-box cc-stat-box--highlight">
+            <div class="cc-stat-box__icon">👥</div>
+            <div class="cc-stat-box__value" data-counter="24853">0</div>
+            <div class="cc-stat-box__label">Active Members</div>
+          </div>
+          <div class="cc-stat-box">
+            <div class="cc-stat-box__icon">📝</div>
+            <div class="cc-stat-box__value" data-counter="342">0</div>
+            <div class="cc-stat-box__label">Posts Today</div>
+          </div>
+          <div class="cc-stat-box">
+            <div class="cc-stat-box__icon">🏕️</div>
+            <div class="cc-stat-box__value" data-counter="1247">0</div>
+            <div class="cc-stat-box__label">Active Trips</div>
+          </div>
+          <div class="cc-stat-box">
+            <div class="cc-stat-box__icon">🌍</div>
+            <div class="cc-stat-box__value" data-counter="89">0</div>
+            <div class="cc-stat-box__label">Countries</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer Links -->
+      <footer class="cc-sidebar-footer">
+        <a href="#">About</a> · <a href="#">Help</a> · <a href="#">Privacy</a> · <a href="#">Terms</a> · <a
+          href="#">Guidelines</a>
+        <br>
+        © 2025 CampConnect
+      </footer>
+    </aside>
+
+  </div><!-- /.cc-layout -->
+</div>

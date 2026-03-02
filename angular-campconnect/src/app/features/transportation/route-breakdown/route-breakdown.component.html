@@ -1,0 +1,39 @@
+<div class="min-h-screen bg-[var(--color-background)] py-12">
+  <div class="container max-w-4xl">
+    <h2 class="mb-8">Route Details</h2>
+
+    <app-card variant="elevated">
+      <app-card-content class="p-6">
+        <div class="space-y-6">
+          @for (segment of routeSegments; track $index) {
+          <div class="flex gap-4">
+            <div class="flex flex-col items-center">
+              <div
+                class="w-10 h-10 bg-[var(--color-primary-600)] rounded-full flex items-center justify-center text-white font-bold">
+                {{ $index + 1 }}
+              </div>
+              @if ($index < routeSegments.length - 1) { <div class="w-0.5 h-16 bg-[var(--color-border-light)] my-2">
+            </div>
+            }
+          </div>
+          <div class="flex-1">
+            <h4 class="mb-2">{{ segment.title }}</h4>
+            <div class="flex items-center gap-4 text-sm text-[var(--color-text-secondary)]">
+              <div class="flex items-center gap-1">
+                <lucide-icon [img]="Clock" class="w-4 h-4"></lucide-icon>
+                <span>{{ segment.duration }}</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <lucide-icon [img]="Navigation" class="w-4 h-4"></lucide-icon>
+                <span>{{ segment.distance }}</span>
+              </div>
+            </div>
+            <p class="text-sm text-[var(--color-text-secondary)] mt-2">{{ segment.description }}</p>
+          </div>
+        </div>
+        }
+  </div>
+  </app-card-content>
+  </app-card>
+</div>
+</div>

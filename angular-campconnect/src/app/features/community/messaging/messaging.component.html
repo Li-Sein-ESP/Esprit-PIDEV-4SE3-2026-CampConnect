@@ -1,0 +1,239 @@
+<div class="cc-messaging">
+    <!-- TOP NAVIGATION BAR -->
+    <header class="cc-msg-topbar">
+        <a routerLink="/community" class="cc-topbar-back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M19 12H5" />
+                <path d="m12 19-7-7 7-7" />
+            </svg>
+            Feed
+        </a>
+
+        <div class="cc-topbar-title">
+            <div class="cc-topbar-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+            </div>
+            <h1>Messages</h1>
+        </div>
+
+        <div class="cc-topbar-actions">
+            <button class="cc-topbar-btn" title="Notifications">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+                <span class="cc-notif-dot"></span>
+            </button>
+            <button class="cc-topbar-btn" title="Settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3" />
+                    <path
+                        d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m7.08 7.08l4.24 4.24M1 12h6m6 0h6M4.22 19.78l4.24-4.24m7.08-7.08l4.24-4.24" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="cc-msg-layout">
+        <div class="cc-msg-container">
+
+            <!-- LEFT PANEL — Conversations -->
+            <aside class="cc-conversations" [class.cc-panel-hidden]="isMobileListHidden">
+                <div class="cc-conv-header">
+                    <div class="cc-conv-title-row">
+                        <h2>Chats</h2>
+                        <button class="cc-new-chat-btn" title="New conversation">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 5v14" />
+                                <path d="M5 12h14" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="cc-conv-search">
+                        <svg class="cc-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        <input type="text" placeholder="Search conversations...">
+                    </div>
+                </div>
+
+                <div class="cc-conv-tabs">
+                    <button class="cc-tab cc-active">All</button>
+                    <button class="cc-tab">Unread <span class="cc-tab-badge">3</span></button>
+                    <button class="cc-tab">Groups</button>
+                    <button class="cc-tab">Archived</button>
+                </div>
+
+                <div class="cc-conv-list">
+                    <div *ngFor="let conv of conversations" class="cc-conv-item"
+                        [class.cc-active]="activeConversation?.id === conv.id" [class.cc-unread]="conv.unread > 0"
+                        (click)="selectConversation(conv)">
+                        <div class="cc-conv-avatar-wrap">
+                            <img [src]="conv.user.avatar" [alt]="conv.user.name" class="cc-conv-avatar">
+                            <span class="cc-online-dot" [ngClass]="conv.user.online ? '' : 'cc-offline'"></span>
+                        </div>
+                        <div class="cc-conv-content">
+                            <div class="cc-conv-top">
+                                <span class="cc-conv-name">{{ conv.user.name }}</span>
+                                <span class="cc-conv-time" *ngIf="conv.messages.length > 0">{{
+                                    conv.messages[conv.messages.length - 1].time }}</span>
+                            </div>
+                            <div class="cc-conv-bottom">
+                                <span class="cc-conv-preview">{{ conv.lastMessage }}</span>
+                                <span class="cc-unread-badge" *ngIf="conv.unread > 0">{{ conv.unread }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- RIGHT PANEL — Chat Area -->
+            <section class="cc-chat-area">
+
+                <ng-container *ngIf="activeConversation; else emptyState">
+                    <!-- Chat Header -->
+                    <header class="cc-chat-header">
+                        <button class="cc-chat-back-btn" (click)="backToList()" aria-label="Back to conversations">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="15 18 9 12 15 6" />
+                            </svg>
+                        </button>
+
+                        <div class="cc-chat-user" [routerLink]="['/community/profile', activeConversation.user.id]">
+                            <div class="cc-chat-avatar-wrap">
+                                <img [src]="activeConversation.user.avatar" [alt]="activeConversation.user.name"
+                                    class="cc-chat-avatar">
+                                <span class="cc-status-dot"
+                                    [style.background]="activeConversation.user.online ? '#34d399' : '#d6d3d1'"></span>
+                            </div>
+                            <div class="cc-chat-user-info">
+                                <div class="cc-chat-name">
+                                    {{ activeConversation.user.name }}
+                                    <span class="cc-verified-sm" *ngIf="activeConversation.user.verified">
+                                        <svg viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                                        </svg>
+                                    </span>
+                                </div>
+                                <div class="cc-chat-status" [class.cc-offline]="!activeConversation.user.online">
+                                    {{ activeConversation.user.online ? 'Online' : 'Offline' }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cc-chat-actions">
+                            <button class="cc-chat-action-btn" title="Voice call"><svg viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                                </svg></button>
+                            <button class="cc-chat-action-btn" title="Video call"><svg viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <polygon points="23 7 16 12 23 17 23 7" />
+                                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                                </svg></button>
+                            <button class="cc-chat-action-btn" title="More options"><svg viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="1" />
+                                    <circle cx="12" cy="5" r="1" />
+                                    <circle cx="12" cy="19" r="1" />
+                                </svg></button>
+                        </div>
+                    </header>
+
+                    <!-- Chat Messages -->
+                    <div class="cc-chat-messages" #chatMessages>
+                        <div *ngFor="let msg of activeConversation.messages" class="cc-message"
+                            [ngClass]="msg.senderId === currentUserId ? 'cc-sent' : 'cc-received'">
+                            <img *ngIf="msg.senderId !== currentUserId" [src]="activeConversation.user.avatar"
+                                class="cc-msg-avatar">
+                            <div class="cc-msg-content">
+                                <div class="cc-msg-bubble">
+                                    <p>{{ msg.text }}</p>
+                                    <span class="cc-msg-time">{{ msg.time }}</span>
+                                </div>
+                                <div class="cc-msg-status" *ngIf="msg.senderId === currentUserId">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                        stroke-linecap="round" stroke-linejoin="round" class="cc-read">
+                                        <polyline points="20 6 9 17 4 12" />
+                                    </svg>
+                                    Read
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Input -->
+                    <div class="cc-chat-input-area">
+                        <div class="cc-input-toolbar">
+                            <button class="cc-toolbar-btn" title="Attach image">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                    <circle cx="8.5" cy="8.5" r="1.5" />
+                                    <polyline points="21 15 16 10 5 21" />
+                                </svg>
+                            </button>
+                            <div class="cc-toolbar-divider"></div>
+                            <button class="cc-toolbar-btn" title="Share location">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                                    <circle cx="12" cy="10" r="3" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="cc-input-row">
+                            <div class="cc-msg-input-wrap">
+                                <textarea class="cc-msg-input" placeholder="Type a message..." rows="1"
+                                    [(ngModel)]="newMessageText"
+                                    (keydown.enter)="$event.preventDefault(); sendMessage()"></textarea>
+                                <button class="cc-emoji-trigger" title="Add emoji" (click)="addEmoji('🏕️')">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                                        <line x1="9" y1="9" x2="9.01" y2="9" />
+                                        <line x1="15" y1="9" x2="15.01" y2="9" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <button class="cc-send-btn" [disabled]="!newMessageText.trim()" (click)="sendMessage()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="22" y1="2" x2="11" y2="13" />
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </ng-container>
+
+                <!-- Empty State -->
+                <ng-template #emptyState>
+                    <div class="cc-chat-empty">
+                        <div class="cc-empty-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                            </svg>
+                        </div>
+                        <h3>Your Messages</h3>
+                        <p>Select a conversation from the sidebar or start a new chat with your fellow campers.</p>
+                    </div>
+                </ng-template>
+
+            </section>
+        </div>
+    </main>
+</div>

@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampConnect – Share Your Adventure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="cc-create-post">
+  <div class="cc-container">
+
+    <!-- Back Navigation -->
+    <nav class="cc-back-nav">
+      <a href="#" class="cc-back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5"/>
+          <path d="m12 19-7-7 7-7"/>
+        </svg>
+        Back to Feed
+      </a>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="cc-page-header">
+      <div class="cc-header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+        </svg>
+      </div>
+      <h1 class="cc-header-title">Share Your Adventure</h1>
+      <p class="cc-header-subtitle">Inspire fellow campers with your experience</p>
+    </header>
+
+    <!-- Creator Card -->
+    <article class="cc-creator-card">
+      <div class="cc-card-inner">
+
+        <!-- User Mini Profile -->
+        <div class="cc-user-profile">
+          <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&h=120&fit=crop&crop=face" alt="Alex Morgan" class="cc-avatar">
+          <div class="cc-user-info">
+            <div class="cc-user-name">
+              Alex Morgan
+              <span class="cc-verified" title="Verified Camper">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+              </span>
+            </div>
+            <div class="cc-user-handle">@alexoutdoors · Verified Camper</div>
+          </div>
+          <span class="cc-posting-to">📢 Posting to Community Feed</span>
+        </div>
+
+        <!-- Textarea -->
+        <div class="cc-textarea-wrap">
+          <textarea id="postContent" class="cc-textarea" placeholder="What happened on your last adventure?" rows="5"></textarea>
+          <span id="charCount" class="cc-char-count">0 / 2,000</span>
+        </div>
+
+        <!-- Quick Format Toolbar -->
+        <div class="cc-quick-tools">
+          <button type="button" class="cc-tool-btn" data-action="emoji">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            <span class="cc-tool-tip">Add Emoji</span>
+          </button>
+          <button type="button" class="cc-tool-btn" data-action="hashtag">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+            <span class="cc-tool-tip">Add Hashtag</span>
+          </button>
+          <button type="button" class="cc-tool-btn" data-action="mention">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/></svg>
+            <span class="cc-tool-tip">Mention Someone</span>
+          </button>
+          <span class="cc-tool-divider"></span>
+          <button type="button" class="cc-tool-btn" data-action="bold">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>
+            <span class="cc-tool-tip">Bold</span>
+          </button>
+          <button type="button" class="cc-tool-btn" data-action="italic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
+            <span class="cc-tool-tip">Italic</span>
+          </button>
+        </div>
+
+        <hr class="cc-divider">
+
+        <!-- Media Upload Section -->
+        <div class="cc-section-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Media
+        </div>
+        <div class="cc-media-upload">
+          <div class="cc-dropzone" id="dropzone">
+            <div class="cc-drop-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <p class="cc-drop-text">Drag & drop your photos or videos, or <strong>browse</strong></p>
+            <p class="cc-drop-hint">JPG, PNG, GIF, MP4 · Max 20MB each · Up to 10 files</p>
+            <input type="file" id="fileInput" multiple accept="image/*,video/*">
+          </div>
+          <div class="cc-media-grid" id="mediaGrid"></div>
+          <div class="cc-upload-progress" id="uploadProgress" style="display:none;">
+            <div class="cc-progress-bar" id="progressBar"></div>
+          </div>
+        </div>
+
+        <hr class="cc-divider">
+
+        <!-- Category Selector -->
+        <div class="cc-form-group">
+          <div class="cc-section-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+            Category
+          </div>
+          <div class="cc-select-wrap" id="categorySelect">
+            <button type="button" class="cc-select-trigger cc-placeholder" id="categoryTrigger">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+              <span class="cc-select-text">Choose a category</span>
+              <svg class="cc-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="cc-select-dropdown" id="categoryDropdown">
+              <div class="cc-select-option" data-value="camping-spots">
+                <span class="cc-opt-icon">🏕️</span> Camping Spots
+              </div>
+              <div class="cc-select-option" data-value="gear-tips">
+                <span class="cc-opt-icon">🎒</span> Gear Tips
+              </div>
+              <div class="cc-select-option" data-value="stories">
+                <span class="cc-opt-icon">📖</span> Stories
+              </div>
+              <div class="cc-select-option" data-value="events">
+                <span class="cc-opt-icon">🎉</span> Events
+              </div>
+              <div class="cc-select-option" data-value="marketplace">
+                <span class="cc-opt-icon">🛒</span> Marketplace Experience
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="cc-divider">
+
+        <!-- Location Tag Input -->
+        <div class="cc-form-group">
+          <div class="cc-section-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            Location
+          </div>
+          <div class="cc-location-input">
+            <svg class="cc-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            <input type="text" id="locationInput" placeholder="Search for a campground or trail..." autocomplete="off">
+            <div class="cc-location-suggestions" id="locationSuggestions">
+              <div class="cc-suggestion" data-location="Yosemite Valley, California">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span><span class="cc-sug-name">Yosemite Valley</span><span class="cc-sug-region">· California, USA</span></span>
+              </div>
+              <div class="cc-suggestion" data-location="Yellowstone National Park, Wyoming">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span><span class="cc-sug-name">Yellowstone</span><span class="cc-sug-region">· Wyoming, USA</span></span>
+              </div>
+              <div class="cc-suggestion" data-location="Grand Canyon, Arizona">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span><span class="cc-sug-name">Grand Canyon</span><span class="cc-sug-region">· Arizona, USA</span></span>
+              </div>
+              <div class="cc-suggestion" data-location="Banff National Park, Alberta">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span><span class="cc-sug-name">Banff National Park</span><span class="cc-sug-region">· Alberta, Canada</span></span>
+              </div>
+              <div class="cc-suggestion" data-location="Zion National Park, Utah">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span><span class="cc-sug-name">Zion National Park</span><span class="cc-sug-region">· Utah, USA</span></span>
+              </div>
+              <div class="cc-suggestion" data-location="Glacier National Park, Montana">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span><span class="cc-sug-name">Glacier National Park</span><span class="cc-sug-region">· Montana, USA</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="cc-divider">
+
+        <!-- Tag Products -->
+        <div class="cc-form-group">
+          <div class="cc-section-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></svg>
+            Tag Products
+          </div>
+          <div class="cc-tag-products">
+            <div class="cc-tags-input-wrap" id="tagsWrap">
+              <input type="text" class="cc-tag-input" id="tagInput" placeholder="Search gear, tents, backpacks..." autocomplete="off">
+            </div>
+            <div class="cc-product-suggestions">
+              <div class="cc-suggestions-list" id="productSuggestions"></div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="cc-divider">
+
+        <!-- Privacy Selector -->
+        <div class="cc-form-group">
+          <div class="cc-section-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Who can see this?
+          </div>
+          <div class="cc-privacy-selector">
+            <div class="cc-privacy-option">
+              <input type="radio" name="privacy" id="privPublic" value="public" checked>
+              <label for="privPublic">
+                <div class="cc-priv-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </div>
+                <span class="cc-priv-name">Public</span>
+                <span class="cc-priv-desc">Anyone can see</span>
+              </label>
+            </div>
+            <div class="cc-privacy-option">
+              <input type="radio" name="privacy" id="privFollowers" value="followers">
+              <label for="privFollowers">
+                <div class="cc-priv-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <span class="cc-priv-name">Followers Only</span>
+                <span class="cc-priv-desc">Your followers</span>
+              </label>
+            </div>
+            <div class="cc-privacy-option">
+              <input type="radio" name="privacy" id="privPrivate" value="private">
+              <label for="privPrivate">
+                <div class="cc-priv-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <span class="cc-priv-name">Private</span>
+                <span class="cc-priv-desc">Only you</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Action Bar -->
+      <footer class="cc-action-bar">
+        <div class="cc-action-left">
+          <button type="button" class="cc-btn cc-btn--ghost" id="btnCancel">Cancel</button>
+          <button type="button" class="cc-btn cc-btn--secondary" id="btnDraft">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <span>Save Draft</span>
+          </button>
+        </div>
+        <div class="cc-action-right">
+          <button type="button" class="cc-btn cc-btn--primary" id="btnPost" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <span class="cc-btn-text">Share Adventure</span>
+            <span class="cc-btn-loader"></span>
+          </button>
+        </div>
+      </footer>
+    </article>
+
+    <!-- Tips Section -->
+    <aside class="cc-tips">
+      <div class="cc-tips-card">
+        <div class="cc-tips-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Tips for a great post
+        </div>
+        <div class="cc-tips-grid">
+          <div class="cc-tip">
+            <span class="cc-tip-icon">📸</span>
+            <span>Share high-quality photos – golden hour shots get 3x more engagement</span>
+          </div>
+          <div class="cc-tip">
+            <span class="cc-tip-icon">📍</span>
+            <span>Tag your location so others can discover amazing spots</span>
+          </div>
+          <div class="cc-tip">
+            <span class="cc-tip-icon">🏷️</span>
+            <span>Tag products you used – it helps fellow campers gear up</span>
+          </div>
+          <div class="cc-tip">
+            <span class="cc-tip-icon">✍️</span>
+            <span>Tell a story – the best posts share lessons and moments</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ========================
+  // AUTO-RESIZING TEXTAREA
+  // ========================
+  const textarea = document.getElementById('postContent');
+  const charCount = document.getElementById('charCount');
+  const postBtn = document.getElementById('btnPost');
+  const MAX_CHARS = 2000;
+
+  function autoResize() {
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+  }
+
+  function updateCharCount() {
+    const len = textarea.value.length;
+    charCount.textContent = len.toLocaleString() + ' / 2,000';
+    charCount.classList.remove('cc-warning', 'cc-danger');
+    if (len > 1800) {
+      charCount.classList.add('cc-danger');
+    } else if (len > 1500) {
+      charCount.classList.add('cc-warning');
+    }
+    validateForm();
+  }
+
+  textarea.addEventListener('input', function() {
+    if (this.value.length > MAX_CHARS) {
+      this.value = this.value.substring(0, MAX_CHARS);
+    }
+    autoResize();
+    updateCharCount();
+  });
+
+  // ========================
+  // FORM VALIDATION
+  // ========================
+  let uploadedFiles = [];
+  let selectedCategory = '';
+  let selectedTags = [];
+
+  function validateForm() {
+    const hasContent = textarea.value.trim().length > 0;
+    const hasMedia = uploadedFiles.length > 0;
+    postBtn.disabled = !(hasContent || hasMedia);
+  }
+
+  // ========================
+  // QUICK TOOLBAR
+  // ========================
+  document.querySelectorAll('.cc-tool-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const action = this.dataset.action;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = textarea.value;
+      let insert = '';
+
+      switch (action) {
+        case 'emoji':
+          const emojis = ['🏕️', '⛺', '🌲', '🔥', '🌄', '⛰️', '🦌', '🌙', '⭐', '🏔️', '🛶', '🎣'];
+          insert = emojis[Math.floor(Math.random() * emojis.length)];
+          break;
+        case 'hashtag':
+          insert = '#';
+          break;
+        case 'mention':
+          insert = '@';
+          break;
+        case 'bold':
+          if (start !== end) {
+            const selected = text.substring(start, end);
+            textarea.value = text.substring(0, start) + '**' + selected + '**' + text.substring(end);
+            textarea.setSelectionRange(start + 2, end + 2);
+          } else {
+            insert = '****';
+          }
+          break;
+        case 'italic':
+          if (start !== end) {
+            const selected = text.substring(start, end);
+            textarea.value = text.substring(0, start) + '*' + selected + '*' + text.substring(end);
+            textarea.setSelectionRange(start + 1, end + 1);
+          } else {
+            insert = '**';
+          }
+          break;
+      }
+
+      if (insert && action !== 'bold' && action !== 'italic') {
+        textarea.value = text.substring(0, start) + insert + text.substring(end);
+        textarea.setSelectionRange(start + insert.length, start + insert.length);
+      }
+
+      textarea.focus();
+      autoResize();
+      updateCharCount();
+    });
+  });
+
+  // ========================
+  // MEDIA UPLOAD / DRAG & DROP
+  // ========================
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const mediaGrid = document.getElementById('mediaGrid');
+  const uploadProgress = document.getElementById('uploadProgress');
+  const progressBar = document.getElementById('progressBar');
+
+  // Prevent default drag behaviors on the whole page
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function(evt) {
+    dropzone.addEventListener(evt, function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+  });
+
+  dropzone.addEventListener('dragenter', function() { this.classList.add('cc-drag-over'); });
+  dropzone.addEventListener('dragover', function() { this.classList.add('cc-drag-over'); });
+  dropzone.addEventListener('dragleave', function() { this.classList.remove('cc-drag-over'); });
+  dropzone.addEventListener('drop', function(e) {
+    this.classList.remove('cc-drag-over');
+    handleFiles(e.dataTransfer.files);
+  });
+
+  fileInput.addEventListener('change', function() {
+    handleFiles(this.files);
+    this.value = '';
+  });
+
+  function handleFiles(files) {
+    const fileArray = Array.from(files);
+    const remaining = 10 - uploadedFiles.length;
+    const toAdd = fileArray.slice(0, remaining);
+
+    if (toAdd.length === 0) return;
+
+    // Show progress
+    uploadProgress.style.display = 'block';
+    let progress = 0;
+    const increment = 100 / toAdd.length;
+
+    toAdd.forEach(function(file, idx) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const isVideo = file.type.startsWith('video/');
+        const mediaObj = {
+          id: Date.now() + idx,
+          url: e.target.result,
+          type: isVideo ? 'video' : 'image',
+          name: file.name
+        };
+        uploadedFiles.push(mediaObj);
+        renderMediaItem(mediaObj);
+
+        progress += increment;
+        progressBar.style.width = Math.min(progress, 100) + '%';
+
+        if (progress >= 100) {
+          setTimeout(function() {
+            uploadProgress.style.display = 'none';
+            progressBar.style.width = '0%';
+          }, 600);
+        }
+        validateForm();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function renderMediaItem(media) {
+    const item = document.createElement('div');
+    item.className = 'cc-media-item';
+    item.dataset.id = media.id;
+
+    let mediaEl;
+    if (media.type === 'video') {
+      mediaEl = '<video src="' + media.url + '" muted></video>';
+    } else {
+      mediaEl = '<img src="' + media.url + '" alt="' + media.name + '">';
+    }
+
+    item.innerHTML =
+      mediaEl +
+      '<div class="cc-media-overlay"></div>' +
+      '<span class="cc-media-type">' + media.type + '</span>' +
+      '<button type="button" class="cc-media-remove" title="Remove">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+      '</button>';
+
+    item.querySelector('.cc-media-remove').addEventListener('click', function() {
+      uploadedFiles = uploadedFiles.filter(function(f) { return f.id !== media.id; });
+      item.style.transform = 'scale(0.7)';
+      item.style.opacity = '0';
+      setTimeout(function() { item.remove(); validateForm(); }, 200);
+    });
+
+    mediaGrid.appendChild(item);
+  }
+
+  // ========================
+  // CATEGORY DROPDOWN
+  // ========================
+  const categoryTrigger = document.getElementById('categoryTrigger');
+  const categoryDropdown = document.getElementById('categoryDropdown');
+  const categoryOptions = categoryDropdown.querySelectorAll('.cc-select-option');
+
+  categoryTrigger.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const isOpen = categoryDropdown.classList.contains('cc-visible');
+    closeAllDropdowns();
+    if (!isOpen) {
+      categoryDropdown.classList.add('cc-visible');
+      categoryTrigger.classList.add('cc-open');
+    }
+  });
+
+  categoryOptions.forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      const val = this.dataset.value;
+      const text = this.textContent.trim();
+      selectedCategory = val;
+
+      categoryOptions.forEach(function(o) { o.classList.remove('cc-selected'); });
+      this.classList.add('cc-selected');
+
+      categoryTrigger.querySelector('.cc-select-text').textContent = text;
+      categoryTrigger.classList.remove('cc-placeholder');
+      categoryDropdown.classList.remove('cc-visible');
+      categoryTrigger.classList.remove('cc-open');
+    });
+  });
+
+  // ========================
+  // LOCATION INPUT
+  // ========================
+  const locationInput = document.getElementById('locationInput');
+  const locationSuggestions = document.getElementById('locationSuggestions');
+  const suggestions = locationSuggestions.querySelectorAll('.cc-suggestion');
+
+  locationInput.addEventListener('focus', function() {
+    filterLocations(this.value);
+  });
+
+  locationInput.addEventListener('input', function() {
+    filterLocations(this.value);
+  });
+
+  function filterLocations(query) {
+    const q = query.toLowerCase().trim();
+    let visible = 0;
+    suggestions.forEach(function(s) {
+      const name = s.dataset.location.toLowerCase();
+      if (!q || name.includes(q)) {
+        s.style.display = 'flex';
+        visible++;
+      } else {
+        s.style.display = 'none';
+      }
+    });
+    if (visible > 0 && document.activeElement === locationInput) {
+      locationSuggestions.classList.add('cc-visible');
+    } else {
+      locationSuggestions.classList.remove('cc-visible');
+    }
+  }
+
+  suggestions.forEach(function(s) {
+    s.addEventListener('click', function() {
+      locationInput.value = this.dataset.location;
+      locationSuggestions.classList.remove('cc-visible');
+    });
+  });
+
+  // ========================
+  // TAG PRODUCTS
+  // ========================
+  const tagInput = document.getElementById('tagInput');
+  const tagsWrap = document.getElementById('tagsWrap');
+  const productSuggestions = document.getElementById('productSuggestions');
+
+  const products = [
+    { id: 1, name: 'Osprey Atmos 65 AG', brand: 'Osprey', emoji: '🎒' },
+    { id: 2, name: 'REI Co-op Half Dome 2+', brand: 'REI', emoji: '⛺' },
+    { id: 3, name: 'MSR PocketRocket 2', brand: 'MSR', emoji: '🔥' },
+    { id: 4, name: 'Nalgene Wide Mouth 32oz', brand: 'Nalgene', emoji: '🍶' },
+    { id: 5, name: 'Black Diamond Spot 400', brand: 'Black Diamond', emoji: '🔦' },
+    { id: 6, name: 'Therm-a-Rest NeoAir XLite', brand: 'Therm-a-Rest', emoji: '🛏️' },
+    { id: 7, name: 'Patagonia Nano Puff', brand: 'Patagonia', emoji: '🧥' },
+    { id: 8, name: 'Kelty Cosmic 20', brand: 'Kelty', emoji: '🛌' },
+    { id: 9, name: 'Jetboil Flash', brand: 'Jetboil', emoji: '☕' },
+    { id: 10, name: 'Garmin inReach Mini 2', brand: 'Garmin', emoji: '📡' }
+  ];
+
+  tagInput.addEventListener('focus', function() {
+    filterProducts(this.value);
+  });
+
+  tagInput.addEventListener('input', function() {
+    filterProducts(this.value);
+  });
+
+  tagInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Backspace' && this.value === '' && selectedTags.length > 0) {
+      removeTag(selectedTags[selectedTags.length - 1]);
+    }
+  });
+
+  tagsWrap.addEventListener('click', function() {
+    tagInput.focus();
+  });
+
+  function filterProducts(query) {
+    const q = query.toLowerCase().trim();
+    if (!q) {
+      productSuggestions.classList.remove('cc-visible');
+      return;
+    }
+
+    const filtered = products.filter(function(p) {
+      return (p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q));
+    });
+
+    if (filtered.length === 0) {
+      productSuggestions.classList.remove('cc-visible');
+      return;
+    }
+
+    productSuggestions.innerHTML = '';
+    filtered.forEach(function(p) {
+      const isSelected = selectedTags.some(function(t) { return t.id === p.id; });
+      const opt = document.createElement('div');
+      opt.className = 'cc-product-option' + (isSelected ? ' cc-disabled' : '');
+      opt.innerHTML =
+        '<span class="cc-prod-emoji">' + p.emoji + '</span>' +
+        '<div class="cc-prod-info">' +
+          '<div class="cc-prod-name">' + p.name + '</div>' +
+          '<div class="cc-prod-brand">' + p.brand + '</div>' +
+        '</div>';
+
+      if (!isSelected) {
+        opt.addEventListener('click', function() {
+          addTag(p);
+          tagInput.value = '';
+          productSuggestions.classList.remove('cc-visible');
+          tagInput.focus();
+        });
+      }
+
+      productSuggestions.appendChild(opt);
+    });
+
+    productSuggestions.classList.add('cc-visible');
+  }
+
+  function addTag(product) {
+    if (selectedTags.some(function(t) { return t.id === product.id; })) return;
+    selectedTags.push(product);
+
+    const chip = document.createElement('span');
+    chip.className = 'cc-tag-chip';
+    chip.dataset.id = product.id;
+    chip.innerHTML =
+      '<span class="cc-chip-icon">' + product.emoji + '</span>' +
+      product.name +
+      '<button type="button" class="cc-chip-remove" title="Remove">&times;</button>';
+
+    chip.querySelector('.cc-chip-remove').addEventListener('click', function(e) {
+      e.stopPropagation();
+      removeTag(product);
+    });
+
+    tagsWrap.insertBefore(chip, tagInput);
+  }
+
+  function removeTag(product) {
+    selectedTags = selectedTags.filter(function(t) { return t.id !== product.id; });
+    const chip = tagsWrap.querySelector('[data-id="' + product.id + '"]');
+    if (chip) {
+      chip.style.transform = 'scale(0.6)';
+      chip.style.opacity = '0';
+      setTimeout(function() { chip.remove(); }, 200);
+    }
+  }
+
+  // ========================
+  // CLOSE DROPDOWNS ON OUTSIDE CLICK
+  // ========================
+  function closeAllDropdowns() {
+    categoryDropdown.classList.remove('cc-visible');
+    categoryTrigger.classList.remove('cc-open');
+    locationSuggestions.classList.remove('cc-visible');
+    productSuggestions.classList.remove('cc-visible');
+  }
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('#categorySelect')) {
+      categoryDropdown.classList.remove('cc-visible');
+      categoryTrigger.classList.remove('cc-open');
+    }
+    if (!e.target.closest('.cc-location-input')) {
+      locationSuggestions.classList.remove('cc-visible');
+    }
+    if (!e.target.closest('.cc-tag-products')) {
+      productSuggestions.classList.remove('cc-visible');
+    }
+  });
+
+  // ========================
+  // ACTION BUTTONS
+  // ========================
+  document.getElementById('btnCancel').addEventListener('click', function() {
+    const hasContent = textarea.value.trim().length > 0 || uploadedFiles.length > 0;
+    if (hasContent) {
+      if (confirm('You have unsaved changes. Are you sure you want to discard this post?')) {
+        resetForm();
+      }
+    } else {
+      resetForm();
+    }
+  });
+
+  document.getElementById('btnDraft').addEventListener('click', function() {
+    const btn = this;
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML =
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><polyline points="20 6 9 17 4 12"/></svg>' +
+      '<span>Draft Saved!</span>';
+    btn.style.background = '#e8f5ed';
+    btn.style.color = '#2d5a3f';
+
+    setTimeout(function() {
+      btn.innerHTML = originalHTML;
+      btn.style.background = '';
+      btn.style.color = '';
+    }, 2000);
+  });
+
+  document.getElementById('btnPost').addEventListener('click', function() {
+    const btn = this;
+    btn.classList.add('cc-loading');
+
+    setTimeout(function() {
+      btn.classList.remove('cc-loading');
+
+      // Success visual
+      btn.innerHTML =
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><polyline points="20 6 9 17 4 12"/></svg>' +
+        '<span class="cc-btn-text">Adventure Shared!</span>';
+
+      setTimeout(function() {
+        btn.innerHTML =
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>' +
+          '<span class="cc-btn-text">Share Adventure</span>' +
+          '<span class="cc-btn-loader"></span>';
+        resetForm();
+      }, 2500);
+    }, 1800);
+  });
+
+  function resetForm() {
+    textarea.value = '';
+    autoResize();
+    updateCharCount();
+    uploadedFiles = [];
+    mediaGrid.innerHTML = '';
+    selectedCategory = '';
+    categoryTrigger.querySelector('.cc-select-text').textContent = 'Choose a category';
+    categoryTrigger.classList.add('cc-placeholder');
+    categoryOptions.forEach(function(o) { o.classList.remove('cc-selected'); });
+    locationInput.value = '';
+    selectedTags = [];
+    tagsWrap.querySelectorAll('.cc-tag-chip').forEach(function(c) { c.remove(); });
+    tagInput.value = '';
+    document.getElementById('privPublic').checked = true;
+    validateForm();
+  }
+
+})();
+</script>
+
+</body>
+</html>

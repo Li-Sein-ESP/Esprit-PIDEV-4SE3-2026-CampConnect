@@ -1,0 +1,240 @@
+<div class="cc-page">
+
+    <!-- ============================== Breadcrumb ============================== -->
+    <nav class="cc-breadcrumb" aria-label="Breadcrumb">
+        <a (click)="navigateToForum()" role="button">Community Forum</a>
+        <span class="cc-breadcrumb__sep">›</span>
+        <a (click)="navigateToCategory()" role="button">{{ topic?.categoryName }}</a>
+        <span class="cc-breadcrumb__sep">›</span>
+        <span class="cc-breadcrumb__current">{{ topic?.title }}</span>
+    </nav>
+
+    <!-- ============================== Original Post ============================== -->
+    <article class="cc-card" id="original-post" *ngIf="topic">
+        <div class="cc-card__body">
+
+            <!-- Author Row -->
+            <div class="cc-author__avatar-wrap">
+                <img [src]="topic.author.avatar" [alt]="topic.author.username" class="cc-author__avatar"
+                    (click)="goToProfile(topic.author.id)" style="cursor: pointer;" loading="lazy" />
+                <span *ngIf="topic.author.trustScore > 90" class="cc-author__online" title="Online now"></span>
+            </div>
+            <div class="cc-author__info">
+                <div class="cc-author__name-row">
+                    <span class="cc-author__name" (click)="goToProfile(topic.author.id)" style="cursor: pointer;">{{
+                        topic.author.username }}</span>
+                    <!-- TrustScore small inline badge -->
+                    <span class="cc-trust-inline" [class.cc-trust-inline--high]="topic.author.trustScore >= 80"
+                        [class.cc-trust-inline--mid]="topic.author.trustScore >= 50 && topic.author.trustScore < 80"
+                        [title]="'Trust Score: ' + topic.author.trustScore">
+                        <span class="cc-trust-inline__icon">✦</span> {{ topic.author.trustScore }}
+                    </span>
+                </div>
+                <!-- User badges -->
+                <div class="cc-badges" *ngIf="topic.author.badges?.length">
+                    <app-camp-badge *ngFor="let badge of topic.author.badges" [title]="badge.title" [icon]="badge.icon"
+                        [unlocked]="badge.unlocked" size="small">
+                    </app-camp-badge>
+                </div>
+                <!-- TrustScoreComponent – compact widget for profile view -->
+                <div class="cc-trust-score-wrap">
+                    <app-trust-score [score]="topic.author.trustScore" variant="small"></app-trust-score>
+                </div>
+                <time class="cc-author__date" [attr.datetime]="topic.dateIso">
+                    <span class="cc-author__date-icon">🕘</span> {{ topic.date }}
+                </time>
+            </div>
+
+            <!-- Title -->
+            <h1 class="cc-post-title">{{ topic.title }}</h1>
+
+            <!-- Tags -->
+            <div class="cc-post-tag-row">
+                <span *ngFor="let tag of topic.tags" class="cc-post-tag">{{ tag }}</span>
+            </div>
+
+            <!-- Content -->
+            <div class="cc-post-content">
+                <p *ngFor="let para of topic.content" [innerHTML]="para || '&nbsp;'"></p>
+
+                <!-- Bullet Points / Requirements -->
+                <div class="cc-post-bullets" *ngIf="topic.bulletPoints?.length">
+                    <ul class="cc-bullet-list">
+                        <li *ngFor="let bp of topic.bulletPoints" class="cc-bullet-item">
+                            <span class="cc-bullet-label">{{ bp.label }}:</span>
+                            <span class="cc-bullet-value">{{ bp.value }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Attached Media -->
+            <div class="cc-media-grid" *ngIf="topic.media?.length">
+                <div *ngFor="let img of topic.media" class="cc-media-grid__item" (click)="openLightbox(img)"
+                    role="button" tabindex="0" (keydown.enter)="openLightbox(img)">
+                    <img [src]="img.url" [alt]="img.alt" loading="lazy" />
+                    <div class="cc-media-grid__overlay">
+                        <span class="cc-media-grid__label">📷 Click to expand</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="cc-actions">
+                <button class="cc-actions__btn" [class.cc-actions__btn--liked]="topic.isLiked"
+                    (click)="togglePostLike()">
+                    <span class="cc-actions__icon">{{ topic.isLiked ? '♥' : '♡' }}</span>
+                    <span class="cc-actions__label">Like</span>
+                    <span class="cc-actions__count">{{ formatNumber(topic.likes) }}</span>
+                </button>
+
+                <button class="cc-actions__btn" (click)="scrollToComposer()">
+                    <span class="cc-actions__icon">💬</span>
+                    <span class="cc-actions__label">Reply</span>
+                </button>
+
+                <button class="cc-actions__btn cc-actions__btn--report" (click)="reportContent('post')">
+                    <span class="cc-actions__icon">⚑</span>
+                    <span class="cc-actions__label">Report</span>
+                </button>
+
+                <span class="cc-actions__spacer"></span>
+                <span class="cc-actions__stat">👁 {{ topic.views }} views</span>
+            </div>
+        </div>
+    </article>
+
+    <!-- ============================== Replies Section ============================== -->
+    <div class="cc-replies-header">
+        <h2 class="cc-replies-header__title">
+            Replies
+            <span class="cc-replies-header__count">{{ topic?.replyCount }}</span>
+        </h2>
+        <select class="cc-replies-header__sort" aria-label="Sort replies">
+            <option>Most Helpful</option>
+            <option>Newest First</option>
+            <option>Oldest First</option>
+        </select>
+    </div>
+
+    <!-- Root Replies -->
+    <div *ngFor="let reply of rootReplies" class="cc-reply" [attr.data-reply-id]="reply.id">
+        <img [src]="reply.author.avatar" [alt]="reply.author.username" class="cc-reply__avatar"
+            (click)="goToProfile(reply.author.id)" style="cursor: pointer;" loading="lazy" />
+        <div class="cc-reply__body">
+            <div class="cc-reply__meta">
+                <span class="cc-reply__name" (click)="goToProfile(reply.author.id)" style="cursor: pointer;">{{
+                    reply.author.username }}</span>
+                <!-- Trust inline badge -->
+                <span class="cc-trust-inline" [class.cc-trust-inline--high]="reply.author.trustScore >= 80"
+                    [class.cc-trust-inline--mid]="reply.author.trustScore >= 50 && reply.author.trustScore < 80"
+                    [title]="'Trust Score: ' + reply.author.trustScore">
+                    <span class="cc-trust-inline__icon">✦</span> {{ reply.author.trustScore }}
+                </span>
+                <!-- User badges -->
+                <div class="cc-badges" *ngIf="reply.author.badges?.length"
+                    style="display: inline-flex; gap: 4px; vertical-align: middle; margin-left: 8px;">
+                    <app-camp-badge *ngFor="let badge of reply.author.badges" [title]="badge.title" [icon]="badge.icon"
+                        [unlocked]="badge.unlocked" size="small">
+                    </app-camp-badge>
+                </div>
+                <span class="cc-reply__date">{{ reply.date }}</span>
+            </div>
+
+            <div class="cc-reply__content">
+                <p *ngFor="let para of reply.content.split('\n\n')">{{ para }}</p>
+            </div>
+
+            <div class="cc-reply__actions">
+                <button class="cc-reply__action-btn" [class.cc-reply__action-btn--liked]="reply.isLiked"
+                    (click)="toggleReplyLike(reply)">
+                    <span>{{ reply.isLiked ? '♥' : '♡' }}</span>
+                    <span class="cc-actions__count">{{ formatNumber(reply.likes) }}</span>
+                </button>
+                <button class="cc-reply__action-btn" (click)="reportContent('reply-' + reply.id)">
+                    <span>⚑</span> Report
+                </button>
+            </div>
+
+            <!-- Nested Replies (1-level) -->
+            <div class="cc-nested-replies" *ngIf="getNestedReplies(reply.id).length > 0">
+                <div *ngFor="let nested of getNestedReplies(reply.id)" class="cc-nested-reply">
+                    <img [src]="nested.author.avatar" [alt]="nested.author.username" class="cc-nested-reply__avatar"
+                        (click)="goToProfile(nested.author.id)" style="cursor: pointer;" loading="lazy" />
+                    <div class="cc-nested-reply__body">
+                        <div class="cc-nested-reply__meta">
+                            <span class="cc-nested-reply__name" (click)="goToProfile(nested.author.id)"
+                                style="cursor: pointer;">{{ nested.author.username }}</span>
+                            <span *ngIf="nested.isOP" class="cc-reply__op-badge">OP</span>
+                            <span class="cc-trust-inline cc-trust-inline--sm"
+                                [class.cc-trust-inline--high]="nested.author.trustScore >= 80"
+                                [class.cc-trust-inline--mid]="nested.author.trustScore >= 50 && nested.author.trustScore < 80"
+                                [title]="'Trust Score: ' + nested.author.trustScore">
+                                <span class="cc-trust-inline__icon">✦</span> {{ nested.author.trustScore }}
+                            </span>
+                            <span class="cc-nested-reply__date">{{ nested.date }}</span>
+                        </div>
+                        <div class="cc-nested-reply__content">{{ nested.content }}</div>
+                        <div class="cc-nested-reply__actions">
+                            <button class="cc-nested-reply__action-btn"
+                                [class.cc-reply__action-btn--liked]="nested.isLiked" (click)="toggleReplyLike(nested)">
+                                <span>{{ nested.isLiked ? '♥' : '♡' }}</span>
+                                <span class="cc-actions__count">{{ formatNumber(nested.likes) }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====== Quick Reply Composer ====== -->
+    <section *ngIf="authService.isAuthenticated() | async; else loginToReply" class="cc-composer">
+        <div class="cc-composer__card">
+            <div class="cc-composer__header">
+                <div class="cc-composer__user">
+                    <div class="cc-composer__avatar">
+                        <img src="https://i.pravatar.cc/100?u=current-user" alt="Your Avatar">
+                    </div>
+                    <div class="cc-composer__user-info">
+                        <span class="cc-composer__username">You</span>
+                        <span class="cc-composer__status">Replying to {{ topic?.title }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cc-composer__body">
+                <textarea placeholder="Write your reply... (Markdown supported)" class="cc-composer__textarea"
+                    rows="4"></textarea>
+            </div>
+
+            <div class="cc-composer__footer">
+                <div class="cc-composer__tools">
+                    <button class="cc-composer__tool-btn" title="Add Image">📷</button>
+                    <button class="cc-composer__tool-btn" title="Format Bold">B</button>
+                    <button class="cc-composer__tool-btn" title="Format Italic">I</button>
+                    <button class="cc-composer__tool-btn" title="Insert Code">/></button>
+                </div>
+                <button class="cc-btn cc-btn--primary">Post Reply</button>
+            </div>
+        </div>
+    </section>
+
+    <ng-template #loginToReply>
+        <section class="cc-composer login-prompt">
+            <div class="cc-composer__card"
+                style="text-align: center; padding: 40px; border-radius: 12px; background: white; border: 1px solid var(--cc-sand);">
+                <p style="margin-bottom: 20px; color: var(--cc-text-secondary); font-size: 1.1rem;">You must be
+                    logged in to reply to this topic.</p>
+                <a routerLink="/login" class="cc-btn cc-btn--primary">Sign In to Join the Discussion</a>
+            </div>
+        </section>
+    </ng-template>
+
+</div>
+
+<!-- ============================== Lightbox ============================== -->
+<div class="cc-lightbox" [class.cc-lightbox--open]="lightboxOpen" (click)="closeLightbox()">
+    <button class="cc-lightbox__close" aria-label="Close" (click)="closeLightbox()">&times;</button>
+    <img class="cc-lightbox__img" [src]="lightboxSrc" [alt]="lightboxAlt" (click)="$event.stopPropagation()" />
+</div>
