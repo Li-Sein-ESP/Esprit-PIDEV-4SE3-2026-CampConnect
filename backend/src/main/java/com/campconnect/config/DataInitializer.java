@@ -29,10 +29,21 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // Initialize Roles
-        if (roleRepository.count() == 0) {
+        // Initialize Roles
+        if (roleRepository.findByName(ERole.ROLE_USER).isEmpty())
             roleRepository.save(new Role(ERole.ROLE_USER));
+        if (roleRepository.findByName(ERole.ROLE_ADMIN).isEmpty())
             roleRepository.save(new Role(ERole.ROLE_ADMIN));
-        }
+        if (roleRepository.findByName(ERole.ROLE_CAMPER).isEmpty())
+            roleRepository.save(new Role(ERole.ROLE_CAMPER));
+        if (roleRepository.findByName(ERole.ROLE_SITE_OWNER).isEmpty())
+            roleRepository.save(new Role(ERole.ROLE_SITE_OWNER));
+        if (roleRepository.findByName(ERole.ROLE_EQUIPMENT_PROVIDER).isEmpty())
+            roleRepository.save(new Role(ERole.ROLE_EQUIPMENT_PROVIDER));
+        if (roleRepository.findByName(ERole.ROLE_ORGANIZER).isEmpty())
+            roleRepository.save(new Role(ERole.ROLE_ORGANIZER));
+        if (roleRepository.findByName(ERole.ROLE_DELIVERY_PROVIDER).isEmpty())
+            roleRepository.save(new Role(ERole.ROLE_DELIVERY_PROVIDER));
 
         // Initialize Users
         if (!userRepository.existsByUsername("admin")) {
@@ -42,6 +53,10 @@ public class DataInitializer implements CommandLineRunner {
                     .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
             roles.add(adminRole);
             admin.setRoles(roles);
+            userRepository.save(admin);
+        } else {
+            User admin = userRepository.findByUsername("admin").get();
+            admin.setPassword(encoder.encode("admin123"));
             userRepository.save(admin);
         }
 

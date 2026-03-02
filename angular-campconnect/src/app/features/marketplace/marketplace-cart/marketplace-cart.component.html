@@ -1,0 +1,181 @@
+<div class="min-h-screen bg-[#fafaf9] font-sans pb-20">
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <!-- Page Title -->
+        <div class="mb-8">
+            <h1 class="font-display text-3xl lg:text-4xl font-semibold text-stone-800 mb-2">Your Cart</h1>
+            <p class="text-stone-500">Review your gear and proceed to checkout</p>
+        </div>
+
+        <!-- Cart Content -->
+        <div *ngIf="cartItems.length > 0; else emptyCart" class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+            <!-- Left Side - Cart Items -->
+            <div class="flex-1">
+                <div class="space-y-6">
+                    <div *ngFor="let item of cartItems; let i = index"
+                        class="cart-item fade-in bg-white rounded-2xl card-shadow p-6"
+                        [style.animation-delay]="i * 0.1 + 's'">
+                        <div class="flex flex-col sm:flex-row gap-6">
+                            <!-- Product Image -->
+                            <div class="sm:w-48 h-36 rounded-xl overflow-hidden flex-shrink-0 cursor-pointer"
+                                [routerLink]="['/marketplace/product', item.id]">
+                                <img [src]="item.image" [alt]="item.name" class="w-full h-full object-cover">
+                            </div>
+
+                            <!-- Item Details -->
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-start justify-between gap-4 mb-3">
+                                    <div>
+                                        <span class="inline-block px-2 py-1 rounded-md font-medium condition-badge mb-2"
+                                            [ngClass]="item.conditionColor">
+                                            {{item.condition}}
+                                        </span>
+                                        <h3 class="font-semibold text-stone-800 text-lg leading-tight cursor-pointer hover:text-[var(--forest-600)] transition-colors"
+                                            [routerLink]="['/marketplace/product', item.id]">{{item.name}}</h3>
+                                        <p class="text-stone-500 text-sm mt-1">{{item.category}}</p>
+                                    </div>
+                                    <div class="text-right flex-shrink-0">
+                                        <p class="text-2xl font-bold text-stone-800">{{calculateItemTotal(item) |
+                                            currency}}</p>
+                                        <p class="text-stone-500 text-sm">{{item.pricePerDay | currency}}/day ×
+                                            {{calculateDuration(item.startDate, item.endDate)}} days</p>
+                                    </div>
+                                </div>
+
+                                <!-- Date Selection -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label class="block text-xs font-medium text-stone-500 mb-1">Start Date</label>
+                                        <input type="date" [(ngModel)]="item.startDate" (change)="updateDate(item)"
+                                            class="date-input w-full px-3 py-2.5 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-colors">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-stone-500 mb-1">End Date</label>
+                                        <input type="date" [(ngModel)]="item.endDate" (change)="updateDate(item)"
+                                            class="date-input w-full px-3 py-2.5 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-colors">
+                                    </div>
+                                </div>
+
+                                <!-- Duration & Actions -->
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div class="flex items-center gap-2">
+                                        <span
+                                            class="px-3 py-1.5 bg-stone-100 rounded-lg text-sm font-medium text-stone-600">
+                                            📅 {{calculateDuration(item.startDate, item.endDate)}}
+                                            day{{calculateDuration(item.startDate, item.endDate) > 1 ? 's' : ''}} rental
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <button (click)="removeItem(item.id)"
+                                            class="remove-btn flex items-center gap-2 px-4 py-2 rounded-lg border border-stone-200 text-stone-500 font-medium text-sm">
+                                            <lucide-icon [name]="icons.Trash2" class="w-4 h-4"></lucide-icon>
+                                            Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - Summary Panel -->
+            <div class="lg:w-[380px]">
+                <div class="bg-white rounded-2xl card-shadow p-6 lg:p-8 sticky-summary">
+                    <h2 class="font-display text-xl font-semibold text-stone-800 mb-6">Order Summary</h2>
+
+                    <!-- Summary Details -->
+                    <div class="space-y-4 border-b border-stone-100 pb-6 mb-6">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-stone-500">Subtotal ({{cartItems.length}} item{{cartItems.length !== 1 ?
+                                's' : ''}})</span>
+                            <span class="text-stone-800 font-medium">{{subtotal | currency}}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-stone-500">Estimated Delivery</span>
+                            <span class="font-medium"
+                                [ngClass]="deliveryCost === 0 ? 'text-green-600' : 'text-stone-800'">
+                                {{deliveryCost === 0 ? 'FREE' : (deliveryCost | currency)}}
+                            </span>
+                        </div>
+
+                        <p *ngIf="subtotal < 100" class="text-xs text-green-600 bg-green-50 p-2 rounded-lg">
+                            🎉 Add {{100 - subtotal | currency}} more for free delivery!
+                        </p>
+
+                        <div class="flex justify-between text-sm">
+                            <span class="text-stone-500">Security Deposits (rational)</span>
+                            <span class="text-stone-800 font-medium">{{totalDeposit | currency}}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-stone-500">Estimated Taxes</span>
+                            <span class="text-stone-800 font-medium">{{taxes | currency}}</span>
+                        </div>
+                    </div>
+
+                    <!-- Totals -->
+                    <div class="space-y-3 mb-8">
+                        <div class="flex justify-between items-center pt-4 border-t border-stone-100">
+                            <span class="text-lg font-semibold text-stone-800">Grand Total</span>
+                            <div class="text-right">
+                                <span class="text-3xl font-bold text-stone-800">{{grandTotal | currency}}</span>
+                                <p class="text-xs text-stone-500 mt-1">+ {{totalDeposit | currency}} refundable deposit
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="space-y-3">
+                        <button (click)="proceedToCheckout()"
+                            class="primary-btn w-full py-4 px-6 rounded-xl text-white font-semibold text-lg flex justify-center items-center gap-2">
+                            Proceed to Checkout
+                            <lucide-icon [name]="icons.ArrowRight" class="w-5 h-5"></lucide-icon>
+                        </button>
+                        <a routerLink="/marketplace"
+                            class="secondary-btn block w-full py-3 px-6 rounded-xl text-stone-600 font-medium text-center hover:bg-stone-100 transition-colors">
+                            Continue Shopping
+                        </a>
+                    </div>
+
+                    <!-- Trust Badges -->
+                    <div class="mt-6 pt-6 border-t border-stone-100">
+                        <div class="flex items-center justify-center gap-4 text-stone-400">
+                            <div class="flex items-center gap-1">
+                                <lucide-icon [name]="icons.ShieldCheck" class="w-4 h-4"></lucide-icon>
+                                <span class="text-xs">Secure checkout</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <lucide-icon [name]="icons.Star" class="w-4 h-4"></lucide-icon>
+                                <span class="text-xs">4.9★ rating</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty Cart State -->
+        <ng-template #emptyCart>
+            <div class="py-16 text-center">
+                <div class="max-w-md mx-auto">
+                    <div
+                        class="w-40 h-40 mx-auto mb-8 bg-gradient-to-br from-stone-100 to-stone-200 rounded-full flex items-center justify-center">
+                        <lucide-icon [name]="icons.ShoppingBag" class="w-20 h-20 text-stone-400"></lucide-icon>
+                    </div>
+
+                    <h2 class="font-display text-2xl font-semibold text-stone-800 mb-3">Your gear bag is empty</h2>
+                    <p class="text-stone-500 mb-8">Discover premium camping equipment for your next adventure</p>
+
+                    <a routerLink="/marketplace"
+                        class="primary-btn inline-flex items-center gap-2 px-8 py-4 rounded-xl text-white font-semibold">
+                        <lucide-icon [name]="icons.ArrowRight" class="w-5 h-5"></lucide-icon>
+                        Explore Marketplace
+                    </a>
+                </div>
+            </div>
+        </ng-template>
+
+    </main>
+</div>

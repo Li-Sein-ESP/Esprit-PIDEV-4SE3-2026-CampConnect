@@ -1,0 +1,264 @@
+<!-- Dashboard Content -->
+<div class="p-6 lg:p-8 space-y-8 bg-[#fafaf9] min-h-full">
+    <!-- Section 1: KPI Cards -->
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Revenue -->
+        <div class="card-hover bg-white rounded-2xl p-6 shadow-sm border border-stone-100 fade-in"
+            style="animation-delay: 0ms;">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-sm font-medium text-stone-500">Total Revenue</p>
+                    <p class="text-3xl font-semibold text-stone-900 mt-2">{{stats.totalRevenue |
+                        currency:'USD':'symbol':'1.0-0'}}</p>
+                    <p class="text-sm text-emerald-600 mt-1 flex items-center gap-1">
+                        <lucide-icon [name]="icons.TrendingUp" class="w-3 h-3"></lucide-icon>
+                        +12.5% this month
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
+                    <lucide-icon [name]="icons.DollarSign" class="w-6 h-6 text-emerald-600"></lucide-icon>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Rentals -->
+        <div class="card-hover bg-white rounded-2xl p-6 shadow-sm border border-stone-100 fade-in"
+            style="animation-delay: 100ms;">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-sm font-medium text-stone-500">Active Rentals</p>
+                    <p class="text-3xl font-semibold text-stone-900 mt-2">{{stats.activeRentals}}</p>
+                    <p class="text-sm text-stone-500 mt-1">Across 45 products</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                    <lucide-icon [name]="icons.CalendarCheck" class="w-6 h-6 text-blue-600"></lucide-icon>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Requests -->
+        <div class="card-hover bg-white rounded-2xl p-6 shadow-sm border border-stone-100 fade-in"
+            style="animation-delay: 200ms;">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-sm font-medium text-stone-500">Pending Requests</p>
+                    <p class="text-3xl font-semibold text-stone-900 mt-2">{{stats.pendingRequests}}</p>
+                    <p class="text-sm text-amber-600 mt-1 flex items-center gap-1">
+                        <lucide-icon [name]="icons.Clock" class="w-3 h-3"></lucide-icon>
+                        Needs attention
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
+                    <lucide-icon [name]="icons.Hourglass" class="w-6 h-6 text-amber-600"></lucide-icon>
+                </div>
+            </div>
+        </div>
+
+        <!-- Average Rating -->
+        <div class="card-hover bg-white rounded-2xl p-6 shadow-sm border border-stone-100 fade-in"
+            style="animation-delay: 300ms;">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-sm font-medium text-stone-500">Average Rating</p>
+                    <p class="text-3xl font-semibold text-stone-900 mt-2">{{stats.averageRating}}</p>
+                    <p class="text-sm text-stone-500 mt-1">Based on 342 reviews</p>
+                </div>
+                <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
+                    <lucide-icon [name]="icons.Star" class="w-6 h-6 text-amber-600"></lucide-icon>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Revenue Chart -->
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-stone-100 fade-in" style="animation-delay: 400ms;">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h3 class="text-lg font-semibold text-stone-900">Revenue Overview</h3>
+                <p class="text-sm text-stone-500">Monthly revenue trend for 2024</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button
+                    class="px-3 py-1.5 text-sm font-medium text-stone-600 bg-stone-100 rounded-lg hover:bg-stone-200 transition-colors">2024</button>
+                <button
+                    class="px-3 py-1.5 text-sm font-medium text-stone-500 hover:bg-stone-100 rounded-lg transition-colors">2023</button>
+            </div>
+        </div>
+
+        <!-- SVG Chart -->
+        <div class="relative h-64 w-full">
+            <svg class="w-full h-full" viewBox="0 0 800 200" preserveAspectRatio="none">
+                <!-- Grid lines -->
+                <line x1="0" y1="0" x2="800" y2="0" stroke="#e7e5e4" stroke-width="1" />
+                <line x1="0" y1="50" x2="800" y2="50" stroke="#e7e5e4" stroke-width="1" />
+                <line x1="0" y1="100" x2="800" y2="100" stroke="#e7e5e4" stroke-width="1" />
+                <line x1="0" y1="150" x2="800" y2="150" stroke="#e7e5e4" stroke-width="1" />
+                <line x1="0" y1="200" x2="800" y2="200" stroke="#e7e5e4" stroke-width="1" />
+
+                <!-- Area fill -->
+                <defs>
+                    <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#d97706;stop-opacity:0.2" />
+                        <stop offset="100%" style="stop-color:#d97706;stop-opacity:0" />
+                    </linearGradient>
+                </defs>
+                <path
+                    d="M0,150 L66,140 L133,120 L200,100 L266,90 L333,70 L400,60 L466,50 L533,45 L600,40 L666,35 L733,30 L800,25 L800,200 L0,200 Z"
+                    fill="url(#areaGradient)" />
+
+                <!-- Line -->
+                <path class="chart-line"
+                    d="M0,150 L66,140 L133,120 L200,100 L266,90 L333,70 L400,60 L466,50 L533,45 L600,40 L666,35 L733,30 L800,25"
+                    fill="none" stroke="#d97706" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+
+                <!-- Data points -->
+                <circle cx="0" cy="150" r="4" fill="#d97706" />
+                <circle cx="66" cy="140" r="4" fill="#d97706" />
+                <circle cx="133" cy="120" r="4" fill="#d97706" />
+                <circle cx="200" cy="100" r="4" fill="#d97706" />
+                <circle cx="266" cy="90" r="4" fill="#d97706" />
+                <circle cx="333" cy="70" r="4" fill="#d97706" />
+                <circle cx="400" cy="60" r="4" fill="#d97706" />
+                <circle cx="466" cy="50" r="4" fill="#d97706" />
+                <circle cx="533" cy="45" r="4" fill="#d97706" />
+                <circle cx="600" cy="40" r="4" fill="#d97706" />
+                <circle cx="666" cy="35" r="4" fill="#d97706" />
+                <circle cx="733" cy="30" r="4" fill="#d97706" />
+                <circle cx="800" cy="25" r="4" fill="#d97706" />
+            </svg>
+
+            <!-- X-axis labels -->
+            <div class="flex justify-between mt-4 text-xs text-stone-500">
+                <span>Jan</span>
+                <span>Feb</span>
+                <span>Mar</span>
+                <span>Apr</span>
+                <span>May</span>
+                <span>Jun</span>
+                <span>Jul</span>
+                <span>Aug</span>
+                <span>Sep</span>
+                <span>Oct</span>
+                <span>Nov</span>
+                <span>Dec</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3 & 4: Two Column Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Section 3: Top Performing Products -->
+        <section class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-stone-100 fade-in"
+            style="animation-delay: 500ms;">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-stone-900">Top Performing Products</h3>
+                    <p class="text-sm text-stone-500">Best rental performers this month</p>
+                </div>
+                <button class="text-sm font-medium text-amber-600 hover:text-amber-700 transition-colors">
+                    View All
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-stone-200">
+                            <th class="text-left py-3 px-4 text-xs font-medium text-stone-500 uppercase tracking-wider">
+                                Product</th>
+                            <th class="text-left py-3 px-4 text-xs font-medium text-stone-500 uppercase tracking-wider">
+                                Rentals</th>
+                            <th class="text-left py-3 px-4 text-xs font-medium text-stone-500 uppercase tracking-wider">
+                                Revenue</th>
+                            <th class="text-left py-3 px-4 text-xs font-medium text-stone-500 uppercase tracking-wider">
+                                Rating</th>
+                            <th
+                                class="text-center py-3 px-4 text-xs font-medium text-stone-500 uppercase tracking-wider">
+                                Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-100">
+                        <tr *ngFor="let product of topProducts" class="hover:bg-stone-50 transition-colors">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center">
+                                        <lucide-icon [name]="product.icon" class="w-5 h-5 text-stone-600"></lucide-icon>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-stone-900">{{product.name}}</p>
+                                        <p class="text-xs text-stone-500">{{product.category}}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-sm text-stone-600">{{product.rentals}}</td>
+                            <td class="py-4 px-4 text-sm font-medium text-stone-900">{{product.revenue |
+                                currency:'USD':'symbol':'1.0-0'}}</td>
+                            <td class="py-4 px-4">
+                                <div class="flex items-center gap-1">
+                                    <lucide-icon [name]="icons.Star"
+                                        class="w-4 h-4 text-amber-500 fill-amber-500"></lucide-icon>
+                                    <span class="text-sm text-stone-600">{{product.rating}}</span>
+                                </div>
+                            <td class="py-4 px-4 text-center">
+                                <a [routerLink]="['/provider/products', product.id, 'analytics']"
+                                    class="text-xs font-semibold text-emerald-600 hover:text-emerald-800 transition-colors inline-block bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg">
+                                    Analytics &rarr;
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 4: Alerts -->
+        <section class="bg-white rounded-2xl p-6 shadow-sm border border-stone-100 fade-in"
+            style="animation-delay: 600ms;">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-stone-900">Alerts</h3>
+                    <p class="text-sm text-stone-500">Items requiring attention</p>
+                </div>
+                <span class="px-2 py-1 bg-rose-100 text-rose-600 text-xs font-medium rounded-full">{{alerts.length}}
+                    New</span>
+            </div>
+
+            <div class="space-y-4">
+                <div *ngFor="let alert of alerts" class="p-4 rounded-xl border" [ngClass]="{
+                            'bg-rose-50 border-rose-100 alert-pulse': alert.type === 'danger',
+                            'bg-amber-50 border-amber-100': alert.type === 'warning',
+                            'bg-blue-50 border-blue-100': alert.type === 'info',
+                            'bg-stone-50 border-stone-200': alert.type === 'default'
+                        }">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" [ngClass]="{
+                                    'bg-rose-100': alert.type === 'danger',
+                                    'bg-amber-100': alert.type === 'warning',
+                                    'bg-blue-100': alert.type === 'info',
+                                    'bg-stone-200': alert.type === 'default'
+                                }">
+                            <lucide-icon [name]="alert.icon" class="w-4 h-4" [ngClass]="{
+                                        'text-rose-600': alert.type === 'danger',
+                                        'text-amber-600': alert.type === 'warning',
+                                        'text-blue-600': alert.type === 'info',
+                                        'text-stone-600': alert.type === 'default'
+                                    }"></lucide-icon>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-stone-900">{{alert.title}}</p>
+                            <p class="text-xs text-stone-600 mt-1">{{alert.message}}</p>
+                            <button class="mt-2 text-xs font-medium transition-colors hover:opacity-80" [ngClass]="{
+                                        'text-rose-600': alert.type === 'danger',
+                                        'text-amber-600': alert.type === 'warning',
+                                        'text-blue-600': alert.type === 'info',
+                                        'text-stone-600': alert.type === 'default'
+                                    }">
+                                {{alert.action}}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

@@ -1,0 +1,110 @@
+<div class="gc-container">
+    <div class="gc-header">
+        <a routerLink="/gear" class="gc-back">&larr; Back to Gear List</a>
+        <h1 class="gc-title">Create New Gear Listing</h1>
+        <p class="gc-subtitle">Add your equipment to the marketplace and start renting.</p>
+    </div>
+
+    <form [formGroup]="gearForm" (ngSubmit)="onSubmit()" class="gc-form">
+
+        <div class="gc-alert gc-alert--error" *ngIf="serverError">
+            {{ serverError }}
+        </div>
+
+        <div class="gc-grid">
+            <!-- Name -->
+            <div class="gc-field gc-col-2">
+                <label for="name">Gear Name *</label>
+                <input id="name" type="text" formControlName="name" class="gc-input"
+                    [class.gc-input--error]="hasError('name')">
+                <span class="gc-error" *ngIf="hasError('name')">{{ getErrorMessage('name') }}</span>
+            </div>
+
+            <!-- Category -->
+            <div class="gc-field">
+                <label for="category">Category *</label>
+                <select id="category" formControlName="category" class="gc-input"
+                    [class.gc-input--error]="hasError('category')">
+                    <option value="">Select Category</option>
+                    <option value="Tents & Shelters">Tents & Shelters</option>
+                    <option value="Sleeping Bags & Pads">Sleeping Bags & Pads</option>
+                    <option value="Backpacks & Bags">Backpacks & Bags</option>
+                    <option value="Cooking & Kitchen">Cooking & Kitchen</option>
+                    <option value="Lighting & Power">Lighting & Power</option>
+                    <option value="Climbing Gear">Climbing Gear</option>
+                    <option value="Navigation & Safety">Navigation & Safety</option>
+                    <option value="Other">Other</option>
+                </select>
+                <span class="gc-error" *ngIf="hasError('category')">{{ getErrorMessage('category') }}</span>
+            </div>
+
+            <!-- Brand -->
+            <div class="gc-field">
+                <label for="brand">Brand *</label>
+                <input id="brand" type="text" formControlName="brand" class="gc-input"
+                    [class.gc-input--error]="hasError('brand')">
+                <span class="gc-error" *ngIf="hasError('brand')">{{ getErrorMessage('brand') }}</span>
+            </div>
+
+            <!-- Price Per Day -->
+            <div class="gc-field">
+                <label for="pricePerDay">Price Per Day ($) *</label>
+                <input id="pricePerDay" type="number" formControlName="pricePerDay" class="gc-input"
+                    [class.gc-input--error]="hasError('pricePerDay')">
+                <span class="gc-error" *ngIf="hasError('pricePerDay')">{{ getErrorMessage('pricePerDay') }}</span>
+            </div>
+
+            <!-- Purchase Price -->
+            <div class="gc-field">
+                <label for="purchasePrice">Purchase Price / Value ($)</label>
+                <input id="purchasePrice" type="number" formControlName="purchasePrice" class="gc-input"
+                    [class.gc-input--error]="hasError('purchasePrice')">
+                <span class="gc-error" *ngIf="hasError('purchasePrice')">{{ getErrorMessage('purchasePrice') }}</span>
+            </div>
+
+            <!-- Condition -->
+            <div class="gc-field">
+                <label for="condition">Condition *</label>
+                <select id="condition" formControlName="condition" class="gc-input"
+                    [class.gc-input--error]="hasError('condition')">
+                    <option value="NEW">New</option>
+                    <option value="LIKE_NEW">Like New</option>
+                    <option value="GOOD">Good</option>
+                    <option value="FAIR">Fair</option>
+                </select>
+                <span class="gc-error" *ngIf="hasError('condition')">{{ getErrorMessage('condition') }}</span>
+            </div>
+
+            <!-- Stock Quantity -->
+            <div class="gc-field">
+                <label for="stockQuantity">Stock Quantity *</label>
+                <input id="stockQuantity" type="number" formControlName="stockQuantity" class="gc-input"
+                    [class.gc-input--error]="hasError('stockQuantity')">
+                <span class="gc-error" *ngIf="hasError('stockQuantity')">{{ getErrorMessage('stockQuantity') }}</span>
+            </div>
+
+            <!-- Location -->
+            <div class="gc-field gc-col-2">
+                <label for="location">Location *</label>
+                <input id="location" type="text" formControlName="location" class="gc-input"
+                    [class.gc-input--error]="hasError('location')">
+                <span class="gc-error" *ngIf="hasError('location')">{{ getErrorMessage('location') }}</span>
+            </div>
+
+            <!-- Description -->
+            <div class="gc-field gc-col-2">
+                <label for="description">Description *</label>
+                <textarea id="description" formControlName="description" class="gc-input gc-textarea" rows="5"
+                    [class.gc-input--error]="hasError('description')"></textarea>
+                <span class="gc-error" *ngIf="hasError('description')">{{ getErrorMessage('description') }}</span>
+            </div>
+        </div>
+
+        <div class="gc-actions">
+            <a routerLink="/gear" class="gc-btn gc-btn--ghost">Cancel</a>
+            <button type="submit" class="gc-btn gc-btn--primary" [disabled]="gearForm.invalid || isSubmitting">
+                {{ isSubmitting ? 'Creating...' : 'Create Gear' }}
+            </button>
+        </div>
+    </form>
+</div>

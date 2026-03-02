@@ -1,0 +1,315 @@
+<div class="min-h-screen bg-[#faf8f5]">
+    <!-- Category Nav -->
+    <div class="bg-white border-b border-stone-200/60 transition-all duration-300">
+        <div class="max-w-[1600px] mx-auto px-6 lg:px-8">
+            <div class="flex items-center gap-1 py-3 overflow-x-auto scrollbar-hide">
+                <button (click)="setCategory('all')" [class.bg-[#1a3d2e]]="selectedCategory === 'all'"
+                    [class.text-white]="selectedCategory === 'all'" [class.text-stone-600]="selectedCategory !== 'all'"
+                    [class.hover:bg-stone-100]="selectedCategory !== 'all'"
+                    class="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all">
+                    All Gear
+                </button>
+                <button *ngFor="let cat of categories" (click)="setCategory(cat.id)"
+                    [class.bg-[#1a3d2e]]="selectedCategory === cat.id" [class.text-white]="selectedCategory === cat.id"
+                    [class.text-stone-600]="selectedCategory !== cat.id"
+                    [class.hover:bg-stone-100]="selectedCategory !== cat.id"
+                    class="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all">
+                    <lucide-icon [name]="cat.icon" class="w-4 h-4"></lucide-icon>
+                    {{cat.name}}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sticky bar with title and sorting -->
+    <div class="sticky top-16 lg:top-20 z-40 bg-[#faf8f5]/95 backdrop-blur-sm border-b border-stone-200/60">
+        <div class="max-w-[1600px] mx-auto px-6 lg:px-8">
+            <div class="flex items-center justify-between py-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-stone-900">
+                        {{ getCategoryName(selectedCategory) }}
+                    </h1>
+                    <p class="text-sm text-stone-500 mt-0.5">{{filteredProducts.length}} items available</p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <!-- Mobile filter toggle -->
+                    <button (click)="showMobileFilters = true"
+                        class="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-white border border-stone-200 rounded-full text-sm font-medium text-stone-700 hover:border-stone-300 transition-colors">
+                        <lucide-icon [name]="SlidersHorizontal" class="w-4 h-4"></lucide-icon>
+                        Filters
+                        <span *ngIf="activeFiltersCount > 0"
+                            class="w-5 h-5 bg-[#1a3d2e] text-white text-xs rounded-full flex items-center justify-center">
+                            {{activeFiltersCount}}
+                        </span>
+                    </button>
+
+                    <!-- Sort dropdown -->
+                    <div class="relative group">
+                        <button
+                            class="flex items-center gap-2 px-4 py-2.5 bg-white border border-stone-200 rounded-full text-sm font-medium text-stone-700 hover:border-stone-300 transition-colors">
+                            <span>Sort: {{ getSortLabel(sortBy) }}</span>
+                            <lucide-icon [name]="ChevronDown" class="w-4 h-4 text-stone-400"></lucide-icon>
+                        </button>
+                        <div
+                            class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-stone-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                            <button *ngFor="let option of sortOptions" (click)="sortBy = option.value"
+                                [class.bg-stone-50]="sortBy === option.value"
+                                [class.text-[#1a3d2e]]="sortBy === option.value"
+                                [class.font-medium]="sortBy === option.value"
+                                [class.text-stone-700]="sortBy !== option.value"
+                                [class.hover:bg-stone-50]="sortBy !== option.value"
+                                class="w-full px-4 py-2.5 text-left text-sm transition-colors first:rounded-t-xl last:rounded-b-xl">
+                                {{option.label}}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="max-w-[1600px] mx-auto px-6 lg:px-8 py-8">
+        <div class="flex gap-8">
+            <!-- Left sidebar - Filters -->
+            <aside class="hidden lg:block w-64 flex-shrink-0">
+                <div class="sticky top-40 space-y-8">
+                    <!-- Price Range -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-stone-100">
+                        <h3 class="font-semibold text-stone-900 mb-4">Price Range</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-stone-500">Min</span>
+                                <span class="font-medium text-stone-900">${{filters.priceRange[1]}}</span>
+                            </div>
+                            <input type="range" min="0" max="500" [value]="filters.priceRange[1]"
+                                (input)="setPriceRange($any($event.target).value)" class="w-full accent-[#1a3d2e]" />
+                            <div class="flex justify-between text-xs text-stone-400">
+                                <span>$0</span>
+                                <span>$500</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Condition -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-stone-100">
+                        <h3 class="font-semibold text-stone-900 mb-4">Condition</h3>
+                        <div class="space-y-3">
+                            <label *ngFor="let condition of conditions"
+                                class="flex items-center gap-3 cursor-pointer group">
+                                <input type="checkbox" [checked]="filters.conditions.includes(condition)"
+                                    (change)="toggleCondition(condition)" class="custom-checkbox" />
+                                <span class="text-sm text-stone-700 group-hover:text-stone-900 transition-colors">
+                                    {{condition}}
+                                </span>
+                                <span class="text-xs text-stone-400 ml-auto">
+                                    {{getProductCountByCondition(condition)}}
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Rating -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-stone-100">
+                        <h3 class="font-semibold text-stone-900 mb-4">Minimum Rating</h3>
+                        <div class="space-y-2">
+                            <button *ngFor="let rating of [4.5, 4.0, 3.5]" (click)="setMinRating(rating)"
+                                [class.bg-[#1a3d2e]/10]="filters.minRating === rating"
+                                [class.text-[#1a3d2e]]="filters.minRating === rating"
+                                [class.text-stone-600]="filters.minRating !== rating"
+                                [class.hover:bg-stone-50]="filters.minRating !== rating"
+                                class="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm transition-colors">
+                                <div class="flex">
+                                    <lucide-icon *ngFor="let i of range(5)" [name]="Star" class="w-4 h-4"
+                                        [class.text-amber-400]="i < Math.floor(rating)"
+                                        [class.fill-amber-400]="i < Math.floor(rating)"
+                                        [class.text-stone-300]="i >= Math.floor(rating)"></lucide-icon>
+                                </div>
+                                <span class="font-medium">{{rating}}+</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Clear filters -->
+                    <button *ngIf="activeFiltersCount > 0" (click)="clearFilters()"
+                        class="w-full py-3 text-sm font-medium text-stone-600 hover:text-[#1a3d2e] transition-colors">
+                        Clear all filters
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Right - Product Grid -->
+            <main class="flex-1 min-w-0">
+                <div *ngIf="filteredProducts.length > 0; else noResults"
+                    class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 lg:gap-8">
+                    <div *ngFor="let product of filteredProducts" class="group cursor-pointer"
+                        [routerLink]="['/marketplace/product', product.id]">
+                        <div class="relative aspect-[4/3] overflow-hidden rounded-2xl bg-stone-100 mb-4">
+                            <img [src]="product.image" [alt]="product.name"
+                                class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" />
+
+                            <!-- Condition Badge -->
+                            <span
+                                class="absolute top-4 left-4 px-3 py-1.5 text-xs font-medium rounded-full border backdrop-blur-sm"
+                                [ngClass]="{
+                                    'bg-emerald-50 text-emerald-800 border-emerald-200': product.condition === 'Like New',
+                                    'bg-amber-50 text-amber-800 border-amber-200': product.condition === 'Excellent',
+                                    'bg-stone-100 text-stone-700 border-stone-200': product.condition === 'Good'
+                                }">
+                                {{product.condition}}
+                            </span>
+
+                            <!-- Rating Badge -->
+                            <div
+                                class="absolute top-4 right-4 flex items-center gap-1.5 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm">
+                                <lucide-icon [name]="Star"
+                                    class="w-3.5 h-3.5 fill-amber-400 text-amber-400"></lucide-icon>
+                                <span class="text-sm font-semibold text-stone-800">{{product.rating}}</span>
+                                <span class="text-xs text-stone-500">({{product.reviewCount}})</span>
+                            </div>
+
+                            <!-- Like button -->
+                            <button (click)="toggleLike($event, product)"
+                                class="absolute bottom-4 right-4 p-2.5 bg-white/95 backdrop-blur-sm rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-white hover:scale-110">
+                                <lucide-icon [name]="Heart" [class.fill-red-500]="product.isLiked"
+                                    [class.text-red-500]="product.isLiked" [class.text-stone-600]="!product.isLiked"
+                                    class="w-5 h-5 transition-colors"></lucide-icon>
+                            </button>
+
+                            <!-- Hover overlay -->
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <p class="text-xs font-medium text-stone-500 uppercase tracking-wide">
+                                        {{product.brand}}
+                                    </p>
+                                    <h3
+                                        class="font-semibold text-stone-900 leading-tight group-hover:text-[#1a3d2e] transition-colors">
+                                        {{product.name}}
+                                    </h3>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-1.5 text-sm text-stone-500">
+                                <lucide-icon [name]="MapPin" class="w-3.5 h-3.5"></lucide-icon>
+                                <span>{{product.location}}</span>
+                            </div>
+
+                            <div class="flex items-baseline gap-2 pt-1">
+                                <span class="text-xl font-bold text-[#1a3d2e]">${{product.pricePerDay}}</span>
+                                <span class="text-sm text-stone-500">/ day</span>
+                                <span class="text-sm text-stone-400 line-through ml-2">
+                                    ${{product.originalPrice}} retail
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <ng-template #noResults>
+                    <div class="flex flex-col items-center justify-center py-20 text-center">
+                        <div class="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mb-4">
+                            <lucide-icon [name]="Search" class="w-8 h-8 text-stone-400"></lucide-icon>
+                        </div>
+                        <h3 class="text-lg font-semibold text-stone-900 mb-2">No items found</h3>
+                        <p class="text-stone-500 max-w-sm">
+                            Try adjusting your filters or search for something else. We have plenty of gear waiting for
+                            your next adventure.
+                        </p>
+                        <button (click)="clearFilters()"
+                            class="mt-6 px-6 py-2.5 bg-[#1a3d2e] text-white rounded-full text-sm font-medium hover:bg-[#2d5a45] transition-colors">
+                            Clear all filters
+                        </button>
+                    </div>
+                </ng-template>
+            </main>
+        </div>
+    </div>
+
+    <!-- Mobile Filters Drawer -->
+    <div *ngIf="showMobileFilters" class="fixed inset-0 z-50 lg:hidden">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="showMobileFilters = false"></div>
+        <div class="absolute right-0 top-0 h-full w-full max-w-sm bg-white shadow-2xl overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b border-stone-200 px-6 py-4 flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-stone-900">Filters</h2>
+                <button (click)="showMobileFilters = false"
+                    class="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-full transition-colors">
+                    <span class="sr-only">Close</span>
+                    <lucide-icon [name]="Check" class="w-5 h-5"></lucide-icon>
+                    <!-- Using Check as Close/X replacement if X not available or just standard X -->
+                    <!-- Wait, close icon isn't imported. I will just use standard SVG for close or text -->
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-8">
+                <!-- Price Range -->
+                <div>
+                    <h3 class="font-semibold text-stone-900 mb-4">Price Range</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-stone-500">Min</span>
+                            <span class="font-medium text-stone-900">${{filters.priceRange[1]}}</span>
+                        </div>
+                        <input type="range" min="0" max="500" [value]="filters.priceRange[1]"
+                            (input)="setPriceRange($any($event.target).value)" class="w-full accent-[#1a3d2e]" />
+                        <div class="flex justify-between text-xs text-stone-400">
+                            <span>$0</span>
+                            <span>$500</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Condition -->
+                <div>
+                    <h3 class="font-semibold text-stone-900 mb-4">Condition</h3>
+                    <div class="space-y-3">
+                        <label *ngFor="let condition of conditions"
+                            class="flex items-center gap-3 cursor-pointer group">
+                            <input type="checkbox" [checked]="filters.conditions.includes(condition)"
+                                (change)="toggleCondition(condition)" class="custom-checkbox" />
+                            <span class="text-sm text-stone-700 group-hover:text-stone-900 transition-colors">
+                                {{condition}}
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Rating -->
+                <div>
+                    <h3 class="font-semibold text-stone-900 mb-4">Minimum Rating</h3>
+                    <div class="space-y-2">
+                        <button *ngFor="let rating of [4.5, 4.0, 3.5]" (click)="setMinRating(rating)"
+                            [class.bg-[#1a3d2e]/10]="filters.minRating === rating"
+                            [class.text-[#1a3d2e]]="filters.minRating === rating"
+                            [class.text-stone-600]="filters.minRating !== rating"
+                            class="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm transition-colors">
+                            <div class="flex">
+                                <lucide-icon *ngFor="let i of range(5)" [name]="Star" class="w-4 h-4"
+                                    [class.text-amber-400]="i < Math.floor(rating)"
+                                    [class.fill-amber-400]="i < Math.floor(rating)"
+                                    [class.text-stone-300]="i >= Math.floor(rating)"></lucide-icon>
+                            </div>
+                            <span class="font-medium">{{rating}}+</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sticky bottom-0 bg-white border-t border-stone-200 p-6">
+                <button (click)="showMobileFilters = false"
+                    class="w-full py-3.5 bg-[#1a3d2e] text-white rounded-xl font-medium hover:bg-[#2d5a45] transition-colors">
+                    Show {{filteredProducts.length}} results
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

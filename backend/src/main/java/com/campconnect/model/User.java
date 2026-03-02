@@ -1,5 +1,6 @@
 package com.campconnect.model;
 
+import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,10 +29,17 @@ public class User {
 	@DBRef
 	private Set<Role> roles = new HashSet<>();
 
+	private boolean verifiedExpert = false;
+
+	private Map<String, Object> profileDetails;
+
+	private java.time.LocalDateTime createdAt;
+
 	public User(String username, String email, String password, String name) {
 		this.username = username;
 		this.email = email;
 		this.password = password;
 		this.name = name;
+		this.createdAt = java.time.LocalDateTime.now();
 	}
 }

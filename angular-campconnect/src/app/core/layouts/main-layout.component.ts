@@ -1,17 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { NavigationComponent } from './navigation.component';
+import { filter } from 'rxjs/operators';
 
 @Component({
-    selector: 'app-main-layout',
-    standalone: true,
-    imports: [CommonModule, RouterModule, NavigationComponent],
-    template: `
+  selector: 'app-main-layout',
+  standalone: true,
+  imports: [CommonModule, RouterModule, NavigationComponent],
+  template: `
     <div class="min-h-screen flex flex-col">
       <app-navigation></app-navigation>
       
-      <main class="flex-1 pb-16 md:pb-0">
+      <!-- Main Content Container with dynamic padding -->
+      <main class="flex-1" [class.pt-20]="!isLandingPage" [class.pt-0]="isLandingPage">
         <router-outlet></router-outlet>
       </main>
 
@@ -72,6 +74,26 @@ import { NavigationComponent } from './navigation.component';
       </footer>
     </div>
   `,
-    styles: []
+  styles: []
 })
-export class MainLayoutComponent { }
+export class MainLayoutComponent implements OnInit {
+  isLandingPage = false;
+
+  constructor(private router: Router) {
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      this.checkLandingPage(event.url);
+    });
+  }
+
+  ngOnInit() {
+    this.checkLandingPage(this.router.url);
+  }
+
+  checkLandingPage(url: string) {
+    const path = url.split('?')[0];
+    // Same logic as navigation to ensure sync
+    this.isLandingPage = path === '/' || path === '/marketplace' || path === '/marketplace/';
+  }
+}

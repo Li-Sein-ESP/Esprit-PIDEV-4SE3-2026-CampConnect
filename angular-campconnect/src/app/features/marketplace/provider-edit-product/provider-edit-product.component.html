@@ -1,0 +1,336 @@
+<div class="edit-product-container">
+    <!-- Header -->
+    <header class="page-header">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <button class="back-btn" (click)="cancelEdit()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 12H5M12 19l-7-7 7-7" />
+                        </svg>
+                        Back to Products
+                    </button>
+
+                    <div class="h-8 w-px bg-gray-200"></div>
+
+                    <img *ngIf="imageUrls.length > 0" [src]="imageUrls[0]" alt="Product" class="product-thumbnail">
+
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">{{ productForm.get('name')?.value || 'New Product'
+                            }}</h1>
+                        <div class="flex items-center gap-3 mt-1">
+                            <span class="badge" [ngClass]="isStatusActive ? 'badge-active' : 'badge-draft'">
+                                <span class="w-1.5 h-1.5 rounded-full mr-1.5"
+                                    [ngClass]="isStatusActive ? 'bg-green-500' : 'bg-yellow-600'"></span>
+                                {{ isStatusActive ? 'Active' : 'Draft' }}
+                            </span>
+                            <span class="text-sm text-gray-500">Last updated: Just now</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button class="btn btn-secondary" (click)="cancelEdit()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 6L6 18M6 6l12 12" />
+                        </svg>
+                        Cancel
+                    </button>
+                    <button class="btn btn-primary" (click)="saveChanges()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                            <polyline points="17 21 17 13 7 13 7 21" />
+                            <polyline points="7 3 7 8 15 8" />
+                        </svg>
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <form [formGroup]="productForm">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left Column - Main Content -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Basic Information Card -->
+                    <div class="card p-6 fade-in" style="animation-delay: 0.1s;">
+                        <h2 class="section-title">Basic Information</h2>
+
+                        <div class="space-y-5">
+                            <div class="form-group">
+                                <label class="form-label required">Product Name</label>
+                                <input type="text" formControlName="name" class="form-input"
+                                    placeholder="Enter product name">
+                            </div>
+
+                            <div class="input-group">
+                                <div class="form-group">
+                                    <label class="form-label required">Category</label>
+                                    <select formControlName="category" class="form-select">
+                                        <option value="">Select category</option>
+                                        <option value="tents">Tents & Shelters</option>
+                                        <option value="sleeping-bags">Sleeping Bags</option>
+                                        <option value="cooking">Cooking Equipment</option>
+                                        <option value="lighting">Lighting</option>
+                                        <option value="furniture">Furniture</option>
+                                        <option value="accessories">Accessories</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Brand</label>
+                                    <input type="text" formControlName="brand" class="form-input"
+                                        placeholder="Enter brand name">
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <div class="form-group">
+                                    <label class="form-label required">Condition</label>
+                                    <select formControlName="condition" class="form-select">
+                                        <option value="">Select condition</option>
+                                        <option value="new">New</option>
+                                        <option value="like-new">Like New</option>
+                                        <option value="good">Good</option>
+                                        <option value="fair">Fair</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">SKU</label>
+                                    <input type="text" formControlName="sku" class="form-input"
+                                        placeholder="Auto-generated">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Short Description</label>
+                                <textarea formControlName="description" class="form-textarea"
+                                    placeholder="Enter a brief description of the product..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pricing Card -->
+                    <div class="card p-6 fade-in" style="animation-delay: 0.2s;">
+                        <h2 class="section-title">Pricing</h2>
+
+                        <div class="input-group">
+                            <div class="form-group">
+                                <label class="form-label required">Price per Day</label>
+                                <div class="input-prefix" data-prefix="$">
+                                    <input type="number" formControlName="pricePerDay" class="form-input" min="0"
+                                        step="0.01" placeholder="0.00">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Deposit Amount</label>
+                                <div class="input-prefix" data-prefix="$">
+                                    <input type="number" formControlName="deposit" class="form-input" min="0"
+                                        step="0.01" placeholder="0.00">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="form-group">
+                                <label class="form-label">Cleaning Buffer (Hours)</label>
+                                <input type="number" formControlName="cleaningBufferHours" class="form-input" min="0"
+                                    max="72" placeholder="0">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Minimum Rental Duration</label>
+                                <div class="input-suffix" data-suffix="days">
+                                    <input type="number" formControlName="minRentalDuration" class="form-input" min="1"
+                                        placeholder="1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Card -->
+                    <div class="card p-6 fade-in" style="animation-delay: 0.3s;">
+                        <h2 class="section-title">Inventory</h2>
+
+                        <div class="input-group">
+                            <div class="form-group">
+                                <label class="form-label required">Stock Quantity</label>
+                                <input type="number" formControlName="stockQuantity" class="form-input" min="0"
+                                    placeholder="0">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Max Delivery Weight</label>
+                                <div class="input-suffix" data-suffix="kg">
+                                    <input type="number" formControlName="maxWeight" class="form-input" min="0"
+                                        step="0.1" placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Product Status</label>
+                            <div class="toggle-wrapper">
+                                <div class="toggle" [class.active]="isStatusActive" (click)="toggleStatus()"></div>
+                                <span class="toggle-label" [class.active]="isStatusActive">{{ isStatusActive ? 'Active'
+                                    : 'Draft' }}</span>
+                                <span class="text-sm text-gray-400 ml-2">(Toggle to set as Draft)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Specifications Card -->
+                    <div class="card p-6 fade-in" style="animation-delay: 0.4s;">
+                        <h2 class="section-title">Specifications</h2>
+
+                        <div formArrayName="specifications">
+                            <div class="spec-row" *ngFor="let spec of specifications.controls; let i=index"
+                                [formGroupName]="i">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <input type="text" formControlName="key" class="form-input"
+                                        placeholder="Specification key">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <input type="text" formControlName="value" class="form-input"
+                                        placeholder="Specification value">
+                                </div>
+                                <button type="button" class="remove-spec-btn" (click)="removeSpec(i)">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M18 6L6 18M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="button" class="add-spec-btn" (click)="addSpec()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 5v14M5 12h14" />
+                            </svg>
+                            Add Specification
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Column - Sidebar -->
+                <div class="space-y-6">
+                    <!-- Images Card -->
+                    <div class="card p-6 fade-in" style="animation-delay: 0.25s;">
+                        <h2 class="section-title">Images</h2>
+
+                        <div class="image-gallery">
+                            <div class="image-item" *ngFor="let img of imageUrls; let i = index">
+                                <img [src]="img" alt="Product Image">
+                                <div class="image-actions">
+                                    <button type="button" class="image-btn" title="Replace">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                            <polyline points="17 8 12 3 7 8" />
+                                            <line x1="12" y1="3" x2="12" y2="15" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="image-btn delete" title="Remove"
+                                        (click)="removeImage(i)">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path
+                                                d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button type="button" class="add-image-btn" (click)="addNewImage()">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 5v14M5 12h14" />
+                                </svg>
+                                <span class="text-xs">Add Image</span>
+                            </button>
+                        </div>
+
+                        <p class="text-xs text-gray-400 mt-4">Recommended: 800x800px, JPG or PNG</p>
+                    </div>
+
+                    <!-- Quick Stats Card -->
+                    <div class="card p-6 fade-in" style="animation-delay: 0.35s;">
+                        <h2 class="section-title">Quick Stats</h2>
+
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                                <span class="text-sm text-gray-500">Total Rentals</span>
+                                <span class="text-sm font-semibold text-gray-900">48</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                                <span class="text-sm text-gray-500">Revenue (30d)</span>
+                                <span class="text-sm font-semibold text-green-600">$1,240</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                                <span class="text-sm text-gray-500">Avg. Rating</span>
+                                <div class="flex items-center gap-1">
+                                    <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    <span class="text-sm font-semibold text-gray-900">4.8</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center py-2">
+                                <span class="text-sm text-gray-500">Availability</span>
+                                <span class="text-sm font-semibold text-green-600">85%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Danger Zone -->
+                    <div class="card p-6 border border-red-100 fade-in" style="animation-delay: 0.45s;">
+                        <h2 class="section-title" style="color: #DC2626;">Danger Zone</h2>
+
+                        <p class="text-sm text-gray-500 mb-4">Once you delete a product, there is no going back.</p>
+
+                        <button type="button" class="btn btn-danger w-full" (click)="deleteProduct()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg>
+                            Delete Product
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast" [class.show]="showToast" [class.success]="toastType === 'success'">
+        <ng-container *ngIf="toastType === 'success'; else errorIcon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+        </ng-container>
+        <ng-template #errorIcon>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+        </ng-template>
+        <span>{{ toastMessage }}</span>
+    </div>
+</div>

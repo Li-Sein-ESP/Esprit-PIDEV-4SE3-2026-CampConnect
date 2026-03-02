@@ -1,0 +1,30 @@
+package com.campconnect.gear.repository;
+
+import com.campconnect.gear.model.Rental;
+import com.campconnect.gear.model.RentalStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Repository
+public interface RentalRepository extends MongoRepository<Rental, String> {
+
+    Page<Rental> findByGearId(String gearId, Pageable pageable);
+
+    Page<Rental> findByRenterId(String renterId, Pageable pageable);
+
+    Page<Rental> findByStatus(RentalStatus status, Pageable pageable);
+
+    Page<Rental> findByGearIdAndStatus(String gearId, RentalStatus status, Pageable pageable);
+
+    List<Rental> findByGearIdAndStatusIn(String gearId, List<RentalStatus> statuses);
+
+    // Range queries using indexed fields
+    Page<Rental> findByStartDateBetween(LocalDate from, LocalDate to, Pageable pageable);
+
+    Page<Rental> findByEndDateBetween(LocalDate from, LocalDate to, Pageable pageable);
+}

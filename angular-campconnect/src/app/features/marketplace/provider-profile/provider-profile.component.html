@@ -1,0 +1,420 @@
+<div class="pp">
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- HEADER                                                 -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <header class="pp__header">
+        <!-- Cover -->
+        <div class="pp__cover">
+            <svg class="pp__cover-pattern" viewBox="0 0 1200 320" preserveAspectRatio="xMidYMid slice">
+                <defs>
+                    <pattern id="pp-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(139,115,85,0.25)" stroke-width="1" />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#pp-grid)" />
+            </svg>
+        </div>
+
+        <!-- Profile info -->
+        <div class="pp__meta-wrap">
+            <div class="pp__identity">
+                <!-- Logo -->
+                <div class="pp__logo-wrap">
+                    <div class="pp__logo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" class="pp__logo-icon">
+                            <path d="M8 3L12 1L16 3L22 7L12 12L2 7Z" />
+                            <path d="M2 7V17L12 22L22 17V7" />
+                            <path d="M12 12V22" />
+                        </svg>
+                    </div>
+                    <div class="pp__verified-badge" *ngIf="verified" title="Verified Provider">
+                        <svg viewBox="0 0 16 16" fill="white" width="12" height="12">
+                            <path d="M6.5 11.5L2.5 7.5l1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Name + badges -->
+                <div class="pp__info">
+                    <div class="pp__name-row">
+                        <h1 class="pp__name">{{ providerName }}</h1>
+                        <span class="pp__chip pp__chip--verified" *ngIf="verified">
+                            ✓ Verified Provider
+                        </span>
+                    </div>
+
+                    <div class="pp__rating-row">
+                        <span class="pp__star" *ngFor="let s of starArray">★</span>
+                        <span class="pp__rating-val">{{ rating }}</span>
+                        <span class="pp__rating-count">({{ reviewCount }} reviews)</span>
+                    </div>
+
+                    <p class="pp__bio">{{ bio }}</p>
+                </div>
+
+                <!-- Edit button -->
+                <div class="pp__actions">
+                    <button class="pp__btn pp__btn--outline" [routerLink]="['/provider/profile/edit']">
+                        ✎ Edit Profile
+                    </button>
+                    <button class="pp__btn pp__btn--primary" [routerLink]="['/provider/products/new']">
+                        + Add Product
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- KPI STATS                                              -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <section class="pp__stats-row">
+        <div class="pp__stat-card">
+            <div class="pp__stat-icon pp__stat-icon--brown">📦</div>
+            <div class="pp__stat-body">
+                <p class="pp__stat-label">Total Products</p>
+                <p class="pp__stat-val">{{ stats.totalProducts }}</p>
+            </div>
+            <span class="pp__stat-trend pp__stat-trend--up">↑ 12%</span>
+        </div>
+        <div class="pp__stat-card">
+            <div class="pp__stat-icon pp__stat-icon--amber">📅</div>
+            <div class="pp__stat-body">
+                <p class="pp__stat-label">Active Rentals</p>
+                <p class="pp__stat-val">{{ stats.activeRentals }}</p>
+            </div>
+            <span class="pp__stat-trend pp__stat-trend--up">↑ 8%</span>
+        </div>
+        <div class="pp__stat-card">
+            <div class="pp__stat-icon pp__stat-icon--green">💵</div>
+            <div class="pp__stat-body">
+                <p class="pp__stat-label">Total Revenue</p>
+                <p class="pp__stat-val">{{ stats.totalRevenue }}</p>
+            </div>
+            <span class="pp__stat-trend pp__stat-trend--up">↑ 24%</span>
+        </div>
+        <div class="pp__stat-card">
+            <div class="pp__stat-icon pp__stat-icon--yellow">⭐</div>
+            <div class="pp__stat-body">
+                <p class="pp__stat-label">Avg. Rating</p>
+                <p class="pp__stat-val">{{ stats.avgRating }}</p>
+            </div>
+            <span class="pp__stat-trend pp__stat-trend--neutral">Steady</span>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- TABBED PANEL                                           -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <section class="pp__panel">
+
+        <!-- Tab nav -->
+        <nav class="pp__tabs" role="tablist">
+            <button class="pp__tab" [class.pp__tab--active]="activeTab === 'overview'"
+                (click)="setActiveTab('overview')">Overview</button>
+            <button class="pp__tab" [class.pp__tab--active]="activeTab === 'products'"
+                (click)="setActiveTab('products')">Products</button>
+            <button class="pp__tab" [class.pp__tab--active]="activeTab === 'rentals'"
+                (click)="setActiveTab('rentals')">Rentals</button>
+            <button class="pp__tab" [class.pp__tab--active]="activeTab === 'reviews'"
+                (click)="setActiveTab('reviews')">Reviews</button>
+            <button class="pp__tab" [class.pp__tab--active]="activeTab === 'analytics'"
+                (click)="setActiveTab('analytics')">Analytics</button>
+        </nav>
+
+        <div class="pp__tab-body">
+
+            <!-- ─── OVERVIEW ─────────────────────────────────── -->
+            <div class="pp__pane" *ngIf="activeTab === 'overview'">
+                <div class="pp__overview-grid">
+
+                    <!-- Revenue sparkline placeholder -->
+                    <div class="pp__chart-card">
+                        <div class="pp__chart-header">
+                            <h3 class="pp__section-title">Revenue (Last 30 Days)</h3>
+                            <span class="pp__legend"><span class="pp__legend-dot"></span> Revenue</span>
+                        </div>
+                        <div class="pp__chart-area">
+                            <!-- Inline SVG sparkline (static demo) -->
+                            <svg viewBox="0 0 400 120" class="pp__sparkline" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#8B7355" stop-opacity="0.3" />
+                                        <stop offset="100%" stop-color="#8B7355" stop-opacity="0" />
+                                    </linearGradient>
+                                </defs>
+                                <path
+                                    d="M0 100 C50 80 80 60 120 50 C160 40 180 90 220 70 C260 50 280 20 320 30 C360 40 380 25 400 10 L400 120 L0 120 Z"
+                                    fill="url(#revGrad)" />
+                                <path
+                                    d="M0 100 C50 80 80 60 120 50 C160 40 180 90 220 70 C260 50 280 20 320 30 C360 40 380 25 400 10"
+                                    fill="none" stroke="#8B7355" stroke-width="2.5" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Top product -->
+                    <div class="pp__top-product-card">
+                        <h3 class="pp__section-title">Most Rented Product</h3>
+                        <div class="pp__top-product">
+                            <div class="pp__top-product-img">🏕️</div>
+                            <h4 class="pp__top-product-name">4-Person Family Tent</h4>
+                            <p class="pp__top-product-cat">Camping Essentials</p>
+                            <div class="pp__top-product-footer">
+                                <span class="pp__price">$45/day</span>
+                                <span class="pp__muted">87 rentals</span>
+                            </div>
+                            <div class="pp__perf-row">
+                                <span class="pp__muted">Performance</span>
+                                <span class="pp__perf-val">+23%</span>
+                            </div>
+                            <div class="pp__progress-track">
+                                <div class="pp__progress-fill" style="width:78%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick metrics -->
+                <div class="pp__metrics-row">
+                    <div class="pp__metric">
+                        <div class="pp__metric-icon pp__metric-icon--brown">⏱</div>
+                        <div>
+                            <p class="pp__muted">Avg. Rental Duration</p>
+                            <p class="pp__metric-val">{{ stats.avgDuration }}</p>
+                        </div>
+                    </div>
+                    <div class="pp__metric">
+                        <div class="pp__metric-icon pp__metric-icon--amber">🔁</div>
+                        <div>
+                            <p class="pp__muted">Repeat Customers</p>
+                            <p class="pp__metric-val">{{ stats.repeatCustomers }}</p>
+                        </div>
+                    </div>
+                    <div class="pp__metric">
+                        <div class="pp__metric-icon pp__metric-icon--green">⚡</div>
+                        <div>
+                            <p class="pp__muted">Response Time</p>
+                            <p class="pp__metric-val">{{ stats.responseTime }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── PRODUCTS ──────────────────────────────────── -->
+            <div class="pp__pane" *ngIf="activeTab === 'products'">
+                <div class="pp__pane-header">
+                    <h3 class="pp__section-title">All Products</h3>
+                    <button class="pp__btn pp__btn--primary" [routerLink]="['/provider/products/new']">+ Add
+                        Product</button>
+                </div>
+
+                <div class="pp__products-grid">
+                    <div class="pp__product-card" *ngFor="let p of products; trackBy: trackById"
+                        [routerLink]="['/provider/products', p.id, 'edit']">
+                        <div class="pp__product-img">{{ p.icon }}</div>
+                        <h4 class="pp__product-name">{{ p.name }}</h4>
+                        <p class="pp__muted">{{ p.category }}</p>
+                        <div class="pp__product-footer">
+                            <span class="pp__price">${{ p.pricePerDay }}/day</span>
+                            <span class="pp__muted">{{ p.available }} available</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── RENTALS ───────────────────────────────────── -->
+            <div class="pp__pane" *ngIf="activeTab === 'rentals'">
+                <div class="pp__pane-header">
+                    <h3 class="pp__section-title">Active Rentals</h3>
+                    <div class="pp__pane-actions">
+                        <button class="pp__btn pp__btn--outline">⊟ Filter</button>
+                        <button class="pp__btn pp__btn--outline">↓ Export</button>
+                    </div>
+                </div>
+
+                <div class="pp__table-wrap">
+                    <table class="pp__table">
+                        <thead>
+                            <tr>
+                                <th>Customer</th>
+                                <th>Product</th>
+                                <th>Dates</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let r of rentals; trackBy: trackById">
+                                <td>
+                                    <div class="pp__customer">
+                                        <div class="pp__avatar" [style.background-color]="r.avatarColor + '22'"
+                                            [style.color]="r.avatarColor">{{ r.customerInitials }}</div>
+                                        <div>
+                                            <p class="pp__customer-name">{{ r.customer }}</p>
+                                            <p class="pp__muted">{{ r.customerEmail }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="pp__td-product">{{ r.product }}</td>
+                                <td class="pp__muted">{{ r.dates }}</td>
+                                <td class="pp__td-total">{{ r.total | currency }}</td>
+                                <td><span class="pp__status" [ngClass]="statusClass(r.status)">{{ r.status }}</span>
+                                </td>
+                                <td><button class="pp__link" [routerLink]="['/provider/rentals']">View</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ─── REVIEWS ───────────────────────────────────── -->
+            <div class="pp__pane" *ngIf="activeTab === 'reviews'">
+                <div class="pp__pane-header">
+                    <h3 class="pp__section-title">Customer Reviews</h3>
+                    <select class="pp__select">
+                        <option>All Ratings</option>
+                        <option>5 Stars</option>
+                        <option>4 Stars</option>
+                        <option>3 Stars</option>
+                    </select>
+                </div>
+
+                <!-- Rating summary -->
+                <div class="pp__rating-summary">
+                    <div class="pp__rating-big">
+                        <p class="pp__rating-num">{{ rating }}</p>
+                        <div class="pp__stars-row">
+                            <span class="pp__star pp__star--filled" *ngFor="let s of starArray">★</span>
+                        </div>
+                        <p class="pp__muted">{{ reviewCount }} reviews</p>
+                    </div>
+                    <div class="pp__rating-bars">
+                        <div class="pp__rating-bar-row" *ngFor="let rb of ratingBreakdown">
+                            <span class="pp__bar-label">{{ rb.stars }}★</span>
+                            <div class="pp__bar-track">
+                                <div class="pp__bar-fill" [style.width.%]="rb.pct"></div>
+                            </div>
+                            <span class="pp__bar-count">{{ rb.count }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review cards -->
+                <div class="pp__reviews-list">
+                    <div class="pp__review-card" *ngFor="let rv of reviews; trackBy: trackById">
+                        <div class="pp__review-header">
+                            <div class="pp__review-author">
+                                <div class="pp__avatar pp__avatar--lg" [style.background-color]="rv.avatarColor + '22'"
+                                    [style.color]="rv.avatarColor">{{ rv.customerInitials }}</div>
+                                <div>
+                                    <div class="pp__review-name-row">
+                                        <h4 class="pp__review-name">{{ rv.customer }}</h4>
+                                        <span class="pp__muted">· {{ rv.date }}</span>
+                                    </div>
+                                    <div class="pp__review-stars">
+                                        <span *ngFor="let s of starArray"
+                                            [class.pp__star--filled]="s <= rv.rating">★</span>
+                                    </div>
+                                    <p class="pp__review-text">{{ rv.text }}</p>
+                                    <p class="pp__review-product"><span class="pp__muted">Product: </span><span
+                                            class="pp__link-text">{{ rv.product }}</span></p>
+                                </div>
+                            </div>
+                            <button class="pp__btn pp__btn--outline pp__btn--sm" (click)="toggleResponse(rv)">
+                                💬 {{ rv.showResponse ? 'Cancel' : 'Respond' }}
+                            </button>
+                        </div>
+                        <!-- Response form -->
+                        <div class="pp__response-form" *ngIf="rv.showResponse">
+                            <textarea class="pp__textarea" rows="3" placeholder="Write your response..."></textarea>
+                            <div class="pp__response-actions">
+                                <button class="pp__btn pp__btn--ghost" (click)="toggleResponse(rv)">Cancel</button>
+                                <button class="pp__btn pp__btn--primary">Post Response</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── ANALYTICS ─────────────────────────────────── -->
+            <div class="pp__pane" *ngIf="activeTab === 'analytics'">
+                <div class="pp__pane-header">
+                    <h3 class="pp__section-title">Product Analytics</h3>
+                    <select class="pp__select">
+                        <option>Last 30 Days</option>
+                        <option>Last 90 Days</option>
+                        <option>This Year</option>
+                    </select>
+                </div>
+
+                <!-- Top performers table -->
+                <div class="pp__analytics-section">
+                    <h4 class="pp__sub-title">Top Performing Products</h4>
+                    <div class="pp__analytics-rows">
+                        <div class="pp__analytics-row" *ngFor="let p of products; trackBy: trackById">
+                            <span class="pp__analytics-icon">{{ p.icon }}</span>
+                            <div class="pp__analytics-info">
+                                <p class="pp__analytics-name">{{ p.name }}</p>
+                                <p class="pp__muted">{{ p.category }}</p>
+                            </div>
+                            <div class="pp__analytics-bar-wrap">
+                                <div class="pp__analytics-track">
+                                    <div class="pp__analytics-fill" [style.width.%]="(p.rentals / 100) * 100"></div>
+                                </div>
+                                <span class="pp__analytics-rentals">{{ p.rentals }} rentals</span>
+                            </div>
+                            <span class="pp__price">${{ p.pricePerDay }}/day</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category split -->
+                <div class="pp__analytics-section pp__analytics-section--mt">
+                    <h4 class="pp__sub-title">Revenue by Category</h4>
+                    <div class="pp__categories-grid">
+                        <div class="pp__cat-card">
+                            <span class="pp__cat-icon">🏕️</span>
+                            <p class="pp__cat-name">Camping</p>
+                            <p class="pp__cat-val">$18.4k</p>
+                            <p class="pp__muted">38%</p>
+                        </div>
+                        <div class="pp__cat-card">
+                            <span class="pp__cat-icon">🎒</span>
+                            <p class="pp__cat-name">Backpacks</p>
+                            <p class="pp__cat-val">$11.2k</p>
+                            <p class="pp__muted">23%</p>
+                        </div>
+                        <div class="pp__cat-card">
+                            <span class="pp__cat-icon">🛌</span>
+                            <p class="pp__cat-name">Sleeping</p>
+                            <p class="pp__cat-val">$9.6k</p>
+                            <p class="pp__muted">20%</p>
+                        </div>
+                        <div class="pp__cat-card">
+                            <span class="pp__cat-icon">🔦</span>
+                            <p class="pp__cat-name">Lighting</p>
+                            <p class="pp__cat-val">$5.8k</p>
+                            <p class="pp__muted">12%</p>
+                        </div>
+                        <div class="pp__cat-card">
+                            <span class="pp__cat-icon">🔥</span>
+                            <p class="pp__cat-name">Cooking</p>
+                            <p class="pp__cat-val">$2.4k</p>
+                            <p class="pp__muted">5%</p>
+                        </div>
+                        <div class="pp__cat-card">
+                            <span class="pp__cat-icon">🧭</span>
+                            <p class="pp__cat-name">Navigation</p>
+                            <p class="pp__cat-val">$0.8k</p>
+                            <p class="pp__muted">2%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /tab-body -->
+    </section>
+</div>

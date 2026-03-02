@@ -1,0 +1,89 @@
+.cc-delivery-root {
+    /* Custom CSS for things Tailwind handles less gracefully or for specific design tokens */
+    --sidebar-bg: #1F2937;
+    /* Gray 800 */
+    --sidebar-text: #9CA3AF;
+    /* Gray 400 */
+    --sidebar-active: #10B981;
+    /* Emerald 500 */
+    --sidebar-active-bg: rgba(16, 185, 129, 0.1);
+    --accent-color: #059669;
+    /* Emerald 600 */
+    --bg-color: #F3F4F6;
+    /* Gray 100 */
+    --card-bg: #FFFFFF;
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+
+    /* Chart CSS-only representation */
+    .bar-chart {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        height: 150px;
+        padding-top: 20px;
+    }
+
+    .bar {
+        width: 12%;
+        background-color: #E5E7EB;
+        border-radius: 6px 6px 0 0;
+        position: relative;
+        transition: background-color 0.3s;
+    }
+
+    .bar:hover {
+        background-color: #10B981;
+    }
+
+    .bar.active {
+        background-color: #059669;
+    }
+
+    .bar-label {
+        position: absolute;
+        bottom: -25px;
+        width: 100%;
+        text-align: center;
+        font-size: 0.75rem;
+        color: #6B7280;
+    }
+
+    /* Map Pattern */
+    .map-bg {
+        background-color: #E5E7EB;
+        background-image:
+            linear-gradient(#fff 2px, transparent 2px),
+            linear-gradient(90deg, #fff 2px, transparent 2px);
+        background-size: 20px 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .map-route {
+        stroke-dasharray: 10;
+        animation: dash 30s linear infinite;
+    }
+
+    @keyframes dash {
+        to {
+            stroke-dashoffset: -1000;
+        }
+    }
+}

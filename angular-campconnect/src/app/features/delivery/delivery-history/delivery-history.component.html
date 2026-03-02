@@ -1,0 +1,307 @@
+<div class="main-content">
+    <!-- Header Section -->
+    <header class="page-header">
+        <div class="header-title">
+            <h1>Delivery History</h1>
+            <p class="subtitle">Track and review all your past deliveries</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-secondary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Export
+            </button>
+            <button class="btn btn-primary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                New Delivery
+            </button>
+        </div>
+    </header>
+
+    <!-- Summary Cards -->
+    <section class="summary-section">
+        <div class="summary-card">
+            <div class="summary-icon completed">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+            </div>
+            <div class="summary-content">
+                <span class="summary-label">Completed</span>
+                <span class="summary-value">{{ totalCompleted }}</span>
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-icon distance">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="10" r="3" />
+                    <path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z" />
+                </svg>
+            </div>
+            <div class="summary-content">
+                <span class="summary-label">Distance</span>
+                <span class="summary-value">{{ totalDistance | number:'1.0-0' }} km</span>
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-icon earnings">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="1" x2="12" y2="23" />
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+            </div>
+            <div class="summary-content">
+                <span class="summary-label">Earnings</span>
+                <span class="summary-value">{{ totalEarnings | currency }}</span>
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-icon rating">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+            </div>
+            <div class="summary-content">
+                <span class="summary-label">Rating</span>
+                <span class="summary-value">{{ averageRating | number:'1.1-1' }}</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filters Section -->
+    <section class="filters-section">
+        <div class="filter-group">
+            <label class="filter-label" for="statusFilter">Status</label>
+            <div class="custom-select">
+                <select id="statusFilter" [(ngModel)]="statusFilter" (change)="onFilterChange()">
+                    <option value="all">All Deliveries</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                    <option value="failed">Failed</option>
+                </select>
+                <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <polyline points="6 9 12 15 18 9" />
+                </svg>
+            </div>
+        </div>
+        <div class="filter-group">
+            <label class="filter-label" for="dateFilter">Date Range</label>
+            <div class="custom-select">
+                <select id="dateFilter" [(ngModel)]="dateFilter" (change)="onFilterChange()">
+                    <option value="7">Last 7 days</option>
+                    <option value="30">Last 30 days</option>
+                    <option value="custom">Custom range</option>
+                </select>
+                <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <polyline points="6 9 12 15 18 9" />
+                </svg>
+            </div>
+        </div>
+        <div class="filter-group search-group">
+            <label class="filter-label">Search</label>
+            <div class="search-input">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
+                </svg>
+                <input type="text" placeholder="Order ID, customer name..." [(ngModel)]="searchTerm"
+                    (input)="onFilterChange()">
+            </div>
+        </div>
+    </section>
+
+    <!-- History Table -->
+    <section class="history-section">
+        <div class="table-container">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Delivery ID</th>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Date</th>
+                        <th>Distance</th>
+                        <th>Vehicle</th>
+                        <th>Earnings</th>
+                        <th>Rating</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngIf="paginatedHistory.length === 0">
+                        <td colspan="10" style="text-align: center; color: var(--color-text-secondary); padding: 32px;">
+                            No deliveries found matching the current filters.
+                        </td>
+                    </tr>
+                    <tr *ngFor="let item of paginatedHistory">
+                        <td class="delivery-id">{{ item.id }}</td>
+                        <td class="order-id">{{ item.orderId }}</td>
+                        <td class="customer">
+                            <div class="customer-avatar">{{ item.customerInitials }}</div>
+                            <span>{{ item.customerName }}</span>
+                        </td>
+                        <td class="date">{{ item.date }}</td>
+                        <td class="distance">{{ item.distanceKm | number:'1.1-1' }} km</td>
+                        <td class="vehicle">
+                            <span class="vehicle-badge" [ngClass]="getVehicleBadgeClass(item.vehicleType)">{{
+                                item.vehicleType }}</span>
+                        </td>
+                        <td class="earnings">{{ item.earnings | currency }}</td>
+                        <td class="rating">
+                            <div class="rating-stars" *ngIf="item.rating">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon
+                                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                </svg>
+                                <span>{{ item.rating | number:'1.1-1' }}</span>
+                            </div>
+                        </td>
+                        <td class="status">
+                            <span class="status-badge" [ngClass]="getStatusBadgeClass(item.status)">{{ item.status |
+                                titlecase }}</span>
+                        </td>
+                        <td class="action">
+                            <button class="btn-text" (click)="openModal(item)">View Details</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" *ngIf="totalPages > 1">
+            <button class="pagination-btn" [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+            </button>
+
+            <ng-container *ngFor="let p of [].constructor(totalPages); let i = index">
+                <button class="pagination-btn" [class.active]="currentPage === i + 1" (click)="setPage(i + 1)">{{ i + 1
+                    }}</button>
+            </ng-container>
+
+            <button class="pagination-btn" [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
+            </button>
+        </div>
+    </section>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal" [class.active]="selectedDelivery !== null" *ngIf="selectedDelivery">
+    <div class="modal-overlay" (click)="closeModal()"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Delivery Details</h2>
+            <button class="modal-close" (click)="closeModal()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="detail-section">
+                <h3>Delivery Information</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">Delivery ID</span>
+                        <span class="detail-value">{{ selectedDelivery.id }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Order ID</span>
+                        <span class="detail-value">{{ selectedDelivery.orderId }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Status</span>
+                        <span class="status-badge" [ngClass]="getStatusBadgeClass(selectedDelivery.status)">{{
+                            selectedDelivery.status | titlecase }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Date</span>
+                        <span class="detail-value">{{ selectedDelivery.date }} at 2:30 PM</span>
+                    </div>
+                </div>
+            </div>
+            <div class="detail-section">
+                <h3>Customer Information</h3>
+                <div class="customer-info">
+                    <div class="customer-avatar large">{{ selectedDelivery.customerInitials }}</div>
+                    <div class="customer-details">
+                        <span class="customer-name">{{ selectedDelivery.customerName }}</span>
+                        <span class="customer-email">{{ selectedDelivery.customerName.toLowerCase().split(' ').join('.')
+                            }}@email.com</span>
+                        <span class="customer-phone">+1 (555) 123-4567</span>
+                    </div>
+                </div>
+            </div>
+            <div class="detail-section">
+                <h3>Delivery Details</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">Distance</span>
+                        <span class="detail-value">{{ selectedDelivery.distanceKm | number:'1.1-1' }} km</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Vehicle</span>
+                        <span class="detail-value">{{ selectedDelivery.vehicleType }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Earnings</span>
+                        <span class="detail-value earnings">{{ selectedDelivery.earnings | currency }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Rating</span>
+                        <div class="rating-stars" *ngIf="selectedDelivery.rating">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <polygon
+                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                            <span>{{ selectedDelivery.rating | number:'1.1-1' }}</span>
+                        </div>
+                        <span class="detail-value" *ngIf="!selectedDelivery.rating"
+                            style="color: var(--color-text-secondary); font-size: 14px;">No Rating</span>
+                    </div>
+                </div>
+            </div>
+            <div class="detail-section">
+                <h3>Route</h3>
+                <div class="route-info">
+                    <div class="route-point">
+                        <div class="route-marker pickup"></div>
+                        <div class="route-details">
+                            <span class="route-label">Pickup</span>
+                            <span class="route-address">CampConnect Warehouse, 123 Industrial Blvd</span>
+                        </div>
+                    </div>
+                    <div class="route-line"></div>
+                    <div class="route-point">
+                        <div class="route-marker dropoff"></div>
+                        <div class="route-details">
+                            <span class="route-label">Dropoff</span>
+                            <span class="route-address">Yosemite National Park, South Entrance</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="closeModal()">Download Receipt</button>
+            <button class="btn btn-primary" (click)="closeModal()">Contact Support</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,261 @@
+<div class="camp-connect-rentals">
+
+    <!-- PAGE HEADER -->
+    <header class="cc-page-header">
+        <div class="cc-page-header__left">
+            <h1 class="cc-page-title">Active Rentals</h1>
+            <p class="cc-page-subtitle">Manage and track all your equipment rentals</p>
+        </div>
+        <div class="cc-page-header__right">
+            <div class="cc-filter-group">
+                <select class="cc-filter-select" id="ccFilterStatus" aria-label="Filter by status"
+                    [(ngModel)]="filterStatus" (change)="applyFilters()">
+                    <option value="all">All Rentals</option>
+                    <option value="active">Active</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="completed">Completed</option>
+                    <option value="late">Late Returns</option>
+                </select>
+                <svg class="cc-filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </div>
+            <button class="cc-btn-export" type="button">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Export
+            </button>
+        </div>
+    </header>
+
+    <!-- KPI STATS ROW -->
+    <section class="cc-stats-row" aria-label="Rental statistics">
+        <article class="cc-stat-card">
+            <div class="cc-stat-card__header">
+                <div class="cc-stat-card__icon cc-stat-card__icon--active">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                </div>
+                <span class="cc-stat-card__trend cc-stat-card__trend--up">↑ 12%</span>
+            </div>
+            <div class="cc-stat-card__value">{{ activeCount }}</div>
+            <div class="cc-stat-card__label">Active Rentals</div>
+        </article>
+
+        <article class="cc-stat-card">
+            <div class="cc-stat-card__header">
+                <div class="cc-stat-card__icon cc-stat-card__icon--upcoming">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                </div>
+                <span class="cc-stat-card__trend cc-stat-card__trend--up">Next 7 days</span>
+            </div>
+            <div class="cc-stat-card__value">{{ upcomingCount }}</div>
+            <div class="cc-stat-card__label">Upcoming Returns</div>
+        </article>
+
+        <article class="cc-stat-card">
+            <div class="cc-stat-card__header">
+                <div class="cc-stat-card__icon cc-stat-card__icon--late">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </div>
+                <span class="cc-stat-card__trend cc-stat-card__trend--warn">Needs attention</span>
+            </div>
+            <div class="cc-stat-card__value">{{ lateCount }}</div>
+            <div class="cc-stat-card__label">Late Rentals</div>
+        </article>
+
+        <article class="cc-stat-card">
+            <div class="cc-stat-card__header">
+                <div class="cc-stat-card__icon cc-stat-card__icon--revenue">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path>
+                        <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
+                        <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path>
+                    </svg>
+                </div>
+                <span class="cc-stat-card__trend cc-stat-card__trend--up">↑ 18%</span>
+            </div>
+            <div class="cc-stat-card__value">${{ totalRevenue | number:'1.0-0' }}</div>
+            <div class="cc-stat-card__label">Total Rental Revenue</div>
+        </article>
+    </section>
+
+    <!-- TOOLBAR -->
+    <div class="cc-toolbar">
+        <div class="cc-search-box">
+            <svg class="cc-search-box__icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" class="cc-search-box__input" placeholder="Search by rental ID, product, or renter..."
+                aria-label="Search rentals" [(ngModel)]="searchQuery" (input)="applyFilters()">
+        </div>
+        <span class="cc-toolbar__count">
+            Showing <strong>{{ filteredRentals.length }}</strong> rentals
+        </span>
+    </div>
+
+    <!-- RENTALS TABLE -->
+    <section class="cc-table-card">
+        <div class="cc-table-wrapper">
+            <table class="cc-table" role="table" aria-label="Rentals list">
+                <thead>
+                    <tr>
+                        <th scope="col">Product</th>
+                        <th scope="col">Renter</th>
+                        <th scope="col">Dates</th>
+                        <th scope="col">Duration</th>
+                        <th scope="col">Delivery</th>
+                        <th scope="col">Payment</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="ccRentalsBody">
+                    <ng-container *ngIf="filteredRentals.length > 0; else emptyState">
+                        <tr *ngFor="let rental of filteredRentals; let i = index" class="cc-animate-row"
+                            [class.cc-row--late]="rental.isLate" [style.animation-delay]="(i * 0.04) + 's'">
+                            <td>
+                                <div class="cc-product-cell">
+                                    <div class="cc-product-thumb"><span class="cc-product-thumb__placeholder">{{
+                                            rental.productImage }}</span></div>
+                                    <div>
+                                        <div class="cc-product-info__name">{{ rental.productName }}</div>
+                                        <div class="cc-product-info__id">{{ rental.id }}</div>
+                                        <div *ngIf="rental.isLate" class="cc-late-indicator">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round">
+                                                <path
+                                                    d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                                                </path>
+                                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                            </svg>
+                                            {{ rental.lateDays }} days overdue
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="cc-renter-cell">
+                                    <div class="cc-renter-avatar" [ngClass]="getAvatarClass(rental.avatarIndex)">{{
+                                        getInitials(rental.renterName) }}</div>
+                                    <span class="cc-renter-name">{{ rental.renterName }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="cc-date-cell">{{ formatDate(rental.startDate) }}</div>
+                                <div class="cc-date-cell" style="color:var(--cc-text-tertiary);font-size:12px">→ {{
+                                    formatDate(rental.endDate) }}</div>
+                            </td>
+                            <td><span class="cc-duration">{{ rental.duration }}</span></td>
+                            <td>
+                                <span class="cc-badge" [ngClass]="getDeliveryBadge(rental.deliveryStatus)">{{
+                                    rental.deliveryStatus }}</span>
+                            </td>
+                            <td>
+                                <span class="cc-badge" [ngClass]="getPaymentBadge(rental.paymentStatus)">{{
+                                    rental.paymentStatus }}</span>
+                            </td>
+                            <td><span class="cc-amount">${{ rental.totalAmount | number:'1.2-2' }}</span></td>
+                            <td>
+                                <div class="cc-actions">
+                                    <button class="cc-btn-action" data-tooltip="View Details"
+                                        (click)="viewDetails(rental.id)">
+                                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                    </button>
+                                    <button class="cc-btn-action" data-tooltip="Contact Renter"
+                                        (click)="contactRenter(rental.renterName)">
+                                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z">
+                                            </path>
+                                        </svg>
+                                    </button>
+                                    <button *ngIf="rental.baseStatus === 'active' || rental.baseStatus === 'late'"
+                                        class="cc-btn-action cc-btn-action--return" data-tooltip="Mark as Returned"
+                                        (click)="markAsReturned(rental)">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path d="M9 14 4 9l5-5"></path>
+                                            <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"></path>
+                                        </svg>
+                                        Return
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-container>
+                    <ng-template #emptyState>
+                        <tr>
+                            <td colspan="8">
+                                <div class="cc-empty-state">
+                                    <div class="cc-empty-state__icon text-4xl mb-3 opacity-40">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round" class="mx-auto">
+                                            <path
+                                                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                                            </path>
+                                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                        </svg>
+                                    </div>
+                                    <p>No rentals match your criteria</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PAGINATION -->
+        <nav class="cc-pagination" aria-label="Pagination">
+            <span class="cc-pagination__info">Page 1 of 1 — {{ filteredRentals.length }} of {{ rentals.length }}
+                results</span>
+            <div class="cc-pagination__controls">
+                <button class="cc-pagination__btn" disabled aria-label="Previous page">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <button class="cc-pagination__btn cc-pagination__btn--active">1</button>
+                <button class="cc-pagination__btn" disabled aria-label="Next page">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+    </section>
+</div>

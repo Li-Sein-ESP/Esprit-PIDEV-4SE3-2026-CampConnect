@@ -1,0 +1,268 @@
+<div class="bg-[var(--cream)] min-h-screen text-[var(--charcoal)] pb-20">
+
+    <!-- Loading State -->
+    <div *ngIf="!product" class="flex items-center justify-center min-h-[60vh]">
+        <lucide-icon name="loader-2" class="w-10 h-10 animate-spin text-[#1a3d2e]"></lucide-icon>
+    </div>
+
+    <ng-container *ngIf="product">
+        <!-- Breadcrumb -->
+        <nav class="cc-breadcrumb" aria-label="Breadcrumb">
+            <ol class="cc-breadcrumb__list">
+                <li>
+                    <a routerLink="/">Home</a>
+                    <span class="cc-breadcrumb__separator"><lucide-icon [name]="icons.ChevronRight"
+                            class="w-[14px] h-[14px]"></lucide-icon></span>
+                </li>
+                <li>
+                    <a routerLink="/marketplace">Marketplace</a>
+                    <span class="cc-breadcrumb__separator"><lucide-icon [name]="icons.ChevronRight"
+                            class="w-[14px] h-[14px]"></lucide-icon></span>
+                </li>
+                <li>
+                    <span class="cc-breadcrumb__current">{{product.name}}</span>
+                </li>
+            </ol>
+        </nav>
+
+        <main class="cc-product">
+            <div class="cc-product__grid">
+
+                <!-- LEFT: Gallery -->
+                <section class="cc-gallery cc-animate" aria-label="Product gallery">
+                    <div class="cc-gallery__main">
+                        <img [src]="product.images[activeImageIndex]" [alt]="product.name" class="cc-gallery__main-img">
+
+                        <div class="cc-gallery__badge">
+                            <span class="cc-gallery__badge-dot"></span>
+                            Available Now
+                        </div>
+
+                        <button class="cc-gallery__favorite" aria-label="Save to favorites">
+                            <lucide-icon [name]="icons.Heart" class="w-[20px] h-[20px]"
+                                style="color: var(--stone-500)"></lucide-icon>
+                        </button>
+
+                        <div class="cc-gallery__nav">
+                            <button *ngFor="let img of product.images; let i = index" class="cc-gallery__dot"
+                                [class.is-active]="i === activeImageIndex" (click)="setActiveImage(i)"
+                                [attr.aria-label]="'Image ' + (i + 1)">
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="cc-gallery__thumbs">
+                        <div *ngFor="let img of product.images; let i = index" class="cc-gallery__thumb"
+                            [class.is-active]="i === activeImageIndex" (click)="setActiveImage(i)">
+                            <img [src]="img" [alt]="'Thumbnail ' + (i+1)">
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- RIGHT: Info -->
+                <section class="cc-info cc-animate" style="transition-delay: 0.1s" aria-label="Product information">
+
+                    <!-- Brand -->
+                    <div class="cc-info__brand">
+                        <lucide-icon [name]="icons.Mountain" class="w-[13px] h-[13px]"></lucide-icon>
+                        {{product.brand}}
+                    </div>
+
+                    <!-- Title -->
+                    <h1 class="cc-info__title">{{product.name}}</h1>
+
+                    <!-- Rating -->
+                    <div class="cc-info__rating">
+                        <div class="cc-info__stars">
+                            <lucide-icon *ngFor="let _ of [1,2,3,4,5]" [name]="icons.Star"
+                                class="w-[16px] h-[16px] cc-info__star fill-amber-400 text-amber-400"></lucide-icon>
+                        </div>
+                        <span class="cc-info__rating-score">{{product.rating}}</span>
+                        <span class="cc-info__rating-count"><a href="#reviews">{{product.reviewCount}}
+                                reviews</a></span>
+                    </div>
+
+                    <!-- Condition -->
+                    <div class="cc-info__condition">
+                        <lucide-icon [name]="icons.BadgeCheck" class="w-[15px] h-[15px]"></lucide-icon>
+                        {{product.condition}}
+                    </div>
+
+                    <div class="cc-info__divider"></div>
+
+                    <!-- Pricing -->
+                    <div class="cc-pricing">
+                        <span class="cc-pricing__amount">\${{product.pricePerDay}}</span>
+                        <span class="cc-pricing__period">/ day</span>
+                    </div>
+                    <div class="cc-pricing__deposit">
+                        <lucide-icon [name]="icons.ShieldCheck" class="w-[14px] h-[14px]"
+                            style="color:var(--forest-green)"></lucide-icon>
+                        Refundable deposit: <strong>$150</strong>
+                    </div>
+
+                    <!-- Date Selector -->
+                    <div class="cc-dates">
+                        <div class="cc-dates__row">
+                            <div class="cc-dates__field">
+                                <label class="cc-dates__label" for="startDate">Pick-up Date</label>
+                                <input type="date" id="startDate" class="cc-dates__input">
+                            </div>
+                            <div class="cc-dates__field">
+                                <label class="cc-dates__label" for="endDate">Return Date</label>
+                                <input type="date" id="endDate" class="cc-dates__input">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CTA Buttons -->
+                    <div class="cc-actions">
+                        <button class="cc-btn cc-btn--primary">
+                            <lucide-icon [name]="icons.ShoppingBag" class="w-[18px] h-[18px]"></lucide-icon>
+                            Add to Cart
+                        </button>
+                        <button class="cc-btn cc-btn--secondary">
+                            <lucide-icon [name]="icons.Heart" class="w-[18px] h-[18px]"></lucide-icon>
+                            Save for Later
+                        </button>
+                    </div>
+
+                    <!-- Trust Signals -->
+                    <div class="cc-trust">
+                        <div class="cc-trust__item">
+                            <lucide-icon [name]="icons.Truck" class="cc-trust__icon"></lucide-icon>
+                            <div class="cc-trust__text">Free delivery<br>over $75</div>
+                        </div>
+                        <div class="cc-trust__item">
+                            <lucide-icon [name]="icons.ShieldCheck" class="cc-trust__icon"></lucide-icon>
+                            <div class="cc-trust__text">Gear protection<br>included</div>
+                        </div>
+                        <div class="cc-trust__item">
+                            <lucide-icon [name]="icons.RotateCcw" class="cc-trust__icon"></lucide-icon>
+                            <div class="cc-trust__text">Free cancellation<br>48h before</div>
+                        </div>
+                    </div>
+
+                </section>
+            </div>
+        </main>
+
+
+        <!-- TABS -->
+        <section class="cc-tabs-section cc-animate" aria-label="Product details tabs">
+
+            <!-- Tab Navigation -->
+            <div class="cc-tabs__nav" role="tablist">
+                <button class="cc-tabs__btn" [class.is-active]="activeTab === 'description'"
+                    (click)="setActiveTab('description')">Description</button>
+                <button class="cc-tabs__btn" [class.is-active]="activeTab === 'specifications'"
+                    (click)="setActiveTab('specifications')">Specifications</button>
+                <button class="cc-tabs__btn" [class.is-active]="activeTab === 'reviews'"
+                    (click)="setActiveTab('reviews')">Reviews ({{product.reviewCount}})</button>
+            </div>
+
+            <!-- Tab: Description -->
+            <div class="cc-tabs__panel" [class.is-active]="activeTab === 'description'">
+                <div class="cc-description">
+                    <h3>Built for the Trail, Designed for Comfort</h3>
+                    <p class="whitespace-pre-line">{{product.description}}</p>
+
+                    <ul class="cc-description__features">
+                        <li *ngFor="let feature of product.features" class="cc-description__feature">
+                            <div class="cc-description__feature-icon">
+                                <lucide-icon [name]="feature.icon" class="w-[18px] h-[18px]"
+                                    style="color:var(--forest-green)"></lucide-icon>
+                            </div>
+                            <span class="cc-description__feature-text">{{feature.text}}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Tab: Specifications -->
+            <div class="cc-tabs__panel" [class.is-active]="activeTab === 'specifications'">
+                <div class="cc-specs">
+                    <table class="cc-specs__table">
+                        <tbody>
+                            <tr *ngFor="let spec of product.specs">
+                                <td>{{spec.label}}</td>
+                                <td>{{spec.value}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: Reviews -->
+            <div class="cc-tabs__panel" [class.is-active]="activeTab === 'reviews'">
+                <div class="cc-reviews">
+                    <article *ngFor="let review of product.reviews" class="cc-review">
+                        <div class="cc-review__header">
+                            <img [src]="review.avatar" [alt]="review.author" class="cc-review__avatar">
+                            <div>
+                                <div class="cc-review__author-name">{{review.author}}</div>
+                                <div class="cc-review__meta">
+                                    <div class="cc-review__stars">
+                                        <lucide-icon *ngFor="let _ of [1,2,3,4,5]" [name]="icons.Star"
+                                            class="w-[12px] h-[12px] fill-amber-400 text-amber-400"></lucide-icon>
+                                    </div>
+                                    <span>{{review.date}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="cc-review__text">{{review.content}}</p>
+                    </article>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- PROVIDER SECTION -->
+        <section class="cc-provider-section">
+            <div class="cc-provider-section__title">Listed by</div>
+            <div class="cc-provider">
+                <img [src]="product.provider.avatar" [alt]="product.provider.name" class="cc-provider__avatar">
+                <div class="cc-provider__info">
+                    <div class="cc-provider__name">{{product.provider.name}}</div>
+                    <div class="cc-provider__meta">
+                        <span>{{product.provider.joined}}</span>
+                        <span>•</span>
+                        <span>{{product.provider.responseRate}}</span>
+                    </div>
+                </div>
+                <button class="cc-provider__action">View Profile</button>
+            </div>
+        </section>
+
+        <!-- RELATED PRODUCTS -->
+        <section class="cc-related">
+            <div class="cc-related__header">
+                <div>
+                    <div class="cc-related__label">You might also like</div>
+                    <h2 class="cc-related__title">Complete your setup</h2>
+                </div>
+            </div>
+
+            <div class="cc-related__scroll">
+                <div *ngFor="let item of relatedProducts" class="cc-related-card"
+                    [routerLink]="['/marketplace/product', item.id]">
+                    <div class="cc-related-card__img-wrap">
+                        <img [src]="item.image" [alt]="item.name" class="cc-related-card__img">
+                        <div class="cc-related-card__rating">
+                            <lucide-icon [name]="icons.Star"
+                                class="w-3 h-3 fill-amber-400 text-amber-400"></lucide-icon>
+                            {{item.rating}}
+                        </div>
+                    </div>
+                    <div class="cc-related-card__body">
+                        <h3 class="cc-related-card__name">{{item.name}}</h3>
+                        <div class="cc-related-card__sub">{{item.category}}</div>
+                        <div class="cc-related-card__price">\${{item.price}}<span>/day</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </ng-container>
+
+</div>

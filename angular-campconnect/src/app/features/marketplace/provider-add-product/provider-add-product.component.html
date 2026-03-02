@@ -1,0 +1,299 @@
+<div class="p-6 lg:p-8 space-y-8 bg-[#fafaf9] min-h-full">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-stone-900">Add New Product</h1>
+            <p class="text-stone-500 mt-1">List new camping equipment for rental on the marketplace</p>
+        </div>
+        <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-xl border border-stone-200 shadow-sm">
+            <span class="text-xs font-medium text-stone-500">Completion</span>
+            <div class="w-24 h-2 bg-stone-100 rounded-full overflow-hidden">
+                <div class="h-full bg-emerald-500 transition-all duration-500" [style.width.%]="completionPercentage">
+                </div>
+            </div>
+            <span class="text-xs font-bold text-emerald-600">{{ completionPercentage }}%</span>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-8 items-start">
+
+        <!-- Sidebar Navigation -->
+        <nav class="hidden lg:block sticky top-24 bg-white rounded-2xl p-4 border border-stone-100 shadow-sm">
+            <div class="space-y-1">
+                <button type="button"
+                    class="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-colors bg-emerald-50 text-emerald-700">
+                    Basic Information
+                </button>
+            </div>
+        </nav>
+
+        <!-- Form Content -->
+        <form [formGroup]="addProductForm" (ngSubmit)="saveProduct()" class="space-y-6 relative">
+
+            <!-- Toast Notification -->
+            <div *ngIf="toast.show"
+                class="absolute -top-12 right-0 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border"
+                [class.bg-emerald-50]="toast.type === 'success'" [class.border-emerald-200]="toast.type === 'success'"
+                [class.text-emerald-800]="toast.type === 'success'" [class.bg-rose-50]="toast.type === 'error'"
+                [class.border-rose-200]="toast.type === 'error'" [class.text-rose-800]="toast.type === 'error'">
+                <span class="font-medium text-sm">{{ toast.msg }}</span>
+            </div>
+
+            <!-- Basic Information Card -->
+            <section id="section-basic" class="bg-white rounded-2xl p-6 shadow-sm border border-stone-100">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                            class="text-emerald-600">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-semibold text-stone-900">Basic Information</h2>
+                        <p class="text-sm text-stone-500">Essential details about your equipment</p>
+                    </div>
+                </div>
+
+                <div class="space-y-5">
+                    <!-- Name -->
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-2">Product Name <span
+                                class="text-rose-500">*</span></label>
+                        <input type="text" formControlName="name"
+                            class="w-full px-4 py-2.5 rounded-xl border border-stone-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all placeholder:text-stone-400"
+                            placeholder="e.g., Osprey Atmos AG 65L Backpack">
+                        <div *ngIf="addProductForm.get('name')?.touched && addProductForm.get('name')?.invalid"
+                            class="text-rose-500 text-xs mt-1 font-medium">Name is required</div>
+                    </div>
+
+                    <!-- Category -->
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-2">Category <span
+                                class="text-rose-500">*</span></label>
+                        <select formControlName="category"
+                            class="w-full px-4 py-2.5 rounded-xl border border-stone-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all bg-white text-stone-700">
+                            <option value="">Select a category</option>
+                            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+                        </select>
+                        <div *ngIf="addProductForm.get('category')?.touched && addProductForm.get('category')?.invalid"
+                            class="text-rose-500 text-xs mt-1 font-medium">Category is required</div>
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-2">Description <span
+                                class="text-rose-500">*</span></label>
+                        <textarea formControlName="description" rows="4"
+                            class="w-full px-4 py-2.5 rounded-xl border border-stone-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all resize-y placeholder:text-stone-400"
+                            placeholder="Briefly describe the product and its key features..."></textarea>
+                        <div *ngIf="addProductForm.get('description')?.touched && addProductForm.get('description')?.invalid"
+                            class="text-rose-500 text-xs mt-1 font-medium">Description is required</div>
+                    </div>
+
+                    <!-- Image Upload -->
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-2">Product Images (Up to 8) <span
+                                class="text-rose-500">*</span></label>
+
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
+                            <!-- Image Previews -->
+                            <div *ngFor="let img of uploadedImages; let i = index"
+                                class="relative w-full aspect-square rounded-xl overflow-hidden border border-stone-200 group">
+                                <img [src]="img.preview" alt="Preview"
+                                    class="w-full h-full object-cover transition-transform group-hover:scale-105"
+                                    [class.opacity-50]="img.uploading">
+
+                                <!-- Loading overlay -->
+                                <div *ngIf="img.uploading"
+                                    class="absolute inset-0 flex items-center justify-center bg-black/10 backdrop-blur-[2px]">
+                                    <lucide-icon name="loader-2" class="w-6 h-6 text-white animate-spin"></lucide-icon>
+                                </div>
+
+                                <!-- Error overlay -->
+                                <div *ngIf="img.error"
+                                    class="absolute inset-0 flex items-center justify-center bg-rose-500/20 backdrop-blur-[2px]">
+                                    <div class="bg-white px-2 py-1 rounded text-xs font-medium text-rose-600 shadow-sm">
+                                        Failed</div>
+                                </div>
+
+                                <!-- Remove button -->
+                                <button type="button" (click)="removeImage(i)" *ngIf="!img.uploading"
+                                    class="absolute top-2 right-2 p-1.5 bg-white/90 backdrop-blur-sm text-stone-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:text-rose-500 hover:bg-white shadow-sm">
+                                    <lucide-icon name="x" class="w-4 h-4"></lucide-icon>
+                                </button>
+                            </div>
+
+                            <!-- Upload Zone (only show if under 8 images) -->
+                            <div *ngIf="uploadedImages.length < 8" class="relative w-full aspect-square">
+                                <input type="file" id="imageUpload" (change)="onFileSelected($event)" accept="image/*"
+                                    multiple class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                    (dragover)="isDragging = true" (dragleave)="isDragging = false"
+                                    (drop)="isDragging = false" title="Upload images">
+                                <div class="w-full h-full p-2 rounded-xl border-2 border-dashed border-stone-200 bg-stone-50 flex flex-col items-center justify-center text-center transition-all"
+                                    [ngClass]="{'border-emerald-500 bg-emerald-50/50': isDragging}">
+                                    <div class="p-2.5 bg-white rounded-full shadow-sm text-stone-400 mb-2">
+                                        <lucide-icon name="camera" class="w-5 h-5"></lucide-icon>
+                                    </div>
+                                    <span class="text-xs font-medium text-stone-600">Add Image</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hidden input to keep form binding and validation happy -->
+                        <input type="hidden" formControlName="imageUrls">
+
+                        <div *ngIf="addProductForm.get('imageUrls')?.touched && addProductForm.get('imageUrls')?.invalid"
+                            class="text-rose-500 text-xs mt-1 font-medium">At least 1 image is required</div>
+                        <div *ngIf="uploadError" class="text-rose-500 text-xs mt-1 font-medium">{{ uploadError }}</div>
+                    </div>
+
+                    <!-- Price & Quantity Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium text-stone-700 mb-2">Price per Day ($) <span
+                                    class="text-rose-500">*</span></label>
+                            <div class="relative">
+                                <span
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500 font-medium">$</span>
+                                <input type="number" formControlName="pricePerDay"
+                                    class="w-full pl-8 pr-4 py-2.5 rounded-xl border border-stone-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
+                                    placeholder="0.00" min="0" step="0.01">
+                            </div>
+                            <div *ngIf="addProductForm.get('pricePerDay')?.touched && addProductForm.get('pricePerDay')?.invalid"
+                                class="text-rose-500 text-xs mt-1 font-medium">Valid price is required</div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-stone-700 mb-2">Stock Quantity <span
+                                    class="text-rose-500">*</span></label>
+                            <input type="number" formControlName="stockQuantity"
+                                class="w-full px-4 py-2.5 rounded-xl border border-stone-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
+                                placeholder="1" min="1">
+                            <div *ngIf="addProductForm.get('stockQuantity')?.touched && addProductForm.get('stockQuantity')?.invalid"
+                                class="text-rose-500 text-xs mt-1 font-medium">Valid quantity required</div>
+                        </div>
+                    </div>
+
+                    <!-- Condition -->
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-2">Condition <span
+                                class="text-rose-500">*</span></label>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <label
+                                class="relative flex flex-col items-center justify-center p-3 border rounded-xl cursor-pointer transition-all"
+                                [class.border-emerald-500]="addProductForm.get('condition')?.value === 'NEW'"
+                                [class.bg-emerald-50]="addProductForm.get('condition')?.value === 'NEW'"
+                                [class.border-stone-200]="addProductForm.get('condition')?.value !== 'NEW'"
+                                (click)="selectCondition('NEW')">
+                                <input type="radio" value="NEW" class="hidden"
+                                    [checked]="addProductForm.get('condition')?.value === 'NEW'">
+                                <span class="text-sm font-medium"
+                                    [class.text-emerald-700]="addProductForm.get('condition')?.value === 'NEW'"
+                                    [class.text-stone-600]="addProductForm.get('condition')?.value !== 'NEW'">New</span>
+                            </label>
+                            <label
+                                class="relative flex flex-col items-center justify-center p-3 border rounded-xl cursor-pointer transition-all"
+                                [class.border-emerald-500]="addProductForm.get('condition')?.value === 'LIKE_NEW'"
+                                [class.bg-emerald-50]="addProductForm.get('condition')?.value === 'LIKE_NEW'"
+                                [class.border-stone-200]="addProductForm.get('condition')?.value !== 'LIKE_NEW'"
+                                (click)="selectCondition('LIKE_NEW')">
+                                <input type="radio" value="LIKE_NEW" class="hidden"
+                                    [checked]="addProductForm.get('condition')?.value === 'LIKE_NEW'">
+                                <span class="text-sm font-medium"
+                                    [class.text-emerald-700]="addProductForm.get('condition')?.value === 'LIKE_NEW'"
+                                    [class.text-stone-600]="addProductForm.get('condition')?.value !== 'LIKE_NEW'">Like
+                                    New</span>
+                            </label>
+                            <label
+                                class="relative flex flex-col items-center justify-center p-3 border rounded-xl cursor-pointer transition-all"
+                                [class.border-emerald-500]="addProductForm.get('condition')?.value === 'GOOD'"
+                                [class.bg-emerald-50]="addProductForm.get('condition')?.value === 'GOOD'"
+                                [class.border-stone-200]="addProductForm.get('condition')?.value !== 'GOOD'"
+                                (click)="selectCondition('GOOD')">
+                                <input type="radio" value="GOOD" class="hidden"
+                                    [checked]="addProductForm.get('condition')?.value === 'GOOD'">
+                                <span class="text-sm font-medium"
+                                    [class.text-emerald-700]="addProductForm.get('condition')?.value === 'GOOD'"
+                                    [class.text-stone-600]="addProductForm.get('condition')?.value !== 'GOOD'">Good</span>
+                            </label>
+                            <label
+                                class="relative flex flex-col items-center justify-center p-3 border rounded-xl cursor-pointer transition-all"
+                                [class.border-emerald-500]="addProductForm.get('condition')?.value === 'FAIR'"
+                                [class.bg-emerald-50]="addProductForm.get('condition')?.value === 'FAIR'"
+                                [class.border-stone-200]="addProductForm.get('condition')?.value !== 'FAIR'"
+                                (click)="selectCondition('FAIR')">
+                                <input type="radio" value="FAIR" class="hidden"
+                                    [checked]="addProductForm.get('condition')?.value === 'FAIR'">
+                                <span class="text-sm font-medium"
+                                    [class.text-emerald-700]="addProductForm.get('condition')?.value === 'FAIR'"
+                                    [class.text-stone-600]="addProductForm.get('condition')?.value !== 'FAIR'">Fair</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Status -->
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-2">Listing Status</label>
+                        <div class="flex items-center gap-4">
+                            <label
+                                class="relative flex items-center justify-center px-4 py-2 border rounded-xl cursor-pointer transition-all"
+                                [class.border-emerald-500]="addProductForm.get('status')?.value === 'active'"
+                                [class.bg-emerald-50]="addProductForm.get('status')?.value === 'active'"
+                                [class.border-stone-200]="addProductForm.get('status')?.value !== 'active'"
+                                (click)="addProductForm.get('status')?.setValue('active')">
+                                <input type="radio" value="active" class="hidden"
+                                    [checked]="addProductForm.get('status')?.value === 'active'">
+                                <span class="text-sm font-medium"
+                                    [class.text-emerald-700]="addProductForm.get('status')?.value === 'active'"
+                                    [class.text-stone-600]="addProductForm.get('status')?.value !== 'active'">Active</span>
+                            </label>
+                            <label
+                                class="relative flex items-center justify-center px-4 py-2 border rounded-xl cursor-pointer transition-all"
+                                [class.border-amber-500]="addProductForm.get('status')?.value === 'maintenance'"
+                                [class.bg-amber-50]="addProductForm.get('status')?.value === 'maintenance'"
+                                [class.border-stone-200]="addProductForm.get('status')?.value !== 'maintenance'"
+                                (click)="addProductForm.get('status')?.setValue('maintenance')">
+                                <input type="radio" value="maintenance" class="hidden"
+                                    [checked]="addProductForm.get('status')?.value === 'maintenance'">
+                                <span class="text-sm font-medium"
+                                    [class.text-amber-700]="addProductForm.get('status')?.value === 'maintenance'"
+                                    [class.text-stone-600]="addProductForm.get('status')?.value !== 'maintenance'">Maintenance</span>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Bottom Action Bar -->
+            <div
+                class="sticky bottom-6 z-40 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-stone-200 p-4">
+                <div class="flex items-center justify-between">
+                    <p class="text-sm text-stone-500 hidden sm:block">Please verify all information before publishing.
+                    </p>
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <button type="button"
+                            class="flex-1 sm:flex-none px-6 py-2.5 text-sm font-medium text-stone-600 bg-white border border-stone-200 rounded-xl hover:bg-stone-50 hover:text-stone-900 transition-colors"
+                            routerLink="/provider/products">
+                            Cancel
+                        </button>
+                        <button type="submit" [disabled]="!addProductForm.valid || isSaving"
+                            class="flex-1 sm:flex-none px-6 py-2.5 text-sm font-medium text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                            <svg *ngIf="isSaving" class="animate-spin h-4 w-4 text-white" fill="none"
+                                viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
+                            </svg>
+                            {{ isSaving ? 'Publishing...' : 'Publish Product' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>

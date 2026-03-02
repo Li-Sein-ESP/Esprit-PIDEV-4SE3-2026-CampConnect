@@ -1,0 +1,385 @@
+:host {
+    display: block;
+    width: 100%;
+
+    /* Earth-tone palette - local scope */
+    --earth-50: #F9F7F4;
+    --earth-100: #F0EBE3;
+    --earth-200: #E0D6C8;
+    --earth-300: #C9B99A;
+    --earth-400: #A89373;
+    --earth-500: #8B7355;
+    --earth-600: #6B5744;
+    --earth-700: #4A3F32;
+    --earth-800: #2D261F;
+
+    /* Status colors */
+    --status-available-bg: #ECFDF5;
+    --status-available-text: #047857;
+    --status-available-dot: #10B981;
+    --status-busy-bg: #FFF7ED;
+    --status-busy-text: #C2410C;
+    --status-busy-dot: #F97316;
+    --status-maintenance-bg: #FEF3C7;
+    --status-maintenance-text: #B45309;
+    --status-maintenance-dot: #F59E0B;
+
+    /* Vehicle type colors */
+    --vehicle-motorcycle: #3B82F6;
+    --vehicle-van: #8B5CF6;
+    --vehicle-4x4: #059669;
+
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.delivery-vehicles {
+    background-color: transparent;
+    /* inherited from layout */
+    color: #1F2937;
+}
+
+/* Card base */
+.dashboard-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.dashboard-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+/* Vehicle cards */
+.vehicle-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.vehicle-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.vehicle-card .grid {
+    flex-grow: 1;
+    /* push footer to bottom */
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.status-available {
+    background-color: var(--status-available-bg);
+    color: var(--status-available-text);
+}
+
+.status-available::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--status-available-dot);
+}
+
+.status-busy {
+    background-color: var(--status-busy-bg);
+    color: var(--status-busy-text);
+}
+
+.status-busy::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--status-busy-dot);
+}
+
+.status-maintenance {
+    background-color: var(--status-maintenance-bg);
+    color: var(--status-maintenance-text);
+}
+
+.status-maintenance::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--status-maintenance-dot);
+}
+
+/* Vehicle type badges */
+.vehicle-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.vehicle-type-motorcycle {
+    background-color: #DBEAFE;
+    color: #1D4ED8;
+}
+
+.vehicle-type-van {
+    background-color: #EDE9FE;
+    color: #6D28D9;
+}
+
+.vehicle-type-4x4 {
+    background-color: #D1FAE5;
+    color: #047857;
+}
+
+/* Action buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: none;
+    outline: none;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background-color: var(--earth-600);
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: var(--earth-700);
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: #F5F5F4;
+    color: #44403C;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background-color: #E7E5E4;
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: var(--earth-600);
+    border: 1.5px solid var(--earth-200);
+}
+
+.btn-outline:hover:not(:disabled) {
+    background-color: var(--earth-50);
+    border-color: var(--earth-400);
+}
+
+.btn-danger {
+    background-color: #FEF2F2;
+    color: #DC2626;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background-color: #FEE2E2;
+}
+
+.btn-sm {
+    padding: 8px 14px;
+    font-size: 13px;
+}
+
+/* Modal styles */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: scale(0.95) translateY(20px);
+    transition: transform 0.2s ease;
+}
+
+.modal-overlay.active .modal-content {
+    transform: scale(1) translateY(0);
+}
+
+/* Form elements */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid #E7E5E4;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #1F2937;
+    background-color: #FAFAF9;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-input.ng-invalid.ng-touched,
+.form-select.ng-invalid.ng-touched {
+    border-color: #DC2626;
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--earth-500);
+    box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+}
+
+.form-input::placeholder {
+    color: #A8A29E;
+}
+
+/* Toggle switch */
+.toggle-switch {
+    position: relative;
+    width: 52px;
+    height: 28px;
+    background-color: #E7E5E4;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.toggle-switch.active {
+    background-color: var(--earth-500);
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    background-color: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.toggle-switch.active::after {
+    transform: translateX(24px);
+}
+
+/* Insight cards */
+.insight-card {
+    background: linear-gradient(135deg, var(--earth-50) 0%, white 100%);
+    border: 1px solid var(--earth-100);
+    border-radius: 14px;
+    padding: 20px;
+    transition: transform 0.2s ease;
+}
+
+.insight-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Stats */
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1F2937;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: #6B7280;
+}
+
+/* Icon containers */
+.icon-container {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+.animate-delay-1 {
+    animation-delay: 0.05s;
+}
+
+.animate-delay-2 {
+    animation-delay: 0.1s;
+}
+
+.animate-delay-3 {
+    animation-delay: 0.15s;
+}

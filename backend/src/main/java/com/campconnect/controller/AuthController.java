@@ -64,10 +64,11 @@ public class AuthController {
 				.collect(Collectors.toList());
 
 		return ResponseEntity.ok(new AuthResponse(jwt,
-												 userDetails.getId(),
-												 userDetails.getUsername(),
-												 userDetails.getEmail(),
-												 roles));
+				userDetails.getId(),
+				userDetails.getUsername(),
+				userDetails.getEmail(),
+				roles,
+				userDetails.getProfileDetails()));
 	}
 
 	@PostMapping("/signup")
@@ -86,35 +87,64 @@ public class AuthController {
 
 		// Create new user's account
 		User user = new User(signUpRequest.getUsername(),
-							 signUpRequest.getEmail(),
-							 encoder.encode(signUpRequest.getPassword()),
-                             signUpRequest.getName());
+				signUpRequest.getEmail(),
+				encoder.encode(signUpRequest.getPassword()),
+				signUpRequest.getName());
 
 		Set<String> strRoles = signUpRequest.getRole();
 		Set<Role> roles = new HashSet<>();
 
-		if (strRoles == null) {
+		if (strRoles == null || strRoles.isEmpty()) {
 			Role userRole = roleRepository.findByName(ERole.ROLE_USER)
 					.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
 			roles.add(userRole);
 		} else {
+			if (strRoles.size() > 1) {
+				throw new RuntimeException("Error: You can only select one role explicitly.");
+			}
 			strRoles.forEach(role -> {
 				switch (role) {
-				case "admin":
-					Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-					roles.add(adminRole);
-
-					break;
-				default:
-					Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-					roles.add(userRole);
+					case "camper":
+						Role camperRole = roleRepository.findByName(ERole.ROLE_CAMPER)
+								.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+						roles.add(camperRole);
+						break;
+					case "equipment_provider":
+						Role equipmentProviderRole = roleRepository.findByName(ERole.ROLE_EQUIPMENT_PROVIDER)
+								.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+						roles.add(equipmentProviderRole);
+						break;
+					case "site_owner":
+						Role siteOwnerRole = roleRepository.findByName(ERole.ROLE_SITE_OWNER)
+								.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+						roles.add(siteOwnerRole);
+						break;
+					case "organizer":
+						Role organizerRole = roleRepository.findByName(ERole.ROLE_ORGANIZER)
+								.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+						roles.add(organizerRole);
+						break;
+					case "delivery_provider":
+						Role deliveryProviderRole = roleRepository.findByName(ERole.ROLE_DELIVERY_PROVIDER)
+								.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+						roles.add(deliveryProviderRole);
+						break;
+					case "admin":
+						throw new RuntimeException("Error: Admin role cannot be selected manually.");
+					default:
+						Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+								.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+						roles.add(userRole);
 				}
 			});
 		}
 
 		user.setRoles(roles);
+
+		if (signUpRequest.getProfileDetails() != null) {
+			user.setProfileDetails(signUpRequest.getProfileDetails());
+		}
+
 		userRepository.save(user);
 
 		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
