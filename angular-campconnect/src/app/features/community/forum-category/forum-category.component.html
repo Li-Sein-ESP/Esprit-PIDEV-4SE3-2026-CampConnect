@@ -92,7 +92,7 @@
                     <div class="cc-topic-row__meta">
                         <span class="cc-topic-row__author">{{ topic.author }}</span>
                         <span>·</span>
-                        <app-trust-score [score]="topic.trustScore" variant="small"></app-trust-score>
+                        <app-trust-score [score]="topic?.trustScore ?? 0" variant="small"></app-trust-score>
                     </div>
                 </div>
             </div>

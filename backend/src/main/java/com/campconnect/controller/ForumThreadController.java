@@ -11,7 +11,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/threads")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class ForumThreadController {
 
     private final ForumThreadService threadService;

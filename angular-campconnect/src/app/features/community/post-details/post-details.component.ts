@@ -247,7 +247,8 @@ Pro tip: Camp at site #47 for this exact view. Arrive Thursday to snag it for th
         if (!text) return;
 
         if (Array.isArray(this.post.comments)) {
-            this.post.comments.unshift({
+            const comments = this.post.comments as any[];
+            comments.unshift({
                 id: Date.now(),
                 author: {
                     id: 100, // Current user

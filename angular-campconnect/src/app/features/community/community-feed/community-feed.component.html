@@ -31,37 +31,84 @@
         </div>
       </article>
 
-      <!-- Quick Links -->
-      <nav class="cc-quick-links" aria-label="Quick links">
+      <!-- Community Navigation Links -->
+      <nav class="cc-quick-links" aria-label="Community navigation">
+        <div class="cc-quick-links-group-title"
+          style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #aab5aa; margin: 16px 0 8px 12px; letter-spacing: 0.5px;">
+          Flux & Médias</div>
         <ul>
           <li>
-            <a href="#" class="cc-quick-links__item cc-quick-links__item--active">
-              <span class="cc-quick-links__icon">📝</span>
-              My Posts
+            <a routerLink="/community" routerLinkActive="cc-quick-links__item--active"
+              [routerLinkActiveOptions]="{exact: true}" class="cc-quick-links__item">
+              <span class="cc-quick-links__icon">🏕️</span>
+              Community Feed
             </a>
           </li>
           <li>
-            <a href="#" class="cc-quick-links__item">
-              <span class="cc-quick-links__icon">🔖</span>
-              Saved Posts
+            <a routerLink="/community/stories" routerLinkActive="cc-quick-links__item--active"
+              class="cc-quick-links__item">
+              <span class="cc-quick-links__icon">📖</span>
+              Trip Stories
+            </a>
+          </li>
+        </ul>
+
+        <div class="cc-quick-links-group-title"
+          style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #aab5aa; margin: 16px 0 8px 12px; letter-spacing: 0.5px;">
+          Discussions</div>
+        <ul>
+          <li>
+            <a routerLink="/community/forum" routerLinkActive="cc-quick-links__item--active"
+              class="cc-quick-links__item">
+              <span class="cc-quick-links__icon">💬</span>
+              Forum
             </a>
           </li>
           <li>
-            <a href="#" class="cc-quick-links__item">
-              <span class="cc-quick-links__icon">📅</span>
-              Events
+            <a routerLink="/community/help" routerLinkActive="cc-quick-links__item--active"
+              class="cc-quick-links__item">
+              <span class="cc-quick-links__icon">🆘</span>
+              Entraide & Q&A
             </a>
           </li>
+        </ul>
+
+        <div class="cc-quick-links-group-title"
+          style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #aab5aa; margin: 16px 0 8px 12px; letter-spacing: 0.5px;">
+          Social</div>
+        <ul>
           <li>
-            <a href="#" class="cc-quick-links__item">
-              <span class="cc-quick-links__icon">🗺️</span>
-              Trail Maps
-            </a>
-          </li>
-          <li>
-            <a routerLink="/community/messages" class="cc-quick-links__item">
+            <a routerLink="/community/messages" routerLinkActive="cc-quick-links__item--active"
+              class="cc-quick-links__item">
               <span class="cc-quick-links__icon" style="background: #e1f5fe; color: #0288d1;">✉️</span>
-              Messages
+              Messagerie
+            </a>
+          </li>
+          <li>
+            <a routerLink="/companions" routerLinkActive="cc-quick-links__item--active" class="cc-quick-links__item">
+              <span class="cc-quick-links__icon">🤝</span>
+              Trouver Partenaires
+            </a>
+          </li>
+          <li>
+            <a routerLink="/companions/groups" routerLinkActive="cc-quick-links__item--active"
+              class="cc-quick-links__item">
+              <span class="cc-quick-links__icon">👥</span>
+              Mes Groupes
+            </a>
+          </li>
+          <li>
+            <a routerLink="/community/events" routerLinkActive="cc-quick-links__item--active"
+              class="cc-quick-links__item">
+              <span class="cc-quick-links__icon">📅</span>
+              Événements
+            </a>
+          </li>
+          <li>
+            <a routerLink="/community/leaderboard" routerLinkActive="cc-quick-links__item--active"
+              class="cc-quick-links__item">
+              <span class="cc-quick-links__icon">🏆</span>
+              Leaderboard
             </a>
           </li>
         </ul>
@@ -145,20 +192,21 @@
 
 
       <!-- Dynamic Angular Posts -->
-      <article class="cc-post" *ngFor="let post of posts" [attr.aria-label]="'Post by ' + post.author.name">
+      <article class="cc-post" *ngFor="let post of posts" [attr.aria-label]="'Post by ' + post?.author?.name">
         <header class="cc-post__header">
-          <img [src]="post.author.avatar" [alt]="post.author.name" class="cc-post__avatar"
-            [routerLink]="['/community/profile', post.author.id]">
+          <img [src]="post?.author?.avatar" [alt]="post?.author?.name" class="cc-post__avatar"
+            [routerLink]="['/community/profile', post?.author?.id]">
           <div class="cc-post__user-info" style="cursor: pointer;">
-            <span class="cc-post__username" [routerLink]="['/community/profile', post.author.id]"
+            <span class="cc-post__username" [routerLink]="['/community/profile', post?.author?.id]"
               style="cursor: pointer; margin-right: 4px;">{{
-              post.author.name }}</span>
-            <span class="cc-post__badge" *ngIf="post.author.role === 'Verified Camper' || post.author.role === 'Admin'">
+              post?.author?.name }}</span>
+            <span class="cc-post__badge"
+              *ngIf="post?.author?.role === 'Verified Camper' || post?.author?.role === 'Admin'">
               <span class="cc-post__badge-icon">✓</span>
               Verified Camper
             </span>
-            <ng-container *ngIf="post.author.badges?.length">
-              <app-camp-badge *ngFor="let b of post.author.badges" [title]="b.title" [description]="b.description"
+            <ng-container *ngIf="post?.author?.badges?.length">
+              <app-camp-badge *ngFor="let b of post?.author?.badges" [title]="b.title" [description]="b.description"
                 [icon]="b.icon" [unlocked]="b.unlocked" size="small">
               </app-camp-badge>
             </ng-container>
@@ -168,8 +216,8 @@
             <span class="cc-post__meta-dot" aria-hidden="true"></span>
             <time class="cc-post__time">{{ post.timestamp }}</time>
           </div>
-          <app-trust-score *ngIf="post.author.trustScore !== undefined" [score]="post.author.trustScore" variant="small"
-            style="margin-left: auto; margin-right: 12px;"></app-trust-score>
+          <app-trust-score *ngIf="post?.author?.trustScore !== undefined" [score]="post?.author?.trustScore ?? 0"
+            variant="small" style="margin-left: auto; margin-right: 12px;"></app-trust-score>
           <button class="cc-post__more-btn" aria-label="More options">⋯</button>
         </header>
 
@@ -236,8 +284,15 @@
           getCommentCount(post.comments) }} comments</button>
       </article>
 
+      <!-- Empty State when no posts -->
+      <div *ngIf="!loading && posts.length === 0" style="padding: 40px 20px; text-align: center; color: #888;">
+        <div style="font-size: 48px; margin-bottom: 12px;">🏕️</div>
+        <h3 style="margin-bottom: 8px; color: #555;">No adventures shared yet</h3>
+        <p style="font-size: 14px;">Be the first to share your camping story!</p>
+      </div>
+
       <!-- Infinite Scroll Loading -->
-      <div class="cc-loading" id="feedLoader" aria-label="Loading more posts">
+      <div class="cc-loading" id="feedLoader" aria-label="Loading more posts" *ngIf="loading">
         <div class="cc-loading__spinner"></div>
         <span>Loading more adventures...</span>
       </div>

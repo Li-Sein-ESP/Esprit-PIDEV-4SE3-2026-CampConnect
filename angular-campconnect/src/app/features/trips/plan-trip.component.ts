@@ -21,7 +21,40 @@ import { TripService } from '../../core/services/trip.service';
     DropdownComponent,
     LucideAngularModule
   ],
-  templateUrl: './plan-trip.component.html',
+  template: `
+    <div class="container mx-auto p-6">
+      <div class="max-w-2xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">Plan Your Next Trip</h1>
+        
+        <div class="bg-white rounded-xl shadow-sm border p-6 space-y-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Trip Name</label>
+            <input type="text" [(ngModel)]="tripName" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g. Summer in Yosemite">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Destination</label>
+            <input type="text" [(ngModel)]="destination" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Enter destination">
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+              <input type="date" [(ngModel)]="startDate" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+              <input type="date" [(ngModel)]="endDate" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+          </div>
+
+          <button (click)="handleSubmit()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors">
+            Create Trip
+          </button>
+        </div>
+      </div>
+    </div>
+  `,
   styles: []
 })
 export class PlanTripComponent {
@@ -51,16 +84,22 @@ export class PlanTripComponent {
   constructor(public router: Router, private tripService: TripService) { }
 
   handleSubmit(): void {
+    if (!this.tripName || !this.destination || !this.startDate || !this.endDate) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+
+    // Backend expects LocalDateTime (ISO format with time)
     const tripData = {
       name: this.tripName,
       destination: this.destination,
-      startDate: this.startDate,
-      endDate: this.endDate,
-      difficulty: 'moderate', // Defaulting
+      startDate: this.startDate + 'T00:00:00',
+      endDate: this.endDate + 'T00:00:00',
+      difficulty: 'MEDIUM', // Must match DifficultyLevel enum: EASY, MEDIUM, HARD, EXTREME
       notes: this.notes
     };
 
-    console.log('Creating trip:', tripData);
+    console.log('Creating trip with formatted data:', tripData);
     this.tripService.saveTrip(tripData as any).subscribe({
       next: () => {
         alert('Trip created successfully!');

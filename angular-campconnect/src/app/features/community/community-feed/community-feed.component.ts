@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -19,7 +19,12 @@ export class CommunityFeedComponent implements OnInit {
     posts: Post[] = [];
     loading: boolean = true;
 
-    constructor(private router: Router, private communityService: CommunityService) { }
+    constructor(
+        private router: Router,
+        private communityService: CommunityService,
+        private cdr: ChangeDetectorRef,
+        private ngZone: NgZone
+    ) { }
 
     ngOnInit(): void {
         this.loadPosts();
@@ -27,15 +32,19 @@ export class CommunityFeedComponent implements OnInit {
 
     loadPosts(): void {
         this.loading = true;
-        this.communityService.getPosts().subscribe({
-            next: (posts) => {
-                this.posts = posts;
-                this.loading = false;
-            },
-            error: (err) => {
-                console.error('Error loading posts', err);
-                this.loading = false;
-            }
+        this.ngZone.run(() => {
+            this.communityService.getPosts().subscribe({
+                next: (posts) => {
+                    this.posts = posts;
+                    this.loading = false;
+                    this.cdr.detectChanges();
+                },
+                error: (err) => {
+                    console.error('Error loading posts', err);
+                    this.loading = false;
+                    this.cdr.detectChanges();
+                }
+            });
         });
     }
 
@@ -45,6 +54,7 @@ export class CommunityFeedComponent implements OnInit {
                 next: () => {
                     post.isLiked = true;
                     post.likes++;
+                    this.cdr.detectChanges();
                 }
             });
         }
@@ -71,4 +81,3 @@ export class CommunityFeedComponent implements OnInit {
         return Array.isArray(val) ? val.length : (val || 0);
     }
 }
-

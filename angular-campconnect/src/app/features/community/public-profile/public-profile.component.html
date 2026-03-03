@@ -41,7 +41,7 @@
                     </div>
 
                     <div class="cc-trust-wrap">
-                        <app-trust-score [score]="userProfile.trustScore"></app-trust-score>
+                        <app-trust-score [score]="userProfile?.trustScore ?? 0"></app-trust-score>
                     </div>
 
                     <p class="cc-bio">{{ userProfile.bio }}</p>

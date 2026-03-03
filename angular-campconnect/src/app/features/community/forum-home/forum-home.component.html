@@ -174,7 +174,7 @@
                                         <div class="cc-discussion-row__meta">
                                             <span class="cc-discussion-row__author">{{ topic.author }}</span>
                                             <!-- TrustScore integration -->
-                                            <app-trust-score [score]="topic.trustScore" variant="small">
+                                            <app-trust-score [score]="topic?.trustScore ?? 0" variant="small">
                                             </app-trust-score>
                                             <span>·</span>
                                             <span class="cc-discussion-row__category-tag">{{ topic.categoryTag }}</span>

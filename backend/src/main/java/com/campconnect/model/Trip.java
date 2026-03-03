@@ -19,7 +19,9 @@ public class Trip {
     @Id
     private String id;
 
+    private String name;
     private String destination;
+    private String notes;
 
     private LocalDateTime startDate;
     private LocalDateTime endDate;

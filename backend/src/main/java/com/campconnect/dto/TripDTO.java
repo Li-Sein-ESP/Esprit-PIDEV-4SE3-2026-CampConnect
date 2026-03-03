@@ -10,7 +10,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class TripDTO {
     private String id;
+    private String name;
     private String destination;
+    private String notes;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private DifficultyLevel difficulty;

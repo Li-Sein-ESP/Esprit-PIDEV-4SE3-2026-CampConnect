@@ -38,7 +38,7 @@
                 </div>
                 <!-- TrustScoreComponent – compact widget for profile view -->
                 <div class="cc-trust-score-wrap">
-                    <app-trust-score [score]="topic.author.trustScore" variant="small"></app-trust-score>
+                    <app-trust-score [score]="topic?.author?.trustScore ?? 0" variant="small"></app-trust-score>
                 </div>
                 <time class="cc-author__date" [attr.datetime]="topic.dateIso">
                     <span class="cc-author__date-icon">🕘</span> {{ topic.date }}

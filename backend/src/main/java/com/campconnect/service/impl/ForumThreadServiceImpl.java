@@ -63,6 +63,12 @@ public class ForumThreadServiceImpl implements ForumThreadService {
         
         return mapToDTO(threadRepository.save(thread));
     }
+    public void deleteThread(String id) {
+        if (!threadRepository.existsById(id)) {
+            throw new RuntimeException("Thread not found");
+        }
+        threadRepository.deleteById(id);
+    }
 
     @Override
     public void likeThread(String id) {

@@ -22,7 +22,9 @@ public class TripServiceImpl implements TripService {
     @Override
     public TripDTO createTrip(TripDTO tripDTO) {
         Trip trip = new Trip();
+        trip.setName(tripDTO.getName());
         trip.setDestination(tripDTO.getDestination());
+        trip.setNotes(tripDTO.getNotes());
         trip.setStartDate(tripDTO.getStartDate());
         trip.setEndDate(tripDTO.getEndDate());
         trip.setDifficulty(tripDTO.getDifficulty());
@@ -60,7 +62,9 @@ public class TripServiceImpl implements TripService {
     private TripDTO mapToDTO(Trip trip) {
         TripDTO dto = new TripDTO();
         dto.setId(trip.getId());
+        dto.setName(trip.getName());
         dto.setDestination(trip.getDestination());
+        dto.setNotes(trip.getNotes());
         dto.setStartDate(trip.getStartDate());
         dto.setEndDate(trip.getEndDate());
         dto.setDifficulty(trip.getDifficulty());
