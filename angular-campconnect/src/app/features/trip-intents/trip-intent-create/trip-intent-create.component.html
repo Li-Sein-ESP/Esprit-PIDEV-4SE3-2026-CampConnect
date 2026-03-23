@@ -1,0 +1,136 @@
+<div class="create-container animate-fade-in">
+    <!-- Top Navigation -->
+    <div class="nav-header">
+        <button class="btn btn-icon" routerLink="/trip-intents">
+            <lucide-icon [img]="ArrowLeft" size="20"></lucide-icon>
+            Retour
+        </button>
+    </div>
+
+    <div class="form-wrapper">
+        <div class="form-header">
+            <h1 class="page-title">Organiser une aventure</h1>
+            <p class="page-subtitle">Lancez l'idée. Laissez la magie du matching réunir votre groupe.</p>
+        </div>
+
+        <form [formGroup]="intentForm" (ngSubmit)="onSubmit()" class="intent-form">
+
+            <!-- General Info -->
+            <div class="form-section">
+                <h3 class="section-title">Informations Générales</h3>
+
+                <div class="form-group">
+                    <label for="title">Titre de l'Aventure</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="title" formControlName="title"
+                            placeholder="Ex: Week-end évasion à Akchour"
+                            [class.is-invalid]="intentForm.get('title')?.invalid && intentForm.get('title')?.touched">
+                    </div>
+                    <div class="error-msg" *ngIf="intentForm.get('title')?.invalid && intentForm.get('title')?.touched">
+                        Donnez un nom inspirant à votre projet.
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="dateFrom">Date de début</label>
+                        <div class="input-wrapper icon-input">
+                            <lucide-icon [img]="Calendar" size="18" class="input-icon"></lucide-icon>
+                            <input type="date" id="dateFrom" formControlName="dateFrom"
+                                [class.is-invalid]="intentForm.get('dateFrom')?.invalid && intentForm.get('dateFrom')?.touched">
+                        </div>
+                    </div>
+
+                    <div class="form-group half">
+                        <label for="dateTo">Date de fin</label>
+                        <div class="input-wrapper icon-input">
+                            <lucide-icon [img]="Calendar" size="18" class="input-icon"></lucide-icon>
+                            <input type="date" id="dateTo" formControlName="dateTo"
+                                [class.is-invalid]="intentForm.get('dateTo')?.invalid && intentForm.get('dateTo')?.touched">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="error-msg text-red-500 mt-2"
+                    *ngIf="intentForm.hasError('dateRangeInvalid') && intentForm.get('dateTo')?.touched">
+                    La date de fin doit être après la date de début.
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="preferredZone">Région préférée (Optionnel)</label>
+                        <div class="input-wrapper icon-input">
+                            <lucide-icon [img]="Map" size="18" class="input-icon"></lucide-icon>
+                            <input type="text" id="preferredZone" formControlName="preferredZone"
+                                placeholder="Ex: Chefchaouen, Ifrane...">
+                        </div>
+                    </div>
+
+                    <div class="form-group half">
+                        <label for="budgetMax">Budget Max (par pers.)</label>
+                        <div class="input-wrapper icon-input">
+                            <lucide-icon [img]="DollarSign" size="18" class="input-icon"></lucide-icon>
+                            <input type="number" id="budgetMax" formControlName="budgetMax" placeholder="1000">
+                            <span class="currency">MAD</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Style & Vibe -->
+            <div class="form-section">
+                <h3 class="section-title">L'Ambiance du Voyage</h3>
+                <p class="section-desc">Ceci nous aide à vous suggérer les meilleurs compagnons de route.</p>
+
+                <!-- Camping Style Selector (Visual Radio) -->
+                <div class="form-group">
+                    <label>Style de Camping</label>
+                    <div class="style-grid">
+                        <div class="style-card" *ngFor="let style of campingStyles"
+                            [class.selected]="intentForm.get('campingStyle')?.value === style.value"
+                            (click)="setCampingStyle(style.value)">
+                            <div class="style-icon">
+                                <lucide-icon [img]="style.icon" size="24"></lucide-icon>
+                            </div>
+                            <div class="style-info">
+                                <h4>{{ style.label }}</h4>
+                                <p>{{ style.desc }}</p>
+                            </div>
+                            <div class="checkmark" *ngIf="intentForm.get('campingStyle')?.value === style.value">
+                                <lucide-icon [img]="CheckCircle" size="20"></lucide-icon>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Experience Level Dropdown -->
+                <div class="form-group mt-4">
+                    <label for="experienceLevel">Niveau d'expérience requis</label>
+                    <div class="input-wrapper icon-input">
+                        <lucide-icon [img]="Target" size="18" class="input-icon"></lucide-icon>
+                        <select id="experienceLevel" formControlName="experienceLevel">
+                            <option *ngFor="let level of experienceLevels" [value]="level">
+                                {{ getStyleLabel(level) }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Area -->
+            <div class="submit-area">
+                <button type="submit" class="btn btn-primary btn-large" [disabled]="isSubmitting">
+                    <span *ngIf="!isSubmitting">Lancer le projet et trouver mon groupe !</span>
+                    <span *ngIf="isSubmitting" class="flex-align">
+                        <div class="spinner-sm"></div>
+                        Publication en cours...
+                    </span>
+                </button>
+                <p class="help-text">Votre intention sera visible par les campeurs compatibles.</p>
+            </div>
+
+        </form>
+    </div>
+</div>

@@ -96,6 +96,14 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/bookings/booking-confirmation/booking-confirmation.component').then(m => m.BookingConfirmationComponent)
             },
             {
+                path: 'booking/details/:id',
+                loadComponent: () => import('./features/bookings/booking-detail/booking-detail.component').then(m => m.BookingDetailComponent)
+            },
+            {
+                path: 'booking/edit/:id',
+                loadComponent: () => import('./features/bookings/booking-edit/booking-edit.component').then(m => m.BookingEditComponent)
+            },
+            {
                 path: 'booking/cancel/:bookingId',
                 loadComponent: () => import('./features/bookings/booking-cancel/booking-cancel.component').then(m => m.BookingCancelComponent)
             },
@@ -118,7 +126,42 @@ export const routes: Routes = [
                     }
                 ]
             },
+            // Groups Management
+            {
+                path: 'groups/:id',
+                loadComponent: () => import('./features/groups/group-dashboard/group-dashboard.component').then(m => m.GroupDashboardComponent)
+            },
+            {
+                path: 'groups/:id/:tab',
+                loadComponent: () => import('./features/groups/group-dashboard/group-dashboard.component').then(m => m.GroupDashboardComponent)
+            },
             // Trip Planning Extended
+            {
+                path: 'trip-intents',
+                loadComponent: () => import('./features/trip-intents/trip-intent-feed/trip-intent-feed.component').then(m => m.TripIntentFeedComponent)
+            },
+            {
+                path: 'trip-intents/create',
+                loadComponent: () => import('./features/trip-intents/trip-intent-create/trip-intent-create.component').then(m => m.TripIntentCreateComponent)
+            },
+            {
+                path: 'trip-intents/edit/:id',
+                loadComponent: () => import('./features/trip-intents/trip-intent-edit/trip-intent-edit').then(m => m.TripIntentEditComponent)
+            },
+
+            {
+                path: 'my-trip-intents',
+                loadComponent: () => import('./features/trip-intents/my-trip-intents/my-trip-intents.component').then(m => m.MyTripIntentsComponent)
+            },
+
+            {
+                path: 'trip-intents/:id',
+                loadComponent: () => import('./features/trip-intents/trip-intent-detail/trip-intent-detail.component').then(m => m.TripIntentDetailComponent)
+            },
+            {
+                path: 'invites',
+                loadComponent: () => import('./features/trip-intents/group-invites-manager/group-invites-manager.component').then(m => m.GroupInvitesManagerComponent)
+            },
             {
                 path: 'plan-trip/create',
                 loadComponent: () => import('./features/trips/trip-create/trip-create.component').then(m => m.TripCreateComponent)

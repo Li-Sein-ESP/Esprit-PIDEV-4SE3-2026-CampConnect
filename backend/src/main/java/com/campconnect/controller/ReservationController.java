@@ -36,20 +36,20 @@ public class ReservationController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Reservation> getReservationById(@PathVariable String id) {
+    public ResponseEntity<Reservation> getReservationById(@PathVariable("id") String id) {
         Reservation reservation = reservationService.getReservationById(id);
         return ResponseEntity.ok(reservation);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Reservation>> getUserReservations(@PathVariable String userId) {
+    public ResponseEntity<List<Reservation>> getUserReservations(@PathVariable("userId") String userId) {
         List<Reservation> reservations = reservationService.getUserReservations(userId);
         return ResponseEntity.ok(reservations);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Reservation> updateReservation(
-            @PathVariable String id,
+            @PathVariable("id") String id,
             @Valid @RequestBody ReservationDto reservationDto) {
         Reservation reservation = new Reservation();
         reservation.setUserId(reservationDto.getUserId());
@@ -61,8 +61,14 @@ public class ReservationController {
     }
 
     @PatchMapping("/{id}/cancel")
-    public ResponseEntity<Reservation> cancelReservation(@PathVariable String id) {
+    public ResponseEntity<Reservation> cancelReservation(@PathVariable("id") String id) {
         Reservation cancelledReservation = reservationService.cancelReservation(id);
         return ResponseEntity.ok(cancelledReservation);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteReservation(@PathVariable("id") String id) {
+        reservationService.deleteReservation(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -21,4 +21,7 @@ public interface IReservationService {
 
     // CANCEL
     Reservation cancelReservation(String id);
+
+    // DELETE
+    void deleteReservation(String id);
 }

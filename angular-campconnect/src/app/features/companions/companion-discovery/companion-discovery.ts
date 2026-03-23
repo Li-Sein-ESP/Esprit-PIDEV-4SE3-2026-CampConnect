@@ -1,12 +1,15 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Target, MapPin, Send, CheckCircle, Clock, X } from 'lucide-angular';
+import { LucideAngularModule, Target, MapPin, Send, CheckCircle, Clock, X, Tent } from 'lucide-angular';
 import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
 import { BadgeComponent } from '../../../shared/components/badge.component';
 import { RadarChart } from '../../../shared/components/radar-chart/radar-chart';
-import { ConnectionRequestService } from '../services/connection-request.service';
-import { ConnectionStatus } from '../models/companion.model';
+import { GroupInviteService } from '../../trip-intents/services/group-invite.service';
+import { TripIntentService } from '../../trip-intents/services/trip-intent.service';
+import { GroupService } from '../../groups/services/group';
+import { AuthService } from '../../../core/services/auth.service';
+import { TripIntent, CampingStyle, ExperienceLevel, TripIntentStatus } from '../../trip-intents/models/trip-intent.model';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -16,13 +19,14 @@ import { Subscription } from 'rxjs';
   templateUrl: './companion-discovery.html',
   styleUrl: './companion-discovery.css'
 })
-export class CompanionDiscovery implements OnDestroy {
+export class CompanionDiscovery implements OnInit, OnDestroy {
   readonly Target = Target;
   readonly MapPin = MapPin;
   readonly Send = Send;
   readonly CheckCircle = CheckCircle;
   readonly Clock = Clock;
-  readonly X = X;
+  readonly XList = X;
+  readonly Tent = Tent;
 
   potentialMatches = [
     {
@@ -67,23 +71,65 @@ export class CompanionDiscovery implements OnDestroy {
   ];
 
   selectedCompanion: any = null;
+  myTripIntents: TripIntent[] = [];
+  selectedTripIntentId: string = '';
   requestMessage = '';
   toastMessage = '';
   toastVisible = false;
-  requestStatuses: Record<string, ConnectionStatus | null> = {};
+
+  requestStatuses: Record<string, string | null> = {};
   private subs: Subscription[] = [];
 
-  constructor(private connectionService: ConnectionRequestService) {
-    // Subscribe to status of each potential match
-    this.potentialMatches.forEach(m => {
-      const sub = this.connectionService.getStatusTo(m.id).subscribe(status => {
-        this.requestStatuses[m.id] = status;
-      });
-      this.subs.push(sub);
+  constructor(
+    private inviteService: GroupInviteService,
+    private tripIntentService: TripIntentService,
+    private groupService: GroupService,
+    private authService: AuthService
+  ) { }
+
+  ngOnInit(): void {
+    this.authService.getCurrentUser().subscribe(user => {
+      const userId = user?.id;
+      if (userId) {
+        this.tripIntentService.getIntentsByCreator(userId).subscribe({
+          next: (intents: TripIntent[]) => {
+            this.myTripIntents = intents.filter(i => i.status === TripIntentStatus.OPEN as any);
+            if (this.myTripIntents.length > 0) {
+              this.selectedTripIntentId = this.myTripIntents[0].id;
+            }
+          },
+          error: () => this.handleIntentError()
+        });
+      } else {
+        this.handleIntentError();
+      }
     });
   }
 
-  ngOnDestroy(): void { this.subs.forEach(s => s.unsubscribe()); }
+  private handleIntentError() {
+    this.myTripIntents = [
+      {
+        id: 'mock-trip-1',
+        creatorUserId: 'me',
+        title: 'Expédition Atlas Nature',
+        dateFrom: '2026-05-15',
+        dateTo: '2026-05-20',
+        budgetMax: 2500,
+        campingStyle: CampingStyle.BACKPACKING,
+        experienceLevel: ExperienceLevel.ADVANCED,
+        preferredZone: 'Haut Atlas',
+        status: TripIntentStatus.OPEN,
+        createdAt: new Date().toISOString()
+      }
+    ];
+    if (this.myTripIntents.length > 0) {
+      this.selectedTripIntentId = this.myTripIntents[0].id;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.subs.forEach(s => s.unsubscribe());
+  }
 
   openMatchRadar(companion: any) {
     this.selectedCompanion = companion;
@@ -94,28 +140,55 @@ export class CompanionDiscovery implements OnDestroy {
     this.selectedCompanion = null;
   }
 
-  getStatusForSelected(): ConnectionStatus | null {
+  getStatusForSelected(): string | null {
     return this.selectedCompanion ? (this.requestStatuses[this.selectedCompanion.id] ?? null) : null;
   }
 
   canSend(): boolean {
     const status = this.getStatusForSelected();
-    return status === null || status === 'declined' || status === 'cancelled';
+    return status === null || status === 'DECLINED' || status === 'CANCELLED';
   }
 
   sendRequest() {
-    if (!this.selectedCompanion || !this.canSend()) return;
-    this.connectionService.sendRequest({
-      toUserId: this.selectedCompanion.id,
-      toUserName: this.selectedCompanion.name,
-      toUserAvatar: this.selectedCompanion.avatar,
-      campingStyle: this.selectedCompanion.campingStyle,
-      experienceLevel: this.selectedCompanion.experienceLevel,
-      matchScore: this.selectedCompanion.matchScore,
-      message: this.requestMessage || undefined,
+    if (!this.selectedCompanion || !this.canSend() || !this.selectedTripIntentId) {
+      if (!this.selectedTripIntentId) {
+        this.showToast('Veuillez créer d\'abord un projet de voyage !');
+      }
+      return;
+    }
+
+    this.authService.getCurrentUser().subscribe(user => {
+      const myId = user?.id;
+      if (!myId) return;
+
+      this.groupService.getMyGroups(myId).subscribe({
+        next: (groups) => {
+          const matchedGroup = groups.find(g => g.tripId === this.selectedTripIntentId);
+          const groupId = matchedGroup ? matchedGroup.id : undefined;
+
+          this.inviteService.sendInvite({
+            tripIntentId: this.selectedTripIntentId,
+            groupId: groupId, // Attach the retrieved group ID
+            toUserId: this.selectedCompanion.id,
+            message: this.requestMessage || undefined,
+            fromUserId: myId
+          } as any).subscribe({
+            next: () => {
+              this.requestStatuses[this.selectedCompanion.id] = 'PENDING';
+              this.showToast(`Invitation envoyée à ${this.selectedCompanion.name} ! 🎉`);
+              this.closeRadar();
+            },
+            error: (err) => {
+              console.error('Error sending invite', err);
+              this.showToast('Erreur lors de l\'envoi.');
+            }
+          });
+        },
+        error: () => {
+          this.showToast('Erreur lors de la récupération du groupe.');
+        }
+      });
     });
-    this.showToast(`Connection request sent to ${this.selectedCompanion.name}! 🎉`);
-    this.closeRadar();
   }
 
   private showToast(msg: string) {

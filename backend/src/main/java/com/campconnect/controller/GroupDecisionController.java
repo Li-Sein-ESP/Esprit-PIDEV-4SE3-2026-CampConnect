@@ -43,27 +43,27 @@ public class GroupDecisionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GroupDecision> getDecisionById(@PathVariable String id) {
+    public ResponseEntity<GroupDecision> getDecisionById(@PathVariable("id") String id) {
         return ResponseEntity.ok(groupDecisionService.getDecisionById(id));
     }
 
     @GetMapping("/group/{groupId}")
-    public ResponseEntity<List<GroupDecision>> getDecisionsForGroup(@PathVariable String groupId) {
+    public ResponseEntity<List<GroupDecision>> getDecisionsForGroup(@PathVariable("groupId") String groupId) {
         return ResponseEntity.ok(groupDecisionService.getDecisionsForGroup(groupId));
     }
 
     @PatchMapping("/{id}/vote")
-    public ResponseEntity<GroupDecision> vote(@PathVariable String id, @RequestBody VoteRequest voteRequest) {
+    public ResponseEntity<GroupDecision> vote(@PathVariable("id") String id, @RequestBody VoteRequest voteRequest) {
         return ResponseEntity.ok(groupDecisionService.vote(id, voteRequest.getUserId(), voteRequest.getOption()));
     }
 
     @PatchMapping("/{id}/close")
-    public ResponseEntity<GroupDecision> closeDecision(@PathVariable String id) {
+    public ResponseEntity<GroupDecision> closeDecision(@PathVariable("id") String id) {
         return ResponseEntity.ok(groupDecisionService.closeDecision(id));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDecision(@PathVariable String id) {
+    public ResponseEntity<Void> deleteDecision(@PathVariable("id") String id) {
         groupDecisionService.deleteDecision(id);
         return ResponseEntity.noContent().build();
     }

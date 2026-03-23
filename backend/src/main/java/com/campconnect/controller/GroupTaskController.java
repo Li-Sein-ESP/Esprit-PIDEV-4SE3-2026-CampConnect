@@ -43,22 +43,22 @@ public class GroupTaskController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GroupTask> getTaskById(@PathVariable String id) {
+    public ResponseEntity<GroupTask> getTaskById(@PathVariable("id") String id) {
         return ResponseEntity.ok(groupTaskService.getTaskById(id));
     }
 
     @GetMapping("/group/{groupId}")
-    public ResponseEntity<List<GroupTask>> getTasksForGroup(@PathVariable String groupId) {
+    public ResponseEntity<List<GroupTask>> getTasksForGroup(@PathVariable("groupId") String groupId) {
         return ResponseEntity.ok(groupTaskService.getTasksForGroup(groupId));
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<GroupTask>> getTasksForUser(@PathVariable String userId) {
+    public ResponseEntity<List<GroupTask>> getTasksForUser(@PathVariable("userId") String userId) {
         return ResponseEntity.ok(groupTaskService.getTasksForUser(userId));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GroupTask> updateTask(@PathVariable String id, @Valid @RequestBody GroupTaskDto dto) {
+    public ResponseEntity<GroupTask> updateTask(@PathVariable("id") String id, @Valid @RequestBody GroupTaskDto dto) {
         GroupTask task = GroupTask.builder()
                 .title(dto.getTitle())
                 .assignedToUserId(dto.getAssignedToUserId())
@@ -69,12 +69,12 @@ public class GroupTaskController {
     }
 
     @PatchMapping("/{id}/complete")
-    public ResponseEntity<GroupTask> completeTask(@PathVariable String id) {
+    public ResponseEntity<GroupTask> completeTask(@PathVariable("id") String id) {
         return ResponseEntity.ok(groupTaskService.completeTask(id));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable String id) {
+    public ResponseEntity<Void> deleteTask(@PathVariable("id") String id) {
         groupTaskService.deleteTask(id);
         return ResponseEntity.noContent().build();
     }

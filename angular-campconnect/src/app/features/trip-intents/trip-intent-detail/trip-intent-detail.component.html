@@ -1,0 +1,145 @@
+<div class="detail-container animate-fade-in" *ngIf="!loading && !error && intent">
+
+    <div class="nav-header">
+        <button class="btn btn-icon" routerLink="/trip-intents">
+            <lucide-icon [img]="ArrowLeft" size="20"></lucide-icon>
+            Retour aux projets
+        </button>
+    </div>
+
+    <div class="hero-section" [ngClass]="'style-' + intent.campingStyle.toLowerCase()">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="badges-row">
+                <app-badge variant="default" class="blur-bg">{{ getStyleLabel(intent.campingStyle) }}</app-badge>
+                <app-badge variant="outline" class="blur-bg text-white">{{ intent.status }}</app-badge>
+            </div>
+            <h1 class="intent-title">{{ intent.title || 'Aventure en pleine nature' }}</h1>
+
+            <div class="quick-stats">
+                <div class="stat-item">
+                    <lucide-icon [img]="Calendar" size="18"></lucide-icon>
+                    <span>{{ getDaysDifference(intent.dateFrom, intent.dateTo) }} Jours</span>
+                </div>
+                <div class="stat-item" *ngIf="intent.preferredZone">
+                    <lucide-icon [img]="MapPin" size="18"></lucide-icon>
+                    <span>{{ intent.preferredZone }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <!-- Main Content Left -->
+        <div class="main-column">
+
+            <div class="card detail-card">
+                <h3 class="card-title">Détails du projet</h3>
+
+                <div class="info-list">
+                    <div class="info-row">
+                        <div class="info-icon bg-primary-light">
+                            <lucide-icon [img]="Calendar" size="20" class="text-primary"></lucide-icon>
+                        </div>
+                        <div class="info-text">
+                            <h4>Dates prévues</h4>
+                            <p>Du {{ formatDate(intent.dateFrom) }}</p>
+                            <p>Au {{ formatDate(intent.dateTo) }}</p>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-icon bg-secondary">
+                            <lucide-icon [img]="DollarSign" size="20" class="text-primary"></lucide-icon>
+                        </div>
+                        <div class="info-text">
+                            <h4>Budget estimé</h4>
+                            <p>Un maximum de <strong>{{ intent.budgetMax }} MAD</strong> par personne.</p>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-icon bg-muted">
+                            <lucide-icon [img]="Target" size="20" class="text-foreground"></lucide-icon>
+                        </div>
+                        <div class="info-text">
+                            <h4>Niveau Requis</h4>
+                            <p>Idéalement de niveau <strong>{{ intent.experienceLevel | titlecase }}</strong>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Sidebar Right -->
+        <div class="sidebar-column">
+
+            <!-- Creator Card -->
+            <div class="card profile-card">
+                <h3 class="card-title mb-4">L'Organisateur</h3>
+                <div class="creator-profile">
+                    <img src="https://ui-avatars.com/api/?name=User&background=random&size=128" alt="Creator Avatar"
+                        class="avatar-lg">
+                    <h4>Utilisateur {{ intent.creatorUserId }}</h4>
+                    <p class="text-muted">Campeur passionné</p>
+                </div>
+
+                <!-- Action Buttons depending on ownership -->
+                <div class="action-buttons mt-6">
+                    <ng-container *ngIf="isCreator">
+                        <button class="btn btn-primary w-full shadow-md" routerLink="/invites">
+                            <lucide-icon [img]="Users" size="18"></lucide-icon>
+                            Gérer les Invitations
+                        </button>
+                        <button class="btn btn-outline w-full mt-3" [routerLink]="['/trip-intents/edit', intent.id]">
+                            Modifier le projet
+                        </button>
+                        <button
+                            class="btn w-full mt-3 bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-colors"
+                            (click)="deleteIntent()">
+                            <lucide-icon [img]="Trash2" size="18" class="mr-2"></lucide-icon>
+                            Supprimer le projet
+                        </button>
+
+                    </ng-container>
+
+                    <ng-container *ngIf="!isCreator">
+                        <!-- If we are viewing someone else's TripIntent, we would show a compatibility score here based on Profile -->
+                        <div class="compatibility-box">
+                            <div class="comp-header">
+                                <span>Score de compatibilité</span>
+                                <span class="score text-primary">85%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 85%"></div>
+                            </div>
+                            <p class="text-xs text-muted mt-2">Basé sur vos préférences de camping et style.</p>
+                        </div>
+
+                        <button class="btn btn-primary w-full shadow-md mt-4">
+                            Demander à rejoindre
+                        </button>
+                    </ng-container>
+
+                    <button class="btn btn-ghost w-full mt-3 text-muted">
+                        <lucide-icon [img]="Share2" size="18"></lucide-icon>
+                        Partager l'idée
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Loading & Error States -->
+<div *ngIf="loading" class="state-container">
+    <div class="spinner"></div>
+</div>
+
+<div *ngIf="error && !loading" class="state-container">
+    <h2 class="text-xl font-bold">Intention Introuvable</h2>
+    <p class="text-muted mt-2">Ce projet a peut-être été supprimé ou n'est plus ouvert.</p>
+    <button class="btn btn-primary mt-4" routerLink="/trip-intents">Retourner aux projets</button>
+</div>

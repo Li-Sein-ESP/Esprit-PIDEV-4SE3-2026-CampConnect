@@ -1,7 +1,5 @@
 package com.campconnect.dto;
 
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -13,10 +11,8 @@ public class ReservationDto {
     @NotBlank(message = "Target ID (Campsite or Event) is required")
     private String targetId;
     @NotNull(message = "Start date is required")
-    @FutureOrPresent(message = "Start date must be today or in the future")
     private LocalDateTime startDate;
     @NotNull(message = "End date is required")
-    @Future(message = "End date must be in the future")
     private LocalDateTime endDate;
 
     public ReservationDto() {

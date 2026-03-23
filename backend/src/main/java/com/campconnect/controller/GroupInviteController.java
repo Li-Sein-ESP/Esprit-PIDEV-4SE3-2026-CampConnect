@@ -41,32 +41,32 @@ public class GroupInviteController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GroupInvite> getInviteById(@PathVariable String id) {
+    public ResponseEntity<GroupInvite> getInviteById(@PathVariable("id") String id) {
         return ResponseEntity.ok(groupInviteService.getInviteById(id));
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<GroupInvite>> getInvitesForUser(@PathVariable String userId) {
+    public ResponseEntity<List<GroupInvite>> getInvitesForUser(@PathVariable("userId") String userId) {
         return ResponseEntity.ok(groupInviteService.getInvitesForUser(userId));
     }
 
     @GetMapping("/group/{groupId}")
-    public ResponseEntity<List<GroupInvite>> getInvitesForGroup(@PathVariable String groupId) {
+    public ResponseEntity<List<GroupInvite>> getInvitesForGroup(@PathVariable("groupId") String groupId) {
         return ResponseEntity.ok(groupInviteService.getInvitesForGroup(groupId));
     }
 
     @PatchMapping("/{id}/accept")
-    public ResponseEntity<GroupInvite> acceptInvite(@PathVariable String id) {
+    public ResponseEntity<GroupInvite> acceptInvite(@PathVariable("id") String id) {
         return ResponseEntity.ok(groupInviteService.acceptInvite(id));
     }
 
     @PatchMapping("/{id}/decline")
-    public ResponseEntity<GroupInvite> declineInvite(@PathVariable String id) {
+    public ResponseEntity<GroupInvite> declineInvite(@PathVariable("id") String id) {
         return ResponseEntity.ok(groupInviteService.declineInvite(id));
     }
 
     @PatchMapping("/{id}/cancel")
-    public ResponseEntity<Void> cancelInvite(@PathVariable String id) {
+    public ResponseEntity<Void> cancelInvite(@PathVariable("id") String id) {
         groupInviteService.cancelInvite(id);
         return ResponseEntity.noContent().build();
     }

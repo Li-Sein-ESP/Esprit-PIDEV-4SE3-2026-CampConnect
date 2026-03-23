@@ -61,39 +61,87 @@
                 </button>
             </div>
             <app-button variant="outline" size="sm" customClass="hidden md:flex">
-                <lucide-icon [name]="Filter" class="w-4 h-4"></lucide-icon>
+                <lucide-icon [img]="Filter" class="w-4 h-4"></lucide-icon>
                 Filter
             </app-button>
         </div>
 
+        <!-- Debug Info -->
+        <div *ngIf="!isLoading" class="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg text-xs space-y-1">
+            <div class="flex justify-between items-center text-gray-500">
+                <span>Current User ID: <strong>{{ currentUser?.id || 'NULL' }}</strong></span>
+                <span>Found {{ reservations.length }} reservations.</span>
+                <div class="flex gap-2">
+                    <button (click)="loadReservations()" class="text-blue-600 hover:underline">Only Mine</button>
+                    <button (click)="showAllReservations()" class="text-purple-600 hover:underline">Show All
+                        (Debug)</button>
+                </div>
+            </div>
+            <p class="text-[10px] text-gray-400">
+                If the count is 0 even with "Show All", the DB is empty. If "Show All" works but "Only Mine" doesn't,
+                the User ID is wrong.
+            </p>
+            <div *ngIf="reservations.length > 0" class="mt-2 group">
+                <div class="text-[10px] font-bold text-gray-500 mb-1">Raw Database State (DEBUG):</div>
+                <div class="max-h-40 overflow-y-auto border border-gray-200 rounded p-1 bg-white">
+                    <table class="w-full text-[10px] text-gray-600">
+                        <thead class="bg-gray-50 sticky top-0">
+                            <tr>
+                                <th class="text-left p-1">Booking ID</th>
+                                <th class="text-left p-1">User ID</th>
+                                <th class="text-left p-1">Target</th>
+                                <th class="text-left p-1">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let res of reservations" class="border-t border-gray-100">
+                                <td class="p-1">{{ res.id || res._id }}</td>
+                                <td class="p-1 font-mono"
+                                    [class.bg-yellow-50]="res.userId === (currentUser?.id || currentUser?._id)">{{
+                                    res.userId }}</td>
+                                <td class="p-1">{{ res.targetId }}</td>
+                                <td class="p-1">{{ res.status }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="flex justify-center py-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary-600)]"></div>
+        </div>
+
         <!-- Bookings List -->
-        <div *ngIf="filteredBookings.length === 0">
+        <div *ngIf="!isLoading && filteredBookings.length === 0">
             <app-card variant="elevated" customClass="text-center py-16">
                 <div class="max-w-md mx-auto">
                     <div
                         class="w-16 h-16 bg-[var(--color-neutral-100)] rounded-full flex items-center justify-center mx-auto mb-4">
-                        <lucide-icon [name]="Calendar" class="w-8 h-8 text-[var(--color-text-tertiary)]"></lucide-icon>
+                        <lucide-icon [img]="Calendar" class="w-8 h-8 text-[var(--color-text-tertiary)]"></lucide-icon>
                     </div>
                     <h3 class="mb-2">No bookings found</h3>
                     <p class="text-[var(--color-text-secondary)] mb-6">
                         You don't have any {{ filter !== 'all' ? filter : '' }} bookings.
                     </p>
                     <app-button (click)="searchCampsites()">
-                        <lucide-icon [name]="Search" class="w-5 h-5"></lucide-icon>
+                        <lucide-icon [img]="Search" class="w-5 h-5"></lucide-icon>
                         Search Campsites
                     </app-button>
                 </div>
             </app-card>
         </div>
 
-        <div *ngIf="filteredBookings.length > 0" class="space-y-4">
+        <div *ngIf="!isLoading && filteredBookings.length > 0" class="space-y-4">
             <app-card *ngFor="let booking of filteredBookings" variant="elevated" padding="none"
                 customClass="overflow-hidden">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-0">
                     <!-- Image -->
-                    <div class="relative h-48 md:h-auto">
-                        <img [src]="booking.campsite.imageUrl" [alt]="booking.campsite.name"
-                            class="w-full h-full object-cover" />
+                    <div class="relative h-48 md:h-auto bg-[var(--color-neutral-100)]">
+                        <img *ngIf="booking.targetId"
+                            src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600&q=80"
+                            [alt]="booking.targetId" class="w-full h-full object-cover" />
                         <div class="absolute top-4 left-4">
                             <app-badge [variant]="statusConfig[booking.status].variant" [dot]="true">
                                 {{ statusConfig[booking.status].label }}
@@ -106,19 +154,46 @@
                         <div class="flex items-start justify-between mb-4">
                             <div class="flex-1">
                                 <div class="flex items-center gap-3 mb-2">
-                                    <h4>{{ booking.campsite.name }}</h4>
+                                    <h4>Reservation for {{ booking.targetId }}</h4>
                                     <app-badge
-                                        *ngIf="getDaysUntil(booking.checkIn) > 0 && getDaysUntil(booking.checkIn) <= 30 && booking.status === 'confirmed'"
+                                        *ngIf="getDaysUntil(booking.startDate) > 0 && getDaysUntil(booking.startDate) <= 30 && booking.status === 'CONFIRMED'"
                                         variant="warning" size="sm">
-                                        {{ getDaysUntil(booking.checkIn) }} days away
+                                        {{ getDaysUntil(booking.startDate) }} days away
                                     </app-badge>
                                 </div>
                                 <div class="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] mb-3">
-                                    <lucide-icon [name]="MapPin" class="w-4 h-4"></lucide-icon>
-                                    <span>{{ booking.campsite.location }}</span>
+                                    <lucide-icon [img]="MapPin" class="w-4 h-4"></lucide-icon>
+                                    <span>Location details available on request</span>
                                 </div>
                                 <div class="text-xs text-[var(--color-text-tertiary)]">
-                                    Booking ID: {{ booking.id }}
+                                    Booking ID: {{ booking.id || booking._id }}
+                                </div>
+                            </div>
+
+                            <!-- Action Menu -->
+                            <div class="relative">
+                                <button (click)="toggleMenu((booking.id || booking._id)!)"
+                                    class="p-2 hover:bg-[var(--color-neutral-100)] rounded-full transition-colors">
+                                    <lucide-icon [img]="MoreVertical" class="w-5 h-5"></lucide-icon>
+                                </button>
+                                <div *ngIf="showMenu === (booking.id || booking._id)"
+                                    class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-[var(--color-border-light)] z-10 py-1">
+                                    <button *ngIf="booking.status === 'PENDING'" (click)="editBooking(booking)"
+                                        class="w-full text-left px-4 py-2 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-50)] flex items-center gap-2">
+                                        <lucide-icon [img]="Edit" class="w-4 h-4"></lucide-icon>
+                                        Modify Reservation
+                                    </button>
+                                    <button *ngIf="booking.status !== 'CANCELLED'"
+                                        (click)="cancelBooking((booking.id || booking._id)!)"
+                                        class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                        <lucide-icon [img]="X" class="w-4 h-4"></lucide-icon>
+                                        Cancel Reservation
+                                    </button>
+                                    <button
+                                        class="w-full text-left px-4 py-2 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-50)] flex items-center gap-2">
+                                        <lucide-icon [img]="Download" class="w-4 h-4"></lucide-icon>
+                                        Download Receipt
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -128,30 +203,29 @@
                             <div>
                                 <div class="text-xs text-[var(--color-text-tertiary)] mb-1">Check-in</div>
                                 <div class="flex items-center gap-2">
-                                    <lucide-icon [name]="Calendar"
+                                    <lucide-icon [img]="Calendar"
                                         class="w-4 h-4 text-[var(--color-primary-600)]"></lucide-icon>
-                                    <span class="text-sm font-medium">{{ formatDate(booking.checkIn) }}</span>
+                                    <span class="text-sm font-medium">{{ formatDate(booking.startDate) }}</span>
                                 </div>
                             </div>
                             <div>
                                 <div class="text-xs text-[var(--color-text-tertiary)] mb-1">Check-out</div>
                                 <div class="flex items-center gap-2">
-                                    <lucide-icon [name]="Calendar"
+                                    <lucide-icon [img]="Calendar"
                                         class="w-4 h-4 text-[var(--color-primary-600)]"></lucide-icon>
-                                    <span class="text-sm font-medium">{{ formatDate(booking.checkOut) }}</span>
+                                    <span class="text-sm font-medium">{{ formatDate(booking.endDate) }}</span>
                                 </div>
                             </div>
                             <div>
                                 <div class="text-xs text-[var(--color-text-tertiary)] mb-1">Duration</div>
-                                <span class="text-sm font-medium">{{ booking.nights }} {{ booking.nights === 1 ? 'night'
-                                    : 'nights' }}</span>
+                                <span class="text-sm font-medium">Flexible</span>
                             </div>
                             <div>
                                 <div class="text-xs text-[var(--color-text-tertiary)] mb-1">Guests</div>
                                 <div class="flex items-center gap-2">
-                                    <lucide-icon [name]="Users"
+                                    <lucide-icon [img]="Users"
                                         class="w-4 h-4 text-[var(--color-primary-600)]"></lucide-icon>
-                                    <span class="text-sm font-medium">{{ booking.guests }}</span>
+                                    <span class="text-sm font-medium">As reserved</span>
                                 </div>
                             </div>
                         </div>
@@ -159,18 +233,14 @@
                         <!-- Footer -->
                         <div class="flex items-center justify-between pt-4 border-t border-[var(--color-border-light)]">
                             <div>
-                                <div class="text-sm text-[var(--color-text-tertiary)] mb-1">Total Paid</div>
-                                <div class="text-xl font-bold text-[var(--color-primary-600)]">
-                                    ${{ booking.total.toFixed(2) }}
+                                <div class="text-sm text-[var(--color-text-tertiary)] mb-1">Status</div>
+                                <div class="text-lg font-bold text-[var(--color-primary-600)]">
+                                    {{ booking.status }}
                                 </div>
                             </div>
-                            <div *ngIf="booking.refundEligible" class="flex items-center gap-2 text-sm text-green-600">
-                                <lucide-icon [name]="CheckCircle" class="w-4 h-4"></lucide-icon>
-                                <span>Refund eligible</span>
-                            </div>
-                            <app-button variant="outline" (click)="viewDetails(booking.id, booking)">
+                            <app-button variant="outline" (click)="viewDetails(booking.id || booking._id, booking)">
                                 View Details
-                                <lucide-icon [name]="ChevronRight" class="w-5 h-5"></lucide-icon>
+                                <lucide-icon [img]="ChevronRight" class="w-5 h-5"></lucide-icon>
                             </app-button>
                         </div>
                     </div>

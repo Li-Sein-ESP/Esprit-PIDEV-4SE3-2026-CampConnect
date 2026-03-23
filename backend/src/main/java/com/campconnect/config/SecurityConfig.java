@@ -13,7 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.Customizer;
 
 import com.campconnect.service.CustomUserDetailsService;
 
@@ -53,18 +53,36 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http.csrf(csrf -> csrf.disable())
+    http.cors(Customizer.withDefaults())
+        .csrf(csrf -> csrf.disable())
         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
+        .authorizeHttpRequests(auth -> auth
+            // Public
+            .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/test/**").permitAll()
             .requestMatchers("/error").permitAll()
-            .requestMatchers(
-                "/v3/api-docs/**",
-                "/v3/api-docs.yaml",
-                "/swagger-ui/**",
-                "/swagger-ui.html")
+            // Swagger UI
+            .requestMatchers("/swagger-ui/**", "/swagger-ui.html",
+                "/v3/api-docs/**", "/v3/api-docs")
             .permitAll()
+            // Public marketplace browsing
+            .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/gear/**").permitAll()
+            .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/categories/**").permitAll()
+            // Admin
+            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+            // Gear management ÔÇö provider or admin (method security via @PreAuthorize)
+            .requestMatchers("/api/marketplace/manage/**").hasRole("EQUIPMENT_PROVIDER")
+            // Site owner
+            .requestMatchers("/api/sites/manage/**").hasRole("SITE_OWNER")
+            // Events
+            .requestMatchers("/api/events/manage/**").hasRole("ORGANIZER")
+            // Delivery ÔÇö DELIVERY_PROVIDER or ADMIN (fine-grained via @PreAuthorize on
+            // each
+            // method)
+            .requestMatchers("/api/deliveries/**").hasAnyRole("DELIVERY_PROVIDER", "ADMIN")
+            .requestMatchers("/api/vehicles/**").hasAnyRole("DELIVERY_PROVIDER", "ADMIN")
+            // All other requests need authentication
             .anyRequest().authenticated());
 
     http.authenticationProvider(authenticationProvider());
@@ -72,13 +90,5 @@ public class SecurityConfig {
     http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
-  }
-
-  @Bean
-  public WebSecurityCustomizer webSecurityCustomizer() {
-    return (web) -> web.ignoring().requestMatchers(
-        "/v3/api-docs/**",
-        "/swagger-ui/**",
-        "/swagger-ui.html");
   }
 }

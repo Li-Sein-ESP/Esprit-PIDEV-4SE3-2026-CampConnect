@@ -45,22 +45,22 @@ public class ExpenseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Expense> getExpenseById(@PathVariable String id) {
+    public ResponseEntity<Expense> getExpenseById(@PathVariable("id") String id) {
         return ResponseEntity.ok(expenseService.getExpenseById(id));
     }
 
     @GetMapping("/group/{groupId}")
-    public ResponseEntity<List<Expense>> getExpensesForGroup(@PathVariable String groupId) {
+    public ResponseEntity<List<Expense>> getExpensesForGroup(@PathVariable("groupId") String groupId) {
         return ResponseEntity.ok(expenseService.getExpensesForGroup(groupId));
     }
 
     @GetMapping("/group/{groupId}/balances")
-    public ResponseEntity<GroupBalances> getBalances(@PathVariable String groupId) {
+    public ResponseEntity<GroupBalances> getBalances(@PathVariable("groupId") String groupId) {
         return ResponseEntity.ok(expenseService.calculateBalances(groupId));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteExpense(@PathVariable String id) {
+    public ResponseEntity<Void> deleteExpense(@PathVariable("id") String id) {
         expenseService.deleteExpense(id);
         return ResponseEntity.noContent().build();
     }

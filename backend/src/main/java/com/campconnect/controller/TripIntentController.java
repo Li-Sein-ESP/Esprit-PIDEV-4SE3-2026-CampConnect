@@ -35,12 +35,12 @@ public class TripIntentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TripIntent> getTripIntentById(@PathVariable String id) {
+    public ResponseEntity<TripIntent> getTripIntentById(@PathVariable("id") String id) {
         return ResponseEntity.ok(tripIntentService.getTripIntentById(id));
     }
 
     @GetMapping("/creator/{userId}")
-    public ResponseEntity<List<TripIntent>> getTripIntentsByCreator(@PathVariable String userId) {
+    public ResponseEntity<List<TripIntent>> getTripIntentsByCreator(@PathVariable("userId") String userId) {
         return ResponseEntity.ok(tripIntentService.getTripIntentsByCreator(userId));
     }
 
@@ -50,13 +50,14 @@ public class TripIntentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TripIntent> updateTripIntent(@PathVariable String id, @Valid @RequestBody TripIntentDto dto) {
+    public ResponseEntity<TripIntent> updateTripIntent(@PathVariable("id") String id,
+            @Valid @RequestBody TripIntentDto dto) {
         TripIntent tripIntent = mapDtoToEntity(dto);
         return ResponseEntity.ok(tripIntentService.updateTripIntent(id, tripIntent));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTripIntent(@PathVariable String id) {
+    public ResponseEntity<Void> deleteTripIntent(@PathVariable("id") String id) {
         tripIntentService.deleteTripIntent(id);
         return ResponseEntity.noContent().build();
     }

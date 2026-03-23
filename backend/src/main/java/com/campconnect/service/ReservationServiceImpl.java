@@ -16,35 +16,43 @@ public class ReservationServiceImpl implements IReservationService {
 
     @Override
     public Reservation createReservation(Reservation reservation) {
-
-        if (reservation.getEndDate().isBefore(reservation.getStartDate())) {
-            throw new IllegalArgumentException("End date must be after start date");
-        }
+        validateDates(reservation.getStartDate(), reservation.getEndDate());
 
         if (reservation.getStartDate().isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("Start date must be in the future");
         }
-        // Anti Double Booking Logic
-        List<Reservation> existingReservations = reservationRepository.findByTargetId(reservation.getTargetId());
 
-        for (Reservation r : existingReservations) {
-
-            if (r.getStatus() != ReservationStatus.CANCELLED) {
-
-                boolean overlap = reservation.getStartDate().isBefore(r.getEndDate()) &&
-                        reservation.getEndDate().isAfter(r.getStartDate());
-
-                if (overlap) {
-                    throw new IllegalStateException("Date conflict: campsite already booked");
-                }
-            }
-        }
+        checkConflicts(reservation, null);
 
         reservation.setCreatedAt(LocalDateTime.now());
         reservation.setUpdatedAt(LocalDateTime.now());
         reservation.setStatus(ReservationStatus.PENDING);
 
         return reservationRepository.save(reservation);
+    }
+
+    private void validateDates(LocalDateTime start, LocalDateTime end) {
+        if (end.isBefore(start)) {
+            throw new IllegalArgumentException("End date must be after start date");
+        }
+    }
+
+    private void checkConflicts(Reservation reservation, String excludeId) {
+        List<Reservation> existingReservations = reservationRepository.findByTargetId(reservation.getTargetId());
+
+        for (Reservation r : existingReservations) {
+            if (excludeId != null && r.getId().equals(excludeId))
+                continue;
+
+            if (r.getStatus() != ReservationStatus.CANCELLED) {
+                boolean overlap = reservation.getStartDate().isBefore(r.getEndDate()) &&
+                        reservation.getEndDate().isAfter(r.getStartDate());
+
+                if (overlap) {
+                    throw new IllegalStateException("Date conflict: campsite already booked for these dates");
+                }
+            }
+        }
     }
 
     public List<Reservation> getUserReservations(String userId) {
@@ -63,22 +71,24 @@ public class ReservationServiceImpl implements IReservationService {
 
     @Override
     public Reservation updateReservation(String id, Reservation updatedReservation) {
-
         Reservation existingReservation = getReservationById(id);
 
-        // 🔥 Rule 1: Cannot modify confirmed or completed reservation
         if (existingReservation.getStatus() == ReservationStatus.CONFIRMED ||
                 existingReservation.getStatus() == ReservationStatus.COMPLETED) {
             throw new IllegalStateException("Cannot modify confirmed or completed reservation");
         }
 
-        if (updatedReservation.getEndDate().isBefore(updatedReservation.getStartDate())) {
-            throw new IllegalArgumentException("End date must be after start date");
-        }
+        validateDates(updatedReservation.getStartDate(), updatedReservation.getEndDate());
+
+        // Temporarily set dates to check conflicts
+        Reservation temp = new Reservation();
+        temp.setTargetId(existingReservation.getTargetId());
+        temp.setStartDate(updatedReservation.getStartDate());
+        temp.setEndDate(updatedReservation.getEndDate());
+        checkConflicts(temp, id);
 
         existingReservation.setStartDate(updatedReservation.getStartDate());
         existingReservation.setEndDate(updatedReservation.getEndDate());
-        existingReservation.setTargetId(updatedReservation.getTargetId());
         existingReservation.setUpdatedAt(LocalDateTime.now());
 
         return reservationRepository.save(existingReservation);
@@ -91,5 +101,12 @@ public class ReservationServiceImpl implements IReservationService {
         existingReservation.setUpdatedAt(LocalDateTime.now());
 
         return reservationRepository.save(existingReservation);
+    }
+
+    public void deleteReservation(String id) {
+        if (!reservationRepository.existsById(id)) {
+            throw new RuntimeException("Reservation not found with id: " + id);
+        }
+        reservationRepository.deleteById(id);
     }
 }

@@ -41,7 +41,7 @@ public class GroupController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Group> getGroupById(@PathVariable String id) {
+    public ResponseEntity<Group> getGroupById(@PathVariable("id") String id) {
         return ResponseEntity.ok(groupService.getGroupById(id));
     }
 
@@ -51,7 +51,7 @@ public class GroupController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Group> updateGroup(@PathVariable String id, @Valid @RequestBody GroupDto dto) {
+    public ResponseEntity<Group> updateGroup(@PathVariable("id") String id, @Valid @RequestBody GroupDto dto) {
         Group group = Group.builder()
                 .name(dto.getName())
                 .tripId(dto.getTripId())
@@ -62,7 +62,7 @@ public class GroupController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteGroup(@PathVariable String id) {
+    public ResponseEntity<Void> deleteGroup(@PathVariable("id") String id) {
         groupService.deleteGroup(id);
         return ResponseEntity.noContent().build();
     }

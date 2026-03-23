@@ -1,5 +1,6 @@
 package com.campconnect.dto;
 
+import java.util.Map;
 import java.util.Set;
 
 import lombok.Data;
@@ -11,4 +12,5 @@ public class RegisterRequest {
     private String password;
     private String name;
     private Set<String> role;
+    private Map<String, Object> profileDetails;
 }

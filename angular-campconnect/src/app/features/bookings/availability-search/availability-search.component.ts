@@ -189,20 +189,11 @@ export class AvailabilitySearchComponent {
     return Math.ceil((end - start) / (1000 * 60 * 60 * 24));
   }
 
-  get minEndDate(): string {
-    return this.searchParams().startDate || this.minDate;
-  }
-
   updateSearchParam(field: keyof SearchParams, value: any) {
     this.searchParams.update(params => ({ ...params, [field]: value }));
   }
 
   handleSearch() {
-    const params = this.searchParams();
-    if (!params.startDate || !params.endDate) {
-      return;
-    }
-
     this.isSearching.set(true);
     // Simulate API call
     setTimeout(() => {

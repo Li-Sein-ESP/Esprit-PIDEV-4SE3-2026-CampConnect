@@ -37,29 +37,7 @@
     <!-- Search Card -->
     <app-card variant="elevated" class="mb-8">
       <app-card-content class="p-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <!-- Check-in Date -->
-          <div>
-            <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-              <lucide-icon [img]="Calendar" class="inline w-4 h-4 mr-1"></lucide-icon>
-              Check-in
-            </label>
-            <input type="date" [value]="searchParams().startDate"
-              (change)="updateSearchParam('startDate', $any($event.target).value)" [min]="minDate"
-              class="w-full px-4 py-2 rounded-lg border-2 border-[var(--color-border-light)] focus:border-[var(--color-primary-600)] focus:ring-2 focus:ring-[var(--color-primary-100)] transition-all" />
-          </div>
-
-          <!-- Check-out Date -->
-          <div>
-            <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-              <lucide-icon [img]="Calendar" class="inline w-4 h-4 mr-1"></lucide-icon>
-              Check-out
-            </label>
-            <input type="date" [value]="searchParams().endDate"
-              (change)="updateSearchParam('endDate', $any($event.target).value)" [min]="minEndDate"
-              class="w-full px-4 py-2 rounded-lg border-2 border-[var(--color-border-light)] focus:border-[var(--color-primary-600)] focus:ring-2 focus:ring-[var(--color-primary-100)] transition-all" />
-          </div>
-
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Guests -->
           <div>
             <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
@@ -73,28 +51,17 @@
 
           <!-- Search Button -->
           <div class="flex items-end">
-            <app-button size="lg" [fullWidth]="true" (click)="handleSearch()"
-              [disabled]="!searchParams().startDate || !searchParams().endDate || isSearching()" class="w-full">
+            <app-button size="lg" [fullWidth]="true" (click)="handleSearch()" [disabled]="isSearching()" class="w-full">
               @if (isSearching()) {
               <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
               Searching...
               } @else {
               <lucide-icon [img]="Search" class="w-5 h-5 mr-2"></lucide-icon>
-              Search
+              Search Campsites
               }
             </app-button>
           </div>
         </div>
-
-        @if (nights > 0) {
-        <div class="mt-4 flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
-          <lucide-icon [img]="Info" class="w-4 h-4"></lucide-icon>
-          <span>
-            {{ nights }} {{ nights === 1 ? 'night' : 'nights' }} •
-            {{ searchParams().guests }} {{ searchParams().guests === 1 ? 'guest' : 'guests' }}
-          </span>
-        </div>
-        }
       </app-card-content>
     </app-card>
 
@@ -105,9 +72,7 @@
       <div>
         <h3 class="mb-1">{{ filteredSites.length }} Campsites Found</h3>
         <p class="text-sm text-[var(--color-text-secondary)]">
-          {{ formatDate(searchParams().startDate, { month: 'short', day: 'numeric' }) }}
-          -
-          {{ formatDate(searchParams().endDate, { month: 'short', day: 'numeric', year: 'numeric' }) }}
+          Showing recommendations for {{ searchParams().guests }} guests
         </p>
       </div>
       <app-button variant="outline" size="sm">
@@ -189,14 +154,11 @@
               <div>
                 <div class="flex items-baseline gap-2">
                   <span class="text-2xl font-bold text-[var(--color-primary-600)]">
-                    ${{ getTotalPrice(site.basePrice) }}
+                    ${{ site.basePrice }}
                   </span>
                   <span class="text-sm text-[var(--color-text-secondary)]">
-                    total
+                    /night
                   </span>
-                </div>
-                <div class="text-sm text-[var(--color-text-tertiary)]">
-                  ${{ site.basePrice }} × {{ nights }} {{ nights === 1 ? 'night' : 'nights' }}
                 </div>
               </div>
 
@@ -209,8 +171,8 @@
               </app-button>
               } @else {
               <app-button (click)="reserveSite(site)">
-                Reserve Now
-                <lucide-icon [img]="ChevronRight" class="w-5 h-5 ml-2"></lucide-icon>
+                Select Dates
+                <lucide-icon [img]="Calendar" class="w-5 h-5 ml-2"></lucide-icon>
               </app-button>
               }
             </div>
