@@ -35,6 +35,9 @@
   --color-primary-700: #1d3027;
   --color-primary-800: #13201b;
   --color-primary-900: #0a100e;
+  --color-primary: var(--color-primary-500);
+  --color-primary-light: var(--color-primary-100);
+  --color-primary-dark: var(--color-primary-600);
 
   /* ============ SECONDARY COLOR ============ */
   /* Moss Green - Softer green for secondary elements */
@@ -440,4 +443,34 @@ html {
 ::selection {
   background-color: var(--color-primary-500);
   color: var(--color-text-inverse);
+}
+
+/* ===================================
+   NAVIGATION & MEGA MENU
+   =================================== */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 6px 1px rgba(34,197,94,0.7); }
+  50% { box-shadow: 0 0 14px 4px rgba(34,197,94,0.95); }
+}
+.companions-badge {
+  animation: pulse-glow 1.8s ease-in-out infinite;
+}
+@keyframes companions-ping {
+  0% { transform: scale(1); opacity: 1; }
+  75%, 100% { transform: scale(2); opacity: 0; }
+}
+.companions-ping {
+  animation: companions-ping 1.4s cubic-bezier(0,0,0.2,1) infinite;
+}
+
+.mega-menu-trigger:hover .mega-menu-content {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.mega-menu-content {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.2s ease-in-out;
 }
