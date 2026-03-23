@@ -26,24 +26,13 @@ public class UserDetailsImpl implements UserDetails {
 
 	private Collection<? extends GrantedAuthority> authorities;
 
-	private boolean verifiedExpert;
-
-	private java.util.Map<String, Object> profileDetails;
-
 	public UserDetailsImpl(String id, String username, String email, String password,
-			boolean verifiedExpert, Collection<? extends GrantedAuthority> authorities,
-			java.util.Map<String, Object> profileDetails) {
+			Collection<? extends GrantedAuthority> authorities) {
 		this.id = id;
 		this.username = username;
 		this.email = email;
 		this.password = password;
-		this.verifiedExpert = verifiedExpert;
 		this.authorities = authorities;
-		this.profileDetails = profileDetails;
-	}
-
-	public java.util.Map<String, Object> getProfileDetails() {
-		return profileDetails;
 	}
 
 	public static UserDetailsImpl build(User user) {
@@ -56,13 +45,7 @@ public class UserDetailsImpl implements UserDetails {
 				user.getUsername(),
 				user.getEmail(),
 				user.getPassword(),
-				user.isVerifiedExpert(),
-				authorities,
-				user.getProfileDetails());
-	}
-
-	public boolean isVerifiedExpert() {
-		return verifiedExpert;
+				authorities);
 	}
 
 	@Override

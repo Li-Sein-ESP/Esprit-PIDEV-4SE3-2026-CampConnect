@@ -2,10 +2,5 @@ package com.campconnect.model;
 
 public enum ERole {
 	ROLE_USER,
-	ROLE_CAMPER,
-	ROLE_EQUIPMENT_PROVIDER,
-	ROLE_SITE_OWNER,
-	ROLE_ORGANIZER,
-	ROLE_DELIVERY_PROVIDER,
 	ROLE_ADMIN
 }
