@@ -1,0 +1,455 @@
+<div class="min-h-screen bg-[var(--color-background)] flex">
+  <!-- Main Content -->
+  <main class="flex-1 p-8 lg:p-12 overflow-y-auto">
+    <div class="max-w-6xl mx-auto">
+      <!-- Header -->
+      <header class="flex justify-between items-end mb-12">
+        <div>
+          <nav class="flex gap-6 mb-8 text-sm font-bold uppercase tracking-widest">
+            <button (click)="formType = 'course'; showForm = false" class="pb-2 transition-all"
+              [class.text-[var(--color-primary-500)]]="formType === 'course'" [class.border-b-4]="formType === 'course'"
+              [class.border-[var(--color-primary-500)]]="formType === 'course'"
+              [class.text-[var(--color-text-tertiary)]]="formType !== 'course'">
+              Courses Management
+            </button>
+            <button (click)="formType = 'certification'; showForm = false" class="pb-2 transition-all"
+              [class.text-[var(--color-primary-500)]]="formType === 'certification'"
+              [class.border-b-4]="formType === 'certification'"
+              [class.border-[var(--color-primary-500)]]="formType === 'certification'"
+              [class.text-[var(--color-text-tertiary)]]="formType !== 'certification'">
+              Certifications
+            </button>
+          </nav>
+          <h2 class="text-4xl font-bold text-[var(--color-text-heading)] mb-2">Academy Governance</h2>
+          <p class="text-[var(--color-text-secondary)] text-lg">Orchestrate your education programs and certification
+            flows.</p>
+        </div>
+        <div class="flex gap-4">
+          <app-button *ngIf="formType === 'course'" variant="primary" (click)="openAddForm()"
+            customClass="shadow-xl shadow-[var(--color-primary-500)]/20">
+            <lucide-icon [img]="PlusIcon" [size]="18" class="mr-2"></lucide-icon>
+            Create New Course
+          </app-button>
+          <app-button *ngIf="formType === 'certification'" variant="primary" (click)="openAddCertForm()"
+            customClass="shadow-xl shadow-[var(--color-primary-500)]/20">
+            <lucide-icon [img]="PlusIcon" [size]="18" class="mr-2"></lucide-icon>
+            Create New Certification
+          </app-button>
+        </div>
+      </header>
+
+      <!-- Stats Overview -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+        <app-card variant="elevated"
+          customClass="border-0 shadow-lg bg-gradient-to-br from-[var(--color-primary-500)] to-[var(--color-primary-700)] text-white overflow-hidden relative">
+          <app-card-content class="relative z-10">
+            <div class="flex justify-between items-start mb-4">
+              <lucide-icon [img]="BookIcon" [size]="24" class="opacity-80"></lucide-icon>
+              <span class="text-[10px] font-bold py-1 px-2 bg-white/20 rounded-full">LIVE</span>
+            </div>
+            <h4 class="text-3xl font-bold text-white mb-1">{{ stats().totalCourses }}</h4>
+            <p class="text-xs text-white/70 uppercase font-bold tracking-tighter">Active Courses</p>
+          </app-card-content>
+          <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
+        </app-card>
+
+        <app-card variant="elevated" customClass="border-0 shadow-lg">
+          <app-card-content>
+            <div class="flex justify-between items-start mb-4 text-[var(--color-primary-500)]">
+              <lucide-icon [img]="CapIcon" [size]="24"></lucide-icon>
+            </div>
+            <h4 class="text-3xl font-bold mb-1">{{ stats().totalCerts }}</h4>
+            <p class="text-xs text-[var(--color-text-secondary)] uppercase font-bold tracking-tighter">Certifications
+            </p>
+          </app-card-content>
+        </app-card>
+
+        <app-card variant="elevated" customClass="border-0 shadow-lg">
+          <app-card-content>
+            <div class="flex justify-between items-start mb-4 text-[var(--color-accent-500)]">
+              <lucide-icon [img]="UsersIcon" [size]="24"></lucide-icon>
+            </div>
+            <h4 class="text-3xl font-bold mb-1">{{ stats().totalExperts }}</h4>
+            <p class="text-xs text-[var(--color-text-secondary)] uppercase font-bold tracking-tighter">Active Experts
+            </p>
+          </app-card-content>
+        </app-card>
+
+        <app-card variant="elevated" customClass="border-0 shadow-lg">
+          <app-card-content>
+            <div class="flex justify-between items-start mb-4 text-emerald-500">
+              <lucide-icon [img]="PlusIcon" [size]="24"></lucide-icon>
+            </div>
+            <h4 class="text-3xl font-bold mb-1">{{ stats().enrolledStudents }}</h4>
+            <p class="text-xs text-[var(--color-text-secondary)] uppercase font-bold tracking-tighter">Students Enrolled
+            </p>
+          </app-card-content>
+        </app-card>
+      </div>
+
+      <!-- Feedback Messages -->
+      <div *ngIf="successMessage()"
+        class="mb-8 p-6 bg-emerald-50 border-l-4 border-emerald-500 rounded-2xl flex items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-500 shadow-sm">
+        <div
+          class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+          <lucide-icon [img]="PlusIcon" [size]="20"></lucide-icon>
+        </div>
+        <div>
+          <h4 class="font-bold text-emerald-900">Opération Réussie</h4>
+          <p class="text-sm text-emerald-700">{{ successMessage() }}</p>
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage()"
+        class="mb-8 p-6 bg-red-50 border-l-4 border-red-500 rounded-2xl flex items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-500 shadow-sm">
+        <div
+          class="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-red-500/20">
+          <lucide-icon [img]="FilterIcon" [size]="20"></lucide-icon>
+        </div>
+        <div>
+          <h4 class="font-bold text-red-900">Oups ! Une erreur est survenue</h4>
+          <p class="text-sm text-red-700">{{ errorMessage() }}</p>
+          <ul *ngIf="formErrors && (formErrors | json) !== '{}'"
+            class="mt-2 text-xs text-red-600 list-disc list-inside">
+            <li *ngFor="let err of formErrors | keyvalue">
+              <strong>{{ err.key }}:</strong> {{ err.value }}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Forms Section -->
+      <app-card *ngIf="showForm" variant="elevated"
+        customClass="mb-12 border-2 border-[var(--color-primary-500)] shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300">
+        <app-card-header>
+          <h3 class="text-2xl font-bold text-[var(--color-primary-600)]">
+            {{ formType === 'course' ? (editingCourse ? 'Edit Course' : 'Launch New Course') : (editingCertification ?
+            'Refine Certification' : 'Architect New Path') }}
+          </h3>
+        </app-card-header>
+        <app-card-content>
+          <!-- Course Form -->
+          <form *ngIf="formType === 'course'" (ngSubmit)="saveCourse()" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-6">
+              <div>
+                <label
+                  class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Excellence
+                  Title</label>
+                <input type="text" [(ngModel)]="courseForm.title" name="title"
+                  class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all font-medium"
+                  placeholder="e.g. Master Desert Survival" [class.ring-2]="formErrors['title']"
+                  [class.ring-red-500]="formErrors['title']">
+                <span *ngIf="formErrors['title']"
+                  class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{ formErrors['title']
+                  }}</span>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label
+                    class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Category</label>
+                  <select [(ngModel)]="courseForm.category" name="category"
+                    class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all"
+                    [class.ring-2]="formErrors['category'] || formErrors['categoryName']"
+                    [class.ring-red-500]="formErrors['category'] || formErrors['categoryName']">
+                    <option value="survival">Survival</option>
+                    <option value="navigation">Navigation</option>
+                    <option value="first-aid">First Aid</option>
+                    <option value="wildlife">Wildlife</option>
+                    <option value="camping-skills">Camping</option>
+                  </select>
+                  <span *ngIf="formErrors['category'] || formErrors['categoryName']"
+                    class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{
+                    formErrors['category'] || formErrors['categoryName'] }}</span>
+                </div>
+                <div>
+                  <label
+                    class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Difficulty</label>
+                  <select [(ngModel)]="courseForm.difficulty" name="difficulty"
+                    class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all"
+                    [class.ring-2]="formErrors['difficulty']" [class.ring-red-500]="formErrors['difficulty']">
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                  </select>
+                  <span *ngIf="formErrors['difficulty']"
+                    class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{
+                    formErrors['difficulty'] }}</span>
+                </div>
+              </div>
+              <div>
+                <label
+                  class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Lead
+                  Instructor</label>
+                <select [(ngModel)]="courseForm.instructorId" name="instructorId"
+                  class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all"
+                  [class.ring-2]="formErrors['instructorId']" [class.ring-red-500]="formErrors['instructorId']">
+                  <option value="">Choose an expert</option>
+                  <option *ngFor="let expert of experts()" [value]="expert.id">{{ expert.name }}</option>
+                </select>
+                <span *ngIf="formErrors['instructorId']"
+                  class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{
+                  formErrors['instructorId'] }}</span>
+              </div>
+            </div>
+            <div class="space-y-6">
+              <div class="grid grid-cols-3 gap-4">
+                <div>
+                  <label
+                    class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Price
+                    ($)</label>
+                  <input type="number" [(ngModel)]="courseForm.price" name="price"
+                    class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all"
+                    [class.ring-2]="formErrors['price']" [class.ring-red-500]="formErrors['price']">
+                  <span *ngIf="formErrors['price']"
+                    class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{
+                    formErrors['price'] }}</span>
+                </div>
+                <div>
+                  <label
+                    class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Duration
+                    (h)</label>
+                  <input type="number" [(ngModel)]="courseForm.duration" name="duration"
+                    class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all"
+                    [class.ring-2]="formErrors['duration']" [class.ring-red-500]="formErrors['duration']">
+                  <span *ngIf="formErrors['duration']"
+                    class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{
+                    formErrors['duration'] }}</span>
+                </div>
+                <div>
+                  <label
+                    class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Passing
+                    %</label>
+                  <input type="number" [(ngModel)]="courseForm.passingScore" name="passingScore"
+                    class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all"
+                    [class.ring-2]="formErrors['passingScore']" [class.ring-red-500]="formErrors['passingScore']">
+                  <span *ngIf="formErrors['passingScore']"
+                    class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{
+                    formErrors['passingScore'] }}</span>
+                </div>
+              </div>
+              <div>
+                <div>
+                  <label
+                    class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Cover
+                    Image URL</label>
+                  <input type="text" [(ngModel)]="courseForm.imageUrl" name="imageUrl"
+                    class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all"
+                    placeholder="https://images.unsplash.com/...">
+                </div>
+                <div>
+                  <label
+                    class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Program
+                    Syllabus Digest</label>
+                  <textarea [(ngModel)]="courseForm.description" name="description" rows="4"
+                    class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all"
+                    placeholder="What will students master?" [class.ring-2]="formErrors['description']"
+                    [class.ring-red-500]="formErrors['description']"></textarea>
+                  <span *ngIf="formErrors['description']"
+                    class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{
+                    formErrors['description'] }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="md:col-span-2 flex flex-col items-end gap-4 mt-4">
+              <!-- Inline Mini Feedback -->
+              <div *ngIf="successMessage()" class="text-emerald-600 font-bold text-sm animate-pulse">
+                ✓ {{ successMessage() }}
+              </div>
+              <div *ngIf="errorMessage()" class="text-red-600 font-bold text-sm animate-pulse">
+                ⚠ {{ errorMessage() }}
+              </div>
+
+              <div class="flex gap-4">
+                <button type="button" (click)="closeForm()"
+                  class="px-8 py-3 text-red-600 font-bold hover:bg-red-50 rounded-xl transition-all">
+                  Discard Changes
+                </button>
+                <app-button variant="primary" type="submit" [disabled]="isSubmitting()" customClass="px-12 py-3">
+                  {{ isSubmitting() ? 'Committing...' : 'Commit Course' }}
+                </app-button>
+              </div>
+            </div>
+          </form>
+
+          <!-- Cert Form -->
+          <form *ngIf="formType === 'certification'" (ngSubmit)="saveCertification()"
+            class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Fields similar to course but for cert -->
+            <div class="space-y-6">
+              <div>
+                <label
+                  class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Certification
+                  Title</label>
+                <input type="text" [(ngModel)]="certForm.name" name="name"
+                  class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all font-medium">
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label
+                    class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Issuer</label>
+                  <input type="text" [(ngModel)]="certForm.issuer" name="issuer"
+                    class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all">
+                </div>
+                <div>
+                  <label
+                    class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Validity
+                    (Months)</label>
+                  <input type="number" [(ngModel)]="certForm.validityPeriod" name="validity"
+                    class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all">
+                </div>
+              </div>
+            </div>
+            <div>
+              <label
+                class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Mastery
+                Requirements</label>
+              <div class="bg-[var(--color-background)] rounded-2xl p-4 overflow-y-auto max-h-[180px] space-y-2">
+                <div *ngFor="let course of courses()" class="flex items-center gap-3 p-3 rounded-xl transition-all"
+                  [class.bg-white]="certForm.requiredCourseIds?.includes(course.id!)"
+                  [class.shadow-sm]="certForm.requiredCourseIds?.includes(course.id!)">
+                  <div class="relative flex items-center">
+                    <input type="checkbox" [id]="'cert-course-' + course.id"
+                      [checked]="certForm.requiredCourseIds?.includes(course.id!)"
+                      (change)="onCourseToggle(course.id!, $event)"
+                      class="w-5 h-5 rounded-md border-2 border-[var(--color-primary-200)] text-[var(--color-primary-500)] focus:ring-[var(--color-primary-500)]">
+                  </div>
+                  <label [for]="'cert-course-' + course.id"
+                    class="text-sm font-medium cursor-pointer text-[var(--color-text-primary)]">
+                    {{ course.title }}
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="md:col-span-2 flex justify-end gap-4 mt-4">
+              <app-button variant="ghost" type="button" (click)="closeForm()">Cancel</app-button>
+              <app-button variant="primary" type="submit" customClass="px-12 py-3">Seal Certification</app-button>
+            </div>
+          </form>
+        </app-card-content>
+      </app-card>
+
+      <!-- Main Lists -->
+      <div class="space-y-6">
+        <!-- Courses Grid -->
+        <div *ngIf="formType === 'course'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div *ngFor="let course of courses()"
+            class="group bg-[var(--color-surface)] rounded-[2rem] p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-[var(--color-neutral-100)] flex flex-col h-full">
+            <div class="relative mb-6 overflow-hidden rounded-2xl aspect-video">
+              <img [src]="course.imageUrl"
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+              <div
+                class="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-black uppercase text-[var(--color-primary-700)] shadow-sm">
+                {{ course.difficulty || 'Expert' }}
+              </div>
+            </div>
+            <div class="flex-1 flex flex-col">
+              <h4
+                class="text-xl font-black text-[var(--color-text-heading)] mb-2 group-hover:text-[var(--color-primary-500)] transition-colors line-clamp-2">
+                {{ course.title }}
+              </h4>
+              <p class="text-sm text-[var(--color-text-secondary)] mb-6 line-clamp-3 leading-relaxed">
+                {{ course.description }}
+              </p>
+
+              <div class="mt-auto pt-6 border-t border-[var(--color-neutral-100)] flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div
+                    class="w-8 h-8 rounded-full bg-[var(--color-primary-100)] flex items-center justify-center text-[var(--color-primary-700)] font-black text-[10px]">
+                    {{ (course.instructorName || 'Expert').charAt(0) }}
+                  </div>
+                  <span class="text-xs font-bold text-[var(--color-text-secondary)] truncate max-w-[100px]">
+                    {{ course.instructorName || 'Wilderness Expert' }}
+                  </span>
+                </div>
+                <div class="flex gap-1">
+                  <button (click)="openEditForm(course)"
+                    class="p-2 rounded-lg hover:bg-[var(--color-primary-50)] text-[var(--color-primary-500)] transition-colors">
+                    <lucide-icon [img]="PencilIcon" [size]="18"></lucide-icon>
+                  </button>
+                  <button (click)="deleteCourse(course.id!)"
+                    class="p-2 rounded-lg hover:bg-red-50 text-red-400 transition-colors">
+                    <lucide-icon [img]="TrashIcon" [size]="18"></lucide-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="courses().length === 0"
+            class="col-span-full py-24 flex flex-col items-center text-center opacity-40">
+            <lucide-icon [img]="BookIcon" [size]="64" class="mb-4"></lucide-icon>
+            <h3 class="text-2xl font-bold">No courses architected yet.</h3>
+            <p>Start your academy journey by creating your first program.</p>
+          </div>
+        </div>
+
+        <!-- Certifications List (Table Style) -->
+        <div *ngIf="formType === 'certification'"
+          class="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-[var(--color-neutral-100)] animate-in fade-in zoom-in-95 duration-500">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-[var(--color-background)] bg-opacity-50">
+                <th
+                  class="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)]">
+                  Certification Path</th>
+                <th
+                  class="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] text-center">
+                  Requirements</th>
+                <th
+                  class="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)]">
+                  Authority</th>
+                <th
+                  class="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] text-right">
+                  Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[var(--color-neutral-100)]">
+              <tr *ngFor="let cert of certifications()"
+                class="group hover:bg-[var(--color-primary-50)]/30 transition-colors">
+                <td class="px-8 py-6">
+                  <div class="flex items-center gap-4">
+                    <div
+                      class="w-12 h-12 bg-amber-100 text-amber-700 rounded-2xl flex items-center justify-center shadow-inner">
+                      <lucide-icon [img]="CapIcon" [size]="24"></lucide-icon>
+                    </div>
+                    <div>
+                      <h4 class="font-black text-[var(--color-text-heading)] mb-1">{{ cert.name }}</h4>
+                      <p class="text-xs font-bold text-amber-600">{{ cert.validityPeriod }} Months Validity</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-8 py-6 text-center">
+                  <span
+                    class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-primary-100)] text-[var(--color-primary-700)] font-black text-sm">
+                    {{ cert.requiredCourseIds?.length || 0 }}
+                  </span>
+                </td>
+                <td class="px-8 py-6">
+                  <span class="text-sm font-bold text-[var(--color-text-secondary)]">{{ cert.issuer }}</span>
+                </td>
+                <td class="px-8 py-6 text-right">
+                  <div class="flex justify-end gap-2">
+                    <button (click)="openEditCertForm(cert)"
+                      class="w-10 h-10 rounded-xl hover:bg-white hover:shadow-md transition-all flex items-center justify-center text-[var(--color-primary-500)]">
+                      <lucide-icon [img]="PencilIcon" [size]="20"></lucide-icon>
+                    </button>
+                    <button (click)="deleteCertification(cert.id)"
+                      class="w-10 h-10 rounded-xl hover:bg-white hover:shadow-md transition-all flex items-center justify-center text-red-400">
+                      <lucide-icon [img]="TrashIcon" [size]="20"></lucide-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div *ngIf="certifications().length === 0" class="py-24 text-center opacity-40">
+            <lucide-icon [img]="CapIcon" [size]="64" class="mx-auto mb-4"></lucide-icon>
+            <h3 class="text-2xl font-bold">No certification pathways available.</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,389 @@
+<div class="min-h-screen bg-[var(--color-background)] pb-12">
+    <!-- Header with Back Button -->
+    <div class="border-b border-[var(--color-border-light)] bg-white">
+        <div class="container py-4">
+            <button (click)="navigate('/campsites')"
+                class="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
+                <lucide-icon [name]="ChevronLeft" class="w-5 h-5"></lucide-icon>
+                Back to Discovery
+            </button>
+        </div>
+    </div>
+
+    <!-- Photo Gallery -->
+    <div class="relative">
+        <div class="container py-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-2 rounded-lg overflow-hidden">
+                <div class="md:col-span-3 relative h-96 md:h-[500px] group">
+                    <img [src]="campsite.images[currentImageIndex]" [alt]="campsite.name"
+                        class="w-full h-full object-cover" />
+                    <ng-container *ngIf="campsite.images.length > 1">
+                        <button (click)="prevImage()"
+                            class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                            <lucide-icon [name]="ChevronLeft" class="w-5 h-5"></lucide-icon>
+                        </button>
+                        <button (click)="nextImage()"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                            <lucide-icon [name]="ChevronRight" class="w-5 h-5"></lucide-icon>
+                        </button>
+                    </ng-container>
+                </div>
+                <div class="md:col-span-1 grid grid-cols-2 md:grid-cols-1 gap-2">
+                    <div *ngFor="let img of campsite.images.slice(1, 3); let i = index"
+                        class="h-48 md:h-[246px] relative">
+                        <img [src]="img" [alt]="campsite.name + ' ' + (i + 2)"
+                            class="w-full h-full object-cover rounded-lg" />
+                    </div>
+                </div>
+            </div>
+            <button (click)="showAllPhotos = true"
+                class="absolute bottom-8 right-8 flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-lg border border-[var(--color-border-light)] hover:shadow-xl transition-all">
+                <lucide-icon [name]="ImageIcon" class="w-4 h-4"></lucide-icon>
+                Show all photos
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Content -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Header -->
+                <div>
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex-1">
+                            <h1 class="mb-2">{{ campsite.name }}</h1>
+                            <div class="flex items-center gap-4 flex-wrap">
+                                <div class="flex items-center gap-2">
+                                    <lucide-icon [name]="MapPin"
+                                        class="w-5 h-5 text-[var(--color-primary-600)]"></lucide-icon>
+                                    <span class="text-[var(--color-text-secondary)]">{{ campsite.location }}</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <lucide-icon [name]="Star"
+                                        class="w-5 h-5 text-amber-500 fill-current"></lucide-icon>
+                                    <span class="font-bold text-lg">{{ campsite.rating }}</span>
+                                    <span class="text-[var(--color-text-secondary)]">
+                                        ({{ campsite.reviewCount }} reviews)
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <app-button variant="ghost" size="sm">
+                                <lucide-icon [name]="Share2" class="w-5 h-5"></lucide-icon>
+                            </app-button>
+                            <app-button variant="ghost" size="sm">
+                                <lucide-icon [name]="Heart" class="w-5 h-5"></lucide-icon>
+                            </app-button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <app-badge variant="success">
+                            <lucide-icon [name]="Accessibility" class="w-4 h-4"></lucide-icon>
+                            Easy Access
+                        </app-badge>
+                        <app-badge variant="default">
+                            <lucide-icon [name]="getTerrainIcon(campsite.terrain)" class="w-4 h-4"></lucide-icon>
+                            {{ campsite.terrain }}
+                        </app-badge>
+                        <app-badge variant="primary">{{ campsite.priceRange }}</app-badge>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <app-card variant="elevated">
+                    <app-card-content customClass="p-6">
+                        <h3 class="mb-4">About this campsite</h3>
+                        <p class="text-[var(--color-text-secondary)] mb-6 leading-relaxed">
+                            {{ campsite.description }}
+                        </p>
+
+                        <h5 class="mb-3">Highlights</h5>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div *ngFor="let highlight of campsite.highlights" class="flex items-center gap-2">
+                                <lucide-icon [name]="CheckCircle"
+                                    class="w-5 h-5 text-green-600 flex-shrink-0"></lucide-icon>
+                                <span class="text-sm text-[var(--color-text-secondary)]">{{ highlight }}</span>
+                            </div>
+                        </div>
+                    </app-card-content>
+                </app-card>
+
+                <!-- Amenities -->
+                <app-card variant="elevated">
+                    <app-card-header>
+                        <app-card-title>Amenities</app-card-title>
+                        <app-card-description>What this campsite offers</app-card-description>
+                    </app-card-header>
+                    <app-card-content>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <ng-container *ngFor="let amenity of campsite.amenities">
+                                <div *ngIf="getAmenityIcon(amenity)"
+                                    class="flex flex-col items-center gap-2 p-4 bg-[var(--color-neutral-50)] rounded-lg">
+                                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                                        <lucide-icon [name]="getAmenityIcon(amenity)"
+                                            class="w-6 h-6 text-[var(--color-primary-600)]"></lucide-icon>
+                                    </div>
+                                    <span class="text-sm font-medium capitalize">{{ amenity }}</span>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </app-card-content>
+                </app-card>
+
+                <!-- Rules & Seasonal Info -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <app-card variant="bordered" customClass="bg-[var(--color-secondary-50)]">
+                        <app-card-header>
+                            <app-card-title customClass="flex items-center gap-2">
+                                <lucide-icon [name]="Info"
+                                    class="w-5 h-5 text-[var(--color-primary-600)]"></lucide-icon>
+                                Campsite Rules
+                            </app-card-title>
+                        </app-card-header>
+                        <app-card-content>
+                            <ul class="space-y-2">
+                                <li *ngFor="let rule of campsite.rules"
+                                    class="flex items-start gap-2 text-sm text-[var(--color-text-secondary)]">
+                                    <lucide-icon [name]="AlertTriangle"
+                                        class="w-4 h-4 flex-shrink-0 mt-0.5 text-[var(--color-accent-500)]"></lucide-icon>
+                                    <span>{{ rule }}</span>
+                                </li>
+                            </ul>
+                        </app-card-content>
+                    </app-card>
+
+                    <app-card variant="bordered" customClass="bg-blue-50">
+                        <app-card-header>
+                            <app-card-title customClass="flex items-center gap-2">
+                                <lucide-icon [name]="Calendar" class="w-5 h-5 text-blue-600"></lucide-icon>
+                                Seasonal Information
+                            </app-card-title>
+                        </app-card-header>
+                        <app-card-content>
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="text-xs text-[var(--color-text-tertiary)] mb-1">Best Time to Visit</div>
+                                    <div class="font-medium">{{ campsite.seasonal.bestTime }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-[var(--color-text-tertiary)] mb-1">Peak Season</div>
+                                    <div class="font-medium">{{ campsite.seasonal.peakSeason }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-[var(--color-text-tertiary)] mb-1">Winter Access</div>
+                                    <div class="font-medium">{{ campsite.seasonal.winterAccess }}</div>
+                                </div>
+                            </div>
+                        </app-card-content>
+                    </app-card>
+                </div>
+
+                <!-- Location Map -->
+                <app-card variant="elevated">
+                    <app-card-header>
+                        <app-card-title customClass="flex items-center gap-2">
+                            <lucide-icon [name]="MapIcon" class="w-5 h-5"></lucide-icon>
+                            Location
+                        </app-card-title>
+                        <app-card-description>Exact location shown after booking</app-card-description>
+                    </app-card-header>
+                    <app-card-content>
+                        <app-map-view [markers]="mapMarkers" [center]="campsite.coordinates" [zoom]="10"
+                            [selectedMarkerId]="campsite.id" height="320px" className="h-80"></app-map-view>
+                    </app-card-content>
+                </app-card>
+
+                <!-- Reviews Section -->
+                <div id="reviews">
+                    <app-card variant="elevated">
+                        <app-card-header>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <app-card-title customClass="flex items-center gap-2">
+                                        <lucide-icon [name]="Star"
+                                            class="w-5 h-5 text-amber-500 fill-current"></lucide-icon>
+                                        {{ campsite.rating }} • {{ campsite.reviewCount }} Reviews
+                                    </app-card-title>
+                                </div>
+                                <app-button (click)="showWriteReview = true">Write a Review</app-button>
+                            </div>
+                        </app-card-header>
+
+                        <app-card-content>
+                            <!-- Rating Breakdown -->
+                            <div
+                                class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 pb-6 border-b border-[var(--color-border-light)]">
+                                <div *ngFor="let item of getDescendantRatingsArray()">
+                                    <div class="text-sm text-[var(--color-text-tertiary)] mb-1 capitalize">
+                                        {{ item.key }}
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <div
+                                            class="flex-1 h-2 bg-[var(--color-neutral-100)] rounded-full overflow-hidden">
+                                            <div class="h-full bg-[var(--color-primary-600)] rounded-full"
+                                                [style.width.%]="(item.value / 5) * 100"></div>
+                                        </div>
+                                        <span class="text-sm font-medium">{{ item.value }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sort Controls -->
+                            <div class="flex items-center gap-3 mb-6">
+                                <span class="text-sm font-medium">Sort by:</span>
+                                <div class="flex gap-2">
+                                    <button *ngFor="let sort of ['recent', 'helpful', 'rating']"
+                                        (click)="setReviewSort(sort)"
+                                        class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                                        [class.bg-[var(--color-primary-600)]]="reviewSort === sort"
+                                        [class.text-white]="reviewSort === sort"
+                                        [class.bg-[var(--color-neutral-100)]]="reviewSort !== sort"
+                                        [class.text-[var(--color-text-secondary)]]="reviewSort !== sort"
+                                        [class.hover:bg-[var(--color-neutral-200)]]="reviewSort !== sort">
+                                        {{ sort === 'recent' ? 'Most Recent' : sort === 'helpful' ? 'Most Helpful' :
+                                        'Highest Rating' }}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Reviews List -->
+                            <div class="space-y-6">
+                                <div *ngFor="let review of sortedReviews"
+                                    class="pb-6 border-b border-[var(--color-border-light)] last:border-0 last:pb-0">
+                                    <!-- Review Header -->
+                                    <div class="flex items-start gap-4 mb-4">
+                                        <img [src]="review.userAvatar" [alt]="review.userName"
+                                            class="w-12 h-12 rounded-full object-cover" />
+                                        <div class="flex-1">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <h6>{{ review.userName }}</h6>
+                                                <app-badge *ngIf="review.verifiedStay" variant="success" size="sm">
+                                                    <lucide-icon [name]="CheckCircle" class="w-3 h-3"></lucide-icon>
+                                                    Verified Stay
+                                                </app-badge>
+                                            </div>
+                                            <div class="flex items-center gap-3">
+                                                <div class="flex items-center gap-1">
+                                                    <lucide-icon *ngFor="let i of range(5)" [name]="Star"
+                                                        class="w-4 h-4" [class.text-amber-500]="i < review.rating"
+                                                        [class.fill-current]="i < review.rating"
+                                                        [class.text-[var(--color-neutral-200)]]="i >= review.rating"></lucide-icon>
+                                                </div>
+                                                <span class="text-sm text-[var(--color-text-tertiary)]">
+                                                    {{ review.createdAt | date:'longDate' }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Review Content -->
+                                    <div class="mb-4">
+                                        <h6 class="mb-2">{{ review.title }}</h6>
+                                        <p class="text-[var(--color-text-secondary)] leading-relaxed">
+                                            {{ review.content }}
+                                        </p>
+                                    </div>
+
+                                    <!-- Review Photos -->
+                                    <div *ngIf="review.photos?.length > 0" class="flex gap-2 mb-4">
+                                        <img *ngFor="let photo of review.photos; let i = index" [src]="photo"
+                                            [alt]="'Review photo ' + (i + 1)"
+                                            class="w-24 h-24 object-cover rounded-lg" />
+                                    </div>
+
+                                    <!-- Review Actions -->
+                                    <div class="flex items-center gap-4">
+                                        <button
+                                            class="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
+                                            <lucide-icon [name]="ThumbsUp" class="w-4 h-4"></lucide-icon>
+                                            Helpful ({{ review.helpful }})
+                                        </button>
+                                        <button
+                                            class="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
+                                            <lucide-icon [name]="MessageSquare" class="w-4 h-4"></lucide-icon>
+                                            Reply
+                                        </button>
+                                    </div>
+
+                                    <!-- Owner/Admin Responses -->
+                                    <div *ngFor="let response of review.responses"
+                                        class="ml-16 mt-4 p-4 bg-[var(--color-primary-50)] rounded-lg border-l-4 border-[var(--color-primary-600)]">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <app-badge variant="primary" size="sm">
+                                                {{ response.from === 'owner' ? 'Owner Response' : 'Official Response' }}
+                                            </app-badge>
+                                            <span class="text-sm font-medium">{{ response.name }}</span>
+                                            <span class="text-xs text-[var(--color-text-tertiary)]">
+                                                {{ response.createdAt | date }}
+                                            </span>
+                                        </div>
+                                        <p class="text-sm text-[var(--color-text-secondary)]">
+                                            {{ response.content }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </app-card-content>
+                    </app-card>
+                </div>
+            </div>
+
+            <!-- Booking Sidebar -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-24">
+                    <app-card variant="elevated">
+                        <app-card-content customClass="p-6">
+                            <div class="mb-6">
+                                <div class="flex items-baseline gap-2 mb-2">
+                                    <span class="text-3xl font-bold text-[var(--color-primary-600)]">
+                                        {{ campsite.basePrice | currency:'USD' }}
+                                    </span>
+                                    <span class="text-[var(--color-text-secondary)]">/night</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <lucide-icon [name]="Star"
+                                        class="w-4 h-4 text-amber-500 fill-current"></lucide-icon>
+                                    <span class="font-medium">{{ campsite.rating }}</span>
+                                    <span class="text-sm text-[var(--color-text-tertiary)]">
+                                        ({{ campsite.reviewCount }} reviews)
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3 mb-6">
+                                <app-button size="lg" [fullWidth]="true"
+                                    (click)="navigate('/discover', { state: { preselectedSite: campsite } })">
+                                    <lucide-icon [name]="Calendar" class="w-5 h-5"></lucide-icon>
+                                    Check Availability
+                                </app-button>
+                                <app-button variant="outline" size="lg" [fullWidth]="true"
+                                    (click)="navigate('/plan-trip/create')">
+                                    <lucide-icon [name]="MapIcon" class="w-5 h-5"></lucide-icon>
+                                    Plan Trip
+                                </app-button>
+                            </div>
+
+                            <div class="pt-6 border-t border-[var(--color-border-light)]">
+                                <div class="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] mb-2">
+                                    <lucide-icon [name]="Users" class="w-4 h-4"></lucide-icon>
+                                    <span>Up to 6 guests</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
+                                    <lucide-icon [name]="CheckCircle" class="w-4 h-4 text-green-600"></lucide-icon>
+                                    <span>Free cancellation up to 7 days</span>
+                                </div>
+                            </div>
+                        </app-card-content>
+                    </app-card>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Write Review Modal -->
+    <app-write-review *ngIf="showWriteReview" [campsiteId]="campsite.id"
+        (close)="showWriteReview = false"></app-write-review>
+</div>

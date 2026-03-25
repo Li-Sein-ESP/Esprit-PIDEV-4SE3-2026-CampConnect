@@ -1,0 +1,95 @@
+<div class="cc-edit">
+    <!-- Header Area -->
+    <header class="cc-edit__header">
+        <div class="cc-edit__container cc-edit__header-inner">
+            <a routerLink="/profile" class="cc-edit__back">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to Profile
+            </a>
+            <h1 class="cc-edit__title">Edit Your Camper Profile</h1>
+        </div>
+    </header>
+
+    <!-- Main Form Area -->
+    <main class="cc-edit__main">
+        <div class="cc-edit__container">
+
+            <form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="cc-edit__card">
+
+                <!-- Profile Picture Section -->
+                <div class="cc-edit__section cc-edit__section--avatar">
+                    <h2 class="cc-edit__subtitle">Profile Picture</h2>
+                    <div class="cc-edit__avatar-wrap">
+                        <img [src]="profileImagePreview" alt="Profile preview" class="cc-edit__avatar"
+                            onError="this.src='https://images.unsplash.com/photo-1535930749574-1399327ce78f?w=300&h=300&fit=crop&crop=face'">
+                        <div class="cc-edit__avatar-controls">
+                            <div class="cc-form-group">
+                                <label for="profileImage" class="cc-form-label">Image URL</label>
+                                <input type="text" id="profileImage" formControlName="profileImage"
+                                    (input)="onImageUrlChange($event)" class="cc-form-input" placeholder="https://...">
+                                <small class="cc-form-hint">Paste an image URL to update your profile photo.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Info Section -->
+                <div class="cc-edit__section">
+                    <h2 class="cc-edit__subtitle">Personal Details</h2>
+
+                    <div class="cc-form-row">
+                        <div class="cc-form-group cc-form-group--half">
+                            <label for="firstName" class="cc-form-label">First Name</label>
+                            <input type="text" id="firstName" formControlName="firstName" class="cc-form-input"
+                                placeholder="Jordan">
+                            <div *ngIf="editForm.get('firstName')?.invalid && editForm.get('firstName')?.touched"
+                                class="cc-form-error">
+                                First name is required.
+                            </div>
+                        </div>
+                        <div class="cc-form-group cc-form-group--half">
+                            <label for="lastName" class="cc-form-label">Last Name</label>
+                            <input type="text" id="lastName" formControlName="lastName" class="cc-form-input"
+                                placeholder="Mitchell">
+                            <div *ngIf="editForm.get('lastName')?.invalid && editForm.get('lastName')?.touched"
+                                class="cc-form-error">
+                                Last name is required.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cc-form-group">
+                        <label for="location" class="cc-form-label">Location</label>
+                        <input type="text" id="location" formControlName="location" class="cc-form-input"
+                            placeholder="e.g. Portland, Oregon">
+                    </div>
+                </div>
+
+                <!-- About Section -->
+                <div class="cc-edit__section">
+                    <h2 class="cc-edit__subtitle">About You</h2>
+                    <div class="cc-form-group">
+                        <label for="bio" class="cc-form-label">Bio</label>
+                        <textarea id="bio" formControlName="bio" class="cc-form-textarea" rows="4"
+                            placeholder="Tell other campers about yourself..."></textarea>
+                        <small class="cc-form-hint">Write a short bio detailing your camper experience and
+                            interests.</small>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="cc-edit__actions">
+                    <a routerLink="/profile" class="cc-btn cc-btn--outline">Cancel</a>
+                    <button type="submit" class="cc-btn cc-btn--primary" [disabled]="editForm.invalid">Save
+                        Changes</button>
+                </div>
+
+            </form>
+
+        </div>
+    </main>
+</div>

@@ -1,0 +1,290 @@
+import { Component, OnInit, AfterViewInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
+import { LucideAngularModule, BookOpen, Clock, Users, Award, Search, Star, TrendingUp, Play, ChevronRight, CheckCircle, ShieldCheck, Medal, GraduationCap, Eye, ArrowRight, Compass, Plus, Video as VideoIcon } from 'lucide-angular';
+import { ButtonComponent } from '../../shared/components/button.component';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { AcademyService } from './services/academy.service';
+import { Course, Certification, Video } from './models/academy.model';
+import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../core/services/auth.service';
+
+gsap.registerPlugin(ScrollTrigger);
+
+@Component({
+  selector: 'app-academy',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    LucideAngularModule,
+    ButtonComponent
+  ],
+  templateUrl: './academy.component.html',
+  styles: [`
+    :host {
+      display: block;
+      background-color: #F1EDE1;
+    }
+    @keyframes ken-burns {
+      0%   { transform: scale(1.05) translate(0%, 0%); }
+      25%  { transform: scale(1.12) translate(-1.5%, -1%); }
+      50%  { transform: scale(1.08) translate(1%, -0.5%); }
+      75%  { transform: scale(1.15) translate(-0.5%, 1%); }
+      100% { transform: scale(1.05) translate(0%, 0%); }
+    }
+    .animate-slow-zoom {
+      animation: ken-burns 30s ease-in-out infinite;
+    }
+    .hero-outline-text {
+      -webkit-text-stroke: 1px rgba(10, 31, 28, 0.08);
+      color: transparent;
+      line-height: 0.8;
+      select: none;
+      pointer-events: none;
+    }
+    .mist-layer {
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 50%, rgba(10, 31, 28, 0.03) 0%, transparent 70%);
+      filter: blur(60px);
+    }
+    .card-asymmetric-1 { border-radius: 28px 32px 24px 30px; }
+    .card-asymmetric-2 { border-radius: 32px 24px 30px 28px; }
+    .card-asymmetric-3 { border-radius: 24px 30px 28px 32px; }
+    .card-asymmetric-4 { border-radius: 30px 28px 32px 24px; }
+    
+    .medallion-shape {
+      border-radius: 24px 24px 8px 8px;
+    }
+    
+    .video-grid-asymmetric {
+      display: grid;
+      grid-template-columns: 1.5fr 0.75fr 0.75fr;
+      gap: 2rem;
+    }
+    @media (max-width: 1024px) {
+      .video-grid-asymmetric {
+        grid-template-columns: 1fr;
+      }
+    }
+    .category-grid-asymmetric {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: auto auto;
+      gap: 3rem;
+    }
+    @media (max-width: 1024px) {
+      .category-grid-asymmetric {
+        grid-template-columns: 1fr;
+      }
+    }
+  `]
+})
+export class AcademyComponent implements OnInit, AfterViewInit {
+  // Icons
+  readonly GraduationCap = GraduationCap;
+  readonly ArrowRight = ArrowRight;
+  readonly Play = Play;
+  readonly Eye = Eye;
+  readonly Star = Star;
+  readonly TrendingUp = TrendingUp;
+  readonly Clock = Clock;
+  readonly Medal = Medal;
+  readonly CheckCircle = CheckCircle;
+  readonly Award = Award;
+  readonly ChevronRight = ChevronRight;
+  readonly Search = Search;
+  readonly Compass = Compass;
+  readonly Plus = Plus;
+  readonly VideoIcon = VideoIcon;
+  readonly BookOpen = BookOpen;
+  readonly Users = Users;
+  readonly ShieldCheck = ShieldCheck;
+
+  selectedCategory = 'all';
+  searchQuery = '';
+
+  stats = [
+    { label: 'Video Lessons', value: 0, target: 0, icon: BookOpen, shadow: 'rgba(34, 197, 94, 0.15)', class: 'card-asymmetric-1' },
+    { label: 'Verified Experts', value: 18, target: 18, icon: ShieldCheck, shadow: 'rgba(59, 130, 246, 0.15)', class: 'card-asymmetric-2' },
+    { label: 'Active Learners', value: 8.4, target: 8.4, suffix: 'K', icon: Users, shadow: 'rgba(232, 93, 4, 0.15)', class: 'card-asymmetric-3' },
+    { label: 'Certifications', value: 0, target: 0, icon: Medal, shadow: 'rgba(212, 165, 116, 0.15)', class: 'card-asymmetric-4' },
+  ];
+
+  featuredVideos = signal<Video[]>([]);
+  courses = signal<Course[]>([]);
+  certifications = signal<Certification[]>([]);
+
+  // Video Creation Modal
+  showVideoModal = false;
+  isSubmittingVideo = false;
+  videoForm = {
+    title: '',
+    videoUrl: '',
+    thumbnailUrl: '',
+    category: 'Experience',
+    type: 'REEL',
+    description: ''
+  };
+
+  constructor(
+    private router: Router,
+    private academyService: AcademyService,
+    private authService: AuthService
+  ) { }
+
+  ngOnInit() {
+    this.initMistAnimation();
+    this.loadAcademyData();
+  }
+
+  private loadAcademyData() {
+    this.academyService.getCourses().subscribe({
+      next: (courses) => {
+        this.courses.set(courses);
+        this.stats[0].value = courses.length;
+        this.stats[0].target = courses.length;
+      },
+      error: (err) => console.error('Failed to load courses:', err)
+    });
+    this.academyService.getCertifications().subscribe({
+      next: (certs) => {
+        this.certifications.set(certs);
+        this.stats[3].value = certs.length;
+        this.stats[3].target = certs.length;
+      },
+      error: (err) => console.error('Failed to load certifications:', err)
+    });
+    this.academyService.getVideos().subscribe({
+      next: (videos) => this.featuredVideos.set(videos),
+      error: (err) => console.error('Failed to load videos:', err)
+    });
+  }
+
+  uploadReel() {
+    // Reset form and show modal
+    this.videoForm = {
+      title: '',
+      videoUrl: '',
+      thumbnailUrl: '',
+      category: 'Experience',
+      type: 'REEL',
+      description: ''
+    };
+    this.showVideoModal = true;
+  }
+
+  closeVideoModal() {
+    this.showVideoModal = false;
+  }
+
+  submitVideo() {
+    if (!this.videoForm.title || !this.videoForm.videoUrl) {
+      alert('Veuillez remplir au moins le titre et l\'URL de la vidéo.');
+      return;
+    }
+
+    this.isSubmittingVideo = true;
+
+    // Auto-generate thumbnail if missing
+    if (!this.videoForm.thumbnailUrl) {
+      this.videoForm.thumbnailUrl = this.videoForm.videoUrl.includes('unsplash')
+        ? this.videoForm.videoUrl
+        : 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=80';
+    }
+
+    const currentUser = this.authService.getToken() ? JSON.parse(localStorage.getItem('cc_user') || '{}') : null;
+
+    const newVideo: Partial<Video> = {
+      ...this.videoForm,
+      takeaways: [],
+      creator: currentUser
+        ? { id: currentUser.id, username: currentUser.username, name: currentUser.name || currentUser.username }
+        : { id: 'admin', username: 'admin', name: 'Explorer' }
+    };
+
+    this.academyService.createVideo(newVideo).subscribe({
+      next: () => {
+        this.isSubmittingVideo = false;
+        this.showVideoModal = false;
+        alert('Vidéo ajoutée avec succès ! 🎉');
+        this.loadAcademyData();
+      },
+      error: (err) => {
+        this.isSubmittingVideo = false;
+        console.error('Failed to create video:', err);
+        if (err.status === 403 || err.status === 401) {
+          alert('Session expirée ou accès refusé. Veuillez vous reconnecter.');
+        } else {
+          alert('Erreur lors de l\'ajout de la vidéo.');
+        }
+      }
+    });
+  }
+
+  ngAfterViewInit() {
+    this.initScrollReveal();
+  }
+
+  initMistAnimation() {
+    gsap.to('.mist-layer', {
+      x: '20%',
+      y: '10%',
+      duration: 20,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut'
+    });
+  }
+
+  initScrollReveal() {
+    gsap.from('.stagger-card', {
+      scrollTrigger: {
+        trigger: '.certification-section',
+        start: 'top 80%'
+      },
+      y: 100,
+      opacity: 0,
+      duration: 1,
+      stagger: 0.1,
+      ease: 'back.out(1.7)'
+    });
+  }
+
+  getIcon(iconName: string) {
+    const icons: Record<string, any> = {
+      'book-open': BookOpen,
+      'trending-up': TrendingUp,
+      'clock': Clock,
+      'star': Star
+    };
+    return icons[iconName] || Award;
+  }
+
+  viewVideo(id: string) {
+    this.router.navigate(['/academy/video', id]);
+  }
+
+  startLearning() {
+    const el = document.getElementById('featured-videos');
+    el?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  viewCertifications() {
+    this.router.navigate(['/academy/certifications']);
+  }
+
+  viewMyProgress() {
+    this.router.navigate(['/academy/my-progress']);
+  }
+
+  viewCourse(id: string) {
+    this.router.navigate(['/academy', id]);
+  }
+
+  viewLibrary() {
+    this.router.navigate(['/academy']);
+  }
+}

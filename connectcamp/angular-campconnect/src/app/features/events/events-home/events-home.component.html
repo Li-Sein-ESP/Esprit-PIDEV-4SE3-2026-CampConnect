@@ -1,0 +1,301 @@
+<div class="academy-container relative min-h-screen bg-[#F1EDE1] text-[#0A1F1C] font-sans overflow-x-hidden">
+
+  <!-- SECTION 1: HERO (Figma Refined) -->
+  <section
+    class="hero-section relative h-[80vh] w-full flex flex-col items-center justify-center overflow-hidden bg-[#F1EDE1]">
+    <!-- Clean Background Image -->
+    <div
+      class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1600')] bg-cover bg-center opacity-40">
+      <div class="absolute inset-0 bg-gradient-to-b from-[#F1EDE1]/10 via-transparent to-[#F1EDE1]"></div>
+    </div>
+
+    <div class="relative z-10 flex flex-col items-center text-center px-6">
+      <h1 class="font-serif text-[10vw] md:text-8xl font-medium text-[#2d6a4f] mb-6 tracking-tight leading-[0.9]">
+        Events & <br>
+        <span class="italic text-[#d4a373]">Expeditions.</span>
+      </h1>
+
+      <p class="text-xl md:text-2xl text-[#0A1F1C]/60 font-medium max-w-2xl mb-12 px-4 leading-relaxed">
+        Join our community for guided adventures, <br class="hidden md:block">
+        workshops, and expert-led wilderness sessions.
+      </p>
+
+      <div class="flex flex-col md:flex-row items-center gap-6">
+        <a href="#events-grid"
+          class="bg-[#2d6a4f] text-white px-12 py-5 rounded-full font-bold uppercase tracking-widest text-xs hover:scale-105 transition-all shadow-xl active:scale-95">
+          Browse All Events
+        </a>
+        <button
+          class="bg-white border border-[#2d6a4f]/20 text-[#2d6a4f] px-12 py-5 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-[#2d6a4f]/5 transition-all">
+          Host an Event
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: FEATURED EVENTS (Figma) -->
+  <section class="py-32 bg-white/50">
+    <div class="container mx-auto px-6 max-w-7xl">
+      <div class="flex items-center gap-4 mb-2">
+        <lucide-icon [img]="TrendingUp" class="w-6 h-6 text-[#d4a373]"></lucide-icon>
+        <h2 class="font-serif text-5xl font-medium text-[#2d6a4f]">Featured Events</h2>
+      </div>
+      <p class="text-[#0A1F1C]/40 font-medium mb-16">Top picks hand-picked by our wilderness experts.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div *ngFor="let event of featuredEvents()"
+          class="bg-white rounded-[2rem] overflow-hidden border border-[#0A1F1C]/5 shadow-sm hover:shadow-2xl transition-all duration-500 group flex flex-col">
+          <!-- Image Container -->
+          <div class="relative h-[300px] overflow-hidden">
+            <img [src]="event.imageUrl" [alt]="event.title"
+              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+            <div class="absolute top-6 right-6">
+              <span
+                class="px-4 py-1.5 bg-white/90 backdrop-blur-sm text-[#0A1F1C] text-[10px] font-black uppercase tracking-widest rounded-full shadow-sm">
+                Featured
+              </span>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="p-10 flex flex-col flex-grow">
+            <div class="flex items-start justify-between mb-6">
+              <h3 class="font-serif text-4xl font-medium text-[#2d6a4f] leading-tight pr-4">
+                {{ event.title }}
+              </h3>
+              <span
+                class="px-3 py-1 bg-[#F8F1E9] text-[#8B5E3C] rounded-md text-[10px] font-black uppercase tracking-widest whitespace-nowrap mt-2">
+                {{ event.difficulty }}
+              </span>
+            </div>
+
+            <p class="text-[#0A1F1C]/50 font-medium leading-relaxed mb-8 line-clamp-2">
+              {{ event.description }}
+            </p>
+
+            <div class="flex flex-col gap-3 mb-10 pb-8 border-b border-[#0A1F1C]/5">
+              <div class="flex items-center gap-3 text-[#0A1F1C]/40">
+                <lucide-icon [img]="Calendar" class="w-5 h-5 text-[#d4a373]"></lucide-icon>
+                <span class="text-sm font-bold">{{ formatDate(event.startDate) }} @ {{ formatTime(event.startDate)
+                  }}</span>
+              </div>
+              <div class="flex items-center gap-3 text-[#0A1F1C]/40">
+                <lucide-icon [img]="MapPin" class="w-5 h-5 text-[#d4a373]"></lucide-icon>
+                <span class="text-sm font-bold">{{ event.location.name }}</span>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex items-center justify-between mt-auto">
+              <div class="flex flex-col gap-2">
+                <div class="flex items-center gap-3 text-[#0A1F1C]/60">
+                  <lucide-icon [img]="Users" class="w-5 h-5"></lucide-icon>
+                  <span class="text-xs font-black tracking-widest">{{ event.registered }}/{{ event.capacity }}
+                    registered</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest"
+                    [class.bg-green-100]="event.registered < event.capacity"
+                    [class.text-green-700]="event.registered < event.capacity"
+                    [class.bg-red-100]="event.registered >= event.capacity"
+                    [class.text-red-700]="event.registered >= event.capacity">
+                    {{ event.registered >= event.capacity ? 'Full' : 'Available' }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="flex flex-col items-end gap-1">
+                <span class="text-3xl font-serif font-medium text-[#0A1F1C] mb-2">
+                  {{ event.price === 0 ? 'Free' : '$' + event.price }}
+                </span>
+                <a [routerLink]="['/events', event.id]"
+                  class="bg-[#2d6a4f] text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest text-[10px] hover:bg-[#1a4a36] transition-all shadow-lg flex items-center gap-2">
+                  View Details
+                  <lucide-icon [img]="ChevronRight" class="w-4 h-4"></lucide-icon>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: UPCOMING EVENTS (Figma) -->
+  <section class="py-20" id="events-grid">
+    <div class="container mx-auto px-6 max-w-7xl">
+
+      <!-- Section Header -->
+      <div class="flex items-center justify-between mb-12">
+        <h2 class="font-serif text-5xl font-medium tracking-tight text-[#2d6a4f]">Upcoming Events</h2>
+        <span class="text-sm font-bold text-[#0A1F1C]/40">{{ filteredEvents().length }} events found</span>
+      </div>
+
+      <!-- Filter Pills -->
+      <div class="flex flex-wrap gap-3 mb-16">
+        <button *ngFor="let cat of categories" (click)="setType(cat.id)"
+          [class.bg-[#0A1F1C]]="selectedType() === cat.id" [class.text-white]="selectedType() === cat.id"
+          [class.bg-white]="selectedType() !== cat.id" [class.text-[#0A1F1C]/40]="selectedType() !== cat.id"
+          class="px-8 py-4 rounded-full font-bold text-[10px] uppercase tracking-[0.15em] border border-[#0A1F1C]/5 shadow-sm transition-all duration-300 hover:scale-105 active:scale-95">
+          {{ cat.label }}
+        </button>
+      </div>
+
+      <!-- Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <a *ngFor="let event of filteredEvents()" [routerLink]="['/events', event.id]"
+          class="group bg-white rounded-[1.5rem] border border-[#0A1F1C]/5 overflow-hidden hover:shadow-2xl transition-all duration-300 flex flex-col h-full shadow-sm">
+
+          <!-- Image Container -->
+          <div class="relative h-60 overflow-hidden">
+            <img [src]="event.imageUrl" [alt]="event.title"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+            <!-- Category Badge (Figma style) -->
+            <div class="absolute top-4 left-4">
+              <span
+                class="px-4 py-1.5 bg-white rounded-full text-[10px] font-black uppercase tracking-widest text-[#0A1F1C]">
+                {{ event.type.replace('-', ' ') }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="p-8 flex flex-col flex-grow">
+            <h3
+              class="font-serif text-2xl font-medium text-[#2d6a4f] mb-3 leading-tight group-hover:text-[#d4a373] transition-colors">
+              {{ event.title }}
+            </h3>
+
+            <!-- Difficulty Badge -->
+            <div class="mb-6">
+              <span class="px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest"
+                [class.bg-[#EAF5F0]]="event.difficulty === 'beginner'"
+                [class.text-[#2d6a4f]]="event.difficulty === 'beginner'"
+                [class.bg-[#F8F1E9]]="event.difficulty === 'moderate' || event.difficulty === 'intermediate'"
+                [class.text-[#8B5E3C]]="event.difficulty === 'moderate' || event.difficulty === 'intermediate'"
+                [class.bg-[#F9EAEA]]="event.difficulty === 'advanced'"
+                [class.text-[#9D4A4A]]="event.difficulty === 'advanced'"
+                [class.bg-[#ECEDF3]]="event.difficulty === 'all-levels'"
+                [class.text-[#4A4D9D]]="event.difficulty === 'all-levels'">
+                {{ event.difficulty.replace('-', ' ') }}
+              </span>
+            </div>
+
+            <!-- Meta Info -->
+            <div class="flex flex-col gap-3 mb-8">
+              <div class="flex items-center gap-3 text-[#0A1F1C]/40">
+                <lucide-icon [img]="Calendar" class="w-4 h-4"></lucide-icon>
+                <span class="text-xs font-bold">{{ formatDate(event.startDate) }} • {{ formatTime(event.startDate)
+                  }}</span>
+              </div>
+              <div class="flex items-center gap-3 text-[#0A1F1C]/40">
+                <lucide-icon [img]="MapPin" class="w-4 h-4"></lucide-icon>
+                <span class="text-xs font-bold">{{ event.location.name }}</span>
+              </div>
+            </div>
+
+            <!-- Card Footer -->
+            <div class="mt-auto pt-6 border-t border-[#0A1F1C]/5 flex items-center justify-between">
+              <div class="flex items-center gap-2 text-[#0A1F1C]/40">
+                <lucide-icon [img]="Users" class="w-4 h-4"></lucide-icon>
+                <span class="text-[10px] font-black tracking-widest">{{ event.registered }}/{{ event.capacity }}</span>
+              </div>
+              <div class="text-sm font-black text-[#0A1F1C]">
+                {{ event.price === 0 ? 'Free' : '$' + event.price }}
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredEvents().length === 0" class="text-center py-32 flex flex-col items-center">
+        <lucide-icon [img]="Search" class="w-16 h-16 text-[#0A1F1C]/10 mb-8"></lucide-icon>
+        <h3 class="font-serif text-3xl font-medium text-[#0A1F1C]/60 mb-4">No events found</h3>
+        <p class="text-[#0A1F1C]/30 font-medium">Try adjusting your filters or search terms.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: WHY JOIN (Figma) -->
+  <section class="py-24 bg-white">
+    <div class="container mx-auto px-6 max-w-7xl">
+      <h2 class="font-serif text-5xl md:text-6xl font-medium text-center text-[#2d6a4f] mb-20 tracking-tight">
+        Why Join CampConnect Events?
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 text-center">
+        <!-- Benefit 1 -->
+        <div class="flex flex-col items-center group">
+          <div
+            class="w-20 h-20 rounded-3xl bg-[#ECEDED] flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+            <lucide-icon [img]="Users" class="w-8 h-8 text-[#0A1F1C]/60"></lucide-icon>
+          </div>
+          <h3 class="text-3xl font-serif font-medium text-[#2d6a4f] mb-4">Connect with Community</h3>
+          <p class="text-[#0A1F1C]/50 text-sm leading-relaxed">
+            Meet like-minded outdoor enthusiasts and build lasting friendships
+          </p>
+        </div>
+
+        <!-- Benefit 2 -->
+        <div class="flex flex-col items-center group">
+          <div
+            class="w-20 h-20 rounded-3xl bg-[#E6F3F0] flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+            <lucide-icon [img]="BookOpen" class="w-8 h-8 text-[#2d6a4f]"></lucide-icon>
+          </div>
+          <h3 class="text-3xl font-serif font-medium text-[#2d6a4f] mb-4">Learn from Experts</h3>
+          <p class="text-[#0A1F1C]/50 text-sm leading-relaxed">
+            Gain skills from certified guides and experienced instructors
+          </p>
+        </div>
+
+        <!-- Benefit 3 -->
+        <div class="flex flex-col items-center group">
+          <div
+            class="w-20 h-20 rounded-3xl bg-[#F8F1EB] flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+            <lucide-icon [img]="Mountain" class="w-8 h-8 text-[#8B5E3C]"></lucide-icon>
+          </div>
+          <h3 class="text-3xl font-serif font-medium text-[#2d6a4f] mb-4">Explore Safely</h3>
+          <p class="text-[#0A1F1C]/50 text-sm leading-relaxed">
+            Venture into new terrain with experienced guides and group support
+          </p>
+        </div>
+
+        <!-- Benefit 4 -->
+        <div class="flex flex-col items-center group">
+          <div
+            class="w-20 h-20 rounded-3xl bg-[#E9F1F7] flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+            <lucide-icon [img]="Award" class="w-8 h-8 text-[#4A7C9D]"></lucide-icon>
+          </div>
+          <h3 class="text-3xl font-serif font-medium text-[#2d6a4f] mb-4">Earn Certifications</h3>
+          <p class="text-[#0A1F1C]/50 text-sm leading-relaxed">
+            Complete courses and earn recognized outdoor certifications
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: CTA BANNER (Academy Style Refined) -->
+  <section class="pb-32 px-6">
+    <div class="container mx-auto max-w-5xl">
+      <div class="relative bg-[#0A1F1C] rounded-[3rem] p-20 text-center overflow-hidden">
+        <div class="absolute -top-32 -right-32 w-96 h-96 bg-[#2d6a4f]/10 blur-[120px] rounded-full"></div>
+        <div class="relative z-10">
+          <h2 class="font-serif text-5xl md:text-7xl font-medium text-white mb-8 tracking-tight">
+            Host Your Own <br>
+            <span class="italic text-[#d4a373]">Expedition.</span>
+          </h2>
+          <p class="text-white/40 font-medium max-w-lg mx-auto mb-12">
+            Share your expertise with the community. Lead workshops, organize treks, or host wilderness certifications.
+          </p>
+          <button
+            class="bg-[#2d6a4f] text-white px-12 py-6 rounded-full font-bold uppercase tracking-widest text-xs hover:scale-105 transition-all shadow-2xl">
+            Start Creating
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>

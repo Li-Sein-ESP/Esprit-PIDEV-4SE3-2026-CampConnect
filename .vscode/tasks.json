@@ -1,0 +1,13 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "npm",
+            "script": "start",
+            "path": "connectcamp/angular-campconnect",
+            "problemMatcher": [],
+            "label": "npm: start - connectcamp/angular-campconnect",
+            "detail": "ng serve"
+        }
+    ]
+}

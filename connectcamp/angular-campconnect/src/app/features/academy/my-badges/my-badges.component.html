@@ -1,0 +1,179 @@
+<div class="academy-container relative min-h-screen bg-[#F1EDE1] text-[#0A1F1C] font-sans overflow-x-hidden">
+
+  <!-- Back Navigation (Glassmorphic Dark Translucent) -->
+  <nav class="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-[#F1EDE1]/60 border-b border-[#0A1F1C]/5 py-6">
+    <div class="container mx-auto px-6 flex justify-between items-center max-w-7xl">
+      <button (click)="goBack()"
+        class="flex items-center gap-2 text-[#0A1F1C]/40 hover:text-[#2d6a4f] transition-all font-bold uppercase tracking-widest text-[10px] group">
+        <lucide-icon [img]="ChevronLeft" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></lucide-icon>
+        Back to Roadmap
+      </button>
+      <div class="flex items-center gap-4">
+        <div class="px-4 py-1.5 rounded-full bg-[#0A1F1C]/5 border border-[#0A1F1C]/10 flex items-center gap-2">
+          <lucide-icon [img]="ShieldCheck" class="w-3.5 h-3.5 text-green-600"></lucide-icon>
+          <span class="text-[9px] font-black uppercase tracking-widest text-[#0A1F1C]/60">Verified Credentials</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="relative pt-48 pb-12 overflow-hidden">
+    <!-- Atmospheric Background Typography -->
+    <div class="absolute inset-0 flex items-center justify-center select-none pointer-events-none z-0">
+      <h1 class="hero-outline-text text-[20vw] font-black uppercase tracking-tighter w-full text-center opacity-30">
+        CREDENTIALS
+      </h1>
+    </div>
+
+    <div class="container mx-auto px-6 relative z-10 max-w-7xl">
+      <div class="flex flex-col items-center text-center">
+        <div
+          class="inline-flex items-center gap-3 bg-[#0A1F1C]/5 backdrop-blur-md px-4 py-2 rounded-full border border-[#0A1F1C]/10 mb-8">
+          <lucide-icon [img]="Award" class="w-4 h-4 text-[#d4a373]"></lucide-icon>
+          <span class="text-[10px] font-black uppercase tracking-widest text-[#0A1F1C]/60 tracking-[0.2em]">The Honor
+            Roll</span>
+        </div>
+        <h2 class="font-serif text-6xl md:text-8xl font-medium text-[#0A1F1C] leading-[0.8] tracking-tight">
+          My <span class="text-[#d4a373]">Badges</span>
+        </h2>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Grid -->
+  <main class="container mx-auto px-6 max-w-7xl relative z-20 pb-40">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+
+      <!-- LEFT: Selection Pillar -->
+      <div class="lg:col-span-4 flex flex-col gap-6">
+        <div class="flex items-center gap-4 mb-6 px-4">
+          <span class="text-[10px] font-black uppercase tracking-[0.3em] text-[#0A1F1C]/20">Earned Awards</span>
+          <div class="h-px flex-1 bg-[#0A1F1C]/10"></div>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <div *ngFor="let cert of certificates" (click)="selectCert(cert.id)"
+            class="cert-selection-card bg-white p-6 cursor-pointer flex items-center gap-6 shadow-sm group hover:shadow-xl transition-all"
+            [class.active]="selectedCertId === cert.id">
+
+            <div
+              class="w-16 h-16 rounded-2xl bg-[#F1EDE1] border border-[#0A1F1C]/10 flex items-center justify-center text-3xl shadow-sm transition-all"
+              [style.border-color]="selectedCertId === cert.id ? cert.color + '60' : 'rgba(10,31,28,0.05)'">
+              {{ cert.emoji }}
+            </div>
+
+            <div class="flex-1">
+              <h3 class="text-lg font-black text-[#0A1F1C] tracking-tighter mb-1">{{ cert.title }}</h3>
+              <div class="flex items-center gap-2">
+                <div class="w-1.5 h-1.5 rounded-full bg-green-600"></div>
+                <span class="text-[9px] font-black uppercase tracking-widest text-[#0A1F1C]/40">Verified Earned</span>
+              </div>
+            </div>
+
+            <lucide-icon [img]="ChevronRight" class="w-5 h-5 text-[#0A1F1C]/10"
+              *ngIf="selectedCertId !== cert.id"></lucide-icon>
+            <lucide-icon [img]="Eye" class="w-5 h-5 text-[#2d6a4f]" *ngIf="selectedCertId === cert.id"></lucide-icon>
+          </div>
+        </div>
+
+        <!-- Verification Meta -->
+        <div class="card-asymmetric bg-white border border-[#0A1F1C]/10 p-8 mt-6 shadow-sm">
+          <div class="flex items-center gap-3 mb-4">
+            <lucide-icon [img]="ShieldCheck" class="w-5 h-5 text-blue-600"></lucide-icon>
+            <h4 class="text-sm font-black text-[#0A1F1C] uppercase tracking-widest">Global Vault</h4>
+          </div>
+          <p class="text-[11px] text-[#0A1F1C]/40 font-medium leading-relaxed mb-6">
+            Your credentials are secured on the CampConnect immutable ledger, accessible worldwide for professional
+            verification.
+          </p>
+          <button
+            class="text-[9px] font-black uppercase tracking-widest text-blue-600 hover:text-[#0A1F1C] transition-colors flex items-center gap-2 group">
+            Vault Security Specs
+            <lucide-icon [img]="ExternalLink" class="w-3 h-3 group-hover:scale-110"></lucide-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- RIGHT: Immersive Credential Viewer -->
+      <div class="lg:col-span-8" *ngIf="selectedCert">
+        <div class="bg-white border border-[#0A1F1C]/10 rounded-[3rem] p-4 relative overflow-hidden group shadow-2xl">
+          <!-- Interior Medallion Display -->
+          <div class="medallion-inner p-16 lg:p-24 flex flex-col items-center text-center">
+
+            <div
+              class="w-40 h-40 bg-[#F1EDE1] border-4 border-[#0A1F1C]/5 rounded-[3rem] flex items-center justify-center text-7xl shadow-sm mb-12 relative">
+              <div class="absolute -inset-4 border border-[#d4a373]/20 rounded-[3.5rem] animate-pulse"></div>
+              {{ selectedCert.emoji }}
+            </div>
+
+            <div class="text-[10px] font-bold uppercase tracking-[0.5em] text-[#d4a373] mb-6">Certificate of Completion
+            </div>
+
+            <h2
+              class="font-serif text-5xl lg:text-7xl font-medium text-[#0A1F1C] tracking-tight leading-[0.9] mb-8 max-w-xl">
+              {{ selectedCert.title }}
+            </h2>
+
+            <p class="text-lg text-[#0A1F1C]/40 font-medium max-w-2xl leading-relaxed mb-12">
+              {{ selectedCert.description }}
+            </p>
+
+            <!-- Skill Badges -->
+            <div class="flex flex-wrap justify-center gap-3 mb-16">
+              <span *ngFor="let skill of selectedCert.skills"
+                class="px-5 py-2 bg-[#0A1F1C]/5 border border-[#0A1F1C]/10 rounded-full text-[10px] font-black uppercase tracking-widest text-[#0A1F1C]/60">
+                #{{ skill }}
+              </span>
+            </div>
+
+            <!-- Signature Metadata -->
+            <div
+              class="grid grid-cols-1 md:grid-cols-2 gap-12 w-full max-w-2xl border-t border-[#0A1F1C]/5 pt-12 text-left">
+              <div>
+                <div
+                  class="text-[9px] font-black text-[#0A1F1C]/20 uppercase tracking-[0.3em] mb-2 text-center md:text-left">
+                  Earning Matrix</div>
+                <div class="flex flex-col gap-4">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-black text-[#0A1F1C]/40 uppercase tracking-widest">Earned Date</span>
+                    <span class="text-sm font-black text-[#0A1F1C]">{{ selectedCert.earnedDate }}</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-black text-[#0A1F1C]/40 uppercase tracking-widest">Auth Code</span>
+                    <span class="text-sm font-black text-blue-600 font-mono">{{ selectedCert.verificationCode }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-col items-center md:items-end justify-center">
+                <div class="flex flex-col items-center md:items-end gap-1">
+                  <span class="text-[9px] font-black text-[#0A1F1C]/20 uppercase tracking-[0.3em]">Authorized by</span>
+                  <div class="text-2xl font-black italic text-[#0A1F1C] tracking-tighter select-none">CampConnect</div>
+                  <div class="h-px w-24 bg-[#0A1F1C]/10 mt-1"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Action Bar (Integrated) -->
+          <div class="flex flex-wrap gap-4 p-8 border-t border-[#0A1F1C]/5 bg-[#0A1F1C]/5">
+            <button (click)="downloadCert()"
+              class="flex-1 py-6 bg-[#2d6a4f] text-white rounded-full font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:scale-[1.02] transition-all active:scale-[0.98] shadow-xl">
+              <lucide-icon [img]="Download" class="w-5 h-5"></lucide-icon>
+              Download PDF
+            </button>
+            <button (click)="shareCert()"
+              class="py-6 px-10 bg-white border border-[#0A1F1C]/10 rounded-full font-bold uppercase tracking-widest text-[10px] text-[#0A1F1C]/60 hover:bg-[#F1EDE1] flex items-center gap-3 transition-all shadow-sm">
+              <lucide-icon [img]="Share2" class="w-4 h-4"></lucide-icon>
+              Distribute
+            </button>
+            <button (click)="downloadCert()"
+              class="py-6 px-10 bg-white border border-[#0A1F1C]/10 rounded-full font-bold uppercase tracking-widest text-[10px] text-[#0A1F1C]/60 hover:bg-[#F1EDE1] flex items-center gap-3 transition-all shadow-sm">
+              <lucide-icon [img]="Printer" class="w-4 h-4"></lucide-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

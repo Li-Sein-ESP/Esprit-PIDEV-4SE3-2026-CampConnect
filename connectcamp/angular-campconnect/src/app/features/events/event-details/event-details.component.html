@@ -1,0 +1,263 @@
+<div class="academy-container relative min-h-screen bg-[#F1EDE1] text-[#0A1F1C] font-sans overflow-x-hidden">
+
+  <!-- Back Navigation -->
+  <nav class="absolute top-0 left-0 w-full z-50 py-8 px-6">
+    <div class="container mx-auto max-w-7xl">
+      <button (click)="navigateBack()"
+        class="flex items-center gap-3 text-[#0A1F1C] hover:text-[#2d6a4f] transition-all font-bold tracking-tight text-sm group">
+        <lucide-icon [img]="ChevronLeft" class="w-5 h-5 group-hover:-translate-x-1 transition-transform"></lucide-icon>
+        Back to Events
+      </button>
+    </div>
+  </nav>
+
+  <ng-container *ngIf="event() as evt">
+
+    <!-- FULL-WIDTH HERO HEADER -->
+    <header class="relative h-[60vh] w-full overflow-hidden">
+      <!-- Background Image -->
+      <img [src]="evt.imageUrl" [alt]="evt.title" class="w-full h-full object-cover">
+      <div class="absolute inset-0 bg-white/20"></div>
+
+      <!-- Overlaid Content -->
+      <div class="absolute bottom-0 left-0 right-0 p-12 pb-16">
+        <div class="container mx-auto max-w-7xl">
+          <!-- Badges -->
+          <div class="flex flex-wrap items-center gap-2 mb-8">
+            <span
+              class="px-5 py-2 bg-white text-[#0A1F1C] rounded-full text-[11px] font-black uppercase tracking-widest shadow-sm">
+              {{ evt.type.replace('-', ' ') }}
+            </span>
+            <span
+              class="px-5 py-2 bg-[#F8F1E9] text-[#8B5E3C] rounded-full text-[11px] font-black uppercase tracking-widest shadow-sm">
+              {{ evt.difficulty }}
+            </span>
+            <span *ngFor="let tag of evt.tags"
+              class="px-5 py-2 border border-[#0A1F1C]/20 backdrop-blur-md text-[#0A1F1C] rounded-full text-[11px] font-black uppercase tracking-widest">
+              {{ tag }}
+            </span>
+          </div>
+
+          <h1
+            class="font-serif text-5xl md:text-8xl font-medium text-[#214930] leading-[0.9] tracking-tight mb-4 opacity-80">
+            {{ evt.title }}
+          </h1>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT GRID -->
+    <main class="container mx-auto px-6 max-w-7xl -mt-12 relative z-10 pb-32">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+        <!-- LEFT COLUMN -->
+        <div class="lg:col-span-8 flex flex-col gap-8">
+
+          <!-- About Section Card -->
+          <div class="bg-white rounded-[1.5rem] p-12 shadow-sm border border-[#0A1F1C]/5">
+            <h2 class="font-serif text-5xl font-medium text-[#2d6a4f] mb-8">About This Event</h2>
+            <p class="text-lg text-[#0A1F1C]/50 leading-relaxed font-medium mb-12">
+              {{ evt.description }}
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-y-12 gap-x-12">
+              <!-- Date & Time -->
+              <div class="flex items-start gap-4">
+                <lucide-icon [img]="Calendar" class="w-6 h-6 text-[#2d6a4f] mt-1"></lucide-icon>
+                <div>
+                  <div class="text-[11px] font-black uppercase tracking-widest text-[#0A1F1C]/30 mb-2">Date & Time</div>
+                  <div class="text-base font-bold text-[#0A1F1C]">{{ formatDate(evt.startDate) }}</div>
+                  <div class="text-sm text-[#0A1F1C]/50 mt-1 font-medium">{{ formatTime(evt.startDate) }} - {{
+                    formatTime(evt.endDate) }}</div>
+                </div>
+              </div>
+
+              <!-- Location -->
+              <div class="flex items-start gap-4">
+                <lucide-icon [img]="MapPin" class="w-6 h-6 text-[#2d6a4f] mt-1"></lucide-icon>
+                <div>
+                  <div class="text-[11px] font-black uppercase tracking-widest text-[#0A1F1C]/30 mb-2">Location</div>
+                  <div class="text-base font-bold text-[#0A1F1C]">{{ evt.location.name }}</div>
+                  <div class="text-sm text-[#0A1F1C]/50 mt-1 font-medium">Meet at: {{ evt.location.address.split(',')[0]
+                    }}</div>
+                </div>
+              </div>
+
+              <!-- Capacity -->
+              <div class="flex items-start gap-4">
+                <lucide-icon [img]="Users" class="w-6 h-6 text-[#2d6a4f] mt-1"></lucide-icon>
+                <div>
+                  <div class="text-[11px] font-black uppercase tracking-widest text-[#0A1F1C]/30 mb-2">Capacity</div>
+                  <div class="text-base font-bold text-[#0A1F1C]">{{ evt.registered }} / {{ evt.capacity }} registered
+                  </div>
+                  <div class="mt-3">
+                    <span
+                      class="px-4 py-1.5 bg-[#9D4A4A] text-white rounded-md text-[10px] font-black uppercase tracking-widest">
+                      Full - Waitlist Available
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Price -->
+              <div class="flex items-start gap-4">
+                <lucide-icon [img]="DollarSign" class="w-6 h-6 text-[#2d6a4f] mt-1"></lucide-icon>
+                <div>
+                  <div class="text-[11px] font-black uppercase tracking-widest text-[#0A1F1C]/30 mb-2">Price</div>
+                  <div class="text-3xl font-serif font-medium text-[#0A1F1C]">
+                    {{ evt.price === 0 ? 'Free' : '$' + evt.price }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- What to Expect Card -->
+          <div *ngIf="evt.whatToExpect" class="bg-white rounded-[1.5rem] p-12 shadow-sm border border-[#0A1F1C]/5">
+            <div class="flex items-center gap-4 mb-8">
+              <lucide-icon [img]="Info" class="w-8 h-8 text-[#2d6a4f]"></lucide-icon>
+              <h2 class="font-serif text-5xl font-medium text-[#2d6a4f]">What to Expect</h2>
+            </div>
+            <div class="flex flex-col gap-6">
+              <div *ngFor="let item of evt.whatToExpect" class="flex items-start gap-4">
+                <lucide-icon [img]="CheckCircle" class="w-5 h-5 text-[#2d6a4f] mt-0.5"></lucide-icon>
+                <span class="text-lg text-[#0A1F1C]/60 font-medium">{{ item }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- What to Bring Card -->
+          <div *ngIf="evt.whatToBring" class="bg-white rounded-[1.5rem] p-12 shadow-sm border border-[#0A1F1C]/5">
+            <div class="flex items-center gap-4 mb-8">
+              <lucide-icon [img]="Backpack" class="w-8 h-8 text-[#2d6a4f]"></lucide-icon>
+              <h2 class="font-serif text-5xl font-medium text-[#2d6a4f]">What to Bring</h2>
+            </div>
+            <div class="flex flex-col gap-4">
+              <div *ngFor="let item of evt.whatToBring" class="flex items-start gap-4">
+                <div class="w-2 h-2 rounded-full bg-[#0A1F1C]/20 mt-2.5"></div>
+                <span class="text-lg text-[#0A1F1C]/60 font-medium">{{ item }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- What's Included Card -->
+          <div *ngIf="evt.whatsIncluded" class="bg-white rounded-[1.5rem] p-12 shadow-sm border border-[#0A1F1C]/5">
+            <div class="flex items-center gap-4 mb-8">
+              <lucide-icon [img]="Award" class="w-8 h-8 text-[#2d6a4f]"></lucide-icon>
+              <h2 class="font-serif text-5xl font-medium text-[#2d6a4f]">What's Included</h2>
+            </div>
+            <div class="flex flex-col gap-6">
+              <div *ngFor="let item of evt.whatsIncluded" class="flex items-start gap-4">
+                <lucide-icon [img]="CheckCircle" class="w-5 h-5 text-[#8B5E3C]/60 mt-0.5"></lucide-icon>
+                <span class="text-lg text-[#0A1F1C]/60 font-medium">{{ item }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Safety & Policies Card -->
+          <div class="bg-white rounded-[1.5rem] p-12 shadow-sm border border-[#0A1F1C]/5">
+            <div class="flex items-center gap-4 mb-8">
+              <lucide-icon [img]="Shield" class="w-8 h-8 text-[#2d6a4f]"></lucide-icon>
+              <h2 class="font-serif text-5xl font-medium text-[#2d6a4f]">Safety & Policies</h2>
+            </div>
+
+            <div class="mb-12">
+              <h3 class="font-serif text-3xl font-medium text-[#2d6a4f] mb-6">Safety Notes</h3>
+              <div class="flex flex-col gap-5">
+                <div *ngFor="let note of evt.safetyNotes" class="flex items-start gap-4">
+                  <lucide-icon [img]="AlertTriangle" class="w-5 h-5 text-[#0A1F1C]/40 mt-0.5"></lucide-icon>
+                  <span class="text-base text-[#0A1F1C]/50 font-medium">{{ note }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="font-serif text-3xl font-medium text-[#2d6a4f] mb-3">Cancellation Policy</h3>
+              <p class="text-base text-[#0A1F1C]/50 font-medium">{{ evt.cancellationPolicy }}</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: Sidebar -->
+        <div class="lg:col-span-4 flex flex-col gap-8 sticky top-12">
+
+          <!-- Registration Sidebar Card -->
+          <div class="bg-white rounded-[1.5rem] p-12 shadow-sm border border-[#0A1F1C]/5 text-center">
+            <div class="flex flex-col items-center mb-10">
+              <span class="text-4xl font-serif font-medium text-[#0A1F1C] mb-2">
+                {{ evt.price === 0 ? 'Free' : '$' + evt.price }}
+              </span>
+              <span class="text-[11px] font-black uppercase tracking-widest text-[#0A1F1C]/30">per person</span>
+            </div>
+
+            <!-- CTA -->
+            <button *ngIf="evt.registered >= evt.capacity" (click)="joinWaitlist()"
+              class="w-full py-6 border-2 border-[#2d6a4f]/20 text-[#2d6a4f]/40 font-serif text-xl rounded-2xl hover:bg-[#2d6a4f]/5 transition-all mb-6">
+              Event Full - Join Waitlist
+            </button>
+            <button *ngIf="evt.registered < evt.capacity" (click)="register()"
+              class="w-full py-6 bg-[#2d6a4f] text-white font-serif text-xl rounded-2xl hover:scale-[1.02] transition-all shadow-xl mb-6">
+              Confirm Registration
+            </button>
+
+            <!-- Save/Share Buttons -->
+            <div class="grid grid-cols-2 gap-4 mb-10 pb-10 border-b border-[#0A1F1C]/5">
+              <button (click)="saveEvent()"
+                class="flex items-center justify-center gap-3 py-4 border border-[#2d6a4f] rounded-xl text-sm font-bold text-[#2d6a4f] tracking-tight hover:bg-[#2d6a4f]/5 transition-all">
+                <lucide-icon [img]="Heart" class="w-5 h-5" [class.fill-red-500]="isFavorited()"
+                  [class.text-red-500]="isFavorited()"></lucide-icon>
+                Save
+              </button>
+              <button (click)="shareEvent()"
+                class="flex items-center justify-center gap-3 py-4 border border-[#2d6a4f] rounded-xl text-sm font-bold text-[#2d6a4f] tracking-tight hover:bg-[#2d6a4f]/5 transition-all">
+                <lucide-icon [img]="Share2" class="w-5 h-5 text-[#0A1F1C]/40"></lucide-icon>
+                Share
+              </button>
+            </div>
+
+            <!-- Checklist -->
+            <div class="flex flex-col gap-5 text-left">
+              <div class="flex items-center gap-4">
+                <lucide-icon [img]="CheckCircle" class="w-5 h-5 text-[#2d6a4f]"></lucide-icon>
+                <span class="text-sm font-medium text-[#0A1F1C]/60">Instant confirmation</span>
+              </div>
+              <div class="flex items-center gap-4">
+                <lucide-icon [img]="CheckCircle" class="w-5 h-5 text-[#2d6a4f]"></lucide-icon>
+                <span class="text-sm font-medium text-[#0A1F1C]/60">Free cancellation (48h notice)</span>
+              </div>
+              <div class="flex items-center gap-4">
+                <lucide-icon [img]="CheckCircle" class="w-5 h-5 text-[#2d6a4f]"></lucide-icon>
+                <span class="text-sm font-medium text-[#0A1F1C]/60">Expert guides & support</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Organizer Profile Card -->
+          <div class="bg-white rounded-[1.5rem] p-10 shadow-sm border border-[#0A1F1C]/5">
+            <h3 class="text-[11px] font-black uppercase tracking-widest text-[#0A1F1C]/30 mb-8">Hosted By</h3>
+            <div class="flex items-center gap-6 mb-8">
+              <img [src]="evt.organizer.avatar" [alt]="evt.organizer.name"
+                class="w-16 h-16 rounded-full object-cover shadow-md bg-[#0A1F1C]/10">
+              <div class="relative">
+                <h3 class="text-3xl font-serif font-medium text-[#2d6a4f] leading-tight mb-1">{{ evt.organizer.name }}
+                </h3>
+                <div class="absolute -right-6 top-2">
+                  <lucide-icon [img]="CheckCircle" class="w-4 h-4 text-[#2d6a4f]"></lucide-icon>
+                </div>
+              </div>
+            </div>
+
+            <button
+              class="w-full py-4 bg-transparent border border-[#2d6a4f]/20 text-[#2d6a4f] font-bold tracking-tight text-sm rounded-xl hover:bg-[#2d6a4f]/5 transition-all">
+              Contact Organizer
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+
+  </ng-container>
+</div>

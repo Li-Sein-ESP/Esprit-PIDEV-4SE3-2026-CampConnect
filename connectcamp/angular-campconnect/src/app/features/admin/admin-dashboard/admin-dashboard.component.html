@@ -1,0 +1,118 @@
+<div class="min-h-screen bg-[var(--color-background)] flex">
+  <!-- Main Content -->
+  <main class="flex-1 p-8 lg:p-12 overflow-y-auto">
+    <div class="max-w-6xl mx-auto">
+      <!-- Welcome Header -->
+      <header class="mb-12">
+        <div class="flex justify-between items-start">
+          <div>
+            <h2 class="text-4xl font-bold text-[var(--color-text-heading)] mb-2">Command Center</h2>
+            <p class="text-[var(--color-text-secondary)] text-lg">Good morning, Commander. Here's what's happening in
+              your wilderness.</p>
+          </div>
+          <div class="flex gap-4">
+            <app-button variant="outline" routerLink="/admin/events">Manage All Events</app-button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+        <app-card variant="elevated"
+          customClass="border-0 shadow-lg bg-[var(--color-primary-500)] text-white overflow-hidden group">
+          <app-card-content class="relative z-10 p-8">
+            <lucide-icon [img]="CalendarIcon" [size]="48"
+              class="absolute -right-4 -top-4 text-white/10 group-hover:scale-125 transition-transform"></lucide-icon>
+            <h4 class="text-4xl font-black mb-1">{{ stats().totalEvents }}</h4>
+            <p class="text-xs font-bold uppercase tracking-widest text-white/70">Missions Deployed</p>
+          </app-card-content>
+        </app-card>
+
+        <app-card variant="elevated"
+          customClass="border-0 shadow-lg bg-[var(--color-secondary-500)] text-white overflow-hidden group">
+          <app-card-content class="relative z-10 p-8">
+            <lucide-icon [img]="BookIcon" [size]="48"
+              class="absolute -right-4 -top-4 text-white/10 group-hover:scale-125 transition-transform"></lucide-icon>
+            <h4 class="text-4xl font-black mb-1">{{ stats().totalCourses }}</h4>
+            <p class="text-xs font-bold uppercase tracking-widest text-white/70">Academy Programs</p>
+          </app-card-content>
+        </app-card>
+
+        <app-card variant="elevated"
+          customClass="border-0 shadow-lg bg-[var(--color-accent-500)] text-white overflow-hidden group">
+          <app-card-content class="relative z-10 p-8">
+            <lucide-icon [img]="TrendingIcon" [size]="48"
+              class="absolute -right-4 -top-4 text-white/10 group-hover:scale-125 transition-transform"></lucide-icon>
+            <h4 class="text-4xl font-black mb-1">{{ stats().totalParticipants }}</h4>
+            <p class="text-xs font-bold uppercase tracking-widest text-white/70">Total Registrations</p>
+          </app-card-content>
+        </app-card>
+
+        <app-card variant="elevated"
+          customClass="border-0 shadow-lg bg-[var(--color-primary-800)] text-white overflow-hidden group">
+          <app-card-content class="relative z-10 p-8">
+            <lucide-icon [img]="ActivityIcon" [size]="48"
+              class="absolute -right-4 -top-4 text-white/10 group-hover:scale-125 transition-transform"></lucide-icon>
+            <h4 class="text-4xl font-black mb-1">{{ stats().activeAcademyCerts }}</h4>
+            <p class="text-xs font-bold uppercase tracking-widest text-white/70">Certifications Active</p>
+          </app-card-content>
+        </app-card>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Quick Actions -->
+        <div class="lg:col-span-1 space-y-6">
+          <h3 class="text-xl font-bold text-[var(--color-text-heading)]">Quick Actions</h3>
+          <div class="grid grid-cols-1 gap-4">
+            <button routerLink="/admin/events" (click)="loadStats()"
+              class="flex items-center gap-4 p-4 bg-white rounded-2xl hover:bg-[var(--color-primary-50)] transition-all border border-[var(--color-neutral-100)] text-left group">
+              <div
+                class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <lucide-icon [img]="PlusIcon" [size]="20"></lucide-icon>
+              </div>
+              <div>
+                <p class="font-bold text-[var(--color-text-heading)]">New Event</p>
+                <p class="text-xs text-[var(--color-text-secondary)]">Create a wilderness mission</p>
+              </div>
+            </button>
+            <button routerLink="/admin/academy"
+              class="flex items-center gap-4 p-4 bg-white rounded-2xl hover:bg-[var(--color-secondary-50)] transition-all border border-[var(--color-neutral-100)] text-left group">
+              <div
+                class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <lucide-icon [img]="PlusIcon" [size]="20"></lucide-icon>
+              </div>
+              <div>
+                <p class="font-bold text-[var(--color-text-heading)]">Add Course</p>
+                <p class="text-xs text-[var(--color-text-secondary)]">Design a new academy program</p>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="lg:col-span-2 space-y-6">
+          <h3 class="text-xl font-bold text-[var(--color-text-heading)]">System Pulse</h3>
+          <div class="bg-white rounded-[2.5rem] p-8 shadow-sm border border-[var(--color-neutral-100)]">
+            <div class="space-y-8">
+              <div *ngFor="let activity of recentActivities()" class="flex gap-6 items-start relative pb-8 last:pb-0">
+                <div class="absolute left-6 top-12 bottom-0 w-0.5 bg-[var(--color-neutral-100)] last:hidden"></div>
+                <div
+                  class="w-12 h-12 bg-[var(--color-background)] rounded-full flex items-center justify-center z-10 shadow-sm border border-white">
+                  <lucide-icon [img]="activity.icon" [size]="20" class="text-[var(--color-primary-500)]"></lucide-icon>
+                </div>
+                <div class="flex-1">
+                  <div class="flex justify-between items-start mb-1">
+                    <h4 class="font-bold text-[var(--color-text-heading)]">{{ activity.title }}</h4>
+                    <span class="text-xs text-[var(--color-text-tertiary)]">{{ activity.time }}</span>
+                  </div>
+                  <p class="text-sm text-[var(--color-text-secondary)]">Activity recorded on the wilderness network
+                    infrastructure.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

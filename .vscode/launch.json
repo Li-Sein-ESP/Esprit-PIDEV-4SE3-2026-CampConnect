@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Backend - CampConnect",
+            "request": "launch",
+            "mainClass": "com.campconnect.CampConnectApplication",
+            "projectName": "campconnect-backend",
+            "cwd": "${workspaceFolder}/connectcamp/backend"
+        },
+        {
+            "name": "Frontend - Angular",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "npm start",
+            "cwd": "${workspaceFolder}/connectcamp/angular-campconnect"
+        }
+    ]
+}

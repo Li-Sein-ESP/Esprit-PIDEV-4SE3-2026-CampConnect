@@ -1,0 +1,377 @@
+<!-- ========== NAVBAR ========== -->
+<nav class="cc-navbar" id="navbar" [class.cc-navbar--scrolled]="isScrolled">
+    <div class="cc-navbar__inner">
+        <a href="#" class="cc-navbar__logo" (click)="scrollToTarget('#hero', $event)">
+            <svg class="cc-navbar__logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 2L3 28h26L16 2z" stroke="currentColor" stroke-width="2" fill="none" />
+                <path d="M10 28l6-10 6 10" stroke="currentColor" stroke-width="2" fill="none" />
+                <circle cx="16" cy="12" r="2" fill="currentColor" />
+            </svg>
+            <span>CampConnect V2</span>
+        </a>
+        <ul class="cc-navbar__links">
+            <li><a href="#campsites" (click)="scrollToTarget('#campsites', $event)">Campsites</a></li>
+            <li><a routerLink="/academy" style="color: var(--cc-sand); font-weight: 700;">ACADEMY</a></li>
+            <li><a routerLink="/events" style="color: var(--cc-sand); font-weight: 700;">EVENTS</a></li>
+            <li><a href="#community" (click)="scrollToTarget('#community', $event)">Community</a></li>
+        </ul>
+        <div class="cc-navbar__actions">
+            <ng-container *ngIf="!isAuthenticated">
+                <a routerLink="/login" class="cc-btn cc-btn--outline cc-btn--sm">Sign In</a>
+                <a routerLink="/signup" class="cc-btn cc-btn--primary cc-btn--sm">Get Started</a>
+            </ng-container>
+            <ng-container *ngIf="isAuthenticated">
+                <a [routerLink]="dashboardRoute" class="cc-btn cc-btn--primary cc-btn--sm">Dashboard</a>
+            </ng-container>
+        </div>
+        <button class="cc-navbar__hamburger" id="hamburger" aria-label="Toggle menu"
+            [class.cc-active]="isMobileMenuOpen" (click)="toggleMobileMenu()">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+    <!-- Mobile menu -->
+    <div class="cc-navbar__mobile" id="mobileMenu" [class.cc-active]="isMobileMenuOpen">
+        <ul>
+            <li><a href="#campsites" (click)="scrollToTarget('#campsites', $event)">Campsites</a></li>
+            <li><a routerLink="/academy" style="color: var(--cc-sand); font-weight: 700;">ACADEMY</a></li>
+            <li><a routerLink="/events" style="color: var(--cc-sand); font-weight: 700;">EVENTS</a></li>
+            <li><a href="#community" (click)="scrollToTarget('#community', $event)">Community</a></li>
+            <ng-container *ngIf="!isAuthenticated">
+                <li><a routerLink="/login" class="cc-btn cc-btn--outline">Sign In</a></li>
+                <li><a routerLink="/signup" class="cc-btn cc-btn--primary">Get Started</a></li>
+            </ng-container>
+            <ng-container *ngIf="isAuthenticated">
+                <li><a [routerLink]="dashboardRoute" class="cc-btn cc-btn--primary">Dashboard</a></li>
+            </ng-container>
+        </ul>
+    </div>
+</nav>
+
+<!-- ========== SECTION 1 — HERO ========== -->
+<section class="cc-hero" id="hero">
+    <div class="cc-hero__bg-wrap">
+        <div class="cc-hero__bg" id="heroBg"></div>
+        <div class="cc-hero__overlay"></div>
+    </div>
+    <div class="cc-stars-container">
+        <div id="stars"></div>
+        <div id="stars2"></div>
+        <div id="stars3"></div>
+    </div>
+    <div class="cc-hero__content">
+        <p class="cc-hero__tagline cc-reveal" #reveal data-delay="0">— CampConnect —</p>
+        <h1 class="cc-hero__headline cc-reveal" #reveal data-delay="200">
+            Reconnect With<br><em>Nature.</em>
+        </h1>
+        <p class="cc-hero__sub cc-reveal" #reveal data-delay="400">
+            Plan, Explore, and Camp Smarter.
+        </p>
+        <div class="cc-hero__buttons cc-reveal" #reveal data-delay="600">
+            <a href="#campsites" class="cc-btn cc-btn--primary cc-btn--lg"
+                (click)="scrollToTarget('#campsites', $event)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.35-4.35" />
+                </svg>
+                Explore Campsites
+            </a>
+
+            <a *ngIf="!isAuthenticated" routerLink="/signup" class="cc-btn cc-btn--glass cc-btn--lg">
+                Get Started
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+            </a>
+            <a *ngIf="isAuthenticated" [routerLink]="dashboardRoute" class="cc-btn cc-btn--glass cc-btn--lg">
+                Go to Dashboard
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+            </a>
+        </div>
+        <div class="cc-hero__stats cc-reveal" #reveal data-delay="800">
+            <div class="cc-hero__stat">
+                <strong #statNumber>2,500+</strong>
+                <span>Campsites</span>
+            </div>
+            <div class="cc-hero__stat-divider"></div>
+            <div class="cc-hero__stat">
+                <strong #statNumber>50K+</strong>
+                <span>Adventurers</span>
+            </div>
+            <div class="cc-hero__stat-divider"></div>
+            <div class="cc-hero__stat">
+                <strong #statNumber>4.9</strong>
+                <span>Avg Rating</span>
+            </div>
+        </div>
+    </div>
+    <div class="cc-hero__scroll-indicator">
+        <span>Scroll to explore</span>
+        <div class="cc-hero__scroll-line"></div>
+    </div>
+</section>
+
+<!-- ========== SECTION 2 — HOW IT WORKS ========== -->
+<section class="cc-section cc-how" id="how-it-works">
+    <div class="cc-container">
+        <div class="cc-section__header cc-scroll-reveal" #scrollReveal>
+            <span class="cc-section__label">How It Works</span>
+            <h2 class="cc-section__title">Your Adventure in<br><em>Three Simple Steps</em></h2>
+            <p class="cc-section__desc">From discovery to departure — we make camping effortless.</p>
+        </div>
+        <div class="cc-how__grid">
+            <!-- Step 1 -->
+            <article class="cc-how__card cc-scroll-reveal" #scrollReveal data-delay="0">
+                <div class="cc-how__card-number">01</div>
+                <div class="cc-how__card-icon">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="20" cy="20" r="14" />
+                        <path d="M30 30l12 12" />
+                        <path d="M14 17h12M14 23h8" />
+                    </svg>
+                </div>
+                <h3>Discover Campsites</h3>
+                <p>Browse thousands of verified campsites with real photos, reviews, and availability — all in one
+                    place.</p>
+                <div class="cc-how__card-line"></div>
+            </article>
+            <!-- Step 2 -->
+            <article class="cc-how__card cc-scroll-reveal" #scrollReveal data-delay="150">
+                <div class="cc-how__card-number">02</div>
+                <div class="cc-how__card-icon">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="6" y="8" width="36" height="32" rx="3" />
+                        <path d="M6 18h36M16 8V4M32 8V4M16 26h6M16 32h10" />
+                    </svg>
+                </div>
+                <h3>Plan Your Trip</h3>
+                <p>Build your perfect itinerary with smart suggestions, weather data, and collaborative planning tools.
+                </p>
+                <div class="cc-how__card-line"></div>
+            </article>
+            <!-- Step 3 -->
+            <article class="cc-how__card cc-scroll-reveal" #scrollReveal data-delay="300">
+                <div class="cc-how__card-number">03</div>
+                <div class="cc-how__card-icon">
+                    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M8 40l12-20 8 12 6-8 8 16" />
+                        <circle cx="34" cy="14" r="4" />
+                        <path d="M4 40h40" />
+                    </svg>
+                </div>
+                <h3>Rent Gear & Go</h3>
+                <p>Join the Academy to learn about gear, or find events where gear is provided.</p>
+                <div class="cc-how__card-line"></div>
+            </article>
+        </div>
+    </div>
+</section>
+
+<!-- ========== SECTION 3 — FEATURED CAMPSITES ========== -->
+<section class="cc-section cc-campsites" id="campsites">
+    <div class="cc-container">
+        <div class="cc-section__header cc-scroll-reveal" #scrollReveal>
+            <span class="cc-section__label">Featured Campsites</span>
+            <h2 class="cc-section__title">Handpicked Destinations<br><em>For Every Explorer</em></h2>
+            <p class="cc-section__desc">Curated locations loved by our community of adventurers.</p>
+        </div>
+        <div class="cc-campsites__grid">
+            <!-- Card 1 -->
+            <article class="cc-camp-card cc-scroll-reveal" #scrollReveal data-delay="0">
+                <div class="cc-camp-card__img-wrap">
+                    <img src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600&h=400&fit=crop"
+                        alt="Yosemite Valley Camp" loading="lazy">
+                    <div class="cc-camp-card__badge">Popular</div>
+                    <div class="cc-camp-card__overlay">
+                        <button class="cc-btn cc-btn--glass cc-btn--sm">View Details</button>
+                    </div>
+                </div>
+                <div class="cc-camp-card__body">
+                    <div class="cc-camp-card__location">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                            <circle cx="12" cy="10" r="3" />
+                        </svg>
+                        Yosemite, California
+                    </div>
+                    <h3>Yosemite Valley Basecamp</h3>
+                    <p>Nestled beneath towering granite cliffs with stunning valley views.</p>
+                    <div class="cc-camp-card__footer">
+                        <div class="cc-camp-card__rating">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                            </svg>
+                            <strong>4.9</strong>
+                            <span>(324 reviews)</span>
+                        </div>
+                        <div class="cc-camp-card__price">From <strong>$45</strong>/night</div>
+                    </div>
+                </div>
+            </article>
+            <!-- Card 2 -->
+            <article class="cc-camp-card cc-scroll-reveal" #scrollReveal data-delay="150">
+                <div class="cc-camp-card__img-wrap">
+                    <img src="https://images.unsplash.com/photo-1510312305653-8ed496efae75?w=600&h=400&fit=crop"
+                        alt="Glacier Peak Retreat" loading="lazy">
+                    <div class="cc-camp-card__badge cc-camp-card__badge--new">New</div>
+                    <div class="cc-camp-card__overlay">
+                        <button class="cc-btn cc-btn--glass cc-btn--sm">View Details</button>
+                    </div>
+                </div>
+                <div class="cc-camp-card__body">
+                    <div class="cc-camp-card__location">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                            <circle cx="12" cy="10" r="3" />
+                        </svg>
+                        Glacier, Montana
+                    </div>
+                    <h3>Glacier Peak Retreat</h3>
+                    <p>Alpine wilderness camping with pristine lakes and mountain trails.</p>
+                    <div class="cc-camp-card__footer">
+                        <div class="cc-camp-card__rating">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                            </svg>
+                            <strong>4.8</strong>
+                            <span>(189 reviews)</span>
+                        </div>
+                        <div class="cc-camp-card__price">From <strong>$55</strong>/night</div>
+                    </div>
+                </div>
+            </article>
+            <!-- Card 3 -->
+            <article class="cc-camp-card cc-scroll-reveal" #scrollReveal data-delay="300">
+                <div class="cc-camp-card__img-wrap">
+                    <img src="https://images.unsplash.com/photo-1537905569824-f89f14cceb68?w=600&h=400&fit=crop"
+                        alt="Redwood Forest Haven" loading="lazy">
+                    <div class="cc-camp-card__badge cc-camp-card__badge--top">Top Rated</div>
+                    <div class="cc-camp-card__overlay">
+                        <button class="cc-btn cc-btn--glass cc-btn--sm">View Details</button>
+                    </div>
+                </div>
+                <div class="cc-camp-card__body">
+                    <div class="cc-camp-card__location">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                            <circle cx="12" cy="10" r="3" />
+                        </svg>
+                        Redwood, California
+                    </div>
+                    <h3>Redwood Forest Haven</h3>
+                    <p>Camp among ancient giants in one of the world's most magical forests.</p>
+                    <div class="cc-camp-card__footer">
+                        <div class="cc-camp-card__rating">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                            </svg>
+                            <strong>5.0</strong>
+                            <span>(412 reviews)</span>
+                        </div>
+                        <div class="cc-camp-card__price">From <strong>$60</strong>/night</div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
+
+<!-- ========== SECTION 6 — COMMUNITY & SAFETY ========== -->
+<section class="cc-section cc-community" id="community">
+    <div class="cc-container">
+        <div class="cc-section__header cc-scroll-reveal" #scrollReveal>
+            <span class="cc-section__label">Community & Safety</span>
+            <h2 class="cc-section__title">Join a Thriving<br><em>Outdoor Community</em></h2>
+            <p class="cc-section__desc">Connect, learn, and stay safe with thousands of fellow adventurers.</p>
+        </div>
+        <div class="cc-community__grid">
+            <article class="cc-community__card cc-scroll-reveal" #scrollReveal data-delay="0">
+                <div class="cc-community__card-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                </div>
+                <h3>Community Forums</h3>
+                <p>Share tips, ask questions, and connect with campers who share your passion for the outdoors.</p>
+                <button class="cc-community__link">Join Discussions →</button>
+            </article>
+            <article class="cc-community__card cc-scroll-reveal" #scrollReveal data-delay="100">
+                <div class="cc-community__card-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <polygon points="23 7 16 12 23 17 23 7" />
+                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                    </svg>
+                </div>
+                <h3>Expert Videos</h3>
+                <p>Learn from seasoned outdoor experts with tutorials on survival, cooking, and wilderness skills.</p>
+                <button class="cc-community__link">Watch Now →</button>
+            </article>
+            <article class="cc-community__card cc-scroll-reveal" #scrollReveal data-delay="200">
+                <div class="cc-community__card-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path
+                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                        <line x1="12" y1="9" x2="12" y2="13" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                </div>
+                <h3>Safety Alerts</h3>
+                <p>Real-time weather, wildfire, and trail condition alerts to keep you safe on every adventure.</p>
+                <button class="cc-community__link">View Alerts →</button>
+            </article>
+            <article class="cc-community__card cc-scroll-reveal" #scrollReveal data-delay="300">
+                <div class="cc-community__card-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <path d="M9 12l2 2 4-4" />
+                    </svg>
+                </div>
+                <h3>Environmental Compliance</h3>
+                <p>Every campsite meets strict environmental standards — Leave No Trace principles built in.</p>
+                <button class="cc-community__link">Learn More →</button>
+            </article>
+        </div>
+    </div>
+</section>
+
+<!-- ========== SECTION 7 — FINAL CTA ========== -->
+<section class="cc-cta" id="cta">
+    <div class="cc-cta__bg-wrap">
+        <div class="cc-cta__bg" id="ctaBg"></div>
+        <div class="cc-cta__overlay"></div>
+    </div>
+    <div class="cc-cta__content cc-scroll-reveal" #scrollReveal>
+        <h2>Your Next Adventure<br><em>Starts Here.</em></h2>
+        <p>Join 50,000+ adventurers who trust CampConnect to plan, explore, and experience the great outdoors.</p>
+
+        <a *ngIf="!isAuthenticated" routerLink="/signup" class="cc-btn cc-btn--primary cc-btn--xl">
+            Create Your Free Account
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+        </a>
+        <a *ngIf="isAuthenticated" [routerLink]="dashboardRoute" class="cc-btn cc-btn--primary cc-btn--xl">
+            Jump to Dashboard
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+        </a>
+
+        <span *ngIf="!isAuthenticated" class="cc-cta__note">No credit card required · Free forever</span>
+    </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<app-footer></app-footer>

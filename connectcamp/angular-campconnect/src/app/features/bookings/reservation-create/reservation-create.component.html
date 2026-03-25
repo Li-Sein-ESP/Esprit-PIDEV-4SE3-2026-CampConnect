@@ -1,0 +1,98 @@
+<div class="min-h-screen bg-[var(--color-background)] py-12">
+  <div class="container max-w-6xl">
+    <button (click)="goBack()" class="flex items-center gap-2 text-[var(--color-text-secondary)] mb-6">
+      <lucide-icon [img]="ChevronLeft" class="w-5 h-5"></lucide-icon>
+      Back
+    </button>
+
+    <h2 class="mb-8">Complete Your Reservation</h2>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Guest Information -->
+        <app-card variant="elevated">
+          <app-card-header>
+            <app-card-title>Guest Information</app-card-title>
+          </app-card-header>
+          <app-card-content>
+            <div class="grid grid-cols-2 gap-4">
+              <input [(ngModel)]="guestInfo.firstName" placeholder="First Name" class="px-4 py-2 rounded-lg border-2" />
+              <input [(ngModel)]="guestInfo.lastName" placeholder="Last Name" class="px-4 py-2 rounded-lg border-2" />
+              <input [(ngModel)]="guestInfo.email" type="email" placeholder="Email"
+                class="px-4 py-2 rounded-lg border-2" />
+              <input [(ngModel)]="guestInfo.phone" type="tel" placeholder="Phone"
+                class="px-4 py-2 rounded-lg border-2" />
+            </div>
+          </app-card-content>
+        </app-card>
+
+        <!-- Add-ons -->
+        <app-card variant="elevated">
+          <app-card-header>
+            <app-card-title>Enhance Your Stay</app-card-title>
+          </app-card-header>
+          <app-card-content>
+            <div class="space-y-3">
+              <label class="flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer">
+                <div class="flex items-center gap-3">
+                  <input type="checkbox" [(ngModel)]="addOns.firewood" class="w-5 h-5" />
+                  <div>
+                    <div class="font-medium">Firewood Bundle</div>
+                    <div class="text-sm text-[var(--color-text-secondary)]">Delivered to your site</div>
+                  </div>
+                </div>
+                <span class="font-medium">+\$25</span>
+              </label>
+              <label class="flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer">
+                <div class="flex items-center gap-3">
+                  <input type="checkbox" [(ngModel)]="addOns.earlyCheckIn" class="w-5 h-5" />
+                  <div>
+                    <div class="font-medium">Early Check-in</div>
+                    <div class="text-sm text-[var(--color-text-secondary)]">12:00 PM instead of 2:00 PM</div>
+                  </div>
+                </div>
+                <span class="font-medium">+\$15</span>
+              </label>
+            </div>
+          </app-card-content>
+        </app-card>
+
+        <!-- Terms -->
+        <app-card variant="elevated">
+          <app-card-content>
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" [(ngModel)]="agreedToTerms" class="mt-1 w-5 h-5" />
+              <span class="text-sm">I agree to the terms and conditions and cancellation policy</span>
+            </label>
+          </app-card-content>
+        </app-card>
+      </div>
+
+      <!-- Price Summary -->
+      <div>
+        <app-card variant="elevated" class="sticky top-24">
+          <app-card-header>
+            <app-card-title>Price Summary</app-card-title>
+          </app-card-header>
+          <app-card-content>
+            <div class="space-y-3 mb-6">
+              <div class="flex justify-between"><span>Base Price</span><span>\${{ basePrice }}</span></div>
+              @if (addOns.firewood) {
+              <div class="flex justify-between"><span>Firewood</span><span>\$25</span></div>
+              }
+              @if (addOns.earlyCheckIn) {
+              <div class="flex justify-between"><span>Early Check-in</span><span>\$15</span></div>
+              }
+              <div class="flex justify-between pt-3 border-t-2"><span class="font-bold">Total</span><span
+                  class="text-2xl font-bold text-[var(--color-primary-600)]">\${{ calculateTotal() }}</span></div>
+            </div>
+            <app-button size="lg" [fullWidth]="true" (click)="continueToPayment()" [disabled]="!canProceed()">
+              Continue to Payment
+              <lucide-icon [img]="ChevronRight" class="w-5 h-5 ml-2"></lucide-icon>
+            </app-button>
+          </app-card-content>
+        </app-card>
+      </div>
+    </div>
+  </div>
+</div>
