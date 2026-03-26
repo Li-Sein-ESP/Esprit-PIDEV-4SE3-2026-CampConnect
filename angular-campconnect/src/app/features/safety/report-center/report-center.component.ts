@@ -2,6 +2,9 @@ import { Component, OnDestroy } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { SafetyService } from '../services/safety.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { catchError, of } from 'rxjs';
 
 interface PreviewFile {
     file: File;
@@ -31,7 +34,9 @@ export class ReportCenterComponent implements OnDestroy {
     constructor(
         private fb: FormBuilder,
         private location: Location,
-        private sanitizer: DomSanitizer
+        private sanitizer: DomSanitizer,
+        private safetyService: SafetyService,
+        private authService: AuthService
     ) {
         this.reportForm = this.fb.group({
             issueType: ['', Validators.required],
@@ -155,12 +160,35 @@ export class ReportCenterComponent implements OnDestroy {
 
         this.isSubmitting = true;
 
-        // Simulate API call
-        setTimeout(() => {
-            this.referenceIdDisplay = 'REF-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-            this.showSuccess = true;
-            this.isSubmitting = false;
-        }, 1500);
+        const reporterId = this.authService.currentUserValue?.id || 'Unknown';
+        const formVal = this.reportForm.value;
+
+        const reportData = {
+            type: formVal.issueType || 'Report Center Issue',
+            level: 'medium', // Default for general reports
+            regionName: 'System', 
+            latitude: 0,
+            longitude: 0,
+            description: `[Ref: ${formVal.referenceId}] ${formVal.description}`,
+            reporterId: reporterId
+        };
+
+        this.safetyService.submitIncident(reportData).pipe(
+            catchError(err => {
+                console.error('Submission failed', err);
+                this.isSubmitting = false;
+                alert('Failed to submit report. Please try again later.');
+                return of(null);
+            })
+        ).subscribe(report => {
+            if (report) {
+                this.referenceIdDisplay = report.id;
+                this.isSubmitting = false;
+                this.showSuccess = true;
+                this.reportForm.reset();
+                this.uploadedFiles = [];
+            }
+        });
     }
 
     onSuccessDone() {

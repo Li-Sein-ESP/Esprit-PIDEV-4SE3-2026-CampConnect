@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SafetyService } from '../services/safety.service';
+import { catchError, of } from 'rxjs';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
     selector: 'app-report-incident',
@@ -20,7 +22,8 @@ export class ReportIncidentComponent {
     constructor(
         private fb: FormBuilder,
         private safetyService: SafetyService,
-        private router: Router
+        private router: Router,
+        private authService: AuthService
     ) {
         this.incidentForm = this.fb.group({
             type: ['', Validators.required],
@@ -50,8 +53,8 @@ export class ReportIncidentComponent {
 
         this.isSubmitting = true;
 
-        // Simulate reporterId from active user profile
-        const reporterId = 'USER-12345';
+        // Read reporterId from active user profile
+        const reporterId = this.authService.currentUserValue?.id || 'Unknown';
 
         const reportData = {
             type: this.incidentForm.value.type,
@@ -63,11 +66,20 @@ export class ReportIncidentComponent {
             reporterId: reporterId
         };
 
-        this.safetyService.submitIncident(reportData).subscribe(report => {
-            this.referenceId = report.id;
-            this.isSubmitting = false;
-            this.showSuccess = true;
-            this.incidentForm.reset();
+        this.safetyService.submitIncident(reportData).pipe(
+            catchError(err => {
+                console.error('Submission failed', err);
+                this.isSubmitting = false;
+                alert('La transmission a échoué. Veuillez vérifier votre connexion ou réessayer plus tard.');
+                return of(null);
+            })
+        ).subscribe(report => {
+            if (report) {
+                this.referenceId = report.id;
+                this.isSubmitting = false;
+                this.showSuccess = true;
+                this.incidentForm.reset();
+            }
         });
     }
 

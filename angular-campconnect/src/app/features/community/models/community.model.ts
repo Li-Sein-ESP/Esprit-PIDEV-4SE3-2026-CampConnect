@@ -3,7 +3,7 @@
 export type UserRole = 'Camper' | 'Verified Camper' | 'Moderator' | 'Admin';
 
 export interface AuthorPreview {
-    id: number;
+    id: string;
     username: string;
     name: string;
     avatar: string;
@@ -19,7 +19,7 @@ export interface AuthorPreview {
 }
 
 export interface Post {
-    id: number;
+    id: string;
     author: AuthorPreview;
     title: string;
     content: string;
@@ -43,8 +43,8 @@ export interface Post {
 }
 
 export interface Comment {
-    id: number;
-    postId: number;
+    id: string;
+    postId: string;
     author: AuthorPreview;
     content: string;
     createdAt: string;
@@ -57,7 +57,7 @@ export interface Comment {
 }
 
 export interface TripStory {
-    id: number;
+    id: string;
     author: AuthorPreview;
     title: string;
     summary: string;
@@ -75,7 +75,7 @@ export interface TripStory {
 }
 
 export interface HelpRequest {
-    id: number;
+    id: string;
     author: AuthorPreview;
     title: string;
     description: string;
@@ -88,8 +88,8 @@ export interface HelpRequest {
 }
 
 export interface HelpResponse {
-    id: number;
-    requestId: number;
+    id: string;
+    requestId: string;
     author: AuthorPreview & { expert: boolean };
     content: string;
     helpful: number;
@@ -98,17 +98,17 @@ export interface HelpResponse {
 }
 
 export interface ModerationAction {
-    id: number;
+    id: string;
     type: 'warning' | 'remove' | 'ban' | 'approve';
     targetType: 'post' | 'comment' | 'user';
-    targetId: number;
+    targetId: string;
     reason: string;
     moderator: string;
     createdAt: string;
 }
 
 export interface UserProfile {
-    id: number;
+    id: string;
     username: string;
     name: string;
     avatar: string;
@@ -137,8 +137,8 @@ export interface UserProfile {
 }
 
 export interface ForumTopic {
-    id: number;
-    categoryId: number;
+    id: string;
+    categoryId: string;
     categoryName: string;
     title: string;
     content: string[];
@@ -155,8 +155,8 @@ export interface ForumTopic {
 }
 
 export interface ForumReply {
-    id: number;
-    parentReplyId: number | null;
+    id: string;
+    parentReplyId: string | null;
     author: AuthorPreview;
     date: string;
     content: string;

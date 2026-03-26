@@ -21,16 +21,24 @@ public class SafetyAlertServiceImpl implements SafetyAlertService {
 
     @Override
     public SafetyAlertDTO createAlert(SafetyAlertDTO alertDTO) {
+        System.out.println("DEBUG: SIMPLE createAlert for: " + alertDTO.getTitle());
         SafetyAlert alert = new SafetyAlert();
-        alert.setMessage(alertDTO.getMessage());
-        alert.setSeverity(alertDTO.getSeverity());
+        alert.setTitle(alertDTO.getTitle());
+        alert.setDescription(alertDTO.getDescription());
+        alert.setRegionName(alertDTO.getRegionName());
+        alert.setLocationName(alertDTO.getLocationName());
+        
+        // Handle Enum mapping safely
+        try {
+            if (alertDTO.getType() != null) alert.setType(alertDTO.getType().toUpperCase());
+            if (alertDTO.getSeverity() != null) alert.setSeverity(alertDTO.getSeverity());
+        } catch (Exception e) {
+            System.out.println("DEBUG: Enum mapping error: " + e.getMessage());
+        }
 
-        Trip trip = tripRepository.findById(alertDTO.getTripId())
-            .orElseThrow(() -> new RuntimeException("Trip not found"));
-        trip.addSafetyAlert(alert);
-        tripRepository.save(trip);
-
+        System.out.println("DEBUG: Saving to repository...");
         SafetyAlert savedAlert = alertRepository.save(alert);
+        System.out.println("DEBUG: Success! New Alert ID: " + savedAlert.getId());
         return mapToDTO(savedAlert);
     }
 
@@ -61,11 +69,37 @@ public class SafetyAlertServiceImpl implements SafetyAlertService {
         alertRepository.deleteById(id);
     }
 
+    @Override
+    public SafetyAlertDTO updateAlert(String id, SafetyAlertDTO alertDTO) {
+        SafetyAlert alert = alertRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Alert not found"));
+        
+        alert.setTitle(alertDTO.getTitle());
+        alert.setDescription(alertDTO.getDescription());
+        alert.setType(alertDTO.getType());
+        alert.setSeverity(alertDTO.getSeverity());
+        alert.setLocationName(alertDTO.getLocationName());
+        alert.setRegionName(alertDTO.getRegionName());
+
+        if (alertDTO.getTripId() != null) {
+            Trip trip = tripRepository.findById(alertDTO.getTripId())
+                .orElseThrow(() -> new RuntimeException("Trip not found"));
+            alert.setTrip(trip);
+        }
+
+        SafetyAlert updatedAlert = alertRepository.save(alert);
+        return mapToDTO(updatedAlert);
+    }
+
     private SafetyAlertDTO mapToDTO(SafetyAlert alert) {
         SafetyAlertDTO dto = new SafetyAlertDTO();
         dto.setId(alert.getId());
-        dto.setMessage(alert.getMessage());
+        dto.setTitle(alert.getTitle());
+        dto.setDescription(alert.getDescription());
+        dto.setType(alert.getType());
         dto.setSeverity(alert.getSeverity());
+        dto.setLocationName(alert.getLocationName());
+        dto.setRegionName(alert.getRegionName());
         dto.setCreatedAt(alert.getCreatedAt());
         if (alert.getTrip() != null) {
             dto.setTripId(alert.getTrip().getId());

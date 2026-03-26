@@ -17,10 +17,12 @@ public class SafetyAlert {
     @Id
     private String id;
 
-    private String message;
-
+    private String title;
+    private String description;
+    private String type;
     private AlertSeverity severity;
-
+    private String locationName;
+    private String regionName;
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @DBRef

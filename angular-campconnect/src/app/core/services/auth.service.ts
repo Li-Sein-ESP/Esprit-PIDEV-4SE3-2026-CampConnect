@@ -84,13 +84,13 @@ export class AuthService {
         );
     }
 
-    signup(username: string, email: string, password: string, name: string): Observable<any> {
+    signup(username: string, email: string, password: string, name: string, role: string[]): Observable<any> {
         return this.http.post(API_URL + 'signup', {
             username,
             email,
             password,
             name,
-            role: ['user']
+            role
         }, httpOptions);
     }
 

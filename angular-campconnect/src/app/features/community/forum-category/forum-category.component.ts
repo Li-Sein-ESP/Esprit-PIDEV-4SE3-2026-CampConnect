@@ -121,7 +121,7 @@ export class ForumCategoryComponent implements OnInit {
     }
 
     navigateToCreate(): void {
-        this.router.navigate(['/community/forum/create']);
+        this.router.navigate(['/community/forum/create'], { queryParams: { categoryId: this.categoryId } });
     }
 
     navigateToForum(): void {

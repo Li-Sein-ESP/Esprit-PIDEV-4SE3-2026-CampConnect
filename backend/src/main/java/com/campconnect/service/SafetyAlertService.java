@@ -8,5 +8,6 @@ public interface SafetyAlertService {
     SafetyAlertDTO getAlertById(String id);
     List<SafetyAlertDTO> getAlertsByTripId(String tripId);
     List<SafetyAlertDTO> getAllAlerts();
+    SafetyAlertDTO updateAlert(String id, SafetyAlertDTO alertDTO);
     void deleteAlert(String id);
 }

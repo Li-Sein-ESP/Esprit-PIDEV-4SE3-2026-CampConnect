@@ -78,6 +78,8 @@ public class PostServiceImpl implements PostService {
         }
         if (post.getAuthor() != null) {
             dto.setAuthorId(post.getAuthor().getId());
+            dto.setAuthorName(post.getAuthor().getName());
+            dto.setAuthorUsername(post.getAuthor().getUsername());
         }
         return dto;
     }

@@ -31,6 +31,11 @@ public class TripController {
         return ResponseEntity.ok(tripService.getAllTrips());
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<TripDTO> updateTrip(@PathVariable String id, @RequestBody TripDTO tripDTO) {
+        return ResponseEntity.ok(tripService.updateTrip(id, tripDTO));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTrip(@PathVariable String id) {
         tripService.deleteTrip(id);

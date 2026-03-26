@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { SafetyService } from '../services/safety.service';
+import { IncidentReport } from '../models/safety.model';
 import { RouterModule } from '@angular/router';
 
 interface TimelineEvent {
@@ -15,7 +17,7 @@ interface Report {
     issueType: string;
     refType: string;
     refName: string;
-    dateSubmitted: string;
+    dateSubmitted: Date;
     status: 'pending' | 'review' | 'resolved' | 'rejected';
     adminMessage: string | null;
     description: string;
@@ -30,92 +32,54 @@ interface Report {
     templateUrl: './my-reports.component.html',
     styleUrls: ['./my-reports.component.scss']
 })
-export class MyReportsComponent {
+export class MyReportsComponent implements OnInit {
+    reports: Report[] = [];
+    loading: boolean = true;
+    error: string | null = null;
+    activeFilter: string = 'all';
 
-    reports: Report[] = [
-        {
-            id: 'RPT-20248',
-            issueType: 'Inappropriate Content',
-            refType: 'Post',
-            refName: 'Sunset Peak Campground Review',
-            dateSubmitted: '2024-12-18',
-            status: 'resolved',
-            adminMessage: 'The reported content has been removed and the user has been notified of the community guidelines.',
-            description: 'This post contains misleading information about trail safety conditions. The author claims the summit trail is beginner-friendly, but it requires Class 3 scrambling and has significant exposure. This could endanger inexperienced hikers who attempt the route without proper gear.',
-            evidence: ['screenshot_trail_post.png', 'trail_conditions_photo.jpg', 'safety_report.pdf'],
-            timeline: [
-                { step: 'Submitted', date: '2024-12-18 09:32 AM', active: true },
-                { step: 'Under Review', date: '2024-12-19 02:15 PM', active: true },
-                { step: 'Decision Made', date: '2024-12-21 11:00 AM', active: true, message: 'Content has been reviewed and removed for violating safety guidelines. Thank you for helping keep the community safe.' }
-            ]
-        },
-        {
-            id: 'RPT-20253',
-            issueType: 'Product Quality Issue',
-            refType: 'Product',
-            refName: 'TrekMaster 4-Season Tent',
-            dateSubmitted: '2025-01-05',
-            status: 'review',
-            adminMessage: null,
-            description: 'Received the tent with a damaged rain fly and missing stakes. The waterproof coating on the seams appears to be peeling off. Product listing advertises "weatherproof construction" which does not match the delivered product quality.',
-            evidence: ['damaged_rainfly.jpg', 'missing_parts.jpg'],
-            timeline: [
-                { step: 'Submitted', date: '2025-01-05 03:18 PM', active: true },
-                { step: 'Under Review', date: '2025-01-06 10:30 AM', active: true, message: 'Our quality team is currently inspecting this report and will reach out shortly.' },
-                { step: 'Decision', date: null, active: false }
-            ]
-        },
-        {
-            id: 'RPT-20261',
-            issueType: 'Fraudulent Listing',
-            refType: 'Product',
-            refName: 'Solar Camp Charger Pro',
-            dateSubmitted: '2025-01-12',
-            status: 'pending',
-            adminMessage: null,
-            description: 'The product listing uses stock images that do not represent the actual item. Specifications listed are significantly exaggerated. The "10000mAh" capacity tested at roughly 3000mAh. Seller has multiple similar listings with identical patterns.',
-            evidence: ['comparison_photos.png', 'capacity_test.jpg', 'listing_screenshot.png'],
-            timeline: [
-                { step: 'Submitted', date: '2025-01-12 08:45 AM', active: true },
-                { step: 'Under Review', date: null, active: false },
-                { step: 'Decision', date: null, active: false }
-            ]
-        },
-        {
-            id: 'RPT-20215',
-            issueType: 'Order Dispute',
-            refType: 'Order',
-            refName: 'Order #CC-99481',
-            dateSubmitted: '2024-11-28',
-            status: 'rejected',
-            adminMessage: 'After thorough review, the order was delivered within the stated timeframe and matches the product description. The return window has also passed.',
-            description: 'I ordered a premium hiking backpack but received a smaller capacity version. The color also does not match what was shown on the listing page. I want a full refund or correct replacement.',
-            evidence: ['order_confirmation.png', 'received_item.jpg'],
-            timeline: [
-                { step: 'Submitted', date: '2024-11-28 11:20 AM', active: true },
-                { step: 'Under Review', date: '2024-11-29 09:00 AM', active: true },
-                { step: 'Decision Made', date: '2024-12-02 04:45 PM', active: true, message: 'After reviewing the order details and delivery photos, the product matches the listing specifications. The return window of 14 days has passed. We recommend contacting the seller directly for further resolution.', rejected: true }
-            ]
-        },
-        {
-            id: 'RPT-20270',
-            issueType: 'Safety Concern',
-            refType: 'Post',
-            refName: 'DIY Bear Canister Guide',
-            dateSubmitted: '2025-01-18',
-            status: 'review',
-            adminMessage: null,
-            description: 'This post provides instructions for building a homemade bear canister from household materials. Following these instructions would create a container that does not meet IGBC requirements and could lead to dangerous bear encounters. This content should be flagged as potentially harmful.',
-            evidence: ['post_screenshot.png'],
-            timeline: [
-                { step: 'Submitted', date: '2025-01-18 06:10 PM', active: true },
-                { step: 'Under Review', date: '2025-01-19 08:00 AM', active: true },
-                { step: 'Decision', date: null, active: false }
-            ]
-        }
-    ];
+    constructor(private safetyService: SafetyService) {}
 
-    activeFilter = 'all';
+    ngOnInit() {
+        this.loadReports();
+    }
+
+    loadReports() {
+        this.loading = true;
+        this.safetyService.getIncidents().subscribe({
+            next: (incidents) => {
+                this.reports = incidents.map(inc => this.mapIncidentToReport(inc));
+                this.loading = false;
+            },
+            error: (err) => {
+                console.error('Failed to load reports', err);
+                this.error = 'Failed to load safety reports.';
+                this.loading = false;
+            }
+        });
+    }
+
+    private mapIncidentToReport(inc: IncidentReport): Report {
+        const dateObj = inc.createdAt ? new Date(inc.createdAt) : new Date();
+        const dateStr = dateObj.toLocaleDateString();
+        
+        return {
+            id: inc.id || 'INC-' + Math.floor(Math.random()*10000),
+            issueType: inc.type || 'General Safety',
+            refType: 'Location',
+            refName: inc.regionName || 'Global',
+            dateSubmitted: dateObj,
+            status: (inc.status === 'reviewed' ? 'review' : inc.status) as any,
+            adminMessage: null,
+            description: inc.description || '',
+            evidence: inc.mediaUrl ? [inc.mediaUrl] : [],
+            timeline: [
+                { step: 'Submitted', date: dateStr, active: true },
+                { step: 'Under Review', date: null, active: inc.status === 'reviewed' || inc.status === 'resolved' },
+                { step: 'Decision Made', date: null, active: inc.status === 'resolved' }
+            ]
+        };
+    }
     selectedReport: Report | null = null;
     isModalOpen = false;
 

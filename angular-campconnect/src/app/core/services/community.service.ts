@@ -32,9 +32,9 @@ export class CommunityService {
             content: thread.description,
             author: {
                 id: thread.authorId || 0,
-                username: 'user_' + thread.authorId,
-                name: 'User ' + thread.authorId,
-                avatar: `https://ui-avatars.com/api/?name=User+${thread.authorId}&background=random`,
+                username: thread.authorUsername || ('user_' + thread.authorId),
+                name: thread.authorName || (thread.authorId ? 'User ' + thread.authorId : 'Anonymous Camper'),
+                avatar: `https://ui-avatars.com/api/?name=${thread.authorName || 'Guest'}&background=random`,
                 role: 'Camper',
                 trustScore: 80
             },
@@ -72,5 +72,13 @@ export class CommunityService {
 
     recordView(postId: string): Observable<any> {
         return this.http.put<any>(`${this.apiThreadsUrl}/${postId}/view`, {});
+    }
+
+    updatePost(id: string, post: any): Observable<any> {
+        return this.http.put<any>(`${this.apiThreadsUrl}/${id}`, post);
+    }
+
+    deletePost(id: string): Observable<any> {
+        return this.http.delete<any>(`${this.apiThreadsUrl}/${id}`);
     }
 }

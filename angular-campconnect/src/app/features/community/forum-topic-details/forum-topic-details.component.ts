@@ -76,8 +76,8 @@ export class ForumTopicDetailsComponent implements OnInit {
 
     private mapPostToForumTopic(post: Post): ForumTopic {
         return {
-            id: Number(post.id) || 0,
-            categoryId: 1, // Defaulting for now
+            id: post.id,
+            categoryId: '1', // Defaulting for now
             categoryName: post.category || 'General',
             title: post.title,
             content: [post.content],
@@ -95,7 +95,7 @@ export class ForumTopicDetailsComponent implements OnInit {
 
     private mapPostDTOToForumReply(post: any): ForumReply {
         return {
-            id: Number(post.id) || Date.now(),
+            id: post.id || Date.now().toString(),
             parentReplyId: null, // Basic flat list for now
             date: 'Recent',
             isOP: post.authorId === this.topic?.author.id.toString(),
@@ -103,10 +103,10 @@ export class ForumTopicDetailsComponent implements OnInit {
             likes: 0,
             content: post.content,
             author: {
-                id: Number(post.authorId) || 0,
-                username: 'author_' + post.authorId,
-                name: 'User ' + post.authorId,
-                avatar: `https://ui-avatars.com/api/?name=User+${post.authorId}`,
+                id: post.authorId || '0',
+                username: post.authorUsername || ('author_' + post.authorId),
+                name: post.authorName || (post.authorId ? 'User ' + post.authorId : 'Anonymous Camper'),
+                avatar: `https://ui-avatars.com/api/?name=${post.authorName || 'Guest'}&background=random`,
                 role: 'Camper',
                 trustScore: 75
             }
@@ -118,7 +118,7 @@ export class ForumTopicDetailsComponent implements OnInit {
         return this.replies.filter(r => r.parentReplyId === null);
     }
 
-    getNestedReplies(parentId: number): ForumReply[] {
+    getNestedReplies(parentId: string): ForumReply[] {
         return this.replies.filter(r => r.parentReplyId === parentId);
     }
 
@@ -215,7 +215,7 @@ export class ForumTopicDetailsComponent implements OnInit {
         }
     }
 
-    goToProfile(userId: number): void {
+    goToProfile(userId: string): void {
         this.router.navigate(['/community/profile', userId]);
     }
 

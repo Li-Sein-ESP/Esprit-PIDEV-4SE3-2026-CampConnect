@@ -12,5 +12,7 @@ public class PostDTO {
     private String content;
     private String threadId;
     private String authorId;
+    private String authorName;
+    private String authorUsername;
     private LocalDateTime createdAt;
 }

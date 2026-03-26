@@ -26,7 +26,6 @@ import { filter } from 'rxjs/operators';
         <a routerLink="/discover" routerLinkActive="text-white" class="hover:text-white transition-colors">Discover</a>
         <a routerLink="/dashboard/bookings" routerLinkActive="text-white" class="hover:text-white transition-colors">Bookings</a>
         <a routerLink="/trips" routerLinkActive="text-white" class="hover:text-white transition-colors">My Trips</a>
-        <a routerLink="/plan-trip/create" routerLinkActive="text-white" class="hover:text-white transition-colors">Plan Trip</a>
         <a routerLink="/events" routerLinkActive="text-white" class="hover:text-white transition-colors">Events</a>
         <a routerLink="/safety/alerts" routerLinkActive="text-white" class="hover:text-white transition-colors">Safety</a>
         <a routerLink="/transportation" routerLinkActive="text-white" class="hover:text-white transition-colors">Transportation</a>
@@ -87,18 +86,28 @@ import { filter } from 'rxjs/operators';
           class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--color-nav-hover)] transition-colors relative"
         >
           <lucide-icon [img]="UserIcon" [size]="20"></lucide-icon>
-          <span class="hidden lg:inline">Account</span>
+          <span class="hidden lg:inline">{{ (authService.getCurrentUser() | async)?.username || 'Account' }}</span>
           
           <!-- User Dropdown -->
           <div
             *ngIf="isUserMenuOpen"
-            class="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-[var(--color-border-light)] py-2 z-50"
+            class="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-[var(--color-border-light)] py-2 z-50 text-left"
           >
-            <a routerLink="/dashboard" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors">Dashboard</a>
-            <a routerLink="/profile" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors">Profile</a>
-            <a routerLink="/trips" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors">My Trips</a>
-            <hr class="my-2 border-[var(--color-border-light)]">
-            <a routerLink="/login" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors">Sign In</a>
+            <ng-container *ngIf="authService.isAuthenticated() | async; else loginTpl">
+              <div class="px-4 py-2 border-b border-[var(--color-border-light)] bg-gray-50">
+                <p class="text-xs text-gray-500">Logged in as</p>
+                <p class="text-sm font-semibold truncate capitalize text-primary-700">{{ (authService.getCurrentUser() | async)?.username }}</p>
+              </div>
+              <a routerLink="/dashboard" (click)="isUserMenuOpen = false" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors">Dashboard</a>
+              <a routerLink="/profile" (click)="isUserMenuOpen = false" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors">Profile</a>
+              <a routerLink="/trips" (click)="isUserMenuOpen = false" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors">My Trips</a>
+              <hr class="my-2 border-[var(--color-border-light)]">
+              <button (click)="logout()" class="w-full text-left block px-4 py-2 text-red-600 hover:bg-red-50 transition-colors">Logout</button>
+            </ng-container>
+            <ng-template #loginTpl>
+              <a routerLink="/login" (click)="isUserMenuOpen = false" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors font-medium">Sign In</a>
+              <a routerLink="/signup" (click)="isUserMenuOpen = false" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors font-medium text-primary-600">Create Account</a>
+            </ng-template>
           </div>
         </button>
       </div>
@@ -121,12 +130,6 @@ import { filter } from 'rxjs/operators';
           </svg>
           <span class="text-xs">Sites</span>
         </a>
-        <a routerLink="/plan-trip" routerLinkActive="text-[var(--color-primary-600)]" class="flex flex-col items-center gap-1 px-3 py-2 text-[var(--color-text-tertiary)]">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
-          </svg>
-          <span class="text-xs">Plan</span>
-        </a>
         <a routerLink="/trips" routerLinkActive="text-[var(--color-primary-600)]" class="flex flex-col items-center gap-1 px-3 py-2 text-[var(--color-text-tertiary)]">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
@@ -134,9 +137,13 @@ import { filter } from 'rxjs/operators';
           </svg>
           <span class="text-xs">Trips</span>
         </a>
-        <a routerLink="/dashboard" routerLinkActive="text-[var(--color-primary-600)]" class="flex flex-col items-center gap-1 px-3 py-2 text-[var(--color-text-tertiary)]">
+        <a *ngIf="authService.isAuthenticated() | async" routerLink="/dashboard" routerLinkActive="text-[var(--color-primary-600)]" class="flex flex-col items-center gap-1 px-3 py-2 text-[var(--color-text-tertiary)]">
           <lucide-icon [img]="UserIcon" [size]="24"></lucide-icon>
           <span class="text-xs">Account</span>
+        </a>
+        <a *ngIf="!(authService.isAuthenticated() | async)" routerLink="/login" routerLinkActive="text-[var(--color-primary-600)]" class="flex flex-col items-center gap-1 px-3 py-2 text-[var(--color-text-tertiary)]">
+          <lucide-icon [img]="UserIcon" [size]="24"></lucide-icon>
+          <span class="text-xs">Login</span>
         </a>
       </div>
     </nav>
@@ -198,5 +205,11 @@ export class NavigationComponent implements OnInit {
     } else {
       document.documentElement.removeAttribute('data-theme');
     }
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.isUserMenuOpen = false;
+    this.router.navigate(['/']);
   }
 }

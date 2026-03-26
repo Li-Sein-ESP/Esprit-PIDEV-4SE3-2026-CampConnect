@@ -69,17 +69,24 @@ export class PublicProfileComponent implements OnInit {
 
         this.userService.getUserById(this.userId).subscribe({
             next: (user) => {
+                let userRole = 'Camper';
+                if (Array.isArray(user.roles)) {
+                    if (user.roles.some((r: any) => r.name === 'ROLE_ADMIN' || r === 'ROLE_ADMIN')) {
+                        userRole = 'Admin';
+                    }
+                }
+                
                 this.userProfile = {
-                    id: user.id || 0,
-                    username: user.username,
-                    name: user.name || user.username,
-                    avatar: user.avatar || `https://ui-avatars.com/api/?name=${user.username}`,
+                    id: user.id || this.userId || '0',
+                    username: user.username || 'unknown_camper',
+                    name: user.name || user.username || 'Camper Member',
+                    avatar: user.avatar || `https://ui-avatars.com/api/?name=${user.username || 'user'}`,
                     banner: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&h=400&fit=crop',
-                    role: (user.roles?.includes('ROLE_ADMIN') ? 'Admin' : 'Camper') as UserRole,
+                    role: userRole as UserRole,
                     trustScore: 85,
-                    bio: user.bio || 'Outdoor enthusiast sharing trail safety tips.',
-                    location: user.location || 'Unknown',
-                    joinDate: 'Joined Recently',
+                    bio: user.bio || 'Outdoor enthusiast sharing trail experiences.',
+                    location: user.location || 'Unknown location',
+                    joinDate: 'Joined recently',
                     isFollowed: false,
                     stats: {
                         posts: 0,
@@ -94,7 +101,23 @@ export class PublicProfileComponent implements OnInit {
                 this.loading = false;
             },
             error: (err) => {
-                console.error('Error loading user profile', err);
+                console.error('Error loading user profile, showing fallback', err);
+                
+                // Keep the page from going completely blank if the user couldn't be fetched
+                this.userProfile = {
+                    id: this.userId || '0',
+                    username: 'anonymous',
+                    name: 'Camper Not Found',
+                    avatar: `https://ui-avatars.com/api/?name=Guest`,
+                    banner: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&h=400&fit=crop',
+                    role: 'Camper' as UserRole,
+                    trustScore: 50,
+                    bio: 'This profile could not be retrieved from the server.',
+                    location: 'Unknown',
+                    joinDate: 'Unknown',
+                    stats: { posts: 0, topics: 0, replies: 0, followers: 0, following: 0 },
+                    badges: []
+                };
                 this.loading = false;
             }
         });

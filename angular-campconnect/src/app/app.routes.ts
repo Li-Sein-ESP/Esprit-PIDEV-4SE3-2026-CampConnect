@@ -5,6 +5,14 @@ import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
     {
+        path: 'login',
+        loadComponent: () => import('./features/auth/login.component').then(m => m.LoginComponent)
+    },
+    {
+        path: 'signup',
+        loadComponent: () => import('./features/auth/signup.component').then(m => m.SignupComponent)
+    },
+    {
         path: '',
         component: MainLayoutComponent,
         children: [
@@ -13,16 +21,8 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent)
             },
             {
-                path: 'login',
-                loadComponent: () => import('./features/auth/login.component').then(m => m.LoginComponent)
-            },
-            {
-                path: 'signup',
-                loadComponent: () => import('./features/auth/signup.component').then(m => m.SignupComponent)
-            },
-            {
                 path: 'plan-trip',
-                loadComponent: () => import('./features/trips/plan-trip.component').then(m => m.PlanTripComponent)
+                loadComponent: () => import('./features/trips/trip-create/trip-create.component').then(m => m.TripCreateComponent)
             },
             {
                 path: 'trips',

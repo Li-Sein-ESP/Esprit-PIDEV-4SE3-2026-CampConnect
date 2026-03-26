@@ -12,6 +12,8 @@ public class ForumThreadDTO {
     private String title;
     private String description;
     private String authorId;
+    private String authorName;
+    private String authorUsername;
     private String category;
     private java.util.List<String> tags;
     private LocalDateTime createdAt;

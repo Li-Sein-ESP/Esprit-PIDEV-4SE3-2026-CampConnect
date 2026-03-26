@@ -5,12 +5,14 @@ import com.campconnect.service.ForumThreadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/threads")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class ForumThreadController {
 
     private final ForumThreadService threadService;

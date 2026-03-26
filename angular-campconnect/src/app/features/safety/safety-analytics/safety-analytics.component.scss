@@ -704,7 +704,7 @@ $transition-base: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
     &--warning {
         background: $risk-medium-bg;
-        color: darken($risk-medium, 10%);
+        color: #bba13a; // Equivalent to darken($risk-medium, 10%)
     }
 
     &--info {
@@ -771,7 +771,7 @@ $transition-base: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         transition: $transition-base;
 
         &:hover {
-            background: darken($accent-blue, 8%);
+            background: #3c58cc; // Equivalent to darken($accent-blue, 8%)
             box-shadow: 0 4px 12px rgba($accent-blue, 0.3);
         }
     }

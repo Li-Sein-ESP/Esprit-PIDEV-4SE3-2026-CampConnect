@@ -19,6 +19,11 @@
               <lucide-icon [img]="MapIcon" [size]="20"></lucide-icon>
               View Safety Map
             </button>
+            <button (click)="openAddAlertModal()"
+              class="flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition-colors shadow-lg cursor-pointer border-none">
+              <lucide-icon [img]="EditIcon" [size]="20"></lucide-icon>
+              Create Alert
+            </button>
             <button routerLink="/safety/report"
               class="flex items-center gap-2 bg-white/20 border border-white/40 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/30 backdrop-blur-md transition-colors shadow-lg cursor-pointer">
               <lucide-icon [img]="AlertTriangle" [size]="20"></lucide-icon>
@@ -88,13 +93,24 @@
   </section>
 
   <main class="container py-8">
-    <div *ngIf="filteredAlerts.length === 0" class="text-center py-20">
-      <lucide-icon [img]="ShieldCheck" [size]="64" class="mx-auto text-[var(--color-neutral-300)] mb-4"></lucide-icon>
-      <h3 class="text-xl font-semibold text-[var(--color-text-heading)]">All Clear!</h3>
-      <p class="text-[var(--color-text-secondary)]">No safety alerts match your current filters.</p>
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex flex-col items-center justify-center py-20">
+      <div class="w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin mb-4"></div>
+      <p class="text-[var(--color-text-secondary)] animate-pulse font-medium">Fetching real-time safety updates...</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Error State -->
+    <div *ngIf="!loading && error" class="bg-red-50 border border-red-200 rounded-2xl p-8 text-center max-w-2xl mx-auto">
+      <lucide-icon [img]="AlertTriangle" [size]="48" class="mx-auto text-red-500 mb-4"></lucide-icon>
+      <h3 class="text-xl font-bold text-red-900 mb-2">Sync Connection Interrupted</h3>
+      <p class="text-red-700 mb-6">{{ error }}</p>
+      <app-button variant="primary" (click)="loadAlerts()" customClass="bg-red-600 hover:bg-red-700">
+        Try Reconnecting
+      </app-button>
+    </div>
+
+    <!-- Alerts Grid -->
+    <div *ngIf="!loading && !error && filteredAlerts.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <app-card *ngFor="let alert of filteredAlerts" variant="interactive"
         customClass="group overflow-hidden border-l-4 transition-all hover:shadow-xl"
         [style.borderLeftColor]="alert.severity === 'critical' || alert.severity === 'danger' ? '#ef4444' : alert.severity === 'warning' ? '#f59e0b' : '#3b82f6'"
@@ -113,8 +129,16 @@
                   {{ alert.severity | uppercase }}
                 </app-badge>
               </div>
-              <div class="bg-green-100 text-green-700 p-1 rounded-full" title="Verified Source">
-                <lucide-icon [img]="ShieldCheck" [size]="16"></lucide-icon>
+              <div class="flex items-center gap-2">
+                <button (click)="onEdit($event, alert)" class="p-1.5 hover:bg-gray-100 rounded-lg text-gray-600 transition-colors cursor-pointer" title="Edit Alert">
+                  <lucide-icon [img]="EditIcon" [size]="16"></lucide-icon>
+                </button>
+                <button (click)="onDelete($event, alert.id)" class="p-1.5 hover:bg-red-50 rounded-lg text-red-600 transition-colors cursor-pointer" title="Delete Alert">
+                  <lucide-icon [img]="TrashIcon" [size]="16"></lucide-icon>
+                </button>
+                <div class="bg-green-100 text-green-700 p-1 rounded-full ml-1" title="Verified Source">
+                  <lucide-icon [img]="ShieldCheck" [size]="16"></lucide-icon>
+                </div>
               </div>
             </div>
 
@@ -131,8 +155,9 @@
             <div class="flex flex-col gap-2 pt-4 border-t border-[var(--color-border-light)]">
               <div class="flex items-center gap-2 text-xs text-[var(--color-text-tertiary)]">
                 <lucide-icon [img]="MapPin" [size]="14"></lucide-icon>
-                <span class="font-medium text-[var(--color-text-secondary)]">{{ alert.location.name }}, {{
-                  alert.location.region }}</span>
+                <span class="font-medium text-[var(--color-text-secondary)]">
+                  {{ alert.location?.name || 'Local Area' }}{{ alert.location?.region ? ', ' + alert.location.region : '' }}
+                </span>
               </div>
               <div class="flex items-center gap-2 text-xs text-[var(--color-text-tertiary)]">
                 <lucide-icon [img]="Clock" [size]="14"></lucide-icon>
@@ -154,6 +179,82 @@
         </app-card-content>
       </app-card>
     </div>
+
+    <!-- Recent Incident Reports Section -->
+    <section class="mt-20">
+      <div class="flex items-center justify-between mb-8 border-b border-[var(--color-border-light)] pb-4">
+        <div>
+          <h2 class="text-2xl font-bold text-[var(--color-text-heading)]">My Incident Reports</h2>
+          <p class="text-[var(--color-text-secondary)] text-sm">Manage and track your submitted safety reports</p>
+        </div>
+        <div class="flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium">
+          <lucide-icon [img]="InfoIcon" [size]="16"></lucide-icon>
+          {{ incidents.length }} Reports Filed
+        </div>
+      </div>
+
+      <!-- Loading State for Incidents -->
+      <div *ngIf="incidentsLoading" class="flex justify-center py-12">
+        <div class="w-8 h-8 border-3 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+      </div>
+
+      <!-- Empty State for Incidents -->
+      <div *ngIf="!incidentsLoading && incidents.length === 0" class="bg-[var(--color-neutral-50)] rounded-2xl p-12 text-center border-2 border-dashed border-[var(--color-border-medium)]">
+        <lucide-icon [img]="AlertCircle" [size]="48" class="mx-auto text-[var(--color-neutral-300)] mb-4"></lucide-icon>
+        <p class="text-[var(--color-text-secondary)] font-medium">No incident reports found. Use "Report Incident" to submit one.</p>
+      </div>
+
+      <!-- Incidents List -->
+      <div *ngIf="!incidentsLoading && incidents.length > 0" class="overflow-hidden bg-white border border-[var(--color-border-light)] rounded-2xl shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-[var(--color-neutral-50)] border-b border-[var(--color-border-light)]">
+                <th class="px-6 py-4 text-xs font-bold text-[var(--color-text-tertiary)] uppercase tracking-wider">Type / Level</th>
+                <th class="px-6 py-4 text-xs font-bold text-[var(--color-text-tertiary)] uppercase tracking-wider">Description</th>
+                <th class="px-6 py-4 text-xs font-bold text-[var(--color-text-tertiary)] uppercase tracking-wider">Location</th>
+                <th class="px-6 py-4 text-xs font-bold text-[var(--color-text-tertiary)] uppercase tracking-wider">Date</th>
+                <th class="px-6 py-4 text-xs font-bold text-[var(--color-text-tertiary)] uppercase tracking-wider text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[var(--color-border-light)]">
+              <tr *ngFor="let incident of incidents" class="hover:bg-blue-50/30 transition-colors">
+                <td class="px-6 py-4">
+                  <div class="flex flex-col gap-1">
+                    <span class="font-bold text-[var(--color-text-heading)]">{{ incident.type }}</span>
+                    <app-badge [variant]="incident.level === 'High' ? 'error' : (incident.level === 'Medium' ? 'warning' : 'info')" size="sm">
+                      {{ incident.level }}
+                    </app-badge>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <p class="text-sm text-[var(--color-text-secondary)] line-clamp-1 max-w-xs">{{ incident.description }}</p>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
+                    <lucide-icon [img]="MapPin" [size]="14" class="text-blue-500"></lucide-icon>
+                    {{ incident.regionName }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-sm text-[var(--color-text-tertiary)]">
+                  {{ formatDate(incident.createdAt) }}
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <div class="flex justify-end gap-2">
+                    <button (click)="onEditIncident($event, incident)" class="p-2 hover:bg-white rounded-lg border border-transparent hover:border-gray-200 text-gray-600 transition-all shadow-sm cursor-pointer" title="Edit Report">
+                      <lucide-icon [img]="EditIcon" [size]="16"></lucide-icon>
+                    </button>
+                    <button (click)="onDeleteIncident($event, incident.id)" class="p-2 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-100 text-red-600 transition-all shadow-sm cursor-pointer" title="Delete Report">
+                      <lucide-icon [img]="TrashIcon" [size]="16"></lucide-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- Footer Help Section -->
@@ -175,4 +276,92 @@
       </div>
     </div>
   </section>
+
+  <!-- Edit Alert Modal -->
+  <app-modal [isOpen]="showEditModal" [title]="isEditingAlert ? 'Edit Safety Alert' : 'Create New Safety Alert'" size="lg" (close)="closeEditModal()">
+    <div class="p-6" *ngIf="editingAlert">
+      <div class="grid grid-cols-1 gap-6">
+        <div>
+          <label class="block text-sm font-bold text-[var(--color-text-primary)] mb-2">Alert Title</label>
+          <input type="text" [(ngModel)]="editingAlert.title" 
+            class="w-full px-4 py-2 border border-[var(--color-border-medium)] rounded-xl focus:ring-2 focus:ring-red-500 outline-none">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-bold text-[var(--color-text-primary)] mb-2">Description</label>
+          <textarea [(ngModel)]="editingAlert.description" rows="4"
+            class="w-full px-4 py-2 border border-[var(--color-border-medium)] rounded-xl focus:ring-2 focus:ring-red-500 outline-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-bold text-[var(--color-text-primary)] mb-2">Severity</label>
+            <select [(ngModel)]="editingAlert.severity" 
+              class="w-full px-4 py-2 border border-[var(--color-border-medium)] rounded-xl focus:ring-2 focus:ring-red-500 outline-none">
+              <option value="critical">Critical</option>
+              <option value="danger">Danger</option>
+              <option value="warning">Warning</option>
+              <option value="info">Information</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-[var(--color-text-primary)] mb-2">Category</label>
+            <select [(ngModel)]="editingAlert.type" 
+              class="w-full px-4 py-2 border border-[var(--color-border-medium)] rounded-xl focus:ring-2 focus:ring-red-500 outline-none">
+              <option value="weather">Weather</option>
+              <option value="fire">Wildfire</option>
+              <option value="wildlife">Wildlife</option>
+              <option value="closure">Closure</option>
+              <option value="advisory">Advisory</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4">
+          <app-button variant="outline" (click)="closeEditModal()" [disabled]="savingAlert">Cancel</app-button>
+          <app-button variant="primary" (click)="saveAlert()" [disabled]="savingAlert || !editingAlert.title" customClass="bg-red-600 hover:bg-red-700 min-w-[120px]">
+            <span *ngIf="!savingAlert">{{ isEditingAlert ? 'Save Changes' : 'Create Alert' }}</span>
+            <div *ngIf="savingAlert" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          </app-button>
+        </div>
+      </div>
+    </div>
+  </app-modal>
+
+  <!-- Edit Incident Modal -->
+  <app-modal [isOpen]="showIncidentEditModal" [title]="'Edit Incident Report'" size="lg" (close)="closeIncidentEditModal()">
+    <div class="p-6" *ngIf="editingIncident">
+      <div class="grid grid-cols-1 gap-6">
+        <div>
+          <label class="block text-sm font-bold text-[var(--color-text-primary)] mb-2">Report Type</label>
+          <input type="text" [(ngModel)]="editingIncident.type" 
+            class="w-full px-4 py-2 border border-[var(--color-border-medium)] rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-bold text-[var(--color-text-primary)] mb-2">Detailed Description</label>
+          <textarea [(ngModel)]="editingIncident.description" rows="4"
+            class="w-full px-4 py-2 border border-[var(--color-border-medium)] rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold text-[var(--color-text-primary)] mb-2">Risk Level</label>
+          <select [(ngModel)]="editingIncident.level" 
+            class="w-full px-4 py-2 border border-[var(--color-border-medium)] rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-[var(--color-border-light)]">
+          <app-button variant="outline" (click)="closeIncidentEditModal()" [disabled]="saving">Cancel</app-button>
+          <app-button variant="primary" (click)="saveIncidentChanges()" [disabled]="saving || !editingIncident.type" customClass="bg-blue-600 hover:bg-blue-700 min-w-[120px]">
+            <span *ngIf="!saving">Update Report</span>
+            <div *ngIf="saving" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          </app-button>
+        </div>
+      </div>
+    </div>
+  </app-modal>
 </div>

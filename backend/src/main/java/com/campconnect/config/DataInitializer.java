@@ -30,28 +30,30 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // 1. Initialize Roles
-        if (roleRepository.count() == 0) {
+        if (roleRepository.findByName(ERole.ROLE_USER).isEmpty()) {
             roleRepository.save(new Role(ERole.ROLE_USER));
+        }
+        if (roleRepository.findByName(ERole.ROLE_ADMIN).isEmpty()) {
             roleRepository.save(new Role(ERole.ROLE_ADMIN));
         }
 
         // 2. Initialize Users
-        User admin = userRepository.findByUsername("admin").orElse(null);
-        if (admin == null) {
-            admin = new User("admin", "admin@campconnect.com", encoder.encode("admin123"), "Administrator");
+        if (!userRepository.existsByUsername("admin")) {
+            User admin = new User("admin", "admin@campconnect.com", encoder.encode("admin123"), "Administrator");
             Set<Role> roles = new HashSet<>();
-            roles.add(roleRepository.findByName(ERole.ROLE_ADMIN).get());
+            roles.add(roleRepository.findByName(ERole.ROLE_ADMIN)
+                    .orElseThrow(() -> new RuntimeException("Error: Role ADMIN not found")));
             admin.setRoles(roles);
-            admin = userRepository.save(admin);
+            userRepository.save(admin);
         }
 
-        User camper = userRepository.findByUsername("camper").orElse(null);
-        if (camper == null) {
-            camper = new User("camper", "camper@campconnect.com", encoder.encode("camper123"), "Happy Camper");
+        if (!userRepository.existsByUsername("camper")) {
+            User camper = new User("camper", "camper@campconnect.com", encoder.encode("camper123"), "Happy Camper");
             Set<Role> roles = new HashSet<>();
-            roles.add(roleRepository.findByName(ERole.ROLE_USER).get());
+            roles.add(roleRepository.findByName(ERole.ROLE_USER)
+                    .orElseThrow(() -> new RuntimeException("Error: Role USER not found")));
             camper.setRoles(roles);
-            camper = userRepository.save(camper);
+            userRepository.save(camper);
         }
 
         // 3. Initialize Groups & Trips
@@ -68,35 +70,63 @@ public class DataInitializer implements CommandLineRunner {
             trip.setDifficulty(DifficultyLevel.MEDIUM);
             trip.setGroup(group);
             trip = tripRepository.save(trip);
+        }
 
-            group.getTrips().add(trip);
-            groupRepository.save(group);
-
-            // 4. Initialize Incidents & Safety Alerts
+        // 4. Initialize Incidents & Safety Alerts
+        safetyAlertRepository.deleteAll();
+        incidentRepository.deleteAll();
+        
+        Trip existingTrip = tripRepository.findAll().stream().findFirst().orElse(null);
+        if (existingTrip != null) {
             Incident incident = new Incident();
             incident.setTitle("Sentier bloqué");
             incident.setDescription("Un arbre est tombé sur le sentier principal");
-            incident.setTrip(trip);
+            incident.setTrip(existingTrip);
             incidentRepository.save(incident);
 
             SafetyAlert alert = new SafetyAlert();
-            alert.setMessage("Risque d'orage prévu pour demain");
+            alert.setTitle("Risque d'orage");
+            alert.setDescription("Risque d'orage prévu pour demain sur le sentier principal.");
+            alert.setType("WEATHER");
             alert.setSeverity(AlertSeverity.DANGER);
-            alert.setTrip(trip);
+            alert.setLocationName("Parc National de l'Ichkeul");
+            alert.setRegionName("Bizerte");
+            alert.setTrip(existingTrip);
             safetyAlertRepository.save(alert);
+            
+            SafetyAlert alert2 = new SafetyAlert();
+            alert2.setTitle("Incendie de forêt");
+            alert2.setDescription("Un incendie s'est déclaré près de la zone de camping C.");
+            alert2.setType("FIRE");
+            alert2.setSeverity(AlertSeverity.CRITICAL);
+            alert2.setLocationName("Forêt d'Ain Draham");
+            alert2.setRegionName("Jendouba");
+            alert2.setTrip(existingTrip);
+            safetyAlertRepository.save(alert2);
         }
 
         // 5. Initialize Forum, Posts & Comments
         if (forumThreadRepository.count() == 0) {
+            User adminUser = userRepository.findByUsername("admin").orElse(null);
+            User camperUser = userRepository.findByUsername("camper").orElse(null);
+
+            ForumThread gearThread = new ForumThread();
+            gearThread.setTitle("Meilleures tentes 4 saisons");
+            gearThread.setDescription("Quelles sont vos recommandations pour le camping d'hiver ?");
+            gearThread.setAuthor(adminUser);
+            gearThread.setCategory("Gear & Equipment");
+            forumThreadRepository.save(gearThread);
+
             ForumThread thread = new ForumThread();
             thread.setTitle("Conseils pour débutants");
             thread.setDescription("Partagez vos astuces pour les premiers campings");
-            thread.setAuthor(admin);
+            thread.setAuthor(adminUser);
+            thread.setCategory("General");
             thread = forumThreadRepository.save(thread);
 
             Post post = new Post();
             post.setContent("N'oubliez pas d'apporter une lampe frontale !");
-            post.setAuthor(camper);
+            post.setAuthor(camperUser);
             post.setThread(thread);
             post = postRepository.save(post);
 
@@ -105,7 +135,7 @@ public class DataInitializer implements CommandLineRunner {
 
             Comment comment = new Comment();
             comment.setContent("Très bon conseil, merci !");
-            comment.setAuthor(admin);
+            comment.setAuthor(adminUser);
             comment.setPost(post);
             commentRepository.save(comment);
 

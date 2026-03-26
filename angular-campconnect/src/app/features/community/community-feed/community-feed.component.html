@@ -160,7 +160,7 @@
         <img src="https://images.unsplash.com/photo-1535930749574-1399327ce78f?w=100&h=100&fit=crop&crop=face" alt=""
           class="cc-create-post__avatar" aria-hidden="true">
         <input type="text" class="cc-create-post__input" placeholder="Share your latest adventure, Jordan..."
-          aria-label="Create a post">
+          aria-label="Create a post" [(ngModel)]="quickPostContent" (keyup.enter)="submitQuickPost()">
         <div class="cc-create-post__actions">
           <button class="cc-create-post__action" aria-label="Add photo">📷</button>
           <button class="cc-create-post__action" aria-label="Add location">📍</button>
@@ -218,11 +218,38 @@
           </div>
           <app-trust-score *ngIf="post?.author?.trustScore !== undefined" [score]="post?.author?.trustScore ?? 0"
             variant="small" style="margin-left: auto; margin-right: 12px;"></app-trust-score>
-          <button class="cc-post__more-btn" aria-label="More options">⋯</button>
+            
+          <div style="position: relative;">
+            <button class="cc-post__more-btn" aria-label="More options" (click)="toggleDropdown(post.id, $event)" 
+              style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; border: none; background: transparent; cursor: pointer;"
+              onmouseover="this.style.backgroundColor='rgba(0,0,0,0.05)'" onmouseout="this.style.backgroundColor='transparent'">
+              <lucide-icon [img] = "MoreHorizontalIcon" [size]="20" style="color: #6b7280;"></lucide-icon>
+            </button>
+            <div *ngIf="activeDropdown === post.id" style="position: absolute; right: 0; top: 100%; margin-top: 4px; padding: 6px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); border-radius: 12px; background: white; z-index: 100; min-width: 160px; border: 1px solid #f3f4f6;">
+              <button (click)="startEdit(post, $event)" style="display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 10px 12px; font-size: 14px; border: none; background: transparent; cursor: pointer; border-radius: 8px; color: #374151; font-weight: 500;" onmouseover="this.style.backgroundColor='#f9fafb'" onmouseout="this.style.backgroundColor='transparent'">
+                <lucide-icon [img]="PencilIcon" [size]="16"></lucide-icon>
+                Modifier le post
+              </button>
+              <button (click)="deletePost(post, $event)" style="display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 10px 12px; font-size: 14px; border: none; background: transparent; cursor: pointer; color: #dc2626; border-radius: 8px; font-weight: 500;" onmouseover="this.style.backgroundColor='#fef2f2'" onmouseout="this.style.backgroundColor='transparent'">
+                <lucide-icon [img]="TrashIcon" [size]="16"></lucide-icon>
+                Supprimer le post
+              </button>
+            </div>
+          </div>
         </header>
 
-        <div class="cc-post__body" (click)="goToPost(post.id)" style="cursor: pointer;">
+        <!-- Read Mode -->
+        <div class="cc-post__body" *ngIf="editingPost?.id !== post.id" (click)="goToPost(post.id)" style="cursor: pointer;">
           <p class="cc-post__text" [innerHTML]="post.content"></p>
+        </div>
+
+        <!-- Edit Mode -->
+        <div class="cc-post__edit-body" *ngIf="editingPost?.id === post.id" (click)="$event.stopPropagation()" style="padding: 12px 16px;">
+          <textarea [(ngModel)]="editContent" rows="3" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-family: inherit; resize: vertical; margin-bottom: 8px;"></textarea>
+          <div style="display: flex; justify-content: flex-end; gap: 8px;">
+            <button (click)="cancelEdit($event)" style="padding: 6px 12px; border: 1px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer; font-size: 13px;">Cancel</button>
+            <button (click)="saveEdit($event)" style="padding: 6px 16px; border: none; border-radius: 6px; background: #2f5d44; color: white; cursor: pointer; font-size: 13px; font-weight: 500;">Save Changes</button>
+          </div>
         </div>
 
         <figure class="cc-post__media" *ngIf="post.media" (click)="goToPost(post.id)">
@@ -285,10 +312,10 @@
       </article>
 
       <!-- Empty State when no posts -->
-      <div *ngIf="!loading && posts.length === 0" style="padding: 40px 20px; text-align: center; color: #888;">
-        <div style="font-size: 48px; margin-bottom: 12px;">🏕️</div>
-        <h3 style="margin-bottom: 8px; color: #555;">No adventures shared yet</h3>
-        <p style="font-size: 14px;">Be the first to share your camping story!</p>
+      <div *ngIf="!loading && posts.length === 0" class="cc-empty-state">
+        <span class="cc-empty-icon">🏕️</span>
+        <h3>No adventures shared yet</h3>
+        <p>Be the first to share your camping story!</p>
       </div>
 
       <!-- Infinite Scroll Loading -->

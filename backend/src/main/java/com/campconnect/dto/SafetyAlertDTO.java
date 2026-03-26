@@ -10,8 +10,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class SafetyAlertDTO {
     private String id;
-    private String message;
+    private String title;
+    private String description;
+    private String type;
     private AlertSeverity severity;
+    private String locationName;
+    private String regionName;
     private LocalDateTime createdAt;
     private String tripId;
 }

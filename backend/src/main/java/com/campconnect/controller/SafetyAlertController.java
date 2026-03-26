@@ -36,6 +36,11 @@ public class SafetyAlertController {
         return ResponseEntity.ok(alertService.getAlertsByTripId(tripId));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<SafetyAlertDTO> updateAlert(@PathVariable String id, @RequestBody SafetyAlertDTO alertDTO) {
+        return ResponseEntity.ok(alertService.updateAlert(id, alertDTO));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAlert(@PathVariable String id) {
         alertService.deleteAlert(id);

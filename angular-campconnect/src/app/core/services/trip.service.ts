@@ -34,7 +34,7 @@ export class TripService {
     }
 
     updateTrip(id: string, updates: Partial<Trip>): Observable<Trip> {
-        return this.http.post<Trip>(this.apiUrl, { ...updates, id }); // Backend uses createTrip (save) for updates too usually, or specialized update
+        return this.http.put<Trip>(`${this.apiUrl}/${id}`, updates);
     }
 
     deleteTrip(id: string): Observable<void> {

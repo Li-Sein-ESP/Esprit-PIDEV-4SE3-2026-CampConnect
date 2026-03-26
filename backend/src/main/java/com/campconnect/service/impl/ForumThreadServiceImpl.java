@@ -4,6 +4,7 @@ import com.campconnect.dto.ForumThreadDTO;
 import com.campconnect.model.ForumThread;
 import com.campconnect.model.User;
 import com.campconnect.repository.ForumThreadRepository;
+import com.campconnect.repository.PostRepository;
 import com.campconnect.repository.UserRepository;
 import com.campconnect.service.ForumThreadService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ public class ForumThreadServiceImpl implements ForumThreadService {
 
     private final ForumThreadRepository threadRepository;
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
 
     @Override
     public ForumThreadDTO createThread(ForumThreadDTO threadDTO) {
@@ -63,10 +65,12 @@ public class ForumThreadServiceImpl implements ForumThreadService {
         
         return mapToDTO(threadRepository.save(thread));
     }
+    @Override
     public void deleteThread(String id) {
         if (!threadRepository.existsById(id)) {
             throw new RuntimeException("Thread not found");
         }
+        postRepository.deleteByThreadId(id);
         threadRepository.deleteById(id);
     }
 
@@ -98,6 +102,8 @@ public class ForumThreadServiceImpl implements ForumThreadService {
         dto.setViews(thread.getViews());
         if (thread.getAuthor() != null) {
             dto.setAuthorId(thread.getAuthor().getId());
+            dto.setAuthorName(thread.getAuthor().getName());
+            dto.setAuthorUsername(thread.getAuthor().getUsername());
         }
         return dto;
     }

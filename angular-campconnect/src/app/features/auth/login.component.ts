@@ -3,202 +3,169 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
-
-import { LucideAngularModule, Mail, Lock, Eye, EyeOff, Tent } from 'lucide-angular';
+import { LucideAngularModule, Mail, Lock, Eye, EyeOff, Zap } from 'lucide-angular';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule],
   template: `
-    <div class="min-h-screen flex">
-      <!-- Left Side - Immersive Outdoor Visual -->
-      <div class="hidden lg:flex lg:w-[45%] xl:w-1/2 relative overflow-hidden">
-        <!-- Background Image -->
-        <div 
-          class="absolute inset-0 bg-cover bg-center"
-          style="background-image: url('https://images.unsplash.com/photo-1536003033612-307626513587?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080')"
-        ></div>
-        
-        <!-- Gradient Overlay -->
-        <div class="absolute inset-0 bg-gradient-to-br from-[#2F4F3E]/80 via-[#2F4F3E]/60 to-[#1a1f1d]/70"></div>
-        
-        <!-- Content -->
-        <div class="relative z-10 flex flex-col justify-between p-12 text-white">
-          <!-- Logo -->
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center">
-              <lucide-icon [img]="TentIcon" [size]="24" class="text-white"></lucide-icon>
-            </div>
-            <span class="text-2xl font-bold">CampConnect</span>
-          </div>
+    <div class="min-h-screen bg-[#1a1f1d] flex items-center justify-center p-6 relative overflow-hidden">
+      <!-- Decorative background elements -->
+      <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#10b981]/10 rounded-full blur-[120px]"></div>
+      <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#10b981]/5 rounded-full blur-[120px]"></div>
 
-          <!-- Quote -->
-          <div>
-            <h2 class="text-4xl font-bold mb-4 text-white">
-              Your Adventure Awaits
-            </h2>
-            <p class="text-xl text-white/90 max-w-md">
-              Connect with nature, discover hidden campsites, and build memories that last a lifetime.
-            </p>
+      <div class="w-full max-w-md z-10">
+        <!-- Logo & Header -->
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center justify-center w-12 h-12 bg-[#10b981] rounded-xl mb-4 shadow-lg shadow-[#10b981]/20">
+            <lucide-icon [img]="ZapIcon" class="text-white" [size]="24"></lucide-icon>
           </div>
-
-          <!-- Footer -->
-          <div class="text-sm text-white/60">
-            © 2026 CampConnect. All rights reserved.
-          </div>
+          <h1 class="text-3xl font-serif font-bold text-white mb-2">CampConnect</h1>
+          <h2 class="text-4xl font-serif font-bold text-white mb-2 leading-tight">Welcome Back, Explorer</h2>
+          <p class="text-gray-400">Log in to continue your adventure.</p>
         </div>
-      </div>
 
-      <!-- Right Side - Authentication Card -->
-      <div class="flex-1 flex items-center justify-center p-6 lg:p-12 bg-[var(--color-background)]">
-        <div class="w-full max-w-md">
-          <!-- Mobile Logo -->
-          <div class="lg:hidden flex items-center gap-3 mb-8">
-            <div class="w-10 h-10 rounded-lg bg-[var(--color-primary-500)] flex items-center justify-center">
-              <lucide-icon [img]="TentIcon" [size]="24" class="text-white"></lucide-icon>
-            </div>
-            <span class="text-2xl font-bold text-[var(--color-text-heading)]">CampConnect</span>
+        <!-- Auth Card -->
+        <div class="bg-[#242a27]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
+          <!-- Tab Switcher -->
+          <div class="flex p-1 bg-[#1a1f1d] rounded-xl mb-8">
+            <button 
+              class="flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-200"
+              [class.bg-[#10b981]]="activeTab === 'login'"
+              [class.text-white]="activeTab === 'login'"
+              [class.text-gray-400]="activeTab !== 'login'"
+              (click)="activeTab = 'login'"
+            >
+              LOG IN
+            </button>
+            <button 
+              class="flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-200"
+              [class.bg-[#10b981]]="activeTab === 'signup'"
+              [class.text-white]="activeTab === 'signup'"
+              [class.text-gray-400]="activeTab !== 'signup'"
+              routerLink="/signup"
+            >
+              SIGN UP
+            </button>
           </div>
 
-          <!-- Authentication Card -->
-          <div 
-            class="bg-[var(--color-surface)] rounded-2xl p-8 border border-[var(--color-border-light)]"
-            style="box-shadow: 0 20px 25px -5px rgba(42, 42, 42, 0.1), 0 8px 10px -6px rgba(42, 42, 42, 0.05)"
-          >
-            <!-- Header -->
-            <div class="mb-8">
-              <h1 class="text-3xl font-bold text-[var(--color-text-heading)] mb-2">
-                Welcome Back
-              </h1>
-              <p class="text-[var(--color-text-secondary)]">
-                Sign in to continue your outdoor adventure
-              </p>
+          <!-- Error Message -->
+          <div *ngIf="errorMessage" class="mb-6 p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-xl text-center">
+            {{ errorMessage }}
+          </div>
+
+          <!-- Form -->
+          <form (ngSubmit)="handleSubmit()" class="space-y-6">
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-bold text-[#10b981] uppercase tracking-wider ml-1">Email Address</label>
+              <div class="relative group">
+                <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#10b981] transition-colors">
+                  <lucide-icon [img]="MailIcon" [size]="18"></lucide-icon>
+                </div>
+                <input
+                  type="text"
+                  placeholder="nawres@gmail.com"
+                  [(ngModel)]="username"
+                  name="username"
+                  class="w-full bg-[#eef2ff] border-none rounded-2xl py-4 pl-12 pr-4 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-[#10b981] transition-all outline-none font-medium"
+                  required
+                />
+              </div>
             </div>
 
-            <!-- Error Message -->
-            <div *ngIf="errorMessage" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                {{ errorMessage }}
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-bold text-[#10b981] uppercase tracking-wider ml-1">Password</label>
+              <div class="relative group">
+                <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#10b981] transition-colors">
+                  <lucide-icon [img]="LockIcon" [size]="18"></lucide-icon>
+                </div>
+                <input
+                  [type]="showPassword ? 'text' : 'password'"
+                  placeholder="••••••••"
+                  [(ngModel)]="password"
+                  name="password"
+                  class="w-full bg-[#eef2ff] border-none rounded-2xl py-4 pl-12 pr-12 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-[#10b981] transition-all outline-none font-medium"
+                  required
+                />
+                <button
+                  type="button"
+                  (click)="showPassword = !showPassword"
+                  class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors"
+                >
+                  <lucide-icon [img]="showPassword ? EyeOffIcon : EyeIcon" [size]="18"></lucide-icon>
+                </button>
+              </div>
             </div>
 
-            <!-- Form -->
-            <form (ngSubmit)="handleSubmit()" class="space-y-5">
-              <!-- Email Input -->
-              <div>
-                <label 
-                  for="email" 
-                  class="block text-sm font-medium text-[var(--color-text-primary)] mb-2"
-                >
-                  Username
-                </label>
-                <div class="relative">
-                  <div class="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]">
-                    <lucide-icon [img]="MailIcon" [size]="20"></lucide-icon>
-                  </div>
-                  <input
-                    id="username"
-                    type="text"
-                    placeholder="username"
-                    [(ngModel)]="username"
-                    name="username"
-                    class="w-full px-4 py-2.5 pl-11 rounded-lg min-h-[44px] bg-white border-2 border-[var(--color-border-light)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:outline-none focus:border-[var(--color-primary-500)] focus:ring-2 focus:ring-[var(--color-primary-100)] transition-all duration-200"
-                    required
-                  />
-                </div>
-              </div>
-
-              <!-- Password Input -->
-              <div>
-                <label 
-                  for="password" 
-                  class="block text-sm font-medium text-[var(--color-text-primary)] mb-2"
-                >
-                  Password
-                </label>
-                <div class="relative">
-                  <div class="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]">
-                    <lucide-icon [img]="LockIcon" [size]="20"></lucide-icon>
-                  </div>
-                  <input
-                    id="password"
-                    [type]="showPassword ? 'text' : 'password'"
-                    placeholder="Enter your password"
-                    [(ngModel)]="password"
-                    name="password"
-                    class="w-full px-4 py-2.5 pl-11 pr-11 rounded-lg min-h-[44px] bg-white border-2 border-[var(--color-border-light)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:outline-none focus:border-[var(--color-primary-500)] focus:ring-2 focus:ring-[var(--color-primary-100)] transition-all duration-200"
-                    required
-                  />
-                  <button
-                    type="button"
-                    (click)="showPassword = !showPassword"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
-                  >
-                    <lucide-icon *ngIf="showPassword" [img]="EyeOffIcon" [size]="20"></lucide-icon>
-                    <lucide-icon *ngIf="!showPassword" [img]="EyeIcon" [size]="20"></lucide-icon>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Remember Me & Forgot Password -->
-              <div class="flex items-center justify-between">
-                <label class="flex items-center gap-2 cursor-pointer">
+            <div class="flex items-center justify-between px-1">
+              <label class="flex items-center gap-2 cursor-pointer group">
+                <div class="relative flex items-center">
                   <input
                     type="checkbox"
                     [(ngModel)]="rememberMe"
                     name="rememberMe"
-                    class="w-4 h-4 rounded border-[var(--color-border-medium)] text-[var(--color-primary-500)] focus:ring-2 focus:ring-[var(--color-primary-500)] focus:ring-offset-0"
+                    class="peer appearance-none w-4 h-4 bg-transparent border-2 border-gray-600 rounded checked:bg-[#10b981] checked:border-[#10b981] transition-all focus:outline-none"
                   />
-                  <span class="text-sm text-[var(--color-text-secondary)]">
-                    Remember me
-                  </span>
-                </label>
-                <a 
-                  routerLink="/forgot-password"
-                  class="text-sm text-[var(--color-primary-500)] hover:text-[var(--color-primary-600)] font-medium transition-colors"
-                >
-                  Forgot password?
-                </a>
-              </div>
-
-              <!-- Submit Button -->
-              <button
-                type="submit"
-                [disabled]="isLoading"
-                class="w-full px-6 py-3 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors font-medium text-base min-h-[48px] disabled:opacity-50"
-              >
-                {{ isLoading ? 'Signing In...' : 'Sign In' }}
-              </button>
-            </form>
-
-            <!-- Sign Up Link -->
-            <div class="mt-6 text-center">
-              <p class="text-sm text-[var(--color-text-secondary)]">
-                Don't have an account? 
-                <a 
-                  routerLink="/signup"
-                  class="text-[var(--color-primary-500)] hover:text-[var(--color-primary-600)] font-medium transition-colors"
-                >
-                  Sign up for free
-                </a>
-              </p>
+                  <svg class="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none left-0.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <span class="text-xs text-gray-300 group-hover:text-white transition-colors">Stay logged in</span>
+              </label>
+              <a href="#" class="text-xs text-[#10b981] hover:underline font-medium">Forgot password?</a>
             </div>
+
+            <button
+              type="submit"
+              [disabled]="isLoading"
+              class="w-full bg-[#10b981] text-white font-bold py-4 rounded-2xl hover:bg-[#0da271] active:scale-[0.98] transition-all shadow-lg shadow-[#10b981]/25 disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              <span *ngIf="isLoading" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+              {{ isLoading ? 'Entering...' : 'Start Adventure' }}
+            </button>
+          </form>
+
+          <!-- Social Login -->
+          <div class="mt-8 text-center relative">
+            <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-white/5"></div>
+            <span class="relative px-4 bg-[#242a27] text-[10px] uppercase font-bold text-gray-500 tracking-[0.2em]">or continue with</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 mt-6">
+            <button class="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl py-3 text-sm text-white font-medium transition-all group">
+              <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5 group-hover:scale-110 transition-transform" alt="Google">
+              <span>Google</span>
+            </button>
+            <button class="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl py-3 text-sm text-white font-medium transition-all group">
+              <img src="https://www.svgrepo.com/show/330033/apple.svg" class="w-5 h-5 invert group-hover:scale-110 transition-transform" alt="Apple">
+              <span>Apple</span>
+            </button>
           </div>
         </div>
       </div>
     </div>
   `,
-  styles: []
+  styles: [`
+    :host {
+      display: block;
+    }
+    input::placeholder {
+      font-weight: 500;
+    }
+  `]
 })
 export class LoginComponent {
-  TentIcon = Tent;
+  activeTab = 'login';
+  ZapIcon = Zap;
   MailIcon = Mail;
   LockIcon = Lock;
   EyeIcon = Eye;
   EyeOffIcon = EyeOff;
 
   showPassword = false;
-  username = '';
-  password = '';
+  username = 'admin';
+  password = 'admin123';
   rememberMe = false;
   isLoading = false;
   errorMessage = '';
@@ -221,7 +188,11 @@ export class LoginComponent {
       error: (err) => {
         this.isLoading = false;
         console.error('Login failed', err);
-        this.errorMessage = 'Invalid username or password';
+        if (err.status === 0) {
+          this.errorMessage = 'Network error: Check if backend is running and CORS is allowed.';
+        } else {
+          this.errorMessage = err.error?.message || 'Invalid email or password';
+        }
       }
     });
   }

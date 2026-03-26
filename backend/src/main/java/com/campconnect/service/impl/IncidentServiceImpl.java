@@ -24,11 +24,20 @@ public class IncidentServiceImpl implements IncidentService {
         Incident incident = new Incident();
         incident.setTitle(incidentDTO.getTitle());
         incident.setDescription(incidentDTO.getDescription());
+        incident.setLevel(incidentDTO.getLevel());
+        incident.setRegionName(incidentDTO.getRegionName());
+        incident.setLatitude(incidentDTO.getLatitude());
+        incident.setLongitude(incidentDTO.getLongitude());
+        incident.setReporterId(incidentDTO.getReporterId());
+        incident.setStatus(incidentDTO.getStatus() != null ? incidentDTO.getStatus() : "pending");
 
-        Trip trip = tripRepository.findById(incidentDTO.getTripId())
-            .orElseThrow(() -> new RuntimeException("Trip not found"));
-        trip.addIncident(incident);
-        tripRepository.save(trip);
+        if (incidentDTO.getTripId() != null && !incidentDTO.getTripId().isEmpty()) {
+            tripRepository.findById(incidentDTO.getTripId()).ifPresent(trip -> {
+                incident.setTrip(trip);
+                trip.addIncident(incident);
+                tripRepository.save(trip);
+            });
+        }
 
         Incident savedIncident = incidentRepository.save(incident);
         return mapToDTO(savedIncident);
@@ -50,8 +59,48 @@ public class IncidentServiceImpl implements IncidentService {
     }
 
     @Override
+    public List<IncidentDTO> getAllIncidents() {
+        return incidentRepository.findAll().stream()
+            .map(this::mapToDTO)
+            .collect(Collectors.toList());
+    }
+
+    @Override
     public void deleteIncident(String id) {
+        System.out.println("Processing delete request for Incident ID: " + id);
         incidentRepository.deleteById(id);
+        System.out.println("Delete request completed for Incident ID: " + id);
+    }
+
+    @Override
+    public IncidentDTO updateIncident(String id, IncidentDTO incidentDTO) {
+        System.out.println("Processing update request for Incident ID: " + id);
+        Incident incident = incidentRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Incident not found"));
+        
+        if (incidentDTO.getTitle() != null) incident.setTitle(incidentDTO.getTitle());
+        if (incidentDTO.getDescription() != null) incident.setDescription(incidentDTO.getDescription());
+        if (incidentDTO.getLevel() != null) incident.setLevel(incidentDTO.getLevel());
+        if (incidentDTO.getRegionName() != null) incident.setRegionName(incidentDTO.getRegionName());
+        
+        // Coordinates and Reporter ID (Only update if not default/empty)
+        if (incidentDTO.getLatitude() != 0) incident.setLatitude(incidentDTO.getLatitude());
+        if (incidentDTO.getLongitude() != 0) incident.setLongitude(incidentDTO.getLongitude());
+        if (incidentDTO.getReporterId() != null) incident.setReporterId(incidentDTO.getReporterId());
+        
+        if (incidentDTO.getStatus() != null) {
+            incident.setStatus(incidentDTO.getStatus());
+        }
+
+        if (incidentDTO.getTripId() != null && !incidentDTO.getTripId().isEmpty() && !incidentDTO.getTripId().equals("default-trip")) {
+            tripRepository.findById(incidentDTO.getTripId()).ifPresent(trip -> {
+                incident.setTrip(trip);
+            });
+        }
+
+        Incident updatedIncident = incidentRepository.save(incident);
+        System.out.println("Update request completed for Incident ID: " + id);
+        return mapToDTO(updatedIncident);
     }
 
     private IncidentDTO mapToDTO(Incident incident) {
@@ -59,7 +108,13 @@ public class IncidentServiceImpl implements IncidentService {
         dto.setId(incident.getId());
         dto.setTitle(incident.getTitle());
         dto.setDescription(incident.getDescription());
+        dto.setLevel(incident.getLevel());
+        dto.setRegionName(incident.getRegionName());
+        dto.setLatitude(incident.getLatitude());
+        dto.setLongitude(incident.getLongitude());
+        dto.setReporterId(incident.getReporterId());
         dto.setReportedAt(incident.getReportedAt());
+        dto.setStatus(incident.getStatus());
         if (incident.getTrip() != null) {
             dto.setTripId(incident.getTrip().getId());
         }

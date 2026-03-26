@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { CardComponent, CardContentComponent, CardFooterComponent } from '../../shared/components/card.component';
 import { BadgeComponent } from '../../shared/components/badge.component';
-import { LucideAngularModule, Calendar, MapPin, Users, Plus, Edit, Trash2 } from 'lucide-angular';
+import { LucideAngularModule, Calendar, MapPin, Users, Plus, Edit, Trash2, X } from 'lucide-angular';
 import { TripService, Trip } from '../../core/services/trip.service';
 
 @Component({
@@ -16,7 +17,8 @@ import { TripService, Trip } from '../../core/services/trip.service';
     CardContentComponent,
     CardFooterComponent,
     BadgeComponent,
-    LucideAngularModule
+    LucideAngularModule,
+    FormsModule
   ],
   template: `
   <div class="container py-8">
@@ -96,7 +98,7 @@ import { TripService, Trip } from '../../core/services/trip.service';
             View Details
           </button>
           <button
-            (click)="editTrip(trip.id)"
+            (click)="editTrip(trip)"
             class="px-4 py-2 border border-[var(--color-border-medium)] rounded-lg hover:bg-[var(--color-neutral-50)] transition-colors"
           >
             <lucide-icon [img]="EditIcon" [size]="16" class="text-[var(--color-text-secondary)]"></lucide-icon>
@@ -135,6 +137,56 @@ import { TripService, Trip } from '../../core/services/trip.service';
         Plan Your First Trip
       </button>
     </div>
+    <!-- Edit Modal -->
+    <div *ngIf="showEditModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+        
+        <div class="p-6 border-b border-[var(--color-border-light)] flex justify-between items-center">
+          <h2 class="text-xl font-semibold text-[var(--color-text-heading)]">Edit Trip</h2>
+          <button (click)="closeEditModal()" class="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors">
+            <lucide-icon [img]="XIcon" [size]="20"></lucide-icon>
+          </button>
+        </div>
+        
+        <div class="p-6 overflow-y-auto flex-1 space-y-4">
+          <div *ngIf="editingTrip">
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">Trip Name</label>
+              <input type="text" [(ngModel)]="editingTrip.name" class="w-full px-4 py-2 border border-[var(--color-border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-500)]">
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">Destination</label>
+              <input type="text" [(ngModel)]="editingTrip.destination" class="w-full px-4 py-2 border border-[var(--color-border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-500)]">
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label class="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">Start Date</label>
+                <input type="date" [(ngModel)]="editingTrip.startDate" class="w-full px-4 py-2 border border-[var(--color-border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-500)]">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">End Date</label>
+                <input type="date" [(ngModel)]="editingTrip.endDate" class="w-full px-4 py-2 border border-[var(--color-border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-500)]">
+              </div>
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">Notes</label>
+              <textarea [(ngModel)]="editingTrip.notes" rows="3" class="w-full px-4 py-2 border border-[var(--color-border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-500)]"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 border-t border-[var(--color-border-light)] bg-gray-50 flex justify-end gap-3">
+          <button (click)="closeEditModal()" class="px-6 py-2 border border-[var(--color-border-medium)] rounded-lg hover:bg-[var(--color-neutral-100)] transition-colors font-medium">
+            Cancel
+          </button>
+          <button (click)="saveTripChanges()" [disabled]="saving" class="px-6 py-2 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors font-medium disabled:opacity-50 flex items-center gap-2">
+            <span *ngIf="saving" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            Save Changes
+          </button>
+        </div>
+
+      </div>
+    </div>
   </div>
     `,
   styles: []
@@ -146,6 +198,7 @@ export class MyTripsComponent implements OnInit {
   PlusIcon = Plus;
   EditIcon = Edit;
   Trash2Icon = Trash2;
+  XIcon = X;
 
   activeTab: string = 'all';
   loading: boolean = true;
@@ -157,6 +210,11 @@ export class MyTripsComponent implements OnInit {
   ];
 
   trips: Trip[] = [];
+
+  // Modal State
+  showEditModal = false;
+  editingTrip: any = null;
+  saving = false;
 
   constructor(public router: Router, private tripService: TripService) { }
 
@@ -213,8 +271,54 @@ export class MyTripsComponent implements OnInit {
     this.router.navigate(['/trips', id]);
   }
 
-  editTrip(id: string): void {
-    console.log('Edit trip:', id);
+  editTrip(trip: Trip): void {
+    this.editingTrip = JSON.parse(JSON.stringify(trip)); // Deep copy
+    
+    // Convert to YYYY-MM-DD for <input type="date">
+    if (this.editingTrip.startDate && this.editingTrip.startDate.includes('T')) {
+      this.editingTrip.startDate = this.editingTrip.startDate.split('T')[0];
+    }
+    if (this.editingTrip.endDate && this.editingTrip.endDate.includes('T')) {
+      this.editingTrip.endDate = this.editingTrip.endDate.split('T')[0];
+    }
+    
+    this.showEditModal = true;
+  }
+
+  closeEditModal(): void {
+    this.showEditModal = false;
+    this.editingTrip = null;
+  }
+
+  saveTripChanges(): void {
+    if (!this.editingTrip) return;
+    
+    this.saving = true;
+    
+    // Prepare payload by appending time component for Spring Boot
+    const payload = { ...this.editingTrip };
+    if (payload.startDate && payload.startDate.length === 10) {
+      payload.startDate = payload.startDate + 'T00:00:00';
+    }
+    if (payload.endDate && payload.endDate.length === 10) {
+      payload.endDate = payload.endDate + 'T00:00:00';
+    }
+
+    this.tripService.updateTrip(payload.id, payload).subscribe({
+      next: (updated) => {
+        const index = this.trips.findIndex(t => t.id === updated.id);
+        if (index !== -1) {
+          this.trips[index] = updated;
+        }
+        this.closeEditModal();
+        this.saving = false;
+      },
+      error: (err) => {
+        console.error('Error updating trip', err);
+        alert('Failed to update trip. Please try again.');
+        this.saving = false;
+      }
+    });
   }
 
   deleteTrip(id: string): void {
@@ -222,6 +326,10 @@ export class MyTripsComponent implements OnInit {
       this.tripService.deleteTrip(id).subscribe({
         next: () => {
           this.loadTrips();
+        },
+        error: (err) => {
+          console.error('Error deleting trip', err);
+          alert('Failed to delete trip. Please try again.');
         }
       });
     }

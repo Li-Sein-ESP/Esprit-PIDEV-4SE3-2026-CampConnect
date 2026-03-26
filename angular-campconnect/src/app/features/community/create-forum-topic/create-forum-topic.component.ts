@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { LucideAngularModule, Image, X, Plus, Info, ChevronLeft, Tag as TagIcon, Send } from 'lucide-angular';
 import { AuthService } from '../../../core/services/auth.service';
@@ -48,12 +48,21 @@ export class CreateForumTopicComponent implements OnInit {
     constructor(
         private fb: FormBuilder,
         private router: Router,
+        private route: ActivatedRoute,
         public authService: AuthService,
         private communityService: CommunityService
     ) { }
 
     ngOnInit(): void {
         this.initForm();
+        
+        // Pre-select category from query params
+        this.route.queryParams.subscribe(params => {
+            const queryCatId = params['categoryId'];
+            if (queryCatId) {
+                this.topicForm.patchValue({ category: queryCatId });
+            }
+        });
     }
 
     private initForm(): void {

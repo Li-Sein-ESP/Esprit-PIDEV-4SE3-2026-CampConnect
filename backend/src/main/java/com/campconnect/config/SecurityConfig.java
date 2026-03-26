@@ -54,7 +54,7 @@ public class SecurityConfig {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.cors(cors -> cors.configurationSource(request -> {
         org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
-        config.setAllowedOriginPatterns(java.util.List.of("http://localhost:4200"));
+        config.setAllowedOrigins(java.util.List.of("http://localhost:4200"));
         config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(java.util.List.of("*"));
         config.setAllowCredentials(true);
@@ -64,9 +64,13 @@ public class SecurityConfig {
         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> 
-          auth.requestMatchers("/api/**").permitAll()
+              auth.requestMatchers("/api/auth/**").permitAll()
+              .requestMatchers("/api/test/**").permitAll()
+              .requestMatchers("/api/incidents/**").permitAll()
+              .requestMatchers("/api/alerts/**").permitAll()
+              .requestMatchers("/api/threads/**", "/api/posts/**", "/api/comments/**").permitAll()
               .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-              .anyRequest().permitAll()
+              .anyRequest().authenticated()
         );
     
     http.authenticationProvider(authenticationProvider());

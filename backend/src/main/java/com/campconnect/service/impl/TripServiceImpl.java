@@ -59,6 +59,28 @@ public class TripServiceImpl implements TripService {
         tripRepository.deleteById(id);
     }
 
+    @Override
+    public TripDTO updateTrip(String id, TripDTO tripDTO) {
+        Trip trip = tripRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Trip not found"));
+        
+        trip.setName(tripDTO.getName());
+        trip.setDestination(tripDTO.getDestination());
+        trip.setNotes(tripDTO.getNotes());
+        trip.setStartDate(tripDTO.getStartDate());
+        trip.setEndDate(tripDTO.getEndDate());
+        trip.setDifficulty(tripDTO.getDifficulty());
+
+        if (tripDTO.getGroupId() != null) {
+            Group group = groupRepository.findById(tripDTO.getGroupId())
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+            trip.setGroup(group);
+        }
+
+        Trip updatedTrip = tripRepository.save(trip);
+        return mapToDTO(updatedTrip);
+    }
+
     private TripDTO mapToDTO(Trip trip) {
         TripDTO dto = new TripDTO();
         dto.setId(trip.getId());
