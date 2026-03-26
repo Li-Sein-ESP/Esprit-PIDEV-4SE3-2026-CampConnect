@@ -23,6 +23,6 @@ export class BookingConfirmationComponent {
   bookingId: string;
 
   constructor(private route: ActivatedRoute) {
-    this.bookingId = this.route.snapshot.paramMap.get('id') || 'BK123456';
+    this.bookingId = this.route.snapshot.paramMap.get('bookingId') || 'BK123456';
   }
 }

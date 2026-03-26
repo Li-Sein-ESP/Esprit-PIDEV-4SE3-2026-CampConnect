@@ -40,7 +40,7 @@ export class ReservationService {
         return this.http.patch<Reservation>(`${API_URL}/${id}/cancel`, {}, httpOptions);
     }
 
-    deleteReservation(id: string): Observable<void> {
-        return this.http.delete<void>(`${API_URL}/${id}`, httpOptions);
+    deleteReservation(id: string): Observable<Reservation> {
+        return this.http.delete<Reservation>(`${API_URL}/${id}`, httpOptions);
     }
 }

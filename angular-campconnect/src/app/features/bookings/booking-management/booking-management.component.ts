@@ -204,8 +204,8 @@ export class BookingManagementComponent {
     }
 
     cancelBooking(bookingId: string) {
-        if (confirm('Are you sure you want to permanently delete this reservation?')) {
-            this.reservationService.deleteReservation(bookingId).subscribe({
+        if (confirm('Are you sure you want to cancel this reservation? It will be preserved in your history.')) {
+            this.reservationService.cancelReservation(bookingId).subscribe({
                 next: () => {
                     this.loadReservations();
                     this.closeMenu();

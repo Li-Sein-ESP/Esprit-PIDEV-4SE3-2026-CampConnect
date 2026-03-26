@@ -104,9 +104,6 @@ public class ReservationServiceImpl implements IReservationService {
     }
 
     public void deleteReservation(String id) {
-        if (!reservationRepository.existsById(id)) {
-            throw new RuntimeException("Reservation not found with id: " + id);
-        }
-        reservationRepository.deleteById(id);
+        cancelReservation(id);
     }
 }

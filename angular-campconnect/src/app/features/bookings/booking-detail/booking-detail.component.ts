@@ -223,8 +223,8 @@ export class BookingDetailComponent implements OnInit {
 
   deleteReservation() {
     const id = this.reservation?.id || this.reservation?._id;
-    if (id && confirm('DANGER: This will permanently delete this reservation record. Continue?')) {
-      this.reservationService.deleteReservation(id).subscribe({
+    if (id && confirm('Are you sure you want to cancel this reservation? It will be preserved in your history.')) {
+      this.reservationService.cancelReservation(id).subscribe({
         next: () => this.router.navigate(['/dashboard/bookings']),
         error: (err) => console.error('Error deleting reservation', err)
       });

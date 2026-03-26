@@ -26,11 +26,11 @@ export class BookingCancelComponent {
   confirmCancel() {
     if (confirm('Are you sure you want to cancel this booking?')) {
       alert('Booking cancelled. Refund will be processed in 5-7 business days.');
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/dashboard/bookings']);
     }
   }
 
   goBack() {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/dashboard/bookings']);
   }
 }

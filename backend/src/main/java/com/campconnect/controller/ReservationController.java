@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @RestController
 @RequestMapping("/api/reservations")
 @RequiredArgsConstructor
@@ -67,8 +68,8 @@ public class ReservationController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable("id") String id) {
-        reservationService.deleteReservation(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Reservation> deleteReservation(@PathVariable("id") String id) {
+        Reservation cancelledReservation = reservationService.cancelReservation(id);
+        return ResponseEntity.ok(cancelledReservation);
     }
 }
