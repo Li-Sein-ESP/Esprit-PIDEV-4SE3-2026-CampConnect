@@ -8,6 +8,7 @@ export interface TransportRoute {
     mode: 'car' | 'bus' | 'train' | 'flight' | 'carpool';
     price?: number;
     provider?: string;
+    imageUrl?: string;
 }
 
 export interface Location {

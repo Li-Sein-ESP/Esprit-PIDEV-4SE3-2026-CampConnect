@@ -1,0 +1,299 @@
+<div class="h-screen w-full flex flex-col md:flex-row font-sans bg-stone-900 text-stone-50 overflow-hidden">
+
+    <!-- LEFT SIDE: Video Panel -->
+    <div class="flex-1 relative video-panel h-[35vh] md:h-auto overflow-hidden">
+
+        <!-- Gradient Overlay -->
+        <div class="video-overlay"></div>
+
+        <video class="video-bg" autoplay muted loop playsinline>
+            <source src="/assets/videos/Video_Remake_Continuous_Walking.mp4" type="video/mp4">
+            Your browser does not support HTML5 video.
+        </video>
+
+        <!-- Decorative Text Overlay -->
+        <div class="absolute bottom-8 left-8 z-20 text-left opacity-90">
+            <p class="text-white font-serif text-3xl italic drop-shadow-lg">"Answer the call of the wild."</p>
+            <p class="text-emerald-300 text-xs tracking-[0.2em] uppercase mt-2 font-bold drop-shadow-md">Explore freely,
+                connect deeply</p>
+        </div>
+    </div>
+
+    <!-- RIGHT SIDE: Login Interface -->
+    <div
+        class="w-full md:w-[480px] lg:w-[520px] h-full relative z-20 flex flex-col justify-center md:items-center p-6 md:p-12 shrink-0 bg-stone-900 border-l border-stone-800 shadow-2xl overflow-y-auto custom-scrollbar">
+
+        <!-- Background Ambient Glows -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+            <div class="absolute top-[-10%] right-[-10%] w-96 h-96 bg-emerald-900/20 rounded-full blur-[100px]"></div>
+            <div class="absolute bottom-[-10%] left-[-10%] w-96 h-96 bg-amber-900/20 rounded-full blur-[100px]"></div>
+        </div>
+
+        <div class="relative z-10 w-full max-w-sm mx-auto">
+
+            <!-- Brand / Header -->
+            <div class="mb-10 text-center md:text-left">
+                <div class="flex items-center justify-center md:justify-start gap-3 mb-4">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-600 to-green-700 flex items-center justify-center shadow-lg shadow-emerald-900/40 transform rotate-3">
+                        <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <span class="text-3xl font-bold tracking-tight text-white font-serif">CampConnect</span>
+                </div>
+                <h1 class="text-4xl font-serif text-stone-100 mb-2">{{ activeTab === 'login' ? 'Welcome Back, Explorer'
+                    : 'Begin Your Journey' }}</h1>
+                <p class="text-stone-400 font-light">{{ activeTab === 'login' ? 'Log in to continue your adventure.' :
+                    'Join our community of outdoor enthusiasts.' }}</p>
+            </div>
+
+            <!-- Toggle Tabs -->
+            <div class="flex bg-stone-800/80 p-1.5 rounded-2xl mb-8 relative border border-stone-700/50 shadow-inner">
+                <div class="absolute left-1.5 top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-emerald-700/90 rounded-xl shadow-sm transition-transform duration-300"
+                    [style.transform]="activeTab === 'login' ? 'translateX(0)' : 'translateX(100%)'"></div>
+                <button (click)="switchMode('login')"
+                    class="flex-1 py-2.5 text-sm font-semibold relative z-10 transition-colors uppercase tracking-wide"
+                    [class.text-white]="activeTab === 'login'" [class.text-stone-400]="activeTab !== 'login'">Log
+                    In</button>
+                <button (click)="switchMode('signup')"
+                    class="flex-1 py-2.5 text-sm font-semibold relative z-10 transition-colors uppercase tracking-wide"
+                    [class.text-white]="activeTab === 'signup'" [class.text-stone-400]="activeTab !== 'signup'">Sign
+                    Up</button>
+            </div>
+
+            <!-- Message Banner (Success/Error) -->
+            <div *ngIf="errorMessage" class="mb-6 p-4 rounded-xl text-sm flex items-start gap-3"
+                [ngClass]="errorMessage.includes('success') ? 'bg-emerald-900/20 border border-emerald-800/30 text-emerald-300' : 'bg-red-900/20 border border-red-800/30 text-red-300'">
+                <svg *ngIf="!errorMessage.includes('success')" class="w-5 h-5 shrink-0 mt-0.5" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <svg *ngIf="errorMessage.includes('success')" class="w-5 h-5 shrink-0 mt-0.5" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                {{ errorMessage }}
+            </div>
+
+            <!-- LOGIN FORM -->
+            <form [formGroup]="loginForm" (ngSubmit)="onLogin()" [class.hidden]="activeTab !== 'login'"
+                class="fade-enter-active">
+                <div class="mb-5">
+                    <app-wave-input label="Email Address" type="email" formControlName="email"
+                        placeholder="e.g. ranger@campconnect.com">
+                        <svg class="w-5 h-5 input-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </app-wave-input>
+                </div>
+
+                <div class="mb-5">
+                    <app-wave-input label="Password" type="password" formControlName="password" placeholder="••••••••">
+                        <svg class="w-5 h-5 input-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                    </app-wave-input>
+                </div>
+
+                <div class="flex justify-between items-center mb-8 text-sm">
+                    <label
+                        class="flex items-center text-stone-400 cursor-pointer hover:text-stone-300 transition-colors">
+                        <input type="checkbox"
+                            class="mr-2.5 rounded border-stone-600 bg-stone-800 text-emerald-600 focus:ring-emerald-900 focus:ring-offset-stone-900">
+                        Stay logged in
+                    </label>
+                    <a href="#"
+                        class="text-emerald-400 hover:text-emerald-300 transition underline underline-offset-4 decoration-emerald-400/30 hover:decoration-emerald-300">Forgot
+                        password?</a>
+                </div>
+
+                <button type="submit" [disabled]="isSubmitting"
+                    class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl shadow-lg shadow-emerald-900/40 transition-all transform hover:scale-[1.02] active:scale-[0.98] border border-emerald-500/20">
+                    {{ isSubmitting ? 'Authenticating...' : 'Start Adventure' }}
+                </button>
+            </form>
+
+            <!-- SIGN UP FORM -->
+            <form [formGroup]="signupForm" (ngSubmit)="onSignup()" [class.hidden]="activeTab !== 'signup'"
+                class="fade-enter-active">
+
+                <!-- Role Selection View -->
+                <div *ngIf="!selectedSignUpRole">
+                    <label class="block text-center text-stone-300 font-bold mb-4">Choose Your Journey</label>
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        <button type="button" (click)="selectRoleForSignUp('camper')"
+                            class="p-4 rounded-xl border border-stone-700 bg-stone-800 hover:bg-stone-700 hover:border-emerald-500/50 transition-all text-center flex flex-col items-center gap-2 group">
+                            <span class="text-2xl group-hover:scale-110 transition-transform">🏕️</span>
+                            <span class="text-xs font-bold text-stone-300 uppercase tracking-wider">Camper</span>
+                        </button>
+                        <button type="button" (click)="selectRoleForSignUp('site_owner')"
+                            class="p-4 rounded-xl border border-stone-700 bg-stone-800 hover:bg-stone-700 hover:border-emerald-500/50 transition-all text-center flex flex-col items-center gap-2 group">
+                            <span class="text-2xl group-hover:scale-110 transition-transform">⛰️</span>
+                            <span class="text-xs font-bold text-stone-300 uppercase tracking-wider">Site Owner</span>
+                        </button>
+                        <button type="button" (click)="selectRoleForSignUp('equipment_provider')"
+                            class="p-4 rounded-xl border border-stone-700 bg-stone-800 hover:bg-stone-700 hover:border-emerald-500/50 transition-all text-center flex flex-col items-center gap-2 group">
+                            <span class="text-2xl group-hover:scale-110 transition-transform">🎒</span>
+                            <span class="text-xs font-bold text-stone-300 uppercase tracking-wider">Provider</span>
+                        </button>
+                        <button type="button" (click)="selectRoleForSignUp('organizer')"
+                            class="p-4 rounded-xl border border-stone-700 bg-stone-800 hover:bg-stone-700 hover:border-emerald-500/50 transition-all text-center flex flex-col items-center gap-2 group">
+                            <span class="text-2xl group-hover:scale-110 transition-transform">📅</span>
+                            <span class="text-xs font-bold text-stone-300 uppercase tracking-wider">Organizer</span>
+                        </button>
+                        <button type="button" (click)="selectRoleForSignUp('delivery_provider')"
+                            class="p-4 rounded-xl border border-stone-700 bg-stone-800 hover:bg-stone-700 hover:border-emerald-500/50 transition-all text-center flex flex-col items-center gap-2 group col-span-2">
+                            <span class="text-2xl group-hover:scale-110 transition-transform">🚚</span>
+                            <span class="text-xs font-bold text-stone-300 uppercase tracking-wider">Delivery
+                                Provider</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Actual Form Fields (shown after role is selected) -->
+                <div *ngIf="selectedSignUpRole" class="fade-enter-active">
+                    <div class="mb-6 flex items-center justify-between">
+                        <span
+                            class="text-emerald-400 text-sm font-bold uppercase tracking-wider inline-flex items-center gap-2">
+                            <span
+                                class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse"></span>
+                            Signing up as: {{ selectedSignUpRole.replace('_', ' ') }}
+                        </span>
+                        <button type="button" (click)="selectedSignUpRole = null"
+                            class="text-xs text-stone-400 hover:text-white underline">Change Role</button>
+                    </div>
+
+                    <div class="mb-5">
+                        <app-wave-input label="Full Name" type="text" formControlName="name"
+                            placeholder="Your Name"></app-wave-input>
+                    </div>
+
+                    <div class="mb-5">
+                        <app-wave-input label="Email" type="email" formControlName="email"
+                            placeholder="your@email.com"></app-wave-input>
+                    </div>
+
+                    <!-- Dynamic Profile Details -->
+                    <div formGroupName="profileDetails"
+                        class="bg-stone-800/40 p-4 rounded-xl border border-stone-700/50 mb-6">
+                        <label
+                            class="block text-stone-300 text-xs font-bold uppercase tracking-wider mb-4 border-b border-stone-700 pb-2">Role
+                            Specific Details</label>
+
+                        <!-- Camper Fields -->
+                        <ng-container *ngIf="selectedSignUpRole === 'camper'">
+                            <div class="mb-5">
+                                <app-wave-input label="Age" type="number" formControlName="age"></app-wave-input>
+                            </div>
+                            <div class="mb-5">
+                                <app-wave-input label="Emergency Contact" type="text"
+                                    formControlName="emergencyContact"></app-wave-input>
+                            </div>
+                        </ng-container>
+
+                        <!-- Equipment Provider Fields -->
+                        <ng-container *ngIf="selectedSignUpRole === 'equipment_provider'">
+                            <div class="mb-5">
+                                <app-wave-input label="Company Name" type="text"
+                                    formControlName="companyName"></app-wave-input>
+                            </div>
+                            <div class="mb-5">
+                                <app-wave-input label="Business Phone" type="text"
+                                    formControlName="businessPhone"></app-wave-input>
+                            </div>
+                            <div class="mb-5">
+                                <app-wave-input label="Business Address" type="text"
+                                    formControlName="businessAddress"></app-wave-input>
+                            </div>
+                        </ng-container>
+
+                        <!-- Site Owner Fields -->
+                        <ng-container *ngIf="selectedSignUpRole === 'site_owner'">
+                            <div class="mb-5">
+                                <app-wave-input label="Property Name" type="text"
+                                    formControlName="propertyName"></app-wave-input>
+                            </div>
+                            <div class="mb-5">
+                                <app-wave-input label="Property Location" type="text"
+                                    formControlName="propertyLocation"></app-wave-input>
+                            </div>
+                            <div class="mb-5">
+                                <app-wave-input label="Contact Number" type="text"
+                                    formControlName="contactNumber"></app-wave-input>
+                            </div>
+                        </ng-container>
+
+                        <!-- Organizer Fields -->
+                        <ng-container *ngIf="selectedSignUpRole === 'organizer'">
+                            <div class="mb-5">
+                                <app-wave-input label="Organization Name" type="text"
+                                    formControlName="organizationName"></app-wave-input>
+                            </div>
+                            <div class="mb-5">
+                                <app-wave-input label="Website (Optional)" type="text"
+                                    formControlName="website"></app-wave-input>
+                            </div>
+                        </ng-container>
+
+                        <!-- Delivery Provider Fields -->
+                        <ng-container *ngIf="selectedSignUpRole === 'delivery_provider'">
+                            <div class="mb-5">
+                                <app-wave-input label="Vehicle Type" type="text" formControlName="vehicleType"
+                                    placeholder="e.g. Van, Truck"></app-wave-input>
+                            </div>
+                            <div class="mb-5">
+                                <app-wave-input label="License Plate Number" type="text"
+                                    formControlName="licensePlateNumber"></app-wave-input>
+                            </div>
+                        </ng-container>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="mb-5">
+                            <app-wave-input label="Password" type="password" formControlName="password"
+                                placeholder="••••••"></app-wave-input>
+                        </div>
+                        <div class="mb-5">
+                            <app-wave-input label="Confirm" type="password" formControlName="confirmPassword"
+                                placeholder="••••••"></app-wave-input>
+                        </div>
+                    </div>
+
+                    <div *ngIf="signupForm.errors?.['mismatch'] && signupForm.get('confirmPassword')?.touched"
+                        class="text-red-400 text-xs mb-4 bg-red-900/20 p-2 rounded border border-red-800/30">
+                        Passwords do not match
+                    </div>
+
+                    <button type="submit" [disabled]="isSubmitting"
+                        class="w-full bg-amber-600 hover:bg-amber-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl shadow-lg shadow-amber-900/40 transition-all transform hover:scale-[1.02] active:scale-[0.98] border border-amber-500/20">
+                        {{ isSubmitting ? 'Creating Account...' : 'Join the Camp' }}
+                    </button>
+                </div>
+            </form>
+
+            <!-- Social Login -->
+            <div class="mt-8 pt-8 border-t border-stone-800">
+                <p class="text-center text-xs text-stone-500 uppercase tracking-widest mb-4">Or continue with</p>
+                <div class="grid grid-cols-2 gap-4">
+                    <button
+                        class="flex items-center justify-center gap-2 py-3 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 transition text-sm text-stone-300 font-medium">
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
+                        Google
+                    </button>
+                    <button
+                        class="flex items-center justify-center gap-2 py-3 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 transition text-sm text-stone-300 font-medium">
+                        <img src="https://www.svgrepo.com/show/448234/apple.svg" class="w-5 h-5 invert opacity-80"
+                            alt="Apple">
+                        Apple
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

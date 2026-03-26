@@ -1,40 +1,144 @@
-import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { LucideAngularModule, MapPin, Search, Car, Bus, Train } from 'lucide-angular';
+import { Component, signal, computed, OnInit } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
+import {
+  LucideAngularModule,
+  MapPin,
+  Calendar,
+  Users,
+  Briefcase,
+  AlertTriangle,
+  Info,
+  Car,
+  ChevronRight,
+  Clock,
+  DollarSign,
+  Leaf,
+  Footprints,
+  Bus,
+  ArrowUpDown,
+  Navigation
+} from 'lucide-angular';
 import { TransportationService } from '../services/transportation.service';
-import { TransportRoute } from '../models/transportation.model';
-import { ButtonComponent } from '../../../shared/components/button.component';
+import { TripService } from '../../trips/services/trip.service';
 import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
-import { BadgeComponent } from '../../../shared/components/badge.component';
+
+export interface TransportOption {
+  id: string;
+  title: string;
+  subtitle: string;
+  isRecommended: boolean;
+  duration: string;
+  cost: string;
+  costValue: number;
+  impact: 'High' | 'Medium' | 'Low';
+  accessibility: 'Accessible' | 'Limited Access' | 'Not Accessible';
+  considerations: string[];
+  icon: any;
+}
+
+export type SortOption = 'time' | 'cost' | 'impact';
 
 @Component({
   selector: 'app-transportation-overview',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, LucideAngularModule, ButtonComponent, CardComponent, CardContentComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    LucideAngularModule,
+    CardComponent,
+    CardContentComponent
+  ],
   templateUrl: './transportation-overview.component.html'
 })
-export class TransportationOverviewComponent {
-  readonly Search = Search;
+export class TransportationOverviewComponent implements OnInit {
   readonly MapPin = MapPin;
+  readonly Calendar = Calendar;
+  readonly Users = Users;
+  readonly Briefcase = Briefcase;
+  readonly AlertTriangle = AlertTriangle;
+  readonly Info = Info;
   readonly Car = Car;
-  readonly Bus = Bus;
-  readonly Train = Train;
+  readonly ChevronRight = ChevronRight;
+  readonly Navigation = Navigation;
 
-  origin = '';
+  tripId: string | null = null;
+  selectedTripId = signal<string>('');
+  trip: any = null;
   destination = '';
-  routes = signal<TransportRoute[]>([]);
+  userTrips = computed(() => this.tripService.getTrips());
 
-  constructor(private transportService: TransportationService) { }
+  // State to simulate showing transportation options
+  showOptions = signal(false);
 
-  searchRoutes() {
-    if (this.origin && this.destination) {
-      this.routes.set(this.transportService.getMockRoutes(this.origin, this.destination));
-    }
+  constructor(
+    private transportationService: TransportationService,
+    private tripService: TripService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private location: Location
+  ) { }
+
+  ngOnInit() {
+    this.route.queryParamMap.subscribe(params => {
+      this.tripId = params.get('tripId');
+      if (this.tripId) {
+        this.selectedTripId.set(this.tripId);
+        this.loadTrip();
+      } else {
+        // Auto-select first trip if available
+        const trips = this.userTrips();
+        if (trips.length > 0) {
+          this.selectedTripId.set(trips[0].id);
+          this.tripId = trips[0].id;
+          this.loadTrip();
+        }
+      }
+    });
+
+    // Also watch userTrips in case they load later
+    this.tripService.getTripsObservable().subscribe((trips: any[]) => {
+      if (!this.tripId && trips.length > 0) {
+        this.selectedTripId.set(trips[0].id);
+        this.tripId = trips[0].id;
+        this.loadTrip();
+      }
+    });
   }
 
-  getIcon(mode: string) {
-    return mode === 'car' ? Car : mode === 'bus' ? Bus : Train;
+  loadTrip() {
+    if (!this.tripId) return;
+    this.tripService.getTripById(this.tripId).subscribe(trip => {
+      this.trip = trip;
+      if (trip.destination) {
+        this.destination = trip.destination;
+      }
+    });
+  }
+
+  viewOptions() {
+    this.router.navigate(['/transportation/options'], {
+      queryParams: { tripId: this.tripId }
+    });
+  }
+
+  onTripChange(id: string) {
+    this.selectedTripId.set(id);
+    this.tripId = id;
+    this.loadTrip();
+    // Update URL without reloading
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tripId: id },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  changeTrip() {
+    // Scroll to trip selector or toggle it
+    const selector = document.getElementById('trip-selector');
+    if (selector) {
+      selector.focus();
+    }
   }
 }

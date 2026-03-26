@@ -1,39 +1,256 @@
-<div class="min-h-screen bg-[var(--color-background)] py-12">
-  <div class="container max-w-4xl">
-    <h2 class="mb-8">Route Details</h2>
+<div class="min-h-screen bg-[#f5f3ef]">
 
-    <app-card variant="elevated">
-      <app-card-content class="p-6">
-        <div class="space-y-6">
-          @for (segment of routeSegments; track $index) {
-          <div class="flex gap-4">
-            <div class="flex flex-col items-center">
-              <div
-                class="w-10 h-10 bg-[var(--color-primary-600)] rounded-full flex items-center justify-center text-white font-bold">
-                {{ $index + 1 }}
+  <!-- Header vert -->
+  <div class="bg-[#2d4a3e] text-white py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+          <lucide-icon [img]="Navigation" class="w-6 h-6"></lucide-icon>
+        </div>
+        <div>
+          <h1 class="text-xl font-semibold">Detailed step-by-step route for Personal Vehicle option</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenu principal -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+      <span class="cursor-pointer hover:text-gray-900 transition-colors" (click)="goBack()">Transportation</span>
+      <lucide-icon [img]="ChevronRight" class="w-4 h-4"></lucide-icon>
+      <span>Options</span>
+      <lucide-icon [img]="ChevronRight" class="w-4 h-4"></lucide-icon>
+      <span class="text-gray-900 font-medium">Route Details</span>
+    </nav>
+
+    <!-- Grille principale -->
+    @if (currentOption(); as option) {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Colonne gauche - contenu principal -->
+      <div class="lg:col-span-2 space-y-6">
+
+        <!-- Summary et Details -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <!-- Route Summary Card -->
+          <app-card>
+            <app-card-content>
+              <h2 class="text-xl font-bold text-[#2d4a3e] mb-1">Route Summary</h2>
+              <p class="text-sm text-gray-500 mb-4">Denver, CO to Rocky Mountain National Park</p>
+
+              <div class="grid grid-cols-2 gap-6">
+                <div class="flex items-start gap-3">
+                  <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                    <lucide-icon [img]="MapPin" class="w-5 h-5 text-blue-600"></lucide-icon>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500 mb-1">Total Distance</p>
+                    <p class="text-sm font-semibold text-gray-900">{{ option.routeInfo.totalDistance }}</p>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-3">
+                  <div class="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center flex-shrink-0">
+                    <lucide-icon [img]="Clock" class="w-5 h-5 text-green-600"></lucide-icon>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500 mb-1">Total Time</p>
+                    <p class="text-sm font-semibold text-gray-900">{{ option.routeInfo.totalTime }}</p>
+                  </div>
+                </div>
               </div>
-              @if ($index < routeSegments.length - 1) { <div class="w-0.5 h-16 bg-[var(--color-border-light)] my-2">
-            </div>
+            </app-card-content>
+          </app-card>
+
+          <!-- Route Details Card -->
+          <app-card>
+            <app-card-content>
+              <h2 class="text-xl font-bold text-[#2d4a3e] mb-4">Route Details</h2>
+
+              <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-500">Total Segments</span>
+                  <span class="text-sm font-medium text-gray-900">{{ option.routeInfo.totalSegments }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-500">Road Types</span>
+                  <span class="text-sm font-medium text-gray-900">{{ option.routeInfo.roadTypes }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-500">Difficulty</span>
+                  <span class="text-sm font-medium text-gray-900">{{ option.routeInfo.difficulty }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-500">Last Mile</span>
+                  <span class="text-sm font-medium text-gray-900">{{ option.routeInfo.lastMile }}</span>
+                </div>
+              </div>
+            </app-card-content>
+          </app-card>
+        </div>
+
+        <!-- Route Segments -->
+        <div>
+          <h2 class="text-xl font-bold text-[#2d4a3e] mb-4">Route Segments</h2>
+          <div class="space-y-4">
+            @for (segment of option.segments; track segment.id) {
+            <app-card [customClass]="segment.isLastMile ? 'border-blue-200 bg-blue-50/30' : ''">
+              <app-card-content customClass="flex items-start gap-4">
+                <!-- Numéro ou icône -->
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                  [ngClass]="segment.isLastMile ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-700'">
+                  @if (segment.isLastMile) {
+                  <lucide-icon [img]="Footprints" class="w-6 h-6"></lucide-icon>
+                  } @else {
+                  <span class="text-xl font-bold">{{ segment.id }}</span>
+                  }
+                </div>
+
+                <!-- Contenu -->
+                <div class="flex-1">
+                  <div class="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 class="font-bold text-gray-900">{{ segment.title }}</h3>
+                      @if (segment.subtitle) {
+                      <p class="text-sm text-gray-500 flex items-center gap-1">
+                        <lucide-icon [img]="MapPin" class="w-3 h-3"></lucide-icon>
+                        {{ segment.subtitle }}
+                      </p>
+                      }
+                    </div>
+                    @if (segment.badge) {
+                    <span class="px-3 py-1 rounded-full text-xs font-medium" [ngClass]="segment.badgeColor">
+                      {{ segment.badge }}
+                    </span>
+                    }
+                  </div>
+
+                  <!-- Distance et durée -->
+                  <div class="grid grid-cols-2 gap-4 py-3 border-t border-b border-gray-100 mb-3">
+                    <div>
+                      <p class="text-xs text-gray-500 mb-1">Distance</p>
+                      <p class="text-sm font-semibold text-gray-900">{{ segment.distance }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 mb-1">{{ segment.isLastMile ? 'Walking Time' : 'Duration' }}</p>
+                      <p class="text-sm font-semibold text-gray-900">
+                        {{ segment.isLastMile ? segment.duration.replace('Walking Time: ', '') : segment.duration }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Conditions -->
+                  @if (segment.conditions) {
+                  <p class="text-sm text-gray-600 mb-3">
+                    <span class="font-medium">Conditions:</span> {{ segment.conditions }}
+                  </p>
+                  }
+
+                  <!-- Notes importantes -->
+                  @if (segment.importantNotes && segment.importantNotes.length > 0) {
+                  <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                      <lucide-icon [img]="AlertTriangle" class="w-4 h-4 text-amber-600"></lucide-icon>
+                      <span class="font-semibold text-amber-900">Important Notes</span>
+                    </div>
+                    <ul class="space-y-1">
+                      @for (note of segment.importantNotes; track $index) {
+                      <li class="text-sm text-amber-800 flex items-start gap-2">
+                        <span class="text-amber-600 mt-1">•</span>
+                        {{ note }}
+                      </li>
+                      }
+                    </ul>
+                  </div>
+                  }
+
+                  <!-- Terrain et Accessibilité (pour Last Mile) -->
+                  @if (segment.terrain) {
+                  <div class="space-y-2 mt-3">
+                    <p class="text-sm text-gray-600">
+                      <span class="font-medium">Terrain:</span> {{ segment.terrain }}
+                    </p>
+                    @if (segment.accessibility) {
+                    <p class="text-sm text-gray-600">
+                      <span class="font-medium">Accessibility:</span> {{ segment.accessibility }}
+                    </p>
+                    }
+                  </div>
+                  }
+                </div>
+              </app-card-content>
+            </app-card>
             }
           </div>
-          <div class="flex-1">
-            <h4 class="mb-2">{{ segment.title }}</h4>
-            <div class="flex items-center gap-4 text-sm text-[var(--color-text-secondary)]">
-              <div class="flex items-center gap-1">
-                <lucide-icon [img]="Clock" class="w-4 h-4"></lucide-icon>
-                <span>{{ segment.duration }}</span>
-              </div>
-              <div class="flex items-center gap-1">
-                <lucide-icon [img]="Navigation" class="w-4 h-4"></lucide-icon>
-                <span>{{ segment.distance }}</span>
-              </div>
-            </div>
-            <p class="text-sm text-[var(--color-text-secondary)] mt-2">{{ segment.description }}</p>
-          </div>
         </div>
-        }
-  </div>
-  </app-card-content>
-  </app-card>
-</div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center gap-4 pt-4">
+          <app-button variant="outline" (click)="goBack()">
+            Back to Options
+          </app-button>
+          <app-button variant="primary" customClass="flex items-center gap-2" (click)="selectRoute()">
+            Select This Route
+            <lucide-icon [img]="ArrowRight" class="w-4 h-4 ml-2"></lucide-icon>
+          </app-button>
+        </div>
+      </div>
+
+      <!-- Colonne droite - sidebar -->
+      <div class="space-y-6">
+
+        <!-- Before You Go -->
+        <app-card>
+          <app-card-content>
+            <div class="flex items-center gap-2 mb-4">
+              <lucide-icon [img]="AlertTriangle" class="w-5 h-5 text-amber-600"></lucide-icon>
+              <h3 class="font-bold text-gray-900">Before You Go</h3>
+            </div>
+            <ul class="space-y-2">
+              @for (item of beforeYouGoItems; track $index) {
+              <li class="text-sm text-gray-600 flex items-start gap-2">
+                <lucide-icon [img]="ChevronRight" class="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0"></lucide-icon>
+                {{ item }}
+              </li>
+              }
+            </ul>
+          </app-card-content>
+        </app-card>
+
+        <!-- Route Updates -->
+        <app-card>
+          <app-card-content>
+            <div class="flex items-center gap-2 mb-3">
+              <lucide-icon [img]="Info" class="w-5 h-5 text-blue-600"></lucide-icon>
+              <h3 class="font-bold text-gray-900">Route Updates</h3>
+            </div>
+            <p class="text-sm text-gray-600 leading-relaxed">
+              Route conditions are updated daily. Check for alerts on the day of travel for the most current
+              information.
+            </p>
+          </app-card-content>
+        </app-card>
+
+        <!-- Route Map -->
+        <app-card>
+          <app-card-content>
+            <h3 class="font-bold text-[#2d4a3e] mb-1">Route Map</h3>
+            <p class="text-sm text-gray-500 mb-4">Visual representation of your journey</p>
+
+            <div
+              class="bg-[#f5f3ef] rounded-lg border-2 border-dashed border-gray-300 h-64 flex flex-col items-center justify-center">
+              <lucide-icon [img]="MapPin" class="w-10 h-10 text-gray-400 mb-3"></lucide-icon>
+              <p class="text-base font-medium text-gray-700 mb-1">Interactive Route Map</p>
+              <p class="text-sm text-gray-500">Detailed map showing all route segments and waypoints</p>
+            </div>
+          </app-card-content>
+        </app-card>
+
+      </div>
+    </div>
+    }
+  </main>
 </div>

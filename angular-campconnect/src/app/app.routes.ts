@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from './core/layouts/main-layout.component';
+import { AdminLayoutComponent } from './core/layouts/admin-layout.component';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
     {
@@ -16,7 +18,19 @@ export const routes: Routes = [
             },
             {
                 path: 'signup',
-                loadComponent: () => import('./features/auth/signup.component').then(m => m.SignupComponent)
+                loadComponent: () => import('./features/auth/login.component').then(m => m.LoginComponent),
+                data: { mode: 'signup' }
+            },
+            {
+                path: 'profile',
+                canActivate: [authGuard],
+                data: { roles: ['ROLE_CAMPER'] },
+                loadComponent: () => import('./features/auth/profile/camper-profile.component').then(m => m.CamperProfileComponent)
+            },
+            {
+                path: 'profile/edit',
+                canActivate: [authGuard],
+                loadComponent: () => import('./features/auth/profile/camper-edit-profile.component').then(m => m.CamperEditProfileComponent)
             },
             {
                 path: 'plan-trip',
@@ -61,10 +75,6 @@ export const routes: Routes = [
             {
                 path: 'academy/:id',
                 loadComponent: () => import('./features/academy/course-detail/course-detail.component').then(m => m.CourseDetailComponent)
-            },
-            {
-                path: 'safety',
-                loadComponent: () => import('./features/safety/safety.component').then(m => m.SafetyComponent)
             },
             {
                 path: 'dashboard',
@@ -197,24 +207,42 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/safety/environmental-compliance/environmental-compliance.component').then(m => m.EnvironmentalComplianceComponent)
             },
             {
+                path: 'safety',
+                redirectTo: '/safety/alerts',
+                pathMatch: 'full'
+            },
+            {
                 path: 'safety/compliance/:tripId',
                 loadComponent: () => import('./features/safety/trip-compliance-report/trip-compliance-report.component').then(m => m.TripComplianceReportComponent)
             },
             {
-                path: 'safety/zones',
-                loadComponent: () => import('./features/safety/environmental-zones/environmental-zones.component').then(m => m.EnvironmentalZonesComponent)
+                path: 'safety/compliance-detail',
+                loadComponent: () => import('./features/safety/trip-compliance-detail/trip-compliance-detail.component').then(m => m.TripComplianceDetailComponent)
             },
             {
                 path: 'safety/wildlife',
                 loadComponent: () => import('./features/safety/wildlife-regulations/wildlife-regulations.component').then(m => m.WildlifeRegulationsComponent)
             },
             {
+                path: 'safety',
+                redirectTo: 'safety/alerts',
+                pathMatch: 'full'
+            },
+            {
+                path: 'safety/zones',
+                loadComponent: () => import('./features/safety/environmental-zones/environmental-zones.component').then(m => m.EnvironmentalZonesComponent)
+            },
+            {
                 path: 'safety/alerts',
                 loadComponent: () => import('./features/safety/safety-alerts/safety-alerts.component').then(m => m.SafetyAlertsComponent)
             },
             {
+                path: 'safety/active-alerts',
+                loadComponent: () => import('./features/safety/active-alerts/active-alerts.component').then(m => m.ActiveAlertsComponent)
+            },
+            {
                 path: 'safety/checkin',
-                loadComponent: () => import('./features/safety/emergency-checkin/emergency-checkin.component').then(m => m.EmergencyCheckinComponent)
+                loadComponent: () => import('./features/safety/trip-checkin/trip-checkin.component').then(m => m.TripCheckinComponent)
             },
             // Companions
             {
@@ -270,52 +298,67 @@ export const routes: Routes = [
             {
                 path: 'events/:eventId',
                 loadComponent: () => import('./features/events/event-details/event-details.component').then(m => m.EventDetailsComponent)
-            },
-            // Admin
+            }
+        ]
+    },
+    // Admin Routes (Independent Layout)
+    {
+        path: 'admin',
+        component: AdminLayoutComponent,
+        // canActivate: [authGuard], // Optional: protect with Role Guard
+        children: [
             {
-                path: 'admin',
+                path: '',
                 loadComponent: () => import('./features/admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent)
             },
             {
-                path: 'admin/users',
+                path: 'trips',
+                loadComponent: () => import('./features/admin/admin-trips/admin-trips.component').then(m => m.AdminTripsComponent)
+            },
+            {
+                path: 'transports',
+                loadComponent: () => import('./features/admin/admin-transports/admin-transports.component').then(m => m.AdminTransportsComponent)
+            },
+            {
+                path: 'users',
                 loadComponent: () => import('./features/admin/admin-user-management/admin-user-management.component').then(m => m.AdminUserManagementComponent)
             },
             {
-                path: 'admin/academy',
+                path: 'academy',
                 loadComponent: () => import('./features/admin/admin-academy-governance/admin-academy-governance.component').then(m => m.AdminAcademyGovernanceComponent)
             },
             {
-                path: 'admin/moderation',
+                path: 'moderation',
                 loadComponent: () => import('./features/admin/admin-moderation/admin-moderation.component').then(m => m.AdminModerationComponent)
             },
             {
-                path: 'admin/incidents',
+                path: 'incidents',
                 loadComponent: () => import('./features/admin/admin-incident-management/admin-incident-management.component').then(m => m.AdminIncidentManagementComponent)
             },
             {
-                path: 'admin/sites',
+                path: 'sites',
                 loadComponent: () => import('./features/admin/admin-sites-management/admin-sites-management.component').then(m => m.AdminSitesManagementComponent)
             },
             {
-                path: 'admin/marketplace',
+                path: 'marketplace',
                 loadComponent: () => import('./features/admin/admin-marketplace/admin-marketplace.component').then(m => m.AdminMarketplaceComponent)
             },
             {
-                path: 'admin/bookings',
+                path: 'bookings',
                 loadComponent: () => import('./features/admin/admin-bookings/admin-bookings.component').then(m => m.AdminBookingsComponent)
             },
             {
-                path: 'admin/analytics',
+                path: 'analytics',
                 loadComponent: () => import('./features/admin/admin-analytics/admin-analytics.component').then(m => m.AdminAnalyticsComponent)
             },
             {
-                path: 'admin/settings',
+                path: 'settings',
                 loadComponent: () => import('./features/admin/admin-settings/admin-settings.component').then(m => m.AdminSettingsComponent)
-            },
-            {
-                path: '**',
-                redirectTo: ''
             }
         ]
+    },
+    {
+        path: '**',
+        redirectTo: ''
     }
 ];

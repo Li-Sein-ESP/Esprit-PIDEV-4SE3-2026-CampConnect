@@ -1,27 +1,225 @@
-<div class="min-h-screen bg-[var(--color-background)] py-12">
-  <div class="container max-w-2xl text-center">
-    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-      <lucide-icon [img]="CheckCircle" class="w-10 h-10 text-green-600"></lucide-icon>
+<div class="min-h-screen bg-[#F5F4F0]">
+  <!-- Hero Section -->
+  <div class="bg-emerald-900 text-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-start space-x-4">
+        <div class="p-3 bg-white/10 rounded-lg">
+          <lucide-icon [img]="CheckCircle" class="w-8 h-8"></lucide-icon>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold mb-2">Review your transportation choice</h1>
+          <p class="text-white/70">Review your transportation choice and understand how it affects your trip</p>
+        </div>
+      </div>
     </div>
-    <h2 class="mb-4">Booking Confirmed!</h2>
-    <p class="text-[var(--color-text-secondary)] mb-8">Your transportation has been successfully booked.</p>
+  </div>
 
-    <app-card variant="elevated" class="mb-8">
-      <app-card-content class="p-8 text-left">
-        <h4 class="mb-4">Booking Details</h4>
-        <div class="space-y-3">
-          <div class="flex items-center gap-3">
-            <lucide-icon [img]="Calendar" class="w-5 h-5 text-[var(--color-primary-600)]"></lucide-icon>
-            <span>Pickup: July 15, 2024 at 9:00 AM</span>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <div class="mb-6">
+      <nav class="flex text-sm text-gray-500">
+        <span class="hover:text-gray-900 cursor-pointer transition-colors"
+          routerLink="/transportation">Transportation</span>
+        <span class="mx-2">/</span>
+        <span class="hover:text-gray-900 cursor-pointer transition-colors"
+          routerLink="/transportation/options">Options</span>
+        <span class="mx-2">/</span>
+        <span class="text-gray-900 font-medium">Confirm Selection</span>
+      </nav>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Main Content -->
+      <div class="lg:col-span-2 space-y-8">
+        <!-- Selected Transportation -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+          <div class="flex items-start space-x-4 mb-6">
+            <div class="relative w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-50 border border-gray-100 shadow-md">
+              <img *ngIf="selectedTransport.imageUrl" [src]="selectedTransport.imageUrl" class="w-full h-full object-cover">
+              <div *ngIf="!selectedTransport.imageUrl" class="w-full h-full flex items-center justify-center bg-gray-100">
+                <lucide-icon [img]="Globe" class="w-10 h-10 text-gray-400"></lucide-icon>
+              </div>
+            </div>
+            <div>
+              <h2 class="text-3xl font-bold text-gray-900 tracking-tight">{{selectedTransport.title}}</h2>
+              <p class="text-gray-500 font-medium mt-1">Confirmed Selection</p>
+            </div>
           </div>
-          <div class="flex items-center gap-3">
-            <lucide-icon [img]="MapPin" class="w-5 h-5 text-[var(--color-primary-600)]"></lucide-icon>
-            <span>Location: San Francisco Airport</span>
+
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-gray-50 rounded-lg p-4">
+              <div class="flex items-center space-x-1 text-gray-500 text-sm mb-2">
+                <lucide-icon [img]="Clock" class="w-4 h-4"></lucide-icon>
+                <span>Total Time</span>
+              </div>
+              <p class="font-semibold text-gray-900 text-sm">{{selectedTransport.time}}</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4">
+              <div class="flex items-center space-x-1 text-gray-500 text-sm mb-2">
+                <lucide-icon [img]="DollarSign" class="w-4 h-4"></lucide-icon>
+                <span>Cost</span>
+              </div>
+              <p class="font-semibold text-gray-900 text-sm">{{selectedTransport.cost}}</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4">
+              <div class="flex items-center space-x-1 text-gray-500 text-sm mb-2">
+                <lucide-icon [img]="MapPin" class="w-4 h-4"></lucide-icon>
+                <span>Distance</span>
+              </div>
+              <p class="font-semibold text-gray-900 text-sm">{{selectedTransport.distance}}</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4">
+              <div class="flex items-center space-x-1 text-gray-500 text-sm mb-2">
+                <lucide-icon [img]="TrendingDown" class="w-4 h-4"></lucide-icon>
+                <span>Impact</span>
+              </div>
+              <p class="font-semibold text-red-600 text-sm">{{selectedTransport.impact}}</p>
+            </div>
+          </div>
+
+          <!-- Last Mile Info -->
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div class="flex items-start space-x-3">
+              <lucide-icon [img]="Info" class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"></lucide-icon>
+              <div>
+                <h4 class="font-medium text-gray-900 text-sm">Last Mile Information</h4>
+                <p class="text-sm text-gray-600 mt-1">Walk 0.3 miles from parking to campsite</p>
+              </div>
+            </div>
           </div>
         </div>
-      </app-card-content>
-    </app-card>
 
-    <app-button routerLink="/dashboard">Return to Dashboard</app-button>
-  </div>
+        <!-- How This Affects Your Trip -->
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">How This Affects Your Trip</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div *ngFor="let effect of tripEffects" class="bg-white rounded-xl border border-gray-200 p-6">
+              <div class="flex items-start space-x-4">
+                <div class="p-2 bg-gray-100 rounded-lg">
+                  <lucide-icon [img]="effect.icon" class="w-5 h-5 text-gray-700"></lucide-icon>
+                </div>
+                <div class="flex-1">
+                  <h3 class="font-semibold text-gray-900 mb-1">{{effect.title}}</h3>
+                  <p class="text-sm text-gray-600 mb-3">{{effect.description}}</p>
+                  <div class="bg-gray-100 rounded-lg p-3">
+                    <p class="text-xs text-gray-700">→ {{effect.detail}}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- What Happens Next -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-1">What Happens Next</h2>
+          <p class="text-sm text-gray-500 mb-6">Your transportation choice will be integrated across these modules</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div *ngFor="let step of nextSteps" class="flex items-start space-x-3">
+              <lucide-icon [img]="step.icon" class="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5"></lucide-icon>
+              <div>
+                <h4 class="font-medium text-gray-900 text-sm">{{step.title}}</h4>
+                <p class="text-sm text-gray-600">{{step.description}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Important Warning -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+          <div class="flex items-start space-x-3">
+            <lucide-icon [img]="AlertTriangle" class="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5"></lucide-icon>
+            <div>
+              <h3 class="font-semibold text-gray-900 mb-2">Important: Verify Before Departure</h3>
+              <ul class="space-y-1 text-sm text-gray-600 grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                <li class="flex items-start space-x-2">
+                  <span class="text-gray-400 mt-1">•</span>
+                  <span>Road conditions can change due to weather</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                  <span class="text-gray-400 mt-1">•</span>
+                  <span>Parking availability is not guaranteed</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                  <span class="text-gray-400 mt-1">•</span>
+                  <span>Fuel costs are estimates and may vary</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                  <span class="text-gray-400 mt-1">•</span>
+                  <span>Check permit requirements before travel</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex space-x-4">
+          <button routerLink="/transportation/options"
+            class="px-6 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+            Change Selection
+          </button>
+          <button (click)="saveToTrip()"
+            class="px-6 py-3 bg-emerald-900 text-white rounded-lg text-sm font-medium hover:bg-emerald-800 transition-colors flex items-center space-x-2 shadow-lg shadow-emerald-900/10">
+            <lucide-icon [img]="CheckCircle" class="w-5 h-5"></lucide-icon>
+            <span>Save to Trip</span>
+            <lucide-icon [img]="ArrowRight" class="w-4 h-4"></lucide-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="space-y-6">
+        <!-- Trip Summary -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-4">Trip Summary</h3>
+          <div class="space-y-4">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Destination</p>
+              <p class="font-medium text-gray-900">Rocky Mountain National Park, CO</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Dates</p>
+              <p class="font-medium text-gray-900">March 10-14, 2026</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Group Size</p>
+              <p class="font-medium text-gray-900">4 people</p>
+            </div>
+            <div class="pt-4 border-t border-gray-100 flex items-center space-x-2 text-emerald-600">
+              <lucide-icon [img]="CheckCircle" class="w-5 h-5"></lucide-icon>
+              <span class="text-sm font-medium">Transportation Selected</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Follow-up Actions -->
+        <div class="bg-white rounded-xl border border-emerald-100 p-6">
+          <h4 class="font-semibold text-gray-900 mb-4">After Saving</h4>
+          <div class="space-y-3">
+            <a *ngFor="let link of followUpLinks" [routerLink]="link.url"
+              class="flex items-center justify-between text-sm text-emerald-600 hover:text-emerald-700 font-medium group transition-colors">
+              <span>{{link.label}}</span>
+              <lucide-icon [img]="ArrowRight"
+                class="w-4 h-4 group-hover:translate-x-1 transition-transform"></lucide-icon>
+            </a>
+          </div>
+        </div>
+
+        <!-- Help -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+          <div class="flex items-start space-x-3">
+            <lucide-icon [img]="FileText" class="w-5 h-5 text-gray-400 mt-0.5"></lucide-icon>
+            <div>
+              <h4 class="font-semibold text-gray-900 mb-1">Need to Change?</h4>
+              <p class="text-sm text-gray-600 leading-relaxed">You can update your transportation choice anytime from
+                your trip planner page.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 </div>

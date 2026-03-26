@@ -12,6 +12,22 @@ export interface Trip {
     createdBy: string;
     createdAt: string;
     updatedAt: string;
+    imageUrl?: string;
+    itineraryDays?: number;
+    packingItems?: { total: number; packed: number; };
+    budget?: { estimated: number; actual: number; };
+    nearbyPlaces?: number;
+    adventureLevel?: string;
+    comfortLevel?: string;
+    activities?: string[];
+    transportIds?: string[];
+    transportation?: {
+        id: string;
+        title: string;
+        time: string;
+        cost: string;
+        impact: string;
+    };
 }
 
 export interface TripItinerary {

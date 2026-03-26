@@ -4,10 +4,10 @@ import { RouterModule } from '@angular/router';
 import { NavigationComponent } from './navigation.component';
 
 @Component({
-    selector: 'app-main-layout',
-    standalone: true,
-    imports: [CommonModule, RouterModule, NavigationComponent],
-    template: `
+  selector: 'app-main-layout',
+  standalone: true,
+  imports: [CommonModule, RouterModule, NavigationComponent],
+  template: `
     <div class="min-h-screen flex flex-col">
       <app-navigation></app-navigation>
       
@@ -39,7 +39,7 @@ import { NavigationComponent } from './navigation.component';
                 <li><a routerLink="/campsites" class="hover:text-white transition-colors">Campsites</a></li>
                 <li><a routerLink="/academy" class="hover:text-white transition-colors">Academy</a></li>
                 <li><a routerLink="/events" class="hover:text-white transition-colors">Events</a></li>
-                <li><a routerLink="/safety" class="hover:text-white transition-colors">Safety</a></li>
+                <li><a routerLink="/safety/alerts" class="hover:text-white transition-colors">Safety</a></li>
               </ul>
             </div>
 
@@ -72,6 +72,6 @@ import { NavigationComponent } from './navigation.component';
       </footer>
     </div>
   `,
-    styles: []
+  styles: []
 })
 export class MainLayoutComponent { }

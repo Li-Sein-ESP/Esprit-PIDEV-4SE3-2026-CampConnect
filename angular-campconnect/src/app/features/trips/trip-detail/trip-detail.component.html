@@ -1,334 +1,358 @@
-<div class="min-h-screen bg-[var(--color-background)]" *ngIf="trip; else notFound">
-    <!-- Hero Section -->
-    <div class="relative h-80 bg-gradient-to-br from-[var(--color-primary-700)] to-[var(--color-primary-900)]">
-        <img [src]="trip.imageUrl" [alt]="trip.name" class="w-full h-full object-cover opacity-40" />
-        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<div class="min-h-screen bg-[#f5f3ea] text-slate-900 font-sans" *ngIf="trip">
+    <!-- Top hero / cover -->
+    <header class="relative h-48 bg-slate-900 text-white overflow-hidden">
+        <div class="absolute inset-0 bg-cover bg-center opacity-40"
+            [style.backgroundImage]="'url(' + trip.imageUrl + ')'"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-slate-900/20"></div>
 
-        <div class="absolute inset-0 container flex flex-col justify-end pb-8">
-            <button (click)="navigate('/plan-trip')"
-                class="flex items-center gap-2 text-white/90 hover:text-white transition-colors mb-6 w-fit">
-                <lucide-icon [name]="ChevronLeft" class="w-5 h-5"></lucide-icon>
-                Back to Trips
-            </button>
-
-            <div class="flex items-start justify-between gap-6">
-                <div class="flex-1">
-                    <app-badge [variant]="getStatusVariant(trip.status)" customClass="mb-3">
-                        {{ getStatusLabel(trip.status) }}
-                    </app-badge>
-                    <h1 class="text-white mb-2">{{ trip.name }}</h1>
-                    <div class="flex flex-wrap items-center gap-4 text-white/90">
-                        <div class="flex items-center gap-2">
-                            <lucide-icon [name]="MapPin" class="w-5 h-5"></lucide-icon>
-                            <span>{{ trip.destination }}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <lucide-icon [name]="Calendar" class="w-5 h-5"></lucide-icon>
-                            <span>
-                                {{ trip.startDate | date:'MMM d' }} - {{ trip.endDate | date:'mediumDate' }}
-                            </span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <lucide-icon [name]="Users" class="w-5 h-5"></lucide-icon>
-                            <span>{{ trip.groupSize }} {{ trip.groupSize === 1 ? 'person' : 'people' }}</span>
-                        </div>
-                    </div>
+        <div class="relative mx-auto flex h-full max-w-6xl flex-col justify-end px-6 pb-6">
+            <div class="flex items-center justify-between mb-2">
+                <h1 class="text-4xl font-bold tracking-tight text-emerald-50">
+                    {{ trip.name }}
+                </h1>
+                <button (click)="renameTrip()" class="p-2 rounded-full hover:bg-white/10 transition-colors"
+                    title="Rename Trip">
+                    <lucide-icon [img]="Edit" size="20" class="text-emerald-400"></lucide-icon>
+                </button>
+            </div>
+            <div class="flex flex-wrap items-center gap-6 text-sm text-emerald-50/80">
+                <div class="flex items-center gap-1.5">
+                    <lucide-icon [img]="MapPin" size="16" class="text-emerald-400"></lucide-icon>
+                    <span>{{ trip.destination }}</span>
                 </div>
-
-                <div class="hidden md:flex gap-3">
-                    <app-button variant="secondary">
-                        <lucide-icon [name]="Share2" class="w-5 h-5"></lucide-icon>
-                        Share
-                    </app-button>
-                    <app-button variant="secondary">
-                        <lucide-icon [name]="Download" class="w-5 h-5"></lucide-icon>
-                        Export
-                    </app-button>
-                    <app-button variant="outline" customClass="!border-white !text-white hover:!bg-white/10">
-                        <lucide-icon [name]="Edit" class="w-5 h-5"></lucide-icon>
-                        Edit Trip
-                    </app-button>
+                <div class="flex items-center gap-1.5">
+                    <lucide-icon [img]="Calendar" size="16" class="text-emerald-400"></lucide-icon>
+                    <span>{{ trip.startDate | date:'MMM d' }} - {{ trip.endDate | date:'MMM d, yyyy' }}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <lucide-icon [img]="Users" size="16" class="text-emerald-400"></lucide-icon>
+                    <span>{{ trip.participants }} people</span>
                 </div>
             </div>
         </div>
-    </div>
+    </header>
 
-    <!-- Main Content -->
-    <div class="container py-12">
-        <!-- Countdown Banner -->
-        <app-card *ngIf="trip.status === 'planned' && trip.daysUntil > 0" variant="elevated"
-            customClass="mb-8 bg-gradient-to-r from-[var(--color-accent-50)] to-[var(--color-secondary-50)] border-[var(--color-accent-200)]">
-            <app-card-content>
-                <div class="flex items-center justify-between">
+    <!-- Main content container -->
+    <main class="mx-auto max-w-6xl space-y-6 px-6 py-8">
+        <!-- Countdown banner -->
+        <section *ngIf="daysUntilDeparture > 0"
+            class="flex flex-col md:flex-row items-center justify-between gap-4 rounded-xl border border-amber-100 bg-amber-50 px-6 py-5 shadow-sm">
+            <div class="flex items-center gap-4">
+                <div
+                    class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-200/50 text-amber-700 shadow-inner">
+                    <lucide-icon [img]="Clock" size="24"></lucide-icon>
+                </div>
+                <div>
+                    <div class="text-lg font-bold text-amber-900">
+                        {{ daysUntilDeparture }} days until departure!
+                    </div>
+                    <div class="text-sm font-medium text-amber-800/80">{{ departureMessage }}</div>
+                </div>
+            </div>
+            <div class="flex flex-col items-end text-right">
+                <div class="text-[10px] font-bold uppercase tracking-widest text-amber-600/70 mb-1">
+                    Trip Duration
+                </div>
+                <div class="text-2xl font-bold text-amber-900">
+                    {{ tripDuration }} days
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats and summary cards -->
+        <section class="grid gap-4 md:grid-cols-4">
+            <button *ngFor="let card of overviewCards" (click)="navigate(card.id)"
+                class="flex flex-col justify-between rounded-2xl border border-white/50 bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-1 hover:shadow-md group">
+                <div class="flex w-full items-start justify-between gap-3">
                     <div class="flex items-center gap-4">
-                        <div class="w-16 h-16 bg-[var(--color-accent-500)] rounded-lg flex items-center justify-center">
-                            <lucide-icon [name]="Clock" class="w-8 h-8 text-white"></lucide-icon>
+                        <div
+                            class="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-50 text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors overflow-hidden border border-slate-100">
+                            <img *ngIf="card.imageUrl" [src]="card.imageUrl" class="w-full h-full object-cover">
+                            <lucide-icon *ngIf="!card.imageUrl" [img]="card.icon" size="24"></lucide-icon>
                         </div>
                         <div>
-                            <h4 class="mb-1">{{ trip.daysUntil }} days until departure!</h4>
-                            <p class="text-[var(--color-text-secondary)]">
-                                Your adventure starts on {{ trip.startDate | date:'fullDate' }}
-                            </p>
-                        </div>
-                    </div>
-                    <div class="hidden md:block">
-                        <div class="text-right">
-                            <div class="text-sm text-[var(--color-text-tertiary)] mb-1">Trip Duration</div>
-                            <div class="text-2xl font-bold text-[var(--color-primary-600)]">
-                                {{ tripDuration }} {{ tripDuration === 1 ? 'day' : 'days' }}
+                            <div class="text-sm font-bold text-slate-800">
+                                {{ card.title }}
+                            </div>
+                            <div *ngIf="card.subtitle" class="mt-0.5 text-xs font-medium text-slate-500">
+                                {{ card.subtitle }}
                             </div>
                         </div>
+                    </div>
+                    <lucide-icon [img]="ChevronRight" size="14"
+                        class="text-slate-300 group-hover:text-emerald-400 transition-colors"></lucide-icon>
+                </div>
+
+                <div *ngIf="card.progress !== undefined" class="mt-6 w-full">
+                    <div class="h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
+                        <div class="h-full rounded-full bg-emerald-600/40 transition-all duration-700"
+                            [style.width]="card.progress + '%'"></div>
+                    </div>
+                    <div class="flex items-center justify-end mt-1.5">
+                        <span class="text-[10px] font-bold text-slate-400">{{ card.progress }}%</span>
                     </div>
                 </div>
-            </app-card-content>
-        </app-card>
+            </button>
+        </section>
 
-        <!-- Quick Actions -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-            <app-card variant="interactive" padding="md" (click)="navigate('/plan-trip/' + trip.id + '/itinerary')">
-                <app-card-content>
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="w-12 h-12 bg-[var(--color-primary-50)] rounded-lg flex items-center justify-center">
-                            <lucide-icon [name]="List" class="w-6 h-6 text-[var(--color-primary-600)]"></lucide-icon>
-                        </div>
-                        <lucide-icon [name]="ChevronRight"
-                            class="w-5 h-5 text-[var(--color-text-tertiary)]"></lucide-icon>
-                    </div>
-                    <h5 class="mb-1">Itinerary</h5>
-                    <p class="text-sm text-[var(--color-text-secondary)]">
-                        {{ trip.itineraryDays }} days planned
-                    </p>
-                </app-card-content>
-            </app-card>
+        <!-- Main detail grid -->
+        <section class="grid gap-6 lg:grid-cols-[minmax(0,2.1fr)_minmax(0,1.1fr)]">
+            <div class="space-y-6">
+                <!-- Trip Summary Info -->
+                <article class="rounded-2xl border border-white bg-white/80 backdrop-blur-sm p-8 shadow-sm">
+                    <h2 class="text-2xl font-bold text-emerald-900 mb-1">Trip Summary</h2>
+                    <p class="text-sm text-slate-500 mb-8">Overview of your camping adventure</p>
 
-            <app-card variant="interactive" padding="md" (click)="navigate('/plan-trip/' + trip.id + '/packing')">
-                <app-card-content>
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="w-12 h-12 bg-[var(--color-accent-50)] rounded-lg flex items-center justify-center">
-                            <lucide-icon [name]="Package" class="w-6 h-6 text-[var(--color-accent-600)]"></lucide-icon>
-                        </div>
-                        <lucide-icon [name]="ChevronRight"
-                            class="w-5 h-5 text-[var(--color-text-tertiary)]"></lucide-icon>
-                    </div>
-                    <h5 class="mb-1">Packing List</h5>
-                    <div class="flex items-center gap-2">
-                        <div class="flex-1 h-2 bg-[var(--color-neutral-200)] rounded-full overflow-hidden">
-                            <div class="h-full bg-[var(--color-success)] transition-all"
-                                [style.width.%]="packingProgress"></div>
-                        </div>
-                        <span class="text-sm text-[var(--color-text-secondary)]">{{ packingProgress }}%</span>
-                    </div>
-                </app-card-content>
-            </app-card>
-
-            <app-card variant="interactive" padding="md" (click)="navigate('/plan-trip/' + trip.id + '/budget')">
-                <app-card-content>
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
-                            <lucide-icon [name]="DollarSign" class="w-6 h-6 text-green-600"></lucide-icon>
-                        </div>
-                        <lucide-icon [name]="ChevronRight"
-                            class="w-5 h-5 text-[var(--color-text-tertiary)]"></lucide-icon>
-                    </div>
-                    <h5 class="mb-1">Budget</h5>
-                    <p class="text-sm text-[var(--color-text-secondary)]">
-                        {{ trip.budget.actual | currency:'USD' }} / {{ trip.budget.estimated | currency:'USD' }}
-                    </p>
-                </app-card-content>
-            </app-card>
-
-            <app-card variant="interactive" padding="md" (click)="navigate('/plan-trip/' + trip.id + '/nearby')">
-                <app-card-content>
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-                            <lucide-icon [name]="MapIcon" class="w-6 h-6 text-blue-600"></lucide-icon>
-                        </div>
-                        <lucide-icon [name]="ChevronRight"
-                            class="w-5 h-5 text-[var(--color-text-tertiary)]"></lucide-icon>
-                    </div>
-                    <h5 class="mb-1">Nearby Places</h5>
-                    <p class="text-sm text-[var(--color-text-secondary)]">
-                        {{ trip.nearbyPlaces }} locations
-                    </p>
-                </app-card-content>
-            </app-card>
-        </div>
-
-        <!-- Trip Details Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Main Details -->
-            <div class="lg:col-span-2 space-y-8">
-                <!-- Trip Summary -->
-                <app-card variant="elevated">
-                    <app-card-header>
-                        <app-card-title>Trip Summary</app-card-title>
-                        <app-card-description>Overview of your camping adventure</app-card-description>
-                    </app-card-header>
-                    <app-card-content>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <div class="text-sm text-[var(--color-text-tertiary)] mb-2">Adventure Level</div>
-                                <div class="flex items-center gap-2">
-                                    <span class="capitalize font-medium">{{ trip.adventureLevel }}</span>
-                                    <app-badge variant="default" size="sm">
-                                        {{ trip.adventureLevel }}
-                                    </app-badge>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="text-sm text-[var(--color-text-tertiary)] mb-2">Comfort Level</div>
-                                <div class="flex items-center gap-2">
-                                    <span class="capitalize font-medium">{{ trip.comfortLevel }}</span>
-                                    <app-badge variant="default" size="sm">
-                                        {{ trip.comfortLevel }}
-                                    </app-badge>
-                                </div>
-                            </div>
-                            <div class="md:col-span-2">
-                                <div class="text-sm text-[var(--color-text-tertiary)] mb-2">Activities</div>
-                                <div class="flex flex-wrap gap-2">
-                                    <app-badge *ngFor="let activity of trip.activities" variant="primary"
-                                        customClass="capitalize">
-                                        {{ activity }}
-                                    </app-badge>
-                                </div>
+                    <div class="grid gap-8 md:grid-cols-2">
+                        <div>
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Adventure
+                                Level</div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-base font-bold text-slate-800 capitalize">{{ trip.adventureLevel ||
+                                    'Moderate' }}</span>
+                                <span
+                                    class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold text-slate-600 uppercase">{{
+                                    trip.adventureLevel || 'moderate' }}</span>
                             </div>
                         </div>
-                    </app-card-content>
-                </app-card>
+                        <div>
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Comfort
+                                Level</div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-base font-bold text-slate-800 text-nowrap capitalize">{{
+                                    trip.comfortLevel || 'Comfortable' }}</span>
+                                <span
+                                    class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold text-slate-600 uppercase">{{
+                                    trip.comfortLevel || 'comfortable' }}</span>
+                            </div>
+                        </div>
+                    </div>
 
-                <!-- Progress Overview -->
-                <app-card variant="elevated">
-                    <app-card-header>
-                        <app-card-title>Trip Preparation</app-card-title>
-                        <app-card-description>Track your progress towards trip readiness</app-card-description>
-                    </app-card-header>
-                    <app-card-content>
-                        <div class="space-y-6">
-                            <!-- Itinerary Status -->
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <lucide-icon [name]="CheckCircle"
-                                        class="w-5 h-5 text-[var(--color-success)]"></lucide-icon>
-                                    <div>
-                                        <div class="font-medium">Itinerary Created</div>
-                                        <div class="text-sm text-[var(--color-text-secondary)]">
-                                            {{ trip.itineraryDays }} days of activities planned
-                                        </div>
+                    <div class="mt-8 pt-8 border-t border-slate-100">
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4">Activities
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span *ngFor="let activity of trip.activities"
+                                class="inline-flex rounded-full bg-emerald-50 px-4 py-1.5 text-xs font-bold text-emerald-800 capitalize border border-emerald-100/50">
+                                {{ activity }}
+                            </span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Preparation Checklist -->
+                <article class="rounded-2xl border border-white bg-white/80 backdrop-blur-sm p-8 shadow-sm">
+                    <h2 class="text-2xl font-bold text-emerald-900 mb-1">Trip Preparation</h2>
+                    <p class="text-sm text-slate-500 mb-8">Track your progress towards trip readiness</p>
+
+                    <ul class="space-y-6">
+                        <li [routerLink]="['/plan-trip', tripId || '', 'itinerary']"
+                            class="flex items-center justify-between group cursor-pointer">
+                            <div class="flex items-start gap-4">
+                                <lucide-icon [img]="CheckCircle" size="20" class="text-emerald-600 mt-1"></lucide-icon>
+                                <div>
+                                    <div class="font-bold text-slate-800 text-lg">Itinerary Created</div>
+                                    <div class="text-sm text-slate-500">{{ trip.itineraryDays || tripDuration }} days of
+                                        activities planned</div>
+                                </div>
+                            </div>
+                            <span
+                                class="text-xs font-bold text-slate-800 group-hover:text-emerald-700 transition-colors uppercase tracking-wider">View</span>
+                        </li>
+                        <li [routerLink]="['/plan-trip', tripId || '', 'packing']"
+                            class="flex items-center justify-between group cursor-pointer">
+                            <div class="flex items-start gap-4">
+                                <lucide-icon [img]="Circle" size="20" class="text-slate-300 mt-1"></lucide-icon>
+                                <div>
+                                    <div class="font-bold text-slate-800 text-lg">Packing List</div>
+                                    <div class="text-sm text-slate-500">{{ trip.packingItems?.packed || 0 }} of {{
+                                        trip.packingItems?.total || 0 }} items packed</div>
+                                </div>
+                            </div>
+                            <span
+                                class="text-xs font-bold text-slate-800 group-hover:text-emerald-700 transition-colors uppercase tracking-wider">Continue</span>
+                        </li>
+                        <li [routerLink]="['/plan-trip', tripId || '', 'budget']"
+                            class="flex items-center justify-between group cursor-pointer">
+                            <div class="flex items-start gap-4">
+                                <lucide-icon [img]="CheckCircle" size="20" class="text-emerald-600 mt-1"></lucide-icon>
+                                <div>
+                                    <div class="font-bold text-slate-800 text-lg">Budget Tracking</div>
+                                    <div class="text-sm text-slate-500">{{ trip.budget?.actual || 0 }} TND spent of {{
+                                        trip.budget?.estimated || 0 }} TND budget</div>
+                                </div>
+                            </div>
+                            <span
+                                class="text-xs font-bold text-slate-800 hover:text-emerald-700 transition-colors uppercase tracking-wider">Update</span>
+                        </li>
+                        <li [routerLink]="['/plan-trip', tripId || '', 'nearby']"
+                            class="flex items-center justify-between group cursor-pointer">
+                            <div class="flex items-start gap-4">
+                                <lucide-icon [img]="CheckCircle" size="20" class="text-emerald-600 mt-1"
+                                    [class.text-slate-300]="trip.nearbyPlaces === 0"></lucide-icon>
+                                <div>
+                                    <div class="font-bold text-slate-800 text-lg">Nearby Places</div>
+                                    <div class="text-sm text-slate-500">{{ trip.nearbyPlaces || 0 }} locations
+                                        discovered</div>
+                                </div>
+                            </div>
+                            <span
+                                class="text-xs font-bold text-slate-800 hover:text-emerald-700 transition-colors uppercase tracking-wider">Explore</span>
+                        </li>
+                        <li [routerLink]="['/transportation']" [queryParams]="{ tripId: tripId }"
+                            class="flex items-center justify-between group cursor-pointer">
+                            <div class="flex items-start gap-4">
+                            <div class="relative mt-1">
+                                <div *ngIf="assignedTransports()[0]?.imageUrl" class="w-10 h-10 rounded-lg overflow-hidden border border-slate-100 shadow-sm">
+                                    <img [src]="assignedTransports()[0]?.imageUrl" class="w-full h-full object-cover">
+                                </div>
+                                <lucide-icon *ngIf="!assignedTransports()[0]?.imageUrl" [img]="trip.transportIds && trip.transportIds.length > 0 ? CheckCircle : Circle" size="20" 
+                                    [class.text-emerald-600]="trip.transportIds && trip.transportIds.length > 0"
+                                    [class.text-slate-300]="!trip.transportIds || trip.transportIds.length === 0"></lucide-icon>
+                            </div>
+                                <div>
+                                    <div class="font-bold text-slate-800 text-lg">Transportation</div>
+                                    <div class="text-sm text-slate-500">
+                                        {{ trip.transportIds && trip.transportIds.length > 0 ? 'Transport successfully arranged' : 'Find the best way to travel' }}
                                     </div>
                                 </div>
-                                <app-button variant="ghost" size="sm"
-                                    (click)="navigate('/plan-trip/' + trip.id + '/itinerary')">
-                                    View
-                                </app-button>
                             </div>
-
-                            <!-- Packing Status -->
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <lucide-icon *ngIf="packingProgress === 100" [name]="CheckCircle"
-                                        class="w-5 h-5 text-[var(--color-success)]"></lucide-icon>
-                                    <lucide-icon *ngIf="packingProgress !== 100" [name]="Circle"
-                                        class="w-5 h-5 text-[var(--color-text-tertiary)]"></lucide-icon>
-                                    <div>
-                                        <div class="font-medium">Packing List</div>
-                                        <div class="text-sm text-[var(--color-text-secondary)]">
-                                            {{ trip.packingItems.packed }} of {{ trip.packingItems.total }} items packed
-                                        </div>
-                                    </div>
-                                </div>
-                                <app-button variant="ghost" size="sm"
-                                    (click)="navigate('/plan-trip/' + trip.id + '/packing')">
-                                    Continue
-                                </app-button>
-                            </div>
-
-                            <!-- Budget Status -->
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <lucide-icon *ngIf="budgetProgress > 0" [name]="CheckCircle"
-                                        class="w-5 h-5 text-[var(--color-success)]"></lucide-icon>
-                                    <lucide-icon *ngIf="budgetProgress === 0" [name]="Circle"
-                                        class="w-5 h-5 text-[var(--color-text-tertiary)]"></lucide-icon>
-                                    <div>
-                                        <div class="font-medium">Budget Tracking</div>
-                                        <div class="text-sm text-[var(--color-text-secondary)]">
-                                            {{ trip.budget.actual | currency:'USD' }} spent of {{ trip.budget.estimated
-                                            | currency:'USD' }} budget
-                                        </div>
-                                    </div>
-                                </div>
-                                <app-button variant="ghost" size="sm"
-                                    (click)="navigate('/plan-trip/' + trip.id + '/budget')">
-                                    Update
-                                </app-button>
-                            </div>
-                        </div>
-                    </app-card-content>
-                </app-card>
+                            <span
+                                class="text-xs font-bold text-slate-800 group-hover:text-emerald-700 transition-colors uppercase tracking-wider">
+                                {{ trip.transportIds && trip.transportIds.length > 0 ? 'Update' : 'Find' }}
+                            </span>
+                        </li>
+                    </ul>
+                </article>
             </div>
 
-            <!-- Sidebar -->
+            <!-- Stats and utilities -->
             <div class="space-y-6">
-                <!-- Quick Stats -->
-                <app-card variant="bordered">
-                    <app-card-header>
-                        <app-card-title>Quick Stats</app-card-title>
-                    </app-card-header>
-                    <app-card-content>
-                        <div class="space-y-4">
-                            <div
-                                class="flex items-center justify-between py-3 border-b border-[var(--color-border-light)] last:border-0">
-                                <span class="text-sm text-[var(--color-text-secondary)]">Trip Duration</span>
-                                <span class="font-medium">{{ tripDuration }} days</span>
-                            </div>
-                            <div
-                                class="flex items-center justify-between py-3 border-b border-[var(--color-border-light)] last:border-0">
-                                <span class="text-sm text-[var(--color-text-secondary)]">Group Size</span>
-                                <span class="font-medium">{{ trip.groupSize }} people</span>
-                            </div>
-                            <div
-                                class="flex items-center justify-between py-3 border-b border-[var(--color-border-light)] last:border-0">
-                                <span class="text-sm text-[var(--color-text-secondary)]">Estimated Budget</span>
-                                <span class="font-medium">{{ trip.budget.estimated | currency:'USD' }}</span>
-                            </div>
-                            <div class="flex items-center justify-between py-3">
-                                <span class="text-sm text-[var(--color-text-secondary)]">Nearby Places</span>
-                                <span class="font-medium">{{ trip.nearbyPlaces }} locations</span>
-                            </div>
+                <!-- Trip quick stats -->
+                <article class="rounded-2xl border border-white bg-white/80 backdrop-blur-sm p-8 shadow-sm">
+                    <h2 class="text-2xl font-bold text-emerald-900 mb-6">Quick Stats</h2>
+                    <dl class="space-y-6">
+                        <div class="flex items-center justify-between text-sm">
+                            <dt class="text-slate-500 font-medium">Trip Duration</dt>
+                            <dd class="font-bold text-slate-900 border-b-2 border-slate-100 pb-0.5">{{ tripDuration }}
+                                days</dd>
                         </div>
-                    </app-card-content>
-                </app-card>
+                        <div class="flex items-center justify-between text-sm">
+                            <dt class="text-slate-500 font-medium">Group Size</dt>
+                            <dd class="font-bold text-slate-900 border-b-2 border-slate-100 pb-0.5">{{ trip.participants
+                                }} people</dd>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <dt class="text-slate-500 font-medium">Estimated Budget</dt>
+                            <dd class="font-bold text-slate-900 border-b-2 border-slate-100 pb-0.5">{{
+                                trip.budget?.estimated || 0 }} TND</dd>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <dt class="text-slate-500 font-medium">Nearby Places</dt>
+                            <dd class="font-bold text-slate-900 border-b-2 border-slate-100 pb-0.5">{{ trip.nearbyPlaces
+                                || 0 }} locations</dd>
+                        </div>
+                    </dl>
+                </article>
 
                 <!-- Actions -->
-                <app-card variant="bordered">
-                    <app-card-header>
-                        <app-card-title>Actions</app-card-title>
-                    </app-card-header>
-                    <app-card-content customClass="space-y-3">
-                        <app-button variant="outline" [fullWidth]="true">
-                            <lucide-icon [name]="Share2" class="w-5 h-5"></lucide-icon>
-                            Share Trip
-                        </app-button>
-                        <app-button variant="outline" [fullWidth]="true">
-                            <lucide-icon [name]="Download" class="w-5 h-5"></lucide-icon>
-                            Export as PDF
-                        </app-button>
-                        <app-button variant="ghost" [fullWidth]="true" customClass="text-[var(--color-error)]">
+                <article class="rounded-2xl border border-white bg-white/80 backdrop-blur-sm p-8 shadow-sm">
+                    <h2 class="text-2xl font-bold text-emerald-900 mb-6">Actions</h2>
+                    <div class="space-y-4">
+                        <button
+                            class="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white py-3.5 px-4 font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:border-slate-300">
+                            <lucide-icon [img]="Share2" size="18" class="text-slate-500"></lucide-icon>
+                            <span>Share Trip</span>
+                        </button>
+                        <button
+                            class="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white py-3.5 px-4 font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:border-slate-300">
+                            <lucide-icon [img]="Download" size="18" class="text-slate-500"></lucide-icon>
+                            <span>Export as PDF</span>
+                        </button>
+                        <button (click)="deleteTrip()"
+                            class="w-full py-4 text-sm font-bold text-red-500 hover:text-red-700 transition-colors">
                             Delete Trip
-                        </app-button>
-                    </app-card-content>
-                </app-card>
+                        </button>
+                    </div>
+                </article>
             </div>
+        </section>
+    </main>
+
+    <!-- Edit Trip Modal -->
+    <div *ngIf="isEditModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+        <div class="w-full max-w-lg rounded-3xl bg-white p-8 shadow-2xl border border-white">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl font-bold text-emerald-900">Edit Trip Details</h2>
+                <button (click)="closeEditModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <lucide-icon [img]="Circle" size="24" class="rotate-45"></lucide-icon>
+                </button>
+            </div>
+
+            <form (ngSubmit)="saveTripEdits()" #editForm="ngForm" class="space-y-6">
+                <!-- Trip Name -->
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Trip
+                        Name</label>
+                    <input type="text" [(ngModel)]="editData.name" name="name" required
+                        class="w-full rounded-xl border-slate-200 bg-slate-50 py-3 px-4 font-bold text-slate-700 focus:border-emerald-500 focus:ring-emerald-500 transition-all shadow-sm">
+                </div>
+
+                <!-- Destination -->
+                <div>
+                    <label
+                        class="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Destination</label>
+                    <input type="text" [(ngModel)]="editData.destination" name="destination" required
+                        class="w-full rounded-xl border-slate-200 bg-slate-50 py-3 px-4 font-bold text-slate-700 focus:border-emerald-500 focus:ring-emerald-500 transition-all shadow-sm">
+                </div>
+
+                <!-- Dates Grid -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Start
+                            Date</label>
+                        <input type="date" [(ngModel)]="editData.startDate" name="startDate" required
+                            class="w-full rounded-xl border-slate-200 bg-slate-50 py-3 px-4 font-bold text-slate-700 focus:border-emerald-500 focus:ring-emerald-500 transition-all shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">End
+                            Date</label>
+                        <input type="date" [(ngModel)]="editData.endDate" name="endDate" required
+                            class="w-full rounded-xl border-slate-200 bg-slate-50 py-3 px-4 font-bold text-slate-700 focus:border-emerald-500 focus:ring-emerald-500 transition-all shadow-sm">
+                    </div>
+                </div>
+
+                <!-- Group Size & Description -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label
+                            class="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Participants</label>
+                        <input type="number" [(ngModel)]="editData.participants" name="participants" min="1" required
+                            class="w-full rounded-xl border-slate-200 bg-slate-50 py-3 px-4 font-bold text-slate-700 focus:border-emerald-500 focus:ring-emerald-500 transition-all shadow-sm">
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex gap-4 pt-4">
+                    <button type="button" (click)="closeEditModal()"
+                        class="flex-1 rounded-xl border border-slate-200 bg-white py-4 font-bold text-slate-600 transition-all hover:bg-slate-50">
+                        Cancel
+                    </button>
+                    <button type="submit" [disabled]="!editForm.form.valid"
+                        class="flex-1 rounded-xl bg-emerald-600 py-4 font-bold text-white shadow-lg shadow-emerald-600/20 transition-all hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
-<ng-template #notFound>
-    <div class="min-h-screen bg-[var(--color-background)] py-12">
-        <div class="container text-center">
-            <h3 class="mb-4">Trip not found</h3>
-            <app-button (click)="navigate('/plan-trip')">Back to Trips</app-button>
-        </div>
+<!-- Loading state -->
+<div *ngIf="!trip" class="flex min-h-screen items-center justify-center bg-[#f5f3ea]">
+    <div class="bg-white p-12 rounded-3xl shadow-xl flex flex-col items-center gap-6 border border-white">
+        <div class="h-12 w-12 animate-spin rounded-full border-4 border-emerald-900/10 border-t-emerald-900"></div>
+        <p class="text-sm font-bold text-emerald-900 uppercase tracking-widest">Loading Adventure...</p>
     </div>
-</ng-template>
+</div>

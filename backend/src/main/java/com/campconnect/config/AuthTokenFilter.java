@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.campconnect.service.CustomUserDetailsService;
+import com.campconnect.user.service.impl.CustomUserDetailsService;
 
 public class AuthTokenFilter extends OncePerRequestFilter {
   @Autowired

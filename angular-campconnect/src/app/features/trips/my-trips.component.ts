@@ -1,251 +1,143 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { CardComponent, CardContentComponent, CardFooterComponent } from '../../shared/components/card.component';
-import { BadgeComponent } from '../../shared/components/badge.component';
-import { LucideAngularModule, Calendar, MapPin, Users, Plus, Edit, Trash2 } from 'lucide-angular';
+import { LucideAngularModule, Compass, Map, Info, Clock, ChevronRight, PlusCircle, History } from 'lucide-angular';
 
-interface Trip {
-  id: string;
-  name: string;
-  destination: string;
-  startDate: string;
-  endDate: string;
-  groupSize: number;
-  status: 'planning' | 'confirmed' | 'completed' | 'cancelled';
-}
+import { StatCardComponent } from './my-trips-components/stat-card.component';
+import { FilterChipComponent } from './my-trips-components/filter-chip.component';
+import { TripCardComponent, TripData } from './my-trips-components/trip-card.component';
+import { TripService } from './services/trip.service';
+import { AuthService } from '../../core/services/auth.service';
+import { Trip } from './models/trip.model';
+
+type FilterType = "all" | TripData["status"];
 
 @Component({
-  selector: 'app-my-trips',
+  selector: 'app-my-my-trips',
   standalone: true,
   imports: [
     CommonModule,
     RouterModule,
-    CardComponent,
-    CardContentComponent,
-    CardFooterComponent,
-    BadgeComponent,
-    LucideAngularModule
+    LucideAngularModule,
+    StatCardComponent,
+    FilterChipComponent,
+    TripCardComponent
   ],
-  template: `
-  <div class="container py-8">
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <h1 class="text-3xl font-bold text-[var(--color-text-heading)] mb-2">
-          My Trips
-        </h1>
-        <p class="text-[var(--color-text-secondary)]">
-          Manage and track all your outdoor adventures
-        </p>
-      </div>
-      <button
-        (click)="router.navigate(['/plan-trip'])"
-        class="flex items-center gap-2 px-6 py-3 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors font-medium"
-      >
-        <lucide-icon [img]="PlusIcon" [size]="20"></lucide-icon>
-        Plan New Trip
-      </button>
-    </div>
-
-    <!-- Tabs -->
-    <div class="flex gap-2 mb-6 border-b border-[var(--color-border-light)]">
-      <button
-        *ngFor="let tab of tabs"
-        (click)="activeTab = tab.value"
-        [class]="getTabClasses(tab.value)"
-      >
-        {{ tab.label }}
-      </button>
-    </div>
-
-    <!-- Trips Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <app-card
-        *ngFor="let trip of getFilteredTrips()"
-        variant="default"
-        padding="none"
-        customClass="overflow-hidden hover:shadow-lg transition-shadow"
-      >
-        <!-- Trip Image -->
-        <div class="h-48 bg-gradient-to-br from-[var(--color-primary-500)] to-[var(--color-primary-700)] relative">
-          <div class="absolute inset-0 flex items-center justify-center">
-            <lucide-icon [img]="MapPinIcon" [size]="64" class="text-white/30"></lucide-icon>
-          </div>
-          <div class="absolute top-4 right-4">
-            <app-badge [variant]="getStatusVariant(trip.status)">
-              {{ trip.status }}
-            </app-badge>
-          </div>
-        </div>
-
-        <!-- Trip Details -->
-        <app-card-content customClass="p-6">
-          <h3 class="text-xl font-semibold text-[var(--color-text-heading)] mb-2">
-            {{ trip.name }}
-          </h3>
-          <div class="space-y-2 text-sm text-[var(--color-text-secondary)]">
-            <div class="flex items-center gap-2">
-              <lucide-icon [img]="MapPinIcon" [size]="16"></lucide-icon>
-              {{ trip.destination }}
-            </div>
-            <div class="flex items-center gap-2">
-              <lucide-icon [img]="CalendarIcon" [size]="16"></lucide-icon>
-              {{ formatDate(trip.startDate) }} - {{ formatDate(trip.endDate) }}
-            </div>
-            <div class="flex items-center gap-2">
-              <lucide-icon [img]="UsersIcon" [size]="16"></lucide-icon>
-              {{ trip.groupSize }} {{ trip.groupSize === 1 ? 'person' : 'people' }}
-            </div>
-          </div>
-        </app-card-content>
-
-        <!-- Actions -->
-        <app-card-footer customClass="p-4 flex gap-2">
-          <button
-            (click)="viewTrip(trip.id)"
-            class="flex-1 px-4 py-2 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors text-sm font-medium"
-          >
-            View Details
-          </button>
-          <button
-            (click)="editTrip(trip.id)"
-            class="px-4 py-2 border border-[var(--color-border-medium)] rounded-lg hover:bg-[var(--color-neutral-50)] transition-colors"
-          >
-            <lucide-icon [img]="EditIcon" [size]="16" class="text-[var(--color-text-secondary)]"></lucide-icon>
-          </button>
-          <button
-            (click)="deleteTrip(trip.id)"
-            class="px-4 py-2 border border-[var(--color-border-medium)] rounded-lg hover:bg-[var(--color-error-50)] hover:border-[var(--color-error-500)] transition-colors"
-          >
-            <lucide-icon [img]="Trash2Icon" [size]="16" class="text-[var(--color-text-secondary)]"></lucide-icon>
-          </button>
-        </app-card-footer>
-      </app-card>
-    </div>
-
-    <!-- Empty State -->
-    <div *ngIf="getFilteredTrips().length === 0" class="text-center py-16">
-      <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-[var(--color-neutral-100)] flex items-center justify-center">
-        <lucide-icon [img]="MapPinIcon" [size]="48" class="text-[var(--color-text-tertiary)]"></lucide-icon>
-      </div>
-      <h3 class="text-xl font-semibold text-[var(--color-text-heading)] mb-2">
-        No trips found
-      </h3>
-      <p class="text-[var(--color-text-secondary)] mb-6">
-        Start planning your next outdoor adventure!
-      </p>
-      <button
-        (click)="router.navigate(['/plan-trip'])"
-        class="inline-flex items-center gap-2 px-6 py-3 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors font-medium"
-      >
-        <lucide-icon [img]="PlusIcon" [size]="20"></lucide-icon>
-        Plan Your First Trip
-      </button>
-    </div>
-  </div>
-    `,
-  styles: []
+  templateUrl: './my-trips.component.html',
+  styles: [`
+    :host { display: block; }
+  `]
 })
 export class MyTripsComponent {
-  CalendarIcon = Calendar;
-  MapPinIcon = MapPin;
-  UsersIcon = Users;
-  PlusIcon = Plus;
-  EditIcon = Edit;
-  Trash2Icon = Trash2;
+  // Lucide Icons
+  readonly CompassIcon = Compass;
+  readonly MapIcon = Map;
+  readonly InfoIcon = Info;
+  readonly ClockIcon = Clock;
+  readonly ChevronRightIcon = ChevronRight;
+  readonly PlusCircleIcon = PlusCircle;
+  readonly HistoryIcon = History;
 
-  activeTab: string = 'all';
+  activeFilter = "all" as FilterType;
 
-  tabs = [
-    { label: 'All Trips', value: 'all' },
-    { label: 'Upcoming', value: 'upcoming' },
-    { label: 'Completed', value: 'completed' },
-  ];
+  constructor(
+    public router: Router,
+    private tripService: TripService,
+    private authService: AuthService
+  ) { }
 
-  trips: Trip[] = [
-    {
-      id: '1',
-      name: 'Yosemite Summer Adventure',
-      destination: 'Yosemite National Park',
-      startDate: '2026-06-15',
-      endDate: '2026-06-18',
-      groupSize: 4,
-      status: 'confirmed'
-    },
-    {
-      id: '2',
-      name: 'Grand Canyon Exploration',
-      destination: 'Grand Canyon National Park',
-      startDate: '2026-07-01',
-      endDate: '2026-07-05',
-      groupSize: 2,
-      status: 'planning'
-    },
-    {
-      id: '3',
-      name: 'Yellowstone Wildlife Tour',
-      destination: 'Yellowstone National Park',
-      startDate: '2026-08-10',
-      endDate: '2026-08-14',
-      groupSize: 6,
-      status: 'planning'
-    },
-    {
-      id: '4',
-      name: 'Spring Break Camping',
-      destination: 'Zion National Park',
-      startDate: '2026-03-20',
-      endDate: '2026-03-23',
-      groupSize: 3,
-      status: 'completed'
-    }
-  ];
-
-  constructor(public router: Router) { }
-
-  getTabClasses(tabValue: string): string {
-    const baseClasses = 'px-4 py-2 font-medium transition-colors';
-    const activeClasses = 'text-[var(--color-primary-600)] border-b-2 border-[var(--color-primary-600)]';
-    const inactiveClasses = 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]';
-
-    return `${baseClasses} ${this.activeTab === tabValue ? activeClasses : inactiveClasses}`;
+  get currentUserName(): string {
+    const user = this.authService.getUserValue();
+    return user?.username || user?.email || 'Camper';
   }
 
-  getFilteredTrips(): Trip[] {
-    if (this.activeTab === 'all') {
+  get currentUserInitials(): string {
+    const name = this.currentUserName;
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  }
+
+  get trips(): TripData[] {
+    return this.tripService.getTrips().map(t => this.mapToTripData(t));
+  }
+
+  private mapToTripData(t: Trip): TripData {
+    const start = new Date(t.startDate);
+    const today = new Date();
+    const diff = start.getTime() - today.getTime();
+    const daysUntil = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+
+    let timelineLabel = '';
+    if (t.status === 'completed') {
+      timelineLabel = 'Completed';
+    } else if (t.status === 'planning' || t.status === 'upcoming') {
+      timelineLabel = `Departing in ${daysUntil} days`;
+    } else {
+      timelineLabel = 'In Progress';
+    }
+
+    const dest = t.destination || '';
+    const parts = dest.includes(',') ? dest.split(',') : [dest, ''];
+
+    return {
+      id: t.id,
+      title: t.name,
+      location: parts[0].trim(),
+      governorate: parts[1]?.trim() || '',
+      status: this.mapStatus(t.status),
+      imageUrl: t.imageUrl || 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80',
+      startDate: t.startDate ? new Date(t.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'TBD',
+      endDate: t.endDate ? new Date(t.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'TBD',
+      durationLabel: `${t.duration || 1} days`,
+      groupSize: t.participants,
+      difficulty: (t.adventureLevel?.charAt(0).toUpperCase() + (t.adventureLevel?.slice(1).toLowerCase() || '')) as any || 'Moderate',
+      difficultyTone: this.mapDifficultyTone(t.adventureLevel),
+      totalCost: `${t.budget?.estimated || 0} TND`,
+      timelineLabel: timelineLabel
+    };
+  }
+
+  private mapStatus(status: string): any {
+    if (status === 'planning') return 'planned';
+    if (status === 'active') return 'planned'; // closest match for now
+    return status;
+  }
+
+  private mapDifficultyTone(level: string | undefined): any {
+    const l = level?.toLowerCase();
+    if (l === 'easy') return 'green';
+    if (l === 'challenging' || l === 'advanced') return 'red';
+    return 'amber';
+  }
+
+  get filteredTrips(): TripData[] {
+    if (this.activeFilter === "all") {
       return this.trips;
-    } else if (this.activeTab === 'upcoming') {
-      return this.trips.filter(t => t.status === 'confirmed' || t.status === 'planning');
-    } else if (this.activeTab === 'completed') {
-      return this.trips.filter(t => t.status === 'completed');
     }
-    return this.trips;
+    return this.trips.filter((t) => t.status === this.activeFilter);
   }
 
-  getStatusVariant(status: string): 'success' | 'warning' | 'info' | 'default' {
-    switch (status) {
-      case 'confirmed': return 'success';
-      case 'planning': return 'warning';
-      case 'completed': return 'info';
-      default: return 'default';
-    }
+  get stats() {
+    const trips = this.trips;
+    return {
+      upcoming: trips.filter((t) => t.status !== "completed").length.toString(),
+      completed: trips.filter((t) => t.status === "completed").length.toString(),
+      destinations: new Set(trips.map(t => t.location)).size.toString(),
+      nextTripIn: this.getNextTripIn(trips),
+    };
   }
 
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  private getNextTripIn(trips: TripData[]): string {
+    const upcoming = trips.filter(t => t.status !== 'completed' && t.timelineLabel.includes('days'));
+    if (upcoming.length === 0) return 'N/A';
+    const days = upcoming.map(t => parseInt(t.timelineLabel.match(/\d+/)?.[0] || '999'));
+    return Math.min(...days) + 'd';
   }
 
-  viewTrip(id: string): void {
-    this.router.navigate(['/trips', id]);
-  }
-
-  editTrip(id: string): void {
-    console.log('Edit trip:', id);
-  }
-
-  deleteTrip(id: string): void {
-    console.log('Delete trip:', id);
+  setFilter(filterName: FilterType) {
+    this.activeFilter = filterName;
   }
 }

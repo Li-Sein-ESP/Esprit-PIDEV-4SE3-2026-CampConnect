@@ -1,42 +1,261 @@
-<div class="min-h-screen bg-[var(--color-background)] py-12">
-  <div class="container max-w-7xl">
-    <h2 class="mb-8">Vehicle Rentals</h2>
+<div class="min-h-screen bg-[#F5F4F0]">
+  <!-- Header -->
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      @for (vehicle of vehicles(); track vehicle.id) {
-      <app-card variant="elevated">
-        <img [src]="vehicle.imageUrl" [alt]="vehicle.make + ' ' + vehicle.model"
-          class="w-full h-48 object-cover rounded-t-lg" />
-        <app-card-content class="p-6">
-          <h4 class="mb-2">{{ vehicle.make }} {{ vehicle.model }}</h4>
-          <div class="flex items-center gap-2 mb-4">
-            <app-badge variant="outline">{{ vehicle.type }}</app-badge>
-            <app-badge variant="outline">{{ vehicle.year }}</app-badge>
-          </div>
 
-          <div class="space-y-2 text-sm mb-4">
-            <div class="flex items-center gap-2">
-              <lucide-icon [img]="Users" class="w-4 h-4"></lucide-icon>
-              <span>{{ vehicle.capacity }} passengers</span>
-            </div>
-            @for (feature of vehicle.features.slice(0, 3); track feature) {
-            <div class="flex items-center gap-2">
-              <lucide-icon [img]="Zap" class="w-4 h-4"></lucide-icon>
-              <span>{{ feature }}</span>
-            </div>
-            }
-          </div>
+  <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <div class="mb-6 flex items-center justify-between">
+      <nav class="flex text-sm text-gray-500">
+        <span class="hover:text-gray-900 cursor-pointer transition-colors"
+          routerLink="/transportation">Transportation</span>
+        <span class="mx-2">/</span>
+        <span class="text-gray-900 font-medium">Options</span>
+      </nav>
 
-          <div class="flex items-center justify-between pt-4 border-t">
-            <div>
-              <div class="text-2xl font-bold text-[var(--color-primary-600)]">\${{ vehicle.pricePerDay }}</div>
-              <div class="text-sm text-[var(--color-text-secondary)]">per day</div>
-            </div>
-            <app-button size="sm">Rent Now</app-button>
-          </div>
-        </app-card-content>
-      </app-card>
-      }
+      <!-- Trip Selector (if no tripId in URL) -->
+      <div *ngIf="!tripId && userTrips().length > 0" class="flex items-center space-x-3">
+        <label class="text-sm font-medium text-gray-700">Assign to Trip:</label>
+        <select [value]="selectedTripId()" (change)="selectedTripId.set($any($event.target).value)"
+          class="rounded-lg border-gray-300 text-sm focus:ring-emerald-500 transition-all">
+          <option value="" disabled selected>Select a trip...</option>
+          <option *ngFor="let trip of userTrips()" [value]="trip.id">{{trip.name}} ({{trip.destination}})</option>
+        </select>
+      </div>
+      <div *ngIf="!tripId && userTrips().length === 0" class="text-sm text-amber-600 font-medium">
+        Create a trip first to assign transport!
+      </div>
     </div>
-  </div>
+
+    <!-- Sort Bar -->
+    <div class="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex items-center space-x-2">
+          <lucide-icon [img]="ArrowUpDown" class="w-5 h-5 text-gray-400"></lucide-icon>
+          <span class="text-sm font-medium text-gray-700">Sort by:</span>
+        </div>
+        <div class="flex space-x-2">
+          <button (click)="setSortBy('time')" [class.bg-emerald-900]="sortBy() === 'time'"
+            [class.text-white]="sortBy() === 'time'" [class.bg-white]="sortBy() !== 'time'"
+            [class.text-gray-700]="sortBy() !== 'time'" [class.border]="sortBy() !== 'time'"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2">
+            <lucide-icon [img]="Clock" class="w-4 h-4"></lucide-icon>
+            <span>Travel Time</span>
+          </button>
+          <button (click)="setSortBy('cost')" [class.bg-emerald-900]="sortBy() === 'cost'"
+            [class.text-white]="sortBy() === 'cost'" [class.bg-white]="sortBy() !== 'cost'"
+            [class.text-gray-700]="sortBy() !== 'cost'" [class.border]="sortBy() !== 'cost'"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2">
+            <span>$</span>
+            <span>Cost</span>
+          </button>
+          <button (click)="setSortBy('impact')" [class.bg-emerald-900]="sortBy() === 'impact'"
+            [class.text-white]="sortBy() === 'impact'" [class.bg-white]="sortBy() !== 'impact'"
+            [class.text-gray-700]="sortBy() !== 'impact'" [class.border]="sortBy() !== 'impact'"
+            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2">
+            <lucide-icon [img]="Leaf" class="w-4 h-4"></lucide-icon>
+            <span>Environmental Impact</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Empty State -->
+        <div *ngIf="sortedOptions().length === 0" 
+          class="bg-white rounded-xl border border-dashed border-gray-300 p-12 text-center">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 mb-4">
+            <lucide-icon [img]="Car" class="w-8 h-8 text-gray-400"></lucide-icon>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">No Transport Options Available</h3>
+          <p class="text-gray-500 max-w-md mx-auto mb-6">
+            We couldn't find any transport options added by the administrator. 
+            Please check back later or contact support to request transportation for this area.
+          </p>
+        </div>
+
+        <!-- Options List -->
+        <div *ngFor="let option of sortedOptions()" (click)="selectOption(option.id)"
+          [class.border-orange-400]="selectedOptionId() === option.id"
+          [class.shadow-lg]="selectedOptionId() === option.id"
+          [class.border-gray-200]="selectedOptionId() !== option.id"
+          class="bg-white rounded-xl border-2 transition-all cursor-pointer">
+          <div class="p-6">
+            <!-- Header -->
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-start space-x-4">
+                <div class="relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-gray-50 border border-gray-100 shadow-sm">
+                  <img *ngIf="option.imageUrl" [src]="option.imageUrl" class="w-full h-full object-cover">
+                  <div *ngIf="!option.imageUrl" class="w-full h-full flex items-center justify-center">
+                    <lucide-icon [img]="option.icon" class="w-8 h-8 text-gray-400"></lucide-icon>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex items-center space-x-2">
+                    <h3 class="text-xl font-semibold text-gray-900">{{option.title}}</h3>
+                    <span *ngIf="option.isRecommended"
+                      class="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
+                      Recommended
+                    </span>
+                  </div>
+                  <p class="text-sm text-gray-500 mt-1">
+                    {{option.segments}} segment{{option.segments > 1 ? 's' : ''}}
+                    <ng-container *ngIf="option.transfers"> • {{option.transfers}} transfer{{option.transfers > 1 ? 's'
+                      : ''}}</ng-container>
+                  </p>
+                </div>
+              </div>
+              <div *ngIf="selectedOptionId() === option.id">
+                <lucide-icon [img]="Check" class="w-6 h-6 text-emerald-600"></lucide-icon>
+              </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-3 gap-4 py-4 border-t border-b border-gray-100">
+              <div>
+                <div class="flex items-center space-x-1 text-gray-500 text-sm mb-1">
+                  <lucide-icon [img]="Clock" class="w-4 h-4"></lucide-icon>
+                  <span>Time</span>
+                </div>
+                <p class="font-medium text-gray-900">{{option.time}}</p>
+              </div>
+              <div>
+                <div class="flex items-center space-x-1 text-gray-500 text-sm mb-1">
+                  <span>$</span>
+                  <span>Cost</span>
+                </div>
+                <p class="font-medium text-gray-900">{{option.cost}}</p>
+              </div>
+              <div>
+                <div class="flex items-center space-x-1 text-gray-500 text-sm mb-1">
+                  <lucide-icon [img]="Leaf" class="w-4 h-4"></lucide-icon>
+                  <span>Impact</span>
+                </div>
+                <div class="flex items-center space-x-1">
+                  <p class="font-medium" [ngClass]="getImpactTextColor(option.impact)">{{option.impact}}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tags -->
+            <div class="flex space-x-2 mt-4">
+              <span [ngClass]="getAccessibilityColors(option.accessibility)"
+                class="px-3 py-1 rounded-full text-xs font-medium border">
+                {{option.accessibility}}
+              </span>
+              <span [ngClass]="getImpactColors(option.impact)"
+                class="px-3 py-1 rounded-full text-xs font-medium border">
+                {{option.impact}} Impact
+              </span>
+            </div>
+
+            <!-- Considerations -->
+            <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div class="flex items-start space-x-2">
+                <lucide-icon [img]="AlertTriangle" class="w-5 h-5 text-gray-600 flex-shrink-0 mt-0.5"></lucide-icon>
+                <div>
+                  <h4 class="font-medium text-gray-900 text-sm">Important Considerations</h4>
+                  <ul class="mt-2 space-y-1">
+                    <li *ngFor="let consideration of option.considerations"
+                      class="text-sm text-gray-600 flex items-start space-x-2">
+                      <span class="text-gray-400 mt-1">•</span>
+                      <span>{{consideration}}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="mt-4 flex space-x-3">
+              <button (click)="viewRouteDetails(option.id, $event)"
+                class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center space-x-2">
+                <lucide-icon [img]="MapPin" class="w-4 h-4"></lucide-icon>
+                <span>View Route Details</span>
+              </button>
+              <button *ngIf="selectedOptionId() === option.id" (click)="confirmSelection()"
+                class="px-6 py-2 bg-emerald-900 text-white rounded-lg text-sm font-medium hover:bg-emerald-800 transition-colors flex items-center space-x-2">
+                <span>Continue with This Option</span>
+                <lucide-icon [img]="ChevronRight" class="w-4 h-4"></lucide-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="space-y-6">
+        <!-- Selected Option Summary -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+          <h3 class="text-2xl font-bold text-gray-900 mb-1">Selected Option</h3>
+          <p class="text-sm text-gray-500 mb-4">Quick summary</p>
+
+          <div *ngIf="selectedData() as data" class="animate-in fade-in duration-300">
+            <div class="flex items-start space-x-3 mb-4">
+              <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-100">
+                <img *ngIf="data.imageUrl" [src]="data.imageUrl" class="w-full h-full object-cover">
+                <div *ngIf="!data.imageUrl" class="w-full h-full flex items-center justify-center">
+                  <lucide-icon [img]="data.icon" class="w-6 h-6 text-gray-400"></lucide-icon>
+                </div>
+              </div>
+              <div>
+                <p class="font-medium text-gray-900 leading-tight">{{data.title}}</p>
+                <p class="text-xs text-gray-500 mt-1">{{data.time}}</p>
+              </div>
+            </div>
+
+            <div class="space-y-2 mb-4">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Estimated Cost</span>
+                <span class="font-medium text-gray-900">{{data.cost}}</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Segments</span>
+                <span class="font-medium text-gray-900">{{data.segments}}</span>
+              </div>
+              <div *ngIf="data.transfers !== undefined" class="flex justify-between text-sm">
+                <span class="text-gray-600">Transfers</span>
+                <span class="font-medium text-gray-900">{{data.transfers}}</span>
+              </div>
+            </div>
+
+            <button (click)="confirmSelection()"
+              class="w-full py-3 bg-emerald-900 text-white rounded-lg font-medium hover:bg-emerald-800 transition-colors flex items-center justify-center space-x-2">
+              <span>Confirm Selection</span>
+              <lucide-icon [img]="ChevronRight" class="w-4 h-4"></lucide-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Environmental Impact Legend -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+          <h4 class="font-semibold text-gray-900 mb-3">Environmental Impact</h4>
+          <div class="space-y-2 text-sm">
+            <div class="flex items-center space-x-2">
+              <span class="text-emerald-600">🌱</span>
+              <span class="text-gray-600"><strong>Low:</strong> Public transit, walking</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-amber-600">🌿</span>
+              <span class="text-gray-600"><strong>Medium:</strong> Shared rides</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-red-600">🏭</span>
+              <span class="text-gray-600"><strong>High:</strong> Personal vehicle</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- About These Options -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+          <h4 class="font-semibold text-gray-900 mb-2">About These Options</h4>
+          <p class="text-sm text-gray-600 leading-relaxed">
+            Transportation options are calculated based on your destination, group size, and current conditions. Costs
+            are estimates and may vary.
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
 </div>
