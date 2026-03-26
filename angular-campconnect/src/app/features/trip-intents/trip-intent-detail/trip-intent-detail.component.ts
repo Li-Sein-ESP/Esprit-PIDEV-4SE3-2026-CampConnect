@@ -50,6 +50,7 @@ export class TripIntentDetailComponent implements OnInit {
     hasRequested = false;
     isMember = false;
     requestSuccess = false;
+    pendingInviteId: string | null = null;
 
     readonly Loader2 = Loader2;
     readonly Check = Check;
@@ -108,10 +109,12 @@ export class TripIntentDetailComponent implements OnInit {
                 // 2. If not a member, check for pending requests
                 if (!this.isMember) {
                     this.inviteService.getInvitesByFromUser(this.currentUserId!).subscribe(invites => {
-                        this.hasRequested = invites.some(inv => 
+                        const pending = invites.find(inv => 
                             inv.tripIntentId === this.intentId && 
                             inv.status === InviteStatus.PENDING
                         );
+                        this.hasRequested = !!pending;
+                        this.pendingInviteId = pending?.id || null;
                     });
                 }
             },
@@ -143,8 +146,9 @@ export class TripIntentDetailComponent implements OnInit {
                 this.inviteService.sendInvite(invite).pipe(
                     finalize(() => this.isJoining = false)
                 ).subscribe({
-                    next: () => {
+                    next: (res) => {
                         this.hasRequested = true;
+                        this.pendingInviteId = res.id || null;
                         this.requestSuccess = true;
                         setTimeout(() => this.requestSuccess = false, 5000);
                     },
@@ -158,6 +162,25 @@ export class TripIntentDetailComponent implements OnInit {
                 console.error('Failed to find associated group', err);
                 this.isJoining = false;
                 alert('Ce projet n\'a pas encore de groupe actif.');
+            }
+        });
+    }
+
+    cancelJoinRequest() {
+        if (!this.pendingInviteId || this.isJoining) return;
+
+        this.isJoining = true;
+        this.inviteService.cancelInvite(this.pendingInviteId).pipe(
+            finalize(() => this.isJoining = false)
+        ).subscribe({
+            next: () => {
+                this.hasRequested = false;
+                this.pendingInviteId = null;
+                alert('Demande annulée.');
+            },
+            error: (err) => {
+                console.error('Failed to cancel request', err);
+                alert('Erreur lors de l\'annulation.');
             }
         });
     }

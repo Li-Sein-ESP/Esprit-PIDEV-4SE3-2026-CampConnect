@@ -148,6 +148,15 @@
                             </ng-container>
                         </button>
 
+                        <button *ngIf="hasRequested && !requestSuccess"
+                            class="btn w-full mt-2 bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-colors flex items-center justify-center gap-2"
+                            (click)="cancelJoinRequest()"
+                            [disabled]="isJoining">
+                            <lucide-icon *ngIf="!isJoining" [img]="Trash2" size="16"></lucide-icon>
+                            <lucide-icon *ngIf="isJoining" [img]="Loader2" size="16" class="animate-spin"></lucide-icon>
+                            Annuler la demande
+                        </button>
+
                         <div *ngIf="isMember" class="mt-4 p-3 bg-blue-50 text-blue-700 rounded-lg flex items-center justify-center gap-2 border border-blue-100">
                             <lucide-icon [img]="Check" size="18"></lucide-icon>
                             <span class="font-medium">Vous êtes déjà membre de ce groupe</span>
