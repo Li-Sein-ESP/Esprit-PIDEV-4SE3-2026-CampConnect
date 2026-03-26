@@ -157,6 +157,24 @@ export class GroupDashboardComponent implements OnInit {
         }
     }
 
+    onLeaveGroup() {
+        if (!this.group || !this.currentUserId) return;
+        
+        if (confirm('Voulez-vous vraiment quitter ce groupe ?')) {
+            this.isDeleting = true; // Use the same loading state for simplicity or add a new one
+            this.groupService.leaveGroup(this.group.id, this.currentUserId).subscribe({
+                next: () => {
+                    this.router.navigate(['/groups']);
+                },
+                error: (err) => {
+                    console.error('Error leaving group:', err);
+                    alert('Erreur lors de la tentative de quitter le groupe.');
+                    this.isDeleting = false;
+                }
+            });
+        }
+    }
+
     switchTab(tab: 'chat' | 'planning' | 'expenses' | 'settings') {
         this.activeTab = tab;
         // this.router.navigate([tab], { relativeTo: this.route });

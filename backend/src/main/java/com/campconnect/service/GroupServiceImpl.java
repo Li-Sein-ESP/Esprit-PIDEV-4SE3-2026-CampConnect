@@ -81,6 +81,34 @@ public class GroupServiceImpl implements IGroupService {
     }
 
     @Override
+    public Group leaveGroup(String groupId, String userId) {
+        Group group = getGroupById(groupId);
+        if (group.getMemberUserIds() != null) {
+            group.getMemberUserIds().remove(userId);
+            
+            // If the user was the creator, we might want to assign a new creator 
+            // or handle it differently. For now, we just remove from membership.
+            if (userId.equals(group.getCreatorUserId())) {
+                // If there are other members, pick the first one as new creator
+                if (!group.getMemberUserIds().isEmpty()) {
+                    group.setCreatorUserId(group.getMemberUserIds().get(0));
+                } else {
+                    // If no members left, maybe deactivate group
+                    group.setStatus(GroupStatus.INACTIVE);
+                }
+            }
+            
+            // If group becomes empty, mark it as inactive
+            if (group.getMemberUserIds().isEmpty()) {
+                group.setStatus(GroupStatus.INACTIVE);
+            }
+            
+            return groupRepository.save(group);
+        }
+        return group;
+    }
+
+    @Override
     public void deleteGroup(String id) {
         groupRepository.deleteById(id);
     }

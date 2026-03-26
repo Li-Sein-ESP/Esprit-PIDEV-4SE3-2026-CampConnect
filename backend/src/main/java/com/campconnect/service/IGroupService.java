@@ -16,6 +16,7 @@ public interface IGroupService {
     List<Group> getAllGroups();
 
     Group updateGroup(String id, Group group);
+    Group leaveGroup(String groupId, String userId);
 
     void deleteGroup(String id);
 }

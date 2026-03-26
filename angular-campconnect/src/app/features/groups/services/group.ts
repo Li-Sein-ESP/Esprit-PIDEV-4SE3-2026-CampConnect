@@ -61,5 +61,12 @@ export class GroupService {
   deleteGroup(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  /**
+   * Leave a group
+   */
+  leaveGroup(groupId: string, userId: string): Observable<Group> {
+    return this.http.patch<Group>(`${this.apiUrl}/${groupId}/leave/${userId}`, {});
+  }
 }
 
