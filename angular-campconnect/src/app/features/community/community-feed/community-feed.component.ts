@@ -7,7 +7,7 @@ import { Post, AuthorPreview, UserRole } from '../models/community.model';
 import { TrustScoreComponent } from '../../../shared/components/trust-score/trust-score.component';
 import { CampBadgeComponent } from '../../../shared/components/badge/badge.component';
 import { CommunityService } from '../../../core/services/community.service';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService, User } from '../../../core/services/auth.service';
 
 @Component({
     selector: 'app-community-feed',
@@ -20,6 +20,7 @@ import { AuthService } from '../../../core/services/auth.service';
 export class CommunityFeedComponent implements OnInit {
     posts: Post[] = [];
     loading: boolean = true;
+    currentUser: User | null = null;
 
     constructor(
         private router: Router,
@@ -34,6 +35,11 @@ export class CommunityFeedComponent implements OnInit {
     TrashIcon = Trash2;
 
     ngOnInit(): void {
+        this.currentUser = this.authService.currentUserValue;
+        this.authService.getCurrentUser().subscribe(user => {
+            this.currentUser = user;
+            this.cdr.detectChanges();
+        });
         this.loadPosts();
     }
 

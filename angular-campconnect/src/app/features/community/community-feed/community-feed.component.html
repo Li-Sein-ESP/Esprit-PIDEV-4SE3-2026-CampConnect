@@ -8,23 +8,23 @@
       <article class="cc-profile-card">
         <div class="cc-profile-card__banner" aria-hidden="true"></div>
         <div class="cc-profile-card__avatar-wrap">
-          <img src="https://images.unsplash.com/photo-1535930749574-1399327ce78f?w=150&h=150&fit=crop&crop=face"
-            alt="Jordan Rivers" class="cc-profile-card__avatar">
+          <img src="https://ui-avatars.com/api/?name={{currentUser?.username || 'User'}}&background=2f5d44&color=fff&size=150"
+            [alt]="currentUser?.username || 'User'" class="cc-profile-card__avatar">
         </div>
         <div class="cc-profile-card__info">
-          <h2 class="cc-profile-card__name">Jordan Rivers</h2>
-          <p class="cc-profile-card__handle">@jordan_trails</p>
+          <h2 class="cc-profile-card__name">{{ currentUser?.username || 'Connecté' }}</h2>
+          <p class="cc-profile-card__handle">@{{ currentUser?.username || 'user' }}</p>
           <div class="cc-profile-card__stats">
             <div class="cc-profile-card__stat">
-              <div class="cc-profile-card__stat-value">284</div>
+              <div class="cc-profile-card__stat-value">{{ posts.length }}</div>
               <div class="cc-profile-card__stat-label">Posts</div>
             </div>
             <div class="cc-profile-card__stat">
-              <div class="cc-profile-card__stat-value">1.2K</div>
+              <div class="cc-profile-card__stat-value">0</div>
               <div class="cc-profile-card__stat-label">Followers</div>
             </div>
             <div class="cc-profile-card__stat">
-              <div class="cc-profile-card__stat-value">89</div>
+              <div class="cc-profile-card__stat-value">0</div>
               <div class="cc-profile-card__stat-label">Trips</div>
             </div>
           </div>
@@ -157,9 +157,9 @@
 
       <!-- Create Post Box -->
       <div class="cc-create-post">
-        <img src="https://images.unsplash.com/photo-1535930749574-1399327ce78f?w=100&h=100&fit=crop&crop=face" alt=""
+        <img src="https://ui-avatars.com/api/?name={{currentUser?.username || 'User'}}&background=2f5d44&color=fff&size=100" alt=""
           class="cc-create-post__avatar" aria-hidden="true">
-        <input type="text" class="cc-create-post__input" placeholder="Share your latest adventure, Jordan..."
+        <input type="text" class="cc-create-post__input" [placeholder]="'Share your latest adventure, ' + (currentUser?.username || 'explorer') + '...'"
           aria-label="Create a post" [(ngModel)]="quickPostContent" (keyup.enter)="submitQuickPost()">
         <div class="cc-create-post__actions">
           <button class="cc-create-post__action" aria-label="Add photo">📷</button>
