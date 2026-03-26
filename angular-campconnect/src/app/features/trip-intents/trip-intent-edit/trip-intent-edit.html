@@ -26,10 +26,13 @@
                 <div class="form-group md:col-span-2">
                     <label>Nom du projet</label>
                     <input type="text" class="input" formControlName="title"
-                        placeholder="Ex: Expédition dans le Haut Atlas">
-                    <span class="error-msg"
+                        placeholder="Ex: Expédition dans le Haut Atlas"
+                        [class.border-red-500]="intentForm.get('title')?.touched && intentForm.get('title')?.invalid">
+                    <span class="error-msg text-red-500 mt-1 block text-sm font-medium"
                         *ngIf="intentForm.get('title')?.touched && intentForm.get('title')?.invalid">
-                        Veuillez donner un nom à votre projet.
+                        <span *ngIf="intentForm.get('title')?.errors?.['required']">Veuillez donner un nom à votre projet.</span>
+                        <span *ngIf="intentForm.get('title')?.errors?.['minlength']">Minimum 5 caractères.</span>
+                        <span *ngIf="intentForm.get('title')?.errors?.['maxlength']">Maximum 100 caractères.</span>
                     </span>
                 </div>
 
@@ -39,27 +42,34 @@
                     <div class="input-with-icon">
                         <lucide-icon [img]="Map" size="18" class="icon-left text-gray-400"></lucide-icon>
                         <input type="text" class="input pl-10" formControlName="preferredZone"
-                            placeholder="Ex: Ifrane, Toubkal, M'Hamid El Ghizlane">
+                            placeholder="Ex: Ifrane, Toubkal, M'Hamid El Ghizlane"
+                            [class.border-red-500]="intentForm.get('preferredZone')?.touched && intentForm.get('preferredZone')?.invalid">
                     </div>
+                    <span class="error-msg text-red-500 mt-1 block text-sm font-medium"
+                        *ngIf="intentForm.get('preferredZone')?.touched && intentForm.get('preferredZone')?.invalid">
+                        <span *ngIf="intentForm.get('preferredZone')?.errors?.['required']">La zone/région est obligatoire.</span>
+                    </span>
                 </div>
 
                 <!-- Dates -->
                 <div class="form-group">
                     <label>Date de départ prévue</label>
-                    <input type="date" class="input" formControlName="dateFrom">
-                    <span class="error-msg"
+                    <input type="date" class="input" formControlName="dateFrom" [min]="today"
+                        [class.border-red-500]="intentForm.get('dateFrom')?.touched && intentForm.get('dateFrom')?.invalid">
+                    <span class="error-msg text-red-500 mt-1 block text-sm font-medium"
                         *ngIf="intentForm.get('dateFrom')?.touched && intentForm.get('dateFrom')?.invalid">
-                        Obligatoire.
+                        <span *ngIf="intentForm.get('dateFrom')?.errors?.['required']">Obligatoire.</span>
                     </span>
                 </div>
                 <div class="form-group">
                     <label>Date de retour prévue</label>
-                    <input type="date" class="input" formControlName="dateTo">
-                    <span class="error-msg"
+                    <input type="date" class="input" formControlName="dateTo" [min]="intentForm.get('dateFrom')?.value || today"
+                        [class.border-red-500]="intentForm.get('dateTo')?.touched && intentForm.get('dateTo')?.invalid">
+                    <span class="error-msg text-red-500 mt-1 block text-sm font-medium"
                         *ngIf="intentForm.get('dateTo')?.touched && intentForm.get('dateTo')?.invalid">
-                        Obligatoire.
+                        <span *ngIf="intentForm.get('dateTo')?.errors?.['required']">Obligatoire.</span>
                     </span>
-                    <span class="error-msg text-red-500 block mt-1"
+                    <span class="error-msg text-red-500 block mt-1 text-sm font-medium"
                         *ngIf="intentForm.hasError('dateRangeInvalid') && intentForm.get('dateTo')?.touched">
                         La date de retour doit être après la date de départ.
                     </span>
@@ -96,8 +106,14 @@
                     <label>Budget Maximum par pers.</label>
                     <div class="input-with-icon">
                         <lucide-icon [img]="DollarSign" size="18" class="icon-left text-gray-400"></lucide-icon>
-                        <input type="number" class="input pl-10" formControlName="budgetMax" placeholder="Max (MAD)">
+                        <input type="number" class="input pl-10" formControlName="budgetMax" placeholder="Max (MAD)"
+                            [class.border-red-500]="intentForm.get('budgetMax')?.touched && intentForm.get('budgetMax')?.invalid">
                     </div>
+                    <span class="error-msg text-red-500 mt-1 block text-sm font-medium"
+                        *ngIf="intentForm.get('budgetMax')?.touched && intentForm.get('budgetMax')?.invalid">
+                        <span *ngIf="intentForm.get('budgetMax')?.errors?.['required']">Budget obligatoire.</span>
+                        <span *ngIf="intentForm.get('budgetMax')?.errors?.['min']">Minimum 50 MAD.</span>
+                    </span>
                 </div>
 
                 <!-- Experience -->

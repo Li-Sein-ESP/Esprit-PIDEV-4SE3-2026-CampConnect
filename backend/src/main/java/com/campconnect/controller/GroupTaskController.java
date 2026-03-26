@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -29,53 +28,35 @@ public class GroupTaskController {
     private final IGroupTaskService groupTaskService;
 
     @PostMapping
-    public ResponseEntity<GroupTask> createTask(@Valid @RequestBody GroupTaskDto dto) {
-        GroupTask task = GroupTask.builder()
-                .groupId(dto.getGroupId())
-                .tripId(dto.getTripId())
-                .title(dto.getTitle())
-                .assignedToUserId(dto.getAssignedToUserId())
-                .status(dto.getStatus())
-                .dueDate(dto.getDueDate())
-                .build();
-        GroupTask created = groupTaskService.createTask(task);
+    public ResponseEntity<GroupTask> createGroupTask(@Valid @RequestBody GroupTaskDto dto) {
+        GroupTask task = mapDtoToEntity(dto);
+        GroupTask created = groupTaskService.createGroupTask(task);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<GroupTask> getTaskById(@PathVariable("id") String id) {
-        return ResponseEntity.ok(groupTaskService.getTaskById(id));
-    }
-
     @GetMapping("/group/{groupId}")
-    public ResponseEntity<List<GroupTask>> getTasksForGroup(@PathVariable("groupId") String groupId) {
-        return ResponseEntity.ok(groupTaskService.getTasksForGroup(groupId));
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<GroupTask>> getTasksForUser(@PathVariable("userId") String userId) {
-        return ResponseEntity.ok(groupTaskService.getTasksForUser(userId));
+    public ResponseEntity<List<GroupTask>> getTasksByGroupId(@PathVariable("groupId") String groupId) {
+        return ResponseEntity.ok(groupTaskService.getTasksByGroupId(groupId));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GroupTask> updateTask(@PathVariable("id") String id, @Valid @RequestBody GroupTaskDto dto) {
-        GroupTask task = GroupTask.builder()
-                .title(dto.getTitle())
-                .assignedToUserId(dto.getAssignedToUserId())
-                .status(dto.getStatus())
-                .dueDate(dto.getDueDate())
-                .build();
-        return ResponseEntity.ok(groupTaskService.updateTask(id, task));
-    }
-
-    @PatchMapping("/{id}/complete")
-    public ResponseEntity<GroupTask> completeTask(@PathVariable("id") String id) {
-        return ResponseEntity.ok(groupTaskService.completeTask(id));
+    public ResponseEntity<GroupTask> updateGroupTask(@PathVariable("id") String id, @RequestBody GroupTaskDto dto) {
+        GroupTask task = mapDtoToEntity(dto);
+        return ResponseEntity.ok(groupTaskService.updateGroupTask(id, task));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable("id") String id) {
-        groupTaskService.deleteTask(id);
+    public ResponseEntity<Void> deleteGroupTask(@PathVariable("id") String id) {
+        groupTaskService.deleteGroupTask(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private GroupTask mapDtoToEntity(GroupTaskDto dto) {
+        return GroupTask.builder()
+                .groupId(dto.getGroupId())
+                .title(dto.getTitle())
+                .assignedUserId(dto.getAssignedUserId())
+                .isCompleted(dto.getIsCompleted())
+                .build();
     }
 }

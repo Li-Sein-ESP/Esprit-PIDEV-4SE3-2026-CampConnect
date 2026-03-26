@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, tap, map, catchError } from 'rxjs';
 
-const API_URL = 'http://localhost:8080/api/auth/';
+const API_URL = 'http://localhost:8089/api/auth/';
 
 const httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -25,15 +25,24 @@ export class AuthService {
 
     constructor(private http: HttpClient) {
         // Check for saved session
+        this.restoreSession();
+    }
+
+    private restoreSession(): void {
         const savedUser = localStorage.getItem('currentUser');
         if (savedUser) {
             try {
                 const user = JSON.parse(savedUser);
-                this.currentUser$.next(user);
-                this.isAuthenticated$.next(true);
+                if (user && user.token && !this.isTokenExpired(user.token)) {
+                    this.currentUser$.next(user);
+                    this.isAuthenticated$.next(true);
+                } else {
+                    console.warn('Session expired or invalid, cleaning up.');
+                    this.logout();
+                }
             } catch (e) {
                 console.error('Error parsing saved user', e);
-                localStorage.removeItem('currentUser');
+                this.logout();
             }
         }
     }
@@ -43,11 +52,33 @@ export class AuthService {
     }
 
     isAuthenticated(): Observable<boolean> {
-        return this.isAuthenticated$.asObservable();
+        return this.isAuthenticated$.asObservable().pipe(
+            map(isAuth => {
+                if (isAuth && this.isTokenExpired(this.getToken())) {
+                    this.logout();
+                    return false;
+                }
+                return isAuth;
+            })
+        );
     }
 
     getToken(): string | undefined {
         return this.currentUser$.value?.token;
+    }
+
+    private isTokenExpired(token: string | undefined): boolean {
+        if (!token) return true;
+        try {
+            const part = token.split('.')[1];
+            const base64 = part.replace(/-/g, '+').replace(/_/g, '/');
+            const payload = JSON.parse(atob(base64));
+            if (!payload.exp) return false;
+            const expirationDate = payload.exp * 1000;
+            return Date.now() > expirationDate;
+        } catch (e) {
+            return true;
+        }
     }
 
     getRoles(): string[] {

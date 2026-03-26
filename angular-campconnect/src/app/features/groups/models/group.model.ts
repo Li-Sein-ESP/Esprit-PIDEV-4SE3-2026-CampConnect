@@ -80,3 +80,23 @@ export interface Balance {
     userId: string;
     owes: { [toUserId: string]: number }; // Who this user owes and how much
 }
+
+export interface User {
+    id: string;
+    username: string;
+    name?: string;
+    avatar?: string;
+    email?: string;
+}
+
+export interface GroupDetail {
+    id: string;
+    name: string;
+    description?: string;
+    tripId: string;
+    creatorUserId: string;
+    status: 'ACTIVE' | 'INACTIVE';
+    members: User[];
+}
+
+

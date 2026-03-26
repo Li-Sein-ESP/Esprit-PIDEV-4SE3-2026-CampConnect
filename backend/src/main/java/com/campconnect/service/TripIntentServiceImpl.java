@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.campconnect.model.Group;
+import com.campconnect.model.GroupStatus;
 import com.campconnect.model.TripIntent;
 import com.campconnect.model.TripIntentStatus;
 import com.campconnect.repository.TripIntentRepository;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class TripIntentServiceImpl implements ITripIntentService {
 
     private final TripIntentRepository tripIntentRepository;
+    private final IGroupService groupService;
 
     @Override
     public TripIntent createTripIntent(TripIntent tripIntent) {
@@ -23,7 +26,22 @@ public class TripIntentServiceImpl implements ITripIntentService {
         if (tripIntent.getStatus() == null) {
             tripIntent.setStatus(TripIntentStatus.OPEN);
         }
-        return tripIntentRepository.save(tripIntent);
+        
+        TripIntent savedTrip = tripIntentRepository.save(tripIntent);
+        
+        // Ensure a group is created
+        Group group = new Group();
+        group.setTripId(savedTrip.getId());
+        group.setName(savedTrip.getTitle());
+        group.setCreatorUserId(savedTrip.getCreatorUserId());
+        group.setStatus(GroupStatus.ACTIVE);
+        group.setMemberUserIds(new java.util.ArrayList<>());
+        group.getMemberUserIds().add(savedTrip.getCreatorUserId());
+        
+        groupService.createGroup(group);
+        System.out.println("Auto-created group for trip: " + savedTrip.getId());
+        
+        return savedTrip;
     }
 
     @Override
@@ -55,11 +73,31 @@ public class TripIntentServiceImpl implements ITripIntentService {
         existing.setPreferredZone(tripIntent.getPreferredZone());
         existing.setStatus(tripIntent.getStatus());
 
-        return tripIntentRepository.save(existing);
+        TripIntent updated = tripIntentRepository.save(existing);
+        
+        // Sync with Group name
+        groupService.getGroupByTripId(id).ifPresent(group -> {
+            boolean modified = false;
+            if (!group.getName().equals(updated.getTitle())) {
+                group.setName(updated.getTitle());
+                modified = true;
+            }
+            if (updated.getStatus() == TripIntentStatus.CLOSED) {
+                group.setStatus(GroupStatus.INACTIVE);
+                modified = true;
+            }
+            if (modified) {
+                groupService.updateGroup(group.getId(), group);
+            }
+        });
+        
+        return updated;
     }
 
     @Override
     public void deleteTripIntent(String id) {
-        tripIntentRepository.deleteById(id);
+        TripIntent existing = getTripIntentById(id);
+        existing.setStatus(TripIntentStatus.CLOSED);
+        tripIntentRepository.save(existing);
     }
 }

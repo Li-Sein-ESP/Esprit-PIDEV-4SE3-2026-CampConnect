@@ -48,6 +48,7 @@ export class TripIntentEditComponent implements OnInit {
   isLoading = true;
   currentUserId: string | null = null;
   intentId: string | null = null;
+  today = new Date().toISOString().split('T')[0];
 
   campingStyles = [
     { value: CampingStyle.WILD, label: 'Sauvage', icon: this.Flame, desc: 'Expérience authentique au milieu de nulle part' },
@@ -86,13 +87,13 @@ export class TripIntentEditComponent implements OnInit {
 
   private initForm(): void {
     this.intentForm = this.fb.group({
-      title: ['', [Validators.required, Validators.maxLength(100)]],
+      title: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
       dateFrom: ['', Validators.required],
       dateTo: ['', Validators.required],
-      budgetMax: [1000, [Validators.required, Validators.min(0)]],
+      budgetMax: [1000, [Validators.required, Validators.min(50)]],
       campingStyle: [CampingStyle.WILD, Validators.required],
       experienceLevel: [ExperienceLevel.INTERMEDIATE, Validators.required],
-      preferredZone: [''],
+      preferredZone: ['', Validators.required],
       status: [TripIntentStatus.OPEN, Validators.required]
     }, { validators: dateRangeValidator() });
   }

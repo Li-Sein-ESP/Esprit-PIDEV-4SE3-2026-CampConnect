@@ -2,7 +2,6 @@ package com.campconnect.controller;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.campconnect.dto.GroupInviteDto;
+import com.campconnect.dto.GroupInviteDetailDto;
 import com.campconnect.model.GroupInvite;
 import com.campconnect.service.IGroupInviteService;
 
@@ -27,17 +26,8 @@ public class GroupInviteController {
     private final IGroupInviteService groupInviteService;
 
     @PostMapping
-    public ResponseEntity<GroupInvite> sendInvite(@Valid @RequestBody GroupInviteDto dto) {
-        GroupInvite invite = GroupInvite.builder()
-                .tripIntentId(dto.getTripIntentId())
-                .groupId(dto.getGroupId())
-                .fromUserId(dto.getFromUserId())
-                .toUserId(dto.getToUserId())
-                .message(dto.getMessage())
-                .expiresAt(dto.getExpiresAt())
-                .build();
-        GroupInvite created = groupInviteService.sendInvite(invite);
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    public ResponseEntity<GroupInvite> createInvite(@Valid @RequestBody GroupInvite invite) {
+        return ResponseEntity.ok(groupInviteService.createInvite(invite));
     }
 
     @GetMapping("/{id}")
@@ -50,9 +40,19 @@ public class GroupInviteController {
         return ResponseEntity.ok(groupInviteService.getInvitesForUser(userId));
     }
 
-    @GetMapping("/group/{groupId}")
-    public ResponseEntity<List<GroupInvite>> getInvitesForGroup(@PathVariable("groupId") String groupId) {
-        return ResponseEntity.ok(groupInviteService.getInvitesForGroup(groupId));
+    @GetMapping("/from-user/{userId}")
+    public ResponseEntity<List<GroupInvite>> getInvitesFromUser(@PathVariable("userId") String userId) {
+        return ResponseEntity.ok(groupInviteService.getInvitesByFromUser(userId));
+    }
+
+    @GetMapping("/user/{userId}/details")
+    public ResponseEntity<List<GroupInviteDetailDto>> getInviteDetailsForUser(@PathVariable("userId") String userId) {
+        return ResponseEntity.ok(groupInviteService.getInviteDetailsForUser(userId));
+    }
+
+    @GetMapping("/from-user/{userId}/details")
+    public ResponseEntity<List<GroupInviteDetailDto>> getInviteDetailsFromUser(@PathVariable("userId") String userId) {
+        return ResponseEntity.ok(groupInviteService.getInviteDetailsFromUser(userId));
     }
 
     @PatchMapping("/{id}/accept")

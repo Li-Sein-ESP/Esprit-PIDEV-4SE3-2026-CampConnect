@@ -2,8 +2,7 @@ package com.campconnect.dto;
 
 import java.time.LocalDateTime;
 
-import com.campconnect.model.GroupTaskStatus;
-
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,11 +14,16 @@ import lombok.NoArgsConstructor;
 @Builder
 public class GroupTaskDto {
     private String id;
+    
+    @NotBlank
     private String groupId;
-    private String tripId;
+    
+    @NotBlank
     private String title;
-    private String assignedToUserId;
-    private GroupTaskStatus status;
-    private LocalDateTime dueDate;
+    
+    private String assignedUserId;
+    
+    private Boolean isCompleted;
+    
     private LocalDateTime createdAt;
 }

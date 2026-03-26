@@ -23,6 +23,17 @@ export class GroupService {
     );
   }
 
+  getGroupByTripId(tripId: string): Observable<Group> {
+    return this.http.get<Group>(`${this.apiUrl}/trip/${tripId}`);
+  }
+
+  /**
+   * Fetch a specific group by ID with resolved members
+   */
+  getGroupDetail(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}/detail`);
+  }
+
   /**
    * Fetch a specific group by ID
    */

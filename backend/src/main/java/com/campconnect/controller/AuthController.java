@@ -30,7 +30,7 @@ import com.campconnect.repository.RoleRepository;
 import com.campconnect.repository.UserRepository;
 import com.campconnect.service.UserDetailsImpl;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {

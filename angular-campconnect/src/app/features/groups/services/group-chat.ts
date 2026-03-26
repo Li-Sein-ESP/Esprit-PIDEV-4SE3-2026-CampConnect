@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, Subject, of } from 'rxjs';
-import { catchError, timeout } from 'rxjs/operators';
+import { Observable, timeout } from 'rxjs';
 import { GroupMessage } from '../models/group.model';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GroupChatService {
-  private apiUrl = 'http://localhost:8080/api/groups';
+  private apiUrl = `${environment.apiUrl}/group-chat`;
   private TIME_OUT = 3000;
 
   constructor(private http: HttpClient) { }
@@ -25,9 +25,9 @@ export class GroupChatService {
   /**
    * Send a new message to the group
    */
-  sendMessage(groupId: string, content: string): Observable<GroupMessage> {
-    const payload = { content };
-    return this.http.post<GroupMessage>(`${this.apiUrl}/${groupId}/messages`, payload).pipe(
+  sendMessage(groupId: string, senderUserId: string, content: string): Observable<GroupMessage> {
+    const payload = { groupId, senderUserId, content };
+    return this.http.post<GroupMessage>(`${this.apiUrl}/send`, payload).pipe(
       timeout(this.TIME_OUT)
     );
   }

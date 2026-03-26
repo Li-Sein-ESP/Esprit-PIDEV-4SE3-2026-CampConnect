@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { LucideAngularModule, Menu, X, User, Sun, Moon, LogIn, LogOut, ChevronDown, Plus, Compass, Users, Calendar, Tent } from 'lucide-angular';
+import { LucideAngularModule, Menu, X, User, Sun, Moon, LogIn, LogOut, ChevronDown, Plus, Compass, Users, Calendar, Tent, Bell } from 'lucide-angular';
 import { AuthService } from '../services/auth.service';
+import { GroupInviteService } from '../../features/groups/services/group-invite.service';
+import { BehaviorSubject, switchMap, of } from 'rxjs';
 
 @Component({
   selector: 'app-navigation',
@@ -33,6 +35,7 @@ import { AuthService } from '../services/auth.service';
             <div class="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors text-sm font-bold shadow-md shadow-emerald-500/20">
                 <lucide-icon [img]="TentIcon" [size]="16"></lucide-icon>
                 Mon Espace Voyage
+                <span *ngIf="(pendingCount$ | async) || 0 > 0" class="ml-1 bg-red-500 text-white text-[10px] px-1 rounded-full">{{ pendingCount$ | async }}</span>
                 <lucide-icon [img]="ChevronDownIcon" [size]="14"></lucide-icon>
             </div>
             
@@ -42,7 +45,7 @@ import { AuthService } from '../services/auth.service';
                 <div class="flex-1 space-y-3">
                     <h3 class="text-[11px] font-black text-emerald-600 uppercase tracking-widest mb-3 border-b border-emerald-100 pb-1">Mes Groupes & Projets</h3>
                     
-                    <a routerLink="/plan-trip/create" class="flex items-start gap-3 p-2.5 hover:bg-emerald-50 rounded-xl transition-all group/link cursor-pointer">
+                    <a routerLink="/trip-intents/create" class="flex items-start gap-3 p-2.5 hover:bg-emerald-50 rounded-xl transition-all group/link cursor-pointer">
                        <div class="bg-emerald-100 p-2 rounded-lg text-emerald-600 group-hover/link:bg-emerald-600 group-hover/link:text-white transition-colors"><lucide-icon [img]="PlusIcon" [size]="18" strokeWidth="3"></lucide-icon></div>
                        <div><div class="text-sm font-bold text-gray-800">Planifier un Trip</div><div class="text-[11px] text-gray-500">Initier une nouvelle aventure</div></div>
                     </a>
@@ -55,6 +58,18 @@ import { AuthService } from '../services/auth.service';
                     <a routerLink="/companions/groups" class="flex items-start gap-3 p-2.5 hover:bg-emerald-50 rounded-xl transition-all group/link cursor-pointer">
                        <div class="bg-emerald-100 p-2 rounded-lg text-emerald-600 group-hover/link:bg-emerald-600 group-hover/link:text-white transition-colors"><lucide-icon [img]="UsersIcon" [size]="18" strokeWidth="2.5"></lucide-icon></div>
                        <div><div class="text-sm font-bold text-gray-800">Mes Groupes (Privé)</div><div class="text-[11px] text-gray-500">Gérer mon équipe et invités</div></div>
+                    </a>
+
+                    <a routerLink="/invites" class="flex items-start gap-3 p-2.5 hover:bg-emerald-50 rounded-xl transition-all group/link cursor-pointer relative">
+                       <div class="bg-emerald-100 p-2 rounded-lg text-emerald-600 group-hover/link:bg-emerald-600 group-hover/link:text-white transition-colors"><lucide-icon [img]="BellIcon" [size]="18" strokeWidth="2.5"></lucide-icon></div>
+                       <div>
+                         <div class="text-sm font-bold text-gray-800">Invitations</div>
+                         <div class="text-[11px] text-gray-500">Gérer les demandes reçues</div>
+                       </div>
+                       <span *ngIf="(pendingCount$ | async) || 0 > 0" class="absolute top-2 right-2 flex h-4 w-4">
+                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                         <span class="relative inline-flex rounded-full h-4 w-4 bg-red-500 text-white text-[9px] items-center justify-center font-bold">{{ pendingCount$ | async }}</span>
+                       </span>
                     </a>
                 </div>
 
@@ -144,7 +159,11 @@ import { AuthService } from '../services/auth.service';
             <a routerLink="/dashboard" (click)="closeUserMenu()" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors">Tableau de bord</a>
             <a routerLink="/profile" (click)="closeUserMenu()" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors">Profil</a>
             <a routerLink="/my-trip-intents" (click)="closeUserMenu()" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors">Mes Projets Initiés</a>
-            <a routerLink="/invites" (click)="closeUserMenu()" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors flex justify-between">Invitations <span class="bg-red-500 text-white rounded-full px-1.5 py-0.5 text-[10px]">New</span></a>
+            <a routerLink="/invites" (click)="closeUserMenu()" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors flex justify-between items-center group/inv">
+              Invitations 
+              <span *ngIf="(pendingCount$ | async) || 0 > 0" class="bg-red-500 text-white rounded-full px-2 py-0.5 text-[10px] font-bold">{{ pendingCount$ | async }}</span>
+              <span *ngIf="!((pendingCount$ | async) || 0 > 0)" class="text-[10px] text-gray-400 opacity-0 group-hover/inv:opacity-100 transition-opacity">Consulter</span>
+            </a>
             <hr class="my-2 border-[var(--color-border-light)]">
             <button
               (click)="handleLogout()"
@@ -185,10 +204,14 @@ import { AuthService } from '../services/auth.service';
           <!-- Popover pour mobile -->
           <div *ngIf="isMobileVoyageOpen" class="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-56 bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-gray-100 p-2 z-[60] flex flex-col animate-in slide-in-from-bottom-2 fade-in">
              <div class="px-2 py-1 mb-1 bg-emerald-50 text-emerald-800 text-xs font-bold uppercase rounded text-center">Groupes & Résas</div>
-             <a routerLink="/plan-trip/create" (click)="isMobileVoyageOpen=false" class="p-2.5 text-sm text-gray-700 hover:bg-emerald-50 rounded-lg flex items-center gap-2"><lucide-icon [img]="PlusIcon" [size]="16" class="text-emerald-500"></lucide-icon> Planifier</a>
+             <a routerLink="/trip-intents/create" (click)="isMobileVoyageOpen=false" class="p-2.5 text-sm text-gray-700 hover:bg-emerald-50 rounded-lg flex items-center gap-2"><lucide-icon [img]="PlusIcon" [size]="16" class="text-emerald-500"></lucide-icon> Planifier</a>
              <a routerLink="/trip-intents" (click)="isMobileVoyageOpen=false" class="p-2.5 text-sm text-gray-700 hover:bg-emerald-50 rounded-lg flex items-center gap-2"><lucide-icon [img]="CompassIcon" [size]="16" class="text-emerald-500"></lucide-icon> Projets de Groupe</a>
              <a routerLink="/companions/groups" (click)="isMobileVoyageOpen=false" class="p-2.5 text-sm text-gray-700 hover:bg-emerald-50 rounded-lg flex items-center gap-2"><lucide-icon [img]="UsersIcon" [size]="16" class="text-emerald-500"></lucide-icon> Mes Groupes</a>
-             <a routerLink="/dashboard/bookings" (click)="isMobileVoyageOpen=false" class="p-2.5 text-sm text-gray-700 hover:bg-emerald-50 rounded-lg flex items-center gap-2 border-t border-gray-100 mt-1 pt-3"><lucide-icon [img]="CalendarIcon" [size]="16" class="text-emerald-500"></lucide-icon> Réservations</a>
+             <a routerLink="/invites" (click)="isMobileVoyageOpen=false" class="p-2.5 text-sm text-gray-700 hover:bg-emerald-50 rounded-lg flex items-center justify-between border-t border-gray-100 mt-1 pt-3">
+               <div class="flex items-center gap-2"><lucide-icon [img]="BellIcon" [size]="16" class="text-emerald-500"></lucide-icon> Invitations</div>
+               <span *ngIf="(pendingCount$ | async) || 0 > 0" class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{{ pendingCount$ | async }}</span>
+             </a>
+             <a routerLink="/dashboard/bookings" (click)="isMobileVoyageOpen=false" class="p-2.5 text-sm text-gray-700 hover:bg-emerald-50 rounded-lg flex items-center gap-2 mt-1"><lucide-icon [img]="CalendarIcon" [size]="16" class="text-emerald-500"></lucide-icon> Réservations</a>
           </div>
         </a>
 
@@ -227,12 +250,18 @@ export class NavigationComponent implements OnInit {
   isMobileVoyageOpen = false;
   isDarkMode = false;
 
-  currentUser$ = this.authService.currentUser$;
-  isAuthenticated$ = this.authService.isAuthenticated$;
+  currentUser$ = this.authService.getCurrentUser();
+  isAuthenticated$ = this.authService.isAuthenticated();
+  pendingCount$ = this.currentUser$.pipe(
+    switchMap(user => user ? this.inviteService.getPendingInvitesCount(user.id) : of(0))
+  );
+
+  BellIcon = Bell;
 
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private inviteService: GroupInviteService
   ) { }
 
   ngOnInit(): void {

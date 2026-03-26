@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Send, Image, Paperclip, Smile } from 'lucide-angular';
 import { GroupChatService } from '../services/group-chat';
-import { GroupMessage } from '../models/group.model';
+import { GroupMessage, GroupDetail } from '../models/group.model';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
     selector: 'app-group-chat',
@@ -14,11 +15,13 @@ import { GroupMessage } from '../models/group.model';
 })
 export class GroupChatComponent implements OnInit, OnDestroy {
     @Input() groupId!: string;
+    @Input() group: GroupDetail | null = null;
+    @Input() currentUserId: string | null = null;
+
 
     messages: GroupMessage[] = [];
     newMessage: string = '';
     loading = true;
-    currentUserId = 'me'; // Simulation
 
     // Icons
     readonly Send = Send;
@@ -28,7 +31,10 @@ export class GroupChatComponent implements OnInit, OnDestroy {
 
     private pollInterval: any;
 
-    constructor(private chatService: GroupChatService) { }
+    constructor(
+        private chatService: GroupChatService,
+        private authService: AuthService
+    ) { }
 
     ngOnInit(): void {
         if (this.groupId) {
@@ -69,7 +75,7 @@ export class GroupChatComponent implements OnInit, OnDestroy {
         const content = this.newMessage;
         this.newMessage = ''; // UI Instant clear
 
-        this.chatService.sendMessage(this.groupId, content).subscribe({
+        this.chatService.sendMessage(this.groupId, this.currentUserId!, content).subscribe({
             next: (msg) => {
                 this.messages.push(msg);
                 this.scrollToBottom();
@@ -79,7 +85,7 @@ export class GroupChatComponent implements OnInit, OnDestroy {
                 const mockMsg: GroupMessage = {
                     id: 'msg-' + Date.now(),
                     groupId: this.groupId,
-                    senderUserId: this.currentUserId,
+                    senderUserId: this.currentUserId || 'me',
                     content: content,
                     createdAt: new Date().toISOString()
                 };
@@ -94,7 +100,16 @@ export class GroupChatComponent implements OnInit, OnDestroy {
     }
 
     getAvatar(userId: string): string {
-        return `https://ui-avatars.com/api/?name=${userId}&background=random&size=40`;
+        const member = this.group?.members?.find((m: any) => m.id === userId);
+        if (member?.avatar) return member.avatar;
+        const name = member?.name || member?.username || userId;
+        return `https://ui-avatars.com/api/?name=${name}&background=random&size=40`;
+    }
+
+    getMemberName(userId: string): string {
+        if (userId === this.currentUserId) return 'Moi';
+        const member = this.group?.members?.find((m: any) => m.id === userId);
+        return member?.name || member?.username || userId;
     }
 
     private scrollToBottom() {

@@ -83,6 +83,17 @@ export const routes: Routes = [
                 path: 'discover',
                 loadComponent: () => import('./features/bookings/availability-search/availability-search.component').then(m => m.AvailabilitySearchComponent)
             },
+            // - [x] Researching the cause of the 401 error <!-- id: 0 -->
+            //     - [x] Locate reservation components and services <!-- id: 1 -->
+            //     - [x] Inspect authentication/interceptor logic <!-- id: 2 -->
+            //     - [x] Check backend security configuration for the reservation endpoint <!-- id: 3 -->
+            // - [x] Implementing the fix for token expiration <!-- id: 4 -->
+            //     - [x] Update `AuthService` to validate token expiration <!-- id: 6 -->
+            //     - [x] Update `AuthInterceptor` to handle 401 errors <!-- id: 7 -->
+            // - [ ] Refining the "My Reservations" interface <!-- id: 8 -->
+            //     - [ ] Remove ID display from the template <!-- id: 9 -->
+            //     - [ ] Ensure only the current user's reservations are shown <!-- id: 10 -->
+            // - [x] Verifying the fix <!-- id: 5 -->
             {
                 path: 'booking/reserve/:siteId',
                 loadComponent: () => import('./features/bookings/reservation-create/reservation-create.component').then(m => m.ReservationCreateComponent)

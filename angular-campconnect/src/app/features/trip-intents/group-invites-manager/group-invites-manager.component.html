@@ -49,7 +49,7 @@
                         <img [src]="item.sender.avatar || 'https://ui-avatars.com/api/?name=' + item.sender.name"
                             alt="Avatar" class="avatar-lg">
                         <div class="sender-info">
-                            <h4>{{ item.sender.name }}</h4>
+                            <h4>{{ item.sender.name || item.sender.username }}</h4>
                             <p class="time-ago">{{ formatTimeAgo(item.invite.createdAt) }}</p>
                         </div>
                     </div>
@@ -96,7 +96,7 @@
                         <img [src]="item.sender.avatar || 'https://ui-avatars.com/api/?name=User'" class="avatar-sm">
                         <div class="history-content">
                             <div class="history-header">
-                                <span class="font-medium">{{ item.sender.name }}</span> a pour <span
+                                <span class="font-medium">{{ item.sender.name || item.sender.username }}</span> a pour <span
                                     class="font-medium">{{ item.trip.title }}</span>
                             </div>
                             <span class="text-xs text-muted">{{ formatTimeAgo(item.invite.createdAt) }}</span>
@@ -127,7 +127,7 @@
                         <div class="receiver-basic">
                             <img [src]="item.receiver.avatar" class="avatar-md">
                             <div>
-                                <h5>Invitation à <strong>{{ item.receiver.name }}</strong></h5>
+                                <h5>Invitation à <strong>{{ item.receiver.name || item.receiver.username }}</strong></h5>
                                 <p class="text-xs text-muted">Envoyée {{ formatTimeAgo(item.invite.createdAt) }}</p>
                             </div>
                         </div>

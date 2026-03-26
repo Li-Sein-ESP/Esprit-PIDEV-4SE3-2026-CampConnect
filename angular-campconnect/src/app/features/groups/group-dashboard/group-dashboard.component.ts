@@ -4,7 +4,8 @@ import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { LucideAngularModule, MessageSquare, CheckSquare, Receipt, Users, Settings, ArrowLeft, MoreVertical, Compass, Save, Trash2 } from 'lucide-angular';
 import { GroupService } from '../services/group';
-import { Group } from '../models/group.model';
+import { Group, GroupDetail } from '../models/group.model';
+import { AuthService } from '../../../core/services/auth.service';
 import { GroupChatComponent } from '../group-chat/group-chat.component';
 import { GroupPlanningComponent } from '../group-planning/group-planning.component';
 import { GroupExpensesComponent } from '../group-expenses/group-expenses.component';
@@ -25,8 +26,9 @@ import { GroupExpensesComponent } from '../group-expenses/group-expenses.compone
     styleUrl: './group-dashboard.component.css'
 })
 export class GroupDashboardComponent implements OnInit {
-    group: Group | null = null;
+    group: GroupDetail | null = null;
     loading = true;
+    currentUserId: string | null = null;
 
     // Icons
     readonly MessageSquare = MessageSquare;
@@ -52,6 +54,7 @@ export class GroupDashboardComponent implements OnInit {
         private route: ActivatedRoute,
         private router: Router,
         private groupService: GroupService,
+        private authService: AuthService,
         private fb: FormBuilder
     ) {
         this.initForm();
@@ -60,9 +63,13 @@ export class GroupDashboardComponent implements OnInit {
     error: string | null = null;
 
     ngOnInit(): void {
+        this.authService.getCurrentUser().subscribe(user => {
+            this.currentUserId = user?.id || null;
+        });
+
         const groupId = this.route.snapshot.paramMap.get('id');
         if (groupId && groupId !== 'mock-id') {
-            this.loadGroup(groupId);
+            this.loadGroupDetail(groupId);
         } else {
             this.error = "ID de groupe invalide.";
             this.loading = false;
@@ -75,8 +82,8 @@ export class GroupDashboardComponent implements OnInit {
         }
     }
 
-    loadGroup(id: string) {
-        this.groupService.getGroupById(id).subscribe({
+    loadGroupDetail(id: string) {
+        this.groupService.getGroupDetail(id).subscribe({
             next: (res) => {
                 this.group = res;
                 this.groupForm.patchValue({
@@ -86,8 +93,8 @@ export class GroupDashboardComponent implements OnInit {
                 this.loading = false;
             },
             error: (err) => {
-                console.error('Group not found in backend or backend down.', err);
-                this.error = "Impossible de charger les informations du groupe.";
+                console.error('Group detail not found.', err);
+                this.error = "Impossible de charger les détails du groupe.";
                 this.loading = false;
             }
         });
@@ -106,20 +113,26 @@ export class GroupDashboardComponent implements OnInit {
         this.isUpdating = true;
         this.updateMessage = '';
 
-        const partialGroup: Partial<Group> = {
+        const partialGroup: any = {
             name: this.groupForm.value.name,
             status: this.groupForm.value.status,
-            tripId: this.group.tripId,
-            memberUserIds: this.group.memberUserIds
+            tripId: this.group.tripId
         };
 
         this.groupService.updateGroup(this.group.id, partialGroup).subscribe({
             next: (updatedGroup) => {
-                this.group = updatedGroup;
+                if (this.group) {
+                    this.group = {
+                        ...this.group,
+                        name: updatedGroup.name,
+                        status: updatedGroup.status
+                    };
+                }
                 this.updateMessage = 'Groupe mis à jour avec succès !';
                 this.isUpdating = false;
                 setTimeout(() => this.updateMessage = '', 3000);
             },
+
             error: (err) => {
                 console.error('Error updating group:', err);
                 this.updateMessage = 'Erreur lors de la mise à jour.';
@@ -150,6 +163,7 @@ export class GroupDashboardComponent implements OnInit {
     }
 
     getMemberAvatar(userId: string): string {
-        return `https://ui-avatars.com/api/?name=${userId}&background=random&size=48`;
+        const member = this.group?.members?.find((m: any) => m.id === userId);
+        return member?.avatar || `https://ui-avatars.com/api/?name=${member?.name || userId}&background=random&size=48`;
     }
 }

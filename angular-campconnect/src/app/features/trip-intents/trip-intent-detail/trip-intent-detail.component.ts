@@ -5,8 +5,12 @@ import { TripIntentService } from '../services/trip-intent.service';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { TripIntent } from '../models/trip-intent.model';
-import { LucideAngularModule, ArrowLeft, Calendar, MapPin, DollarSign, Target, Tent, Clock, Share2, Users, Trash2 } from 'lucide-angular';
+import { LucideAngularModule, ArrowLeft, Calendar, MapPin, DollarSign, Target, Tent, Clock, Share2, Users, Trash2, Loader2, Check } from 'lucide-angular';
 import { BadgeComponent } from '../../../shared/components/badge.component';
+import { GroupService } from '../../groups/services/group';
+import { GroupInviteService } from '../../groups/services/group-invite.service';
+import { InviteStatus } from '../../groups/models/group-invite.model';
+import { finalize } from 'rxjs';
 
 @Component({
     selector: 'app-trip-intent-detail',
@@ -41,11 +45,22 @@ export class TripIntentDetailComponent implements OnInit {
     isCreator = false;
     isDeleting = false;
 
+    // Join Request States
+    isJoining = false;
+    hasRequested = false;
+    isMember = false;
+    requestSuccess = false;
+
+    readonly Loader2 = Loader2;
+    readonly Check = Check;
+
     constructor(
         private route: ActivatedRoute,
         private router: Router,
         private tripIntentService: TripIntentService,
-        private authService: AuthService
+        private authService: AuthService,
+        private groupService: GroupService,
+        private inviteService: GroupInviteService
     ) { }
 
     ngOnInit(): void {
@@ -71,12 +86,78 @@ export class TripIntentDetailComponent implements OnInit {
             next: (data) => {
                 this.intent = data;
                 this.updateIsCreator();
+                this.checkIfRequested();
                 this.loading = false;
             },
             error: (err) => {
                 console.error('Error fetching intent details', err);
                 this.error = true;
                 this.loading = false;
+            }
+        });
+    }
+
+    private checkIfRequested() {
+        if (!this.currentUserId || !this.intentId) return;
+
+        // 1. Check if already a member
+        this.groupService.getGroupByTripId(this.intentId).subscribe({
+            next: (group) => {
+                this.isMember = group.memberUserIds?.includes(this.currentUserId!) || false;
+                
+                // 2. If not a member, check for pending requests
+                if (!this.isMember) {
+                    this.inviteService.getInvitesByFromUser(this.currentUserId!).subscribe(invites => {
+                        this.hasRequested = invites.some(inv => 
+                            inv.tripIntentId === this.intentId && 
+                            inv.status === InviteStatus.PENDING
+                        );
+                    });
+                }
+            },
+            error: () => {
+                // If group not found, user definitely not a member
+                this.isMember = false;
+            }
+        });
+    }
+
+    requestToJoin() {
+        if (!this.intent || !this.currentUserId || this.isJoining || this.hasRequested) return;
+
+        this.isJoining = true;
+
+        // 1. Find the associated group
+        this.groupService.getGroupByTripId(this.intent.id!).subscribe({
+            next: (group) => {
+                // 2. Send the invitation/request
+                const invite = {
+                    tripIntentId: this.intent!.id!,
+                    groupId: group.id,
+                    fromUserId: this.currentUserId!,
+                    toUserId: this.intent!.creatorUserId,
+                    message: `Je souhaite rejoindre votre projet : ${this.intent!.title}`,
+                    status: InviteStatus.PENDING
+                };
+
+                this.inviteService.sendInvite(invite).pipe(
+                    finalize(() => this.isJoining = false)
+                ).subscribe({
+                    next: () => {
+                        this.hasRequested = true;
+                        this.requestSuccess = true;
+                        setTimeout(() => this.requestSuccess = false, 5000);
+                    },
+                    error: (err) => {
+                        console.error('Failed to send join request', err);
+                        alert('Erreur lors de l\'envoi de la demande.');
+                    }
+                });
+            },
+            error: (err) => {
+                console.error('Failed to find associated group', err);
+                this.isJoining = false;
+                alert('Ce projet n\'a pas encore de groupe actif.');
             }
         });
     }

@@ -41,11 +41,7 @@ interface Booking {
         CardContentComponent
     ],
     templateUrl: './booking-management.component.html',
-    styles: [`
-    :host {
-      display: block;
-    }
-  `]
+    styleUrls: ['./booking-management.component.css']
 })
 export class BookingManagementComponent {
     readonly Calendar = Calendar;
@@ -63,6 +59,7 @@ export class BookingManagementComponent {
     readonly Search = Search;
 
     filter: 'all' | 'upcoming' | 'past' | 'cancelled' = 'all';
+    searchTerm: string = '';
     showMenu: string | null = null;
 
     statusConfig = {
@@ -111,18 +108,9 @@ export class BookingManagementComponent {
         this.authService.getCurrentUser().pipe(take(1)).subscribe(user => {
             this.currentUser = user;
             if (user) {
-                const targetId = user.id || user._id;
-                console.log('DEBUG: Loading reservations for user:', targetId);
-
-                // Use ALL reservations and filter locally to bypass backend query issues
-                this.reservationService.getAllReservations().subscribe({
-                    next: (allData) => {
-                        console.log('DEBUG: All data from server:', allData);
-                        // Filter locally
-                        this.reservations = allData.filter(res =>
-                            res.userId === targetId || res.userId === user.id || res.userId === user._id
-                        );
-                        console.log('DEBUG: Filtered reservations for user:', this.reservations);
+                this.reservationService.getUserReservations(user.id).subscribe({
+                    next: (data) => {
+                        this.reservations = data;
                         this.isLoading = false;
                     },
                     error: (err) => {
@@ -137,38 +125,39 @@ export class BookingManagementComponent {
         });
     }
 
-    showAllReservations() {
-        this.isLoading = true;
-        this.reservationService.getAllReservations().subscribe({
-            next: (data) => {
-                console.log('DEBUG: ALL reservations in database:', data);
-                this.reservations = data;
-                this.isLoading = false;
-            },
-            error: (err) => {
-                console.error('Error loading all reservations', err);
-                this.isLoading = false;
+    get filteredBookings() {
+        // Create a 'today' date at 00:00:00 for accurate day comparison
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        return this.reservations.filter((res) => {
+            const checkIn = new Date(res.startDate);
+            checkIn.setHours(0, 0, 0, 0);
+            const checkOut = new Date(res.endDate);
+            checkOut.setHours(0, 0, 0, 0);
+
+            // 1. Status/Date Filtering
+            let matchesTab = true;
+            if (this.filter === 'upcoming') {
+                matchesTab = checkIn >= today && res.status !== ReservationStatus.CANCELLED;
+            } else if (this.filter === 'past') {
+                matchesTab = checkOut < today || res.status === ReservationStatus.COMPLETED;
+            } else if (this.filter === 'cancelled') {
+                matchesTab = res.status === ReservationStatus.CANCELLED;
             }
+
+            // 2. Search Filtering
+            const searchLower = this.searchTerm.toLowerCase().trim();
+            const matchesSearch = !searchLower || 
+                res.targetId.toLowerCase().includes(searchLower) ||
+                (res.id || '').toLowerCase().includes(searchLower);
+
+            return matchesTab && matchesSearch;
         });
     }
 
-    get filteredBookings() {
-        return this.reservations.filter((res) => {
-            const today = new Date();
-            const checkIn = new Date(res.startDate);
-            const checkOut = new Date(res.endDate);
-
-            if (this.filter === 'upcoming') {
-                return checkIn > today && res.status !== ReservationStatus.CANCELLED;
-            }
-            if (this.filter === 'past') {
-                return checkOut < today || res.status === ReservationStatus.COMPLETED;
-            }
-            if (this.filter === 'cancelled') {
-                return res.status === ReservationStatus.CANCELLED;
-            }
-            return true;
-        });
+    onSearch(event: any) {
+        this.searchTerm = event.target.value;
     }
 
     get upcomingCount() {

@@ -45,9 +45,21 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getGroupById(id));
     }
 
+    @GetMapping("/{id}/detail")
+    public ResponseEntity<com.campconnect.dto.GroupDetailDto> getGroupDetail(@PathVariable("id") String id) {
+        return ResponseEntity.ok(groupService.getGroupDetail(id));
+    }
+
     @GetMapping
     public ResponseEntity<List<Group>> getAllGroups() {
         return ResponseEntity.ok(groupService.getAllGroups());
+    }
+
+    @GetMapping("/trip/{tripId}")
+    public ResponseEntity<Group> getGroupByTripId(@PathVariable("tripId") String tripId) {
+        return groupService.getGroupByTripId(tripId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")

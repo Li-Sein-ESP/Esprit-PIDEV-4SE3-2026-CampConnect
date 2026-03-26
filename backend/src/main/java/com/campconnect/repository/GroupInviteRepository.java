@@ -12,6 +12,8 @@ import com.campconnect.model.GroupInviteStatus;
 public interface GroupInviteRepository extends MongoRepository<GroupInvite, String> {
     List<GroupInvite> findByToUserId(String toUserId);
 
+    List<GroupInvite> findByFromUserId(String fromUserId);
+
     List<GroupInvite> findByGroupId(String groupId);
 
     List<GroupInvite> findByTripIntentId(String tripIntentId);

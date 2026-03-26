@@ -10,6 +10,4 @@ import com.campconnect.model.GroupTask;
 @Repository
 public interface GroupTaskRepository extends MongoRepository<GroupTask, String> {
     List<GroupTask> findByGroupId(String groupId);
-
-    List<GroupTask> findByAssignedToUserId(String assignedToUserId);
 }

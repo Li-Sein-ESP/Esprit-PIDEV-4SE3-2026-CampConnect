@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.campconnect.model.GroupTask;
-import com.campconnect.model.GroupTaskStatus;
 import com.campconnect.repository.GroupTaskRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -18,49 +17,44 @@ public class GroupTaskServiceImpl implements IGroupTaskService {
     private final GroupTaskRepository groupTaskRepository;
 
     @Override
-    public GroupTask createTask(GroupTask task) {
-        task.setCreatedAt(LocalDateTime.now());
-        if (task.getStatus() == null) {
-            task.setStatus(GroupTaskStatus.TODO);
+    public GroupTask createGroupTask(GroupTask groupTask) {
+        groupTask.setCreatedAt(LocalDateTime.now());
+        if (groupTask.getIsCompleted() == null) {
+            groupTask.setIsCompleted(false);
         }
-        return groupTaskRepository.save(task);
+        return groupTaskRepository.save(groupTask);
     }
 
     @Override
-    public GroupTask getTaskById(String id) {
+    public List<GroupTask> getTasksByGroupId(String groupId) {
+        return groupTaskRepository.findByGroupId(groupId);
+    }
+
+    @Override
+    public GroupTask getGroupTaskById(String id) {
         return groupTaskRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("GroupTask not found with id: " + id));
     }
 
     @Override
-    public List<GroupTask> getTasksForGroup(String groupId) {
-        return groupTaskRepository.findByGroupId(groupId);
-    }
-
-    @Override
-    public List<GroupTask> getTasksForUser(String userId) {
-        return groupTaskRepository.findByAssignedToUserId(userId);
-    }
-
-    @Override
-    public GroupTask updateTask(String id, GroupTask task) {
-        GroupTask existing = getTaskById(id);
-        existing.setTitle(task.getTitle());
-        existing.setAssignedToUserId(task.getAssignedToUserId());
-        existing.setStatus(task.getStatus());
-        existing.setDueDate(task.getDueDate());
+    public GroupTask updateGroupTask(String id, GroupTask groupTask) {
+        GroupTask existing = getGroupTaskById(id);
+        
+        if (groupTask.getTitle() != null) {
+            existing.setTitle(groupTask.getTitle());
+        }
+        if (groupTask.getAssignedUserId() != null) {
+            existing.setAssignedUserId(groupTask.getAssignedUserId());
+        }
+        if (groupTask.getIsCompleted() != null) {
+            existing.setIsCompleted(groupTask.getIsCompleted());
+        }
+        
         return groupTaskRepository.save(existing);
     }
 
     @Override
-    public GroupTask completeTask(String id) {
-        GroupTask task = getTaskById(id);
-        task.setStatus(GroupTaskStatus.DONE);
-        return groupTaskRepository.save(task);
-    }
-
-    @Override
-    public void deleteTask(String id) {
+    public void deleteGroupTask(String id) {
         groupTaskRepository.deleteById(id);
     }
 }

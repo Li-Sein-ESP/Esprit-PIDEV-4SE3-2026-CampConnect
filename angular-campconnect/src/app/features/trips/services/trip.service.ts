@@ -5,7 +5,7 @@ import { Trip, TripBudget, PackingList, TripItinerary } from '../models/trip.mod
     providedIn: 'root'
 })
 export class TripService {
-    private trips = signal<Trip[]>([]);
+    trips = signal<Trip[]>(this.getMockTrips());
 
     getMockTrips(): Trip[] {
         return [

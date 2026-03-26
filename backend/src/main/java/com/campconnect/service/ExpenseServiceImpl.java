@@ -1,13 +1,17 @@
 package com.campconnect.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.campconnect.dto.BalanceDetail;
 import com.campconnect.dto.GroupBalances;
+
 import com.campconnect.model.Expense;
 import com.campconnect.model.ExpenseSplitType;
 import com.campconnect.repository.ExpenseRepository;
@@ -66,11 +70,52 @@ public class ExpenseServiceImpl implements IExpenseService {
             }
         }
 
+        List<BalanceDetail> details = new ArrayList<>();
+        
+        // Final balances might have floating point noise, use small epsilon
+        final double EPSILON = 0.01;
+        
+        Map<String, Double> mutableBalances = new HashMap<>(balances);
+        
+        List<Map.Entry<String, Double>> debtors = mutableBalances.entrySet().stream()
+                .filter(e -> e.getValue() < -EPSILON)
+                .collect(Collectors.toList());
+
+        List<Map.Entry<String, Double>> creditors = mutableBalances.entrySet().stream()
+                .filter(e -> e.getValue() > EPSILON)
+                .collect(Collectors.toList());
+
+        int dIdx = 0;
+        int cIdx = 0;
+        while (dIdx < debtors.size() && cIdx < creditors.size()) {
+            Map.Entry<String, Double> debtor = debtors.get(dIdx);
+            Map.Entry<String, Double> creditor = creditors.get(cIdx);
+
+            double debitVal = Math.abs(debtor.getValue());
+            double creditVal = creditor.getValue();
+
+            double settleAmount = Math.min(debitVal, creditVal);
+            
+            details.add(BalanceDetail.builder()
+                    .fromUserId(debtor.getKey())
+                    .toUserId(creditor.getKey())
+                    .amount(settleAmount)
+                    .build());
+
+            debtor.setValue(debtor.getValue() + settleAmount);
+            creditor.setValue(creditor.getValue() - settleAmount);
+
+            if (Math.abs(debtor.getValue()) < EPSILON) dIdx++;
+            if (Math.abs(creditor.getValue()) < EPSILON) cIdx++;
+        }
+
         return GroupBalances.builder()
                 .groupId(groupId)
-                .balances(balances)
+                .balances(balances) // Return original net balances or results
+                .details(details)
                 .build();
     }
+
 
     @Override
     public void deleteExpense(String id) {

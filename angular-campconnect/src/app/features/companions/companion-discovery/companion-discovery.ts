@@ -5,7 +5,7 @@ import { LucideAngularModule, Target, MapPin, Send, CheckCircle, Clock, X, Tent 
 import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
 import { BadgeComponent } from '../../../shared/components/badge.component';
 import { RadarChart } from '../../../shared/components/radar-chart/radar-chart';
-import { GroupInviteService } from '../../trip-intents/services/group-invite.service';
+import { GroupInviteService } from '../../groups/services/group-invite.service';
 import { TripIntentService } from '../../trip-intents/services/trip-intent.service';
 import { GroupService } from '../../groups/services/group';
 import { AuthService } from '../../../core/services/auth.service';
@@ -178,7 +178,7 @@ export class CompanionDiscovery implements OnInit, OnDestroy {
               this.showToast(`Invitation envoyée à ${this.selectedCompanion.name} ! 🎉`);
               this.closeRadar();
             },
-            error: (err) => {
+            error: (err: any) => {
               console.error('Error sending invite', err);
               this.showToast('Erreur lors de l\'envoi.');
             }

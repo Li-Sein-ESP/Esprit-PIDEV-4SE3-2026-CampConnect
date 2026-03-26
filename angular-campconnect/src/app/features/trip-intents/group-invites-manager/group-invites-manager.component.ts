@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { GroupInviteService } from '../services/group-invite.service';
+import { GroupInviteService } from '../../groups/services/group-invite.service';
+import { InviteStatus } from '../../groups/models/group-invite.model';
+import { AuthService } from '../../../core/services/auth.service';
 import { LucideAngularModule, Mail, MailOpen, Check, X, Send, Calendar, Tent, BellRing, Navigation } from 'lucide-angular';
 
 @Component({
@@ -31,21 +33,29 @@ export class GroupInvitesManagerComponent implements OnInit {
     invites: any[] = [];
     loading = true;
 
-    constructor(private inviteService: GroupInviteService) { }
+    constructor(
+        private inviteService: GroupInviteService,
+        private authService: AuthService
+    ) { }
 
     ngOnInit(): void {
-        this.loadInvites();
+        this.authService.getCurrentUser().subscribe(user => {
+            if (user?.id) {
+                this.currentUserId = user.id;
+                this.loadInvites(user.id);
+            }
+        });
     }
+    currentUserId: string | null = null;
 
-    loadInvites() {
+    loadInvites(userId: string) {
         this.loading = true;
-        // Using the mock method for showcase while actual backend DTOs might differ
-        this.inviteService.getMockInvitesWithDetails().subscribe({
-            next: (data) => {
+        this.inviteService.getInvitesWithDetails(userId).subscribe({
+            next: (data: any[]) => {
                 this.invites = data;
                 this.loading = false;
             },
-            error: (err) => {
+            error: (err: any) => {
                 console.error('Failed to load invites', err);
                 this.loading = false;
             }
@@ -87,33 +97,34 @@ export class GroupInvitesManagerComponent implements OnInit {
     }
 
     acceptInvite(inviteId: string) {
-        // Optimistic UI update
-        const index = this.invites.findIndex(i => i.invite.id === inviteId);
-        if (index > -1) {
-            this.invites[index].invite.status = 'ACCEPTED';
-        }
-
         // API Call
         this.inviteService.acceptInvite(inviteId).subscribe({
-            next: () => console.log('Invite accepted'),
-            error: () => console.log('Simulating success for frontend UI demo')
+            next: () => {
+                console.log('Invite accepted');
+                if (this.currentUserId) this.loadInvites(this.currentUserId);
+            },
+            error: (err) => {
+                console.error('Failed to accept invite', err);
+                const msg = err.error?.message || err.message || 'Problème de connexion au serveur.';
+                alert(`Erreur lors de l'acceptation : ${msg}\nStatus: ${err.status}`);
+            }
         });
     }
 
     declineInvite(inviteId: string) {
-        const index = this.invites.findIndex(i => i.invite.id === inviteId);
-        if (index > -1) {
-            this.invites[index].invite.status = 'DECLINED';
-        }
-        this.inviteService.declineInvite(inviteId).subscribe();
+        this.inviteService.declineInvite(inviteId).subscribe({
+            next: () => {
+                if (this.currentUserId) this.loadInvites(this.currentUserId);
+            }
+        });
     }
 
     cancelInvite(inviteId: string) {
-        const index = this.invites.findIndex(i => i.invite.id === inviteId);
-        if (index > -1) {
-            this.invites[index].invite.status = 'CANCELLED';
-        }
-        this.inviteService.cancelInvite(inviteId).subscribe();
+        this.inviteService.cancelInvite(inviteId).subscribe({
+            next: () => {
+                if (this.currentUserId) this.loadInvites(this.currentUserId);
+            }
+        });
     }
 
     getStatusClass(status: string): string {

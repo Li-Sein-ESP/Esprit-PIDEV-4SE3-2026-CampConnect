@@ -46,7 +46,7 @@
             <!-- Quick Members Preview -->
             <div class="members-preview mt-4 flex items-center justify-between">
                 <div class="flex -space-x-2 overflow-hidden">
-                    <img *ngFor="let member of (group.members || []) | slice:0:4" [src]="getMemberAvatar(member.userId)"
+                    <img *ngFor="let member of (group.members || []) | slice:0:4" [src]="getMemberAvatar(member.id)"
                         class="inline-block h-8 w-8 rounded-full ring-2 ring-white">
                     <div *ngIf="(group.members?.length || 0) > 4"
                         class="h-8 w-8 rounded-full bg-[var(--color-bg-muted)] flex items-center justify-center text-xs font-medium text-[var(--color-text-secondary)] ring-2 ring-white">
@@ -98,11 +98,10 @@
 
         <!-- View Container (Routing Outlet normally goes here if we use child routes. For now, logic hides components) -->
         <div class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-
             <ng-container [ngSwitch]="activeTab">
                 <!-- Chat View -->
                 <div *ngSwitchCase="'chat'" class="h-full animate-fade-in relative z-10 w-full">
-                    <app-group-chat [groupId]="group.id" class="block h-full"></app-group-chat>
+                    <app-group-chat [groupId]="group.id" [group]="group" [currentUserId]="currentUserId" class="block h-full"></app-group-chat>
                 </div>
 
                 <!-- Planning View -->
@@ -112,7 +111,7 @@
 
                 <!-- Expenses View -->
                 <div *ngSwitchCase="'expenses'" class="h-full animate-fade-in relative z-10 w-full">
-                    <app-group-expenses [groupId]="group.id" class="block h-full"></app-group-expenses>
+                    <app-group-expenses [groupId]="group.id" [group]="group" [currentUserId]="currentUserId" class="block h-full"></app-group-expenses>
                 </div>
 
                 <!-- Settings View -->

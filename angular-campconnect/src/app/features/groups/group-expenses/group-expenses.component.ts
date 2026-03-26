@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Receipt, Plus, ArrowRight, Wallet, User as UserIcon } from 'lucide-angular';
 import { GroupService } from '../services/group';
 import { GroupExpenseService } from '../services/group-expenses.service';
-import { Expense, Balance, GroupMember } from '../models/group.model';
+import { Expense, Balance, GroupMember, User, GroupDetail } from '../models/group.model';
 
 @Component({
     selector: 'app-group-expenses',
@@ -15,11 +15,11 @@ import { Expense, Balance, GroupMember } from '../models/group.model';
 })
 export class GroupExpensesComponent implements OnInit {
     @Input() groupId!: string;
+    @Input() group: GroupDetail | null = null;
+    @Input() currentUserId: string | null = null;
 
     expenses: Expense[] = [];
     balances: Balance[] = [];
-    members: GroupMember[] = [];
-    currentUserId = 'me'; // Simulation
 
     loading = true;
     showNewExpenseForm = false;
@@ -27,8 +27,8 @@ export class GroupExpensesComponent implements OnInit {
     // New Expense Form State
     newExpenseAmount: number | null = null;
     newExpenseDescription = '';
-    newExpensePaidBy = this.currentUserId; // Default to current user
-    newExpenseSplitAmong: string[] = []; // Default everyone
+    newExpensePaidBy = ''; 
+    newExpenseSplitAmong: string[] = []; 
 
     // Icons
     readonly Receipt = Receipt;
@@ -44,24 +44,16 @@ export class GroupExpensesComponent implements OnInit {
 
     ngOnInit(): void {
         if (this.groupId) {
-            this.loadGroupMembers();
+            this.loadExpenses();
+            this.loadBalances();
+            this.newExpensePaidBy = this.currentUserId || '';
+            this.newExpenseSplitAmong = this.group?.members?.map((m: any) => m.id) || [];
         }
     }
 
-    loadGroupMembers() {
-        this.groupService.getGroupById(this.groupId).subscribe({
-            next: (group) => {
-                this.members = group.members || [];
-                this.newExpenseSplitAmong = this.members.map(m => m.userId);
-                this.loadExpenses();
-                this.loadBalances();
-            },
-            error: (err) => {
-                console.error("Erreur de chargement du groupe", err);
-                this.members = [];
-                this.loading = false;
-            }
-        });
+    // Helper for template to access members
+    get members(): any[] {
+        return this.group?.members?.map(m => ({ ...m, userId: m.id })) || [];
     }
 
     loadExpenses() {
@@ -82,9 +74,7 @@ export class GroupExpensesComponent implements OnInit {
     loadBalances() {
         this.expenseService.getBalances(this.groupId).subscribe({
             next: (backendBalances) => {
-                // Map backend BalanceDetail[] to frontend Balance[] structure
-                this.balances = this.members.map(m => ({ userId: m.userId, owes: {} }));
-
+                this.balances = this.group?.members?.map((m: any) => ({ userId: m.id, owes: {} })) || [];
                 if (backendBalances && backendBalances.details) {
                     backendBalances.details.forEach((detail: any) => {
                         const debtor = this.balances.find(b => b.userId === detail.fromUserId);
@@ -96,7 +86,6 @@ export class GroupExpensesComponent implements OnInit {
             },
             error: (err) => {
                 console.error("Erreur de calcul des balances", err);
-                this.balances = [];
             }
         });
     }
@@ -106,28 +95,32 @@ export class GroupExpensesComponent implements OnInit {
 
         const newExpense: any = {
             groupId: this.groupId,
-            paidByUserId: this.newExpensePaidBy,
+            paidByUserId: this.newExpensePaidBy || this.currentUserId,
             amount: this.newExpenseAmount,
             description: this.newExpenseDescription,
-            category: 'OTHER', // Default category
-            splitType: 'EQUAL', // Default split type
+            category: 'OTHER',
+            splitType: 'EQUAL',
             participants: [...this.newExpenseSplitAmong]
         };
 
         this.expenseService.addExpense(newExpense).subscribe({
             next: (expense) => {
                 this.expenses.unshift(expense);
-                this.loadBalances(); // Refresh balances from backend
+                this.loadBalances();
+                this.resetForm();
             },
             error: (err) => {
                 console.error("Erreur d'ajout de la dépense", err);
             }
         });
+    }
 
+    resetForm() {
         this.showNewExpenseForm = false;
         this.newExpenseAmount = null;
         this.newExpenseDescription = '';
-        this.newExpenseSplitAmong = this.members.map(m => m.userId);
+        this.newExpenseSplitAmong = this.group?.members?.map((m: any) => m.id) || [];
+        this.newExpensePaidBy = this.currentUserId || '';
     }
 
     toggleSplitMember(userId: string) {
@@ -139,12 +132,19 @@ export class GroupExpensesComponent implements OnInit {
         }
     }
 
-    // --- Utilities ---
     getTotalSpent(): number {
         return this.expenses.reduce((acc, curr) => acc + curr.amount, 0);
     }
 
-    getMemberName(userId: string): string {
-        return userId === 'me' ? 'Moi' : (userId === 'u2' ? 'Alex' : (userId === 'u3' ? 'Sarah' : userId));
+    getMemberName(userId: string | undefined): string {
+        if (!userId) return 'Inconnu';
+        if (userId === this.currentUserId) return 'Moi';
+        const member = this.group?.members?.find((m: any) => m.id === userId);
+        return member?.name || member?.username || userId;
+    }
+
+    getMemberAvatar(userId: string): string {
+        const member = this.group?.members?.find((m: any) => m.id === userId);
+        return member?.avatar || `https://ui-avatars.com/api/?name=${member?.name || userId}&background=random&size=48`;
     }
 }

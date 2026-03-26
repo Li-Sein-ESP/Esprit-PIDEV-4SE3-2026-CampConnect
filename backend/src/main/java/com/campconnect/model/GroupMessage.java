@@ -11,24 +11,21 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Document(collection = "group_tasks")
+@Document(collection = "group_messages")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GroupTask {
+public class GroupMessage {
     @Id
     private String id;
-    
+
     private String groupId;
-    
-    private String title;
-    
-    private String assignedUserId;
-    
-    @Builder.Default
-    private Boolean isCompleted = false;
-    
+
+    private String senderUserId;
+
+    private String content;
+
     @CreatedDate
     private LocalDateTime createdAt;
 }

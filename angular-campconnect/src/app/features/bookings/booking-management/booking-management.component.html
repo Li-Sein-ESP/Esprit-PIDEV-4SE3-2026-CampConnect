@@ -1,116 +1,84 @@
 <div class="min-h-screen bg-[var(--color-background)] py-12">
     <div class="container max-w-6xl">
         <!-- Header -->
-        <div class="mb-8">
-            <h2 class="mb-2">My Bookings</h2>
-            <p class="text-[var(--color-text-secondary)]">
-                Manage your campsite reservations and view booking history
+        <div class="mb-10 text-center md:text-left">
+            <h2 class="mb-2 text-4xl font-bold tracking-tight text-[var(--color-primary-600)]">My Reservations</h2>
+            <p class="text-lg text-[var(--color-text-secondary)]">
+                Manage your campsite stays and upcoming adventures.
             </p>
         </div>
 
-        <!-- Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <app-card variant="bordered">
-                <app-card-content customClass="text-center py-4">
-                    <div class="text-3xl font-bold text-[var(--color-primary-600)] mb-1">
-                        {{ upcomingCount }}
-                    </div>
-                    <div class="text-sm text-[var(--color-text-secondary)]">Upcoming Trips</div>
-                </app-card-content>
-            </app-card>
-            <app-card variant="bordered">
-                <app-card-content customClass="text-center py-4">
-                    <div class="text-3xl font-bold text-green-600 mb-1">
-                        {{ confirmedCount }}
-                    </div>
-                    <div class="text-sm text-[var(--color-text-secondary)]">Confirmed</div>
-                </app-card-content>
-            </app-card>
-            <app-card variant="bordered">
-                <app-card-content customClass="text-center py-4">
-                    <div class="text-3xl font-bold text-amber-600 mb-1">
-                        {{ pendingCount }}
-                    </div>
-                    <div class="text-sm text-[var(--color-text-secondary)]">Pending</div>
-                </app-card-content>
-            </app-card>
-            <app-card variant="bordered">
-                <app-card-content customClass="text-center py-4">
-                    <div class="text-3xl font-bold text-[var(--color-text-secondary)] mb-1">
-                        {{ completedCount }}
-                    </div>
-                    <div class="text-sm text-[var(--color-text-secondary)]">Completed</div>
-                </app-card-content>
-            </app-card>
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon-wrapper bg-[var(--color-primary-50)] text-[var(--color-primary-600)]">
+                    <lucide-icon [img]="Calendar" class="w-6 h-6"></lucide-icon>
+                </div>
+                <div>
+                    <div class="stat-value">{{ upcomingCount }}</div>
+                    <div class="stat-label">Upcoming</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon-wrapper bg-green-50 text-green-600">
+                    <lucide-icon [img]="CheckCircle" class="w-6 h-6"></lucide-icon>
+                </div>
+                <div>
+                    <div class="stat-value">{{ confirmedCount }}</div>
+                    <div class="stat-label">Confirmed</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon-wrapper bg-amber-50 text-amber-600">
+                    <lucide-icon [img]="Clock" class="w-6 h-6"></lucide-icon>
+                </div>
+                <div>
+                    <div class="stat-value">{{ pendingCount }}</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon-wrapper bg-gray-50 text-gray-500">
+                    <lucide-icon [img]="CheckCircle" class="w-6 h-6"></lucide-icon>
+                </div>
+                <div>
+                    <div class="stat-value">{{ completedCount }}</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+            </div>
         </div>
 
         <!-- Filters -->
-        <div class="flex items-center justify-between gap-4 mb-6">
-            <div class="flex gap-2 overflow-x-auto pb-2 flex-1">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+            <div class="filter-container">
                 <button *ngFor="let tab of [
-            { id: 'all', label: 'All Bookings' },
-            { id: 'upcoming', label: 'Upcoming' },
-            { id: 'past', label: 'Past' },
-            { id: 'cancelled', label: 'Cancelled' }
-          ]" (click)="setFilter(tab.id)"
-                    [class]="'px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all ' +
-            (filter === tab.id
-              ? 'bg-[var(--color-primary-600)] text-white'
-              : 'bg-white border border-[var(--color-border-light)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary-300)]')">
+                        { id: 'all', label: 'All' },
+                        { id: 'upcoming', label: 'Upcoming' },
+                        { id: 'past', label: 'Past' },
+                        { id: 'cancelled', label: 'Cancelled' }
+                    ]" 
+                    (click)="setFilter(tab.id)"
+                    [class.active]="filter === tab.id"
+                    class="filter-pill">
                     {{ tab.label }}
                 </button>
             </div>
-            <app-button variant="outline" size="sm" customClass="hidden md:flex">
-                <lucide-icon [img]="Filter" class="w-4 h-4"></lucide-icon>
-                Filter
-            </app-button>
-        </div>
-
-        <!-- Debug Info -->
-        <div *ngIf="!isLoading" class="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg text-xs space-y-1">
-            <div class="flex justify-between items-center text-gray-500">
-                <span>Current User ID: <strong>{{ currentUser?.id || 'NULL' }}</strong></span>
-                <span>Found {{ reservations.length }} reservations.</span>
-                <div class="flex gap-2">
-                    <button (click)="loadReservations()" class="text-blue-600 hover:underline">Only Mine</button>
-                    <button (click)="showAllReservations()" class="text-purple-600 hover:underline">Show All
-                        (Debug)</button>
+            
+            <div class="flex gap-3">
+                <div class="relative flex-1 md:w-64">
+                    <lucide-icon [img]="Search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></lucide-icon>
+                    <input type="text" placeholder="Search reservations..." 
+                        (input)="onSearch($event)"
+                        class="w-full pl-10 pr-4 py-2 bg-white border border-[var(--color-border-light)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-500)] focus:border-transparent transition-all">
                 </div>
+                <app-button variant="outline" size="sm" customClass="!rounded-xl px-4">
+                    <lucide-icon [img]="Filter" class="w-4 h-4"></lucide-icon>
+                    <span class="ml-2">Filter</span>
+                </app-button>
             </div>
-            <p class="text-[10px] text-gray-400">
-                If the count is 0 even with "Show All", the DB is empty. If "Show All" works but "Only Mine" doesn't,
-                the User ID is wrong.
-            </p>
-            <div *ngIf="reservations.length > 0" class="mt-2 group">
-                <div class="text-[10px] font-bold text-gray-500 mb-1">Raw Database State (DEBUG):</div>
-                <div class="max-h-40 overflow-y-auto border border-gray-200 rounded p-1 bg-white">
-                    <table class="w-full text-[10px] text-gray-600">
-                        <thead class="bg-gray-50 sticky top-0">
-                            <tr>
-                                <th class="text-left p-1">Booking ID</th>
-                                <th class="text-left p-1">User ID</th>
-                                <th class="text-left p-1">Target</th>
-                                <th class="text-left p-1">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let res of reservations" class="border-t border-gray-100">
-                                <td class="p-1">{{ res.id || res._id }}</td>
-                                <td class="p-1 font-mono"
-                                    [class.bg-yellow-50]="res.userId === (currentUser?.id || currentUser?._id)">{{
-                                    res.userId }}</td>
-                                <td class="p-1">{{ res.targetId }}</td>
-                                <td class="p-1">{{ res.status }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Loading State -->
-        <div *ngIf="isLoading" class="flex justify-center py-20">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary-600)]"></div>
         </div>
 
         <!-- Bookings List -->
@@ -133,16 +101,16 @@
             </app-card>
         </div>
 
-        <div *ngIf="!isLoading && filteredBookings.length > 0" class="space-y-4">
+        <div *ngIf="!isLoading && filteredBookings.length > 0" class="space-y-6">
             <app-card *ngFor="let booking of filteredBookings" variant="elevated" padding="none"
-                customClass="overflow-hidden">
+                customClass="booking-card">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-0">
                     <!-- Image -->
-                    <div class="relative h-48 md:h-auto bg-[var(--color-neutral-100)]">
+                    <div class="booking-image-container h-48 md:h-auto bg-[var(--color-neutral-100)]">
                         <img *ngIf="booking.targetId"
                             src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600&q=80"
-                            [alt]="booking.targetId" class="w-full h-full object-cover" />
-                        <div class="absolute top-4 left-4">
+                            [alt]="booking.targetId" class="booking-image w-full h-full object-cover" />
+                        <div class="absolute top-4 left-4 z-10">
                             <app-badge [variant]="statusConfig[booking.status].variant" [dot]="true">
                                 {{ statusConfig[booking.status].label }}
                             </app-badge>
@@ -164,9 +132,6 @@
                                 <div class="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] mb-3">
                                     <lucide-icon [img]="MapPin" class="w-4 h-4"></lucide-icon>
                                     <span>Location details available on request</span>
-                                </div>
-                                <div class="text-xs text-[var(--color-text-tertiary)]">
-                                    Booking ID: {{ booking.id || booking._id }}
                                 </div>
                             </div>
 
@@ -231,13 +196,7 @@
                         </div>
 
                         <!-- Footer -->
-                        <div class="flex items-center justify-between pt-4 border-t border-[var(--color-border-light)]">
-                            <div>
-                                <div class="text-sm text-[var(--color-text-tertiary)] mb-1">Status</div>
-                                <div class="text-lg font-bold text-[var(--color-primary-600)]">
-                                    {{ booking.status }}
-                                </div>
-                            </div>
+                        <div class="flex items-center justify-end pt-4 border-t border-[var(--color-border-light)]">
                             <app-button variant="outline" (click)="viewDetails(booking.id || booking._id, booking)">
                                 View Details
                                 <lucide-icon [img]="ChevronRight" class="w-5 h-5"></lucide-icon>

@@ -47,6 +47,7 @@ export class TripIntentCreateComponent implements OnInit {
     intentForm!: FormGroup;
     isSubmitting = false;
     currentUserId: string | null = null;
+    today = new Date().toISOString().split('T')[0];
 
     campingStyles = [
         { value: CampingStyle.WILD, label: 'Sauvage', icon: this.Flame, desc: 'Expérience authentique au milieu de nulle part' },
@@ -72,13 +73,13 @@ export class TripIntentCreateComponent implements OnInit {
         });
 
         this.intentForm = this.fb.group({
-            title: ['', [Validators.required, Validators.maxLength(100)]],
+            title: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
             dateFrom: ['', Validators.required],
             dateTo: ['', Validators.required],
-            budgetMax: [1000, [Validators.required, Validators.min(0)]],
+            budgetMax: [1000, [Validators.required, Validators.min(50)]],
             campingStyle: [CampingStyle.WILD, Validators.required],
             experienceLevel: [ExperienceLevel.INTERMEDIATE, Validators.required],
-            preferredZone: [''],
+            preferredZone: ['', Validators.required],
             status: [TripIntentStatus.OPEN, Validators.required]
         }, { validators: dateRangeValidator() });
     }
@@ -119,34 +120,14 @@ export class TripIntentCreateComponent implements OnInit {
 
         this.tripIntentService.createTripIntent(reqData).subscribe({
             next: (res) => {
+                this.isSubmitting = false;
                 const tripId = res.id || (res as any)._id;
-
-                // Auto-create associated Group
-                this.groupService.createGroup({
-                    name: res.title || reqData.title,
-                    creatorUserId: this.currentUserId!,
-                    tripId: tripId,
-                    memberUserIds: [this.currentUserId!],
-                    status: 'ACTIVE' as any
-                }).subscribe({
-                    next: () => {
-                        this.isSubmitting = false;
-                        if (tripId) {
-                            this.router.navigate(['/trip-intents', tripId]);
-                        } else {
-                            this.router.navigate(['/trip-intents']);
-                        }
-                    },
-                    error: (err) => {
-                        console.error('Failed to create associated group', err);
-                        this.isSubmitting = false;
-                        if (tripId) {
-                            this.router.navigate(['/trip-intents', tripId]);
-                        } else {
-                            this.router.navigate(['/trip-intents']);
-                        }
-                    }
-                });
+                console.log('Trip created (group handled by backend)', tripId);
+                if (tripId) {
+                    this.router.navigate(['/trip-intents', tripId]);
+                } else {
+                    this.router.navigate(['/trip-intents']);
+                }
             },
             error: (err) => {
                 console.error('Failed to create trip intent', err);
