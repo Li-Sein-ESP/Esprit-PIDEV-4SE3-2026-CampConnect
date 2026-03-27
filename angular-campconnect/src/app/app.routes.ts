@@ -161,13 +161,13 @@ export const routes: Routes = [
                 path: 'profile/edit',
                 loadComponent: () => import('./features/auth/profile/camper-edit-profile.component').then(m => m.CamperEditProfileComponent),
                 canActivate: [authGuard],
-                data: { roles: ['ROLE_CAMPER', 'ROLE_site_owner', 'ROLE_equipment_provider', 'ROLE_organizer', 'ROLE_delivery_provider', 'ROLE_admin'] }
+                data: { roles: ['ROLE_CAMPER', 'ROLE_SITE_OWNER', 'ROLE_EQUIPMENT_PROVIDER', 'ROLE_ORGANIZER', 'ROLE_DELIVERY_PROVIDER', 'ROLE_ADMIN'] }
             },
             {
                 path: 'profile',
                 loadComponent: () => import('./features/auth/profile/camper-profile.component').then(m => m.CamperProfileComponent),
                 canActivate: [authGuard],
-                data: { roles: ['ROLE_CAMPER', 'ROLE_site_owner', 'ROLE_equipment_provider', 'ROLE_organizer', 'ROLE_delivery_provider', 'ROLE_admin'] } // Accessible to all logged in
+                data: { roles: ['ROLE_CAMPER', 'ROLE_SITE_OWNER', 'ROLE_EQUIPMENT_PROVIDER', 'ROLE_ORGANIZER', 'ROLE_DELIVERY_PROVIDER', 'ROLE_ADMIN'] } // Accessible to all logged-in users
             },
             // Existing routes
             {

@@ -53,13 +53,8 @@
                                 },
                                 {
                                     "type": "anyComponentStyle",
-<<<<<<< HEAD
                                     "maximumWarning": "100kB",
                                     "maximumError": "150kB"
-=======
-                                    "maximumWarning": "10kB",
-                                    "maximumError": "15kB"
->>>>>>> origin/rayene_booking+matching
                                 }
                             ],
                             "outputHashing": "all"

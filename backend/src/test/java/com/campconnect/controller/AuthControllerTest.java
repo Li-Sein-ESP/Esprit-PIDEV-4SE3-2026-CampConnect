@@ -64,8 +64,10 @@ class AuthControllerTest {
         loginRequest.setPassword("password");
 
         Authentication authentication = mock(Authentication.class);
-        UserDetailsImpl userDetails = new UserDetailsImpl("1", "testuser", "test@test.com", "pass", 
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
+        UserDetailsImpl userDetails = new UserDetailsImpl("1", "testuser", "test@test.com", "pass",
+                false,
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")),
+                null);
         
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(authenticationManager.authenticate(any())).thenReturn(authentication);

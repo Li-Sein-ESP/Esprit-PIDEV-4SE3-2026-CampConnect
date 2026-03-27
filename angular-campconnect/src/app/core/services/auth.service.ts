@@ -65,8 +65,8 @@ export class AuthService {
     }
 
     hasRole(role: string): boolean {
-        const roles = this.getRoles();
-        const normalized = role.startsWith('ROLE_') ? role : `ROLE_${role}`;
+        const roles = this.getRoles().map(r => r.toUpperCase());
+        const normalized = role.toUpperCase().startsWith('ROLE_') ? role.toUpperCase() : `ROLE_${role.toUpperCase()}`;
         return roles.includes(normalized) || roles.includes('ROLE_ADMIN');
     }
 

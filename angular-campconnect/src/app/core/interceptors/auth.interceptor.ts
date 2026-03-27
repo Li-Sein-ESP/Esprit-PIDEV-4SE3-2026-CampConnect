@@ -25,26 +25,28 @@ export class AuthInterceptor implements HttpInterceptor {
     intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
         const token = this.authService.getToken();
 
-        // Check if token is expired before making request
-        if (token && this.authService.isTokenExpired()) {
-            console.warn('Token expired, clearing and redirecting to login');
-            this.authService.logout();
-            this.router.navigate(['/login']);
-            return throwError(() => new Error('Session expired'));
-        }
+        // Never block or modify auth requests — they must always pass through cleanly
+        const isAuthEndpoint = request.url.includes('/auth/signin') || request.url.includes('/auth/signup');
 
-        if (token) {
-            request = request.clone({
-                setHeaders: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+        if (!isAuthEndpoint) {
+            // Block expired-token requests for protected endpoints
+            if (token && this.authService.isTokenExpired()) {
+                console.warn('Token expired, clearing and redirecting to login');
+                this.authService.logout();
+                this.router.navigate(['/login']);
+                return throwError(() => new Error('Session expired'));
+            }
+
+            if (token) {
+                request = request.clone({
+                    setHeaders: { Authorization: `Bearer ${token}` }
+                });
+            }
         }
 
         return next.handle(request).pipe(
             catchError((error: HttpErrorResponse) => {
-                // Handle auth errors that slip through
-                if (error.status === 401 || error.status === 403) {
+                if (!isAuthEndpoint && (error.status === 401 || error.status === 403)) {
                     console.warn('Auth error detected, clearing session');
                     this.authService.logout();
                     this.router.navigate(['/login']);
