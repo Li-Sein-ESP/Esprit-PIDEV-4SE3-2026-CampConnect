@@ -5,11 +5,12 @@ import { LucideAngularModule, CheckCircle, Calendar, MapPin, Download, Mail } fr
 import { ButtonComponent } from '../../../shared/components/button.component';
 import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
 import { BadgeComponent } from '../../../shared/components/badge.component';
+import { ReservationTimeline } from '../../../shared/components/reservation-timeline/reservation-timeline';
 
 @Component({
   selector: 'app-booking-confirmation',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideAngularModule, ButtonComponent, CardComponent, CardContentComponent, BadgeComponent],
+  imports: [CommonModule, RouterModule, LucideAngularModule, ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, ReservationTimeline],
   templateUrl: './booking-confirmation.component.html'
 })
 export class BookingConfirmationComponent {
@@ -22,6 +23,6 @@ export class BookingConfirmationComponent {
   bookingId: string;
 
   constructor(private route: ActivatedRoute) {
-    this.bookingId = this.route.snapshot.paramMap.get('id') || 'BK123456';
+    this.bookingId = this.route.snapshot.paramMap.get('bookingId') || 'BK123456';
   }
 }

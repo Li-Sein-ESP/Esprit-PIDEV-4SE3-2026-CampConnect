@@ -273,9 +273,24 @@ export const routes: Routes = [
                 canActivate: [authGuard]
             },
             {
+                path: 'booking/dates/:siteId',
+                loadComponent: () => import('./features/bookings/dynamic-calendar/dynamic-calendar').then(m => m.DynamicCalendar)
+            },
+            {
                 path: 'discover',
                 loadComponent: () => import('./features/bookings/availability-search/availability-search.component').then(m => m.AvailabilitySearchComponent)
             },
+            // - [x] Researching the cause of the 401 error <!-- id: 0 -->
+            //     - [x] Locate reservation components and services <!-- id: 1 -->
+            //     - [x] Inspect authentication/interceptor logic <!-- id: 2 -->
+            //     - [x] Check backend security configuration for the reservation endpoint <!-- id: 3 -->
+            // - [x] Implementing the fix for token expiration <!-- id: 4 -->
+            //     - [x] Update `AuthService` to validate token expiration <!-- id: 6 -->
+            //     - [x] Update `AuthInterceptor` to handle 401 errors <!-- id: 7 -->
+            // - [ ] Refining the "My Reservations" interface <!-- id: 8 -->
+            //     - [ ] Remove ID display from the template <!-- id: 9 -->
+            //     - [ ] Ensure only the current user's reservations are shown <!-- id: 10 -->
+            // - [x] Verifying the fix <!-- id: 5 -->
             {
                 path: 'booking/reserve/:siteId',
                 loadComponent: () => import('./features/bookings/reservation-create/reservation-create.component').then(m => m.ReservationCreateComponent),
@@ -292,11 +307,73 @@ export const routes: Routes = [
                 canActivate: [authGuard]
             },
             {
+                path: 'booking/details/:id',
+                loadComponent: () => import('./features/bookings/booking-detail/booking-detail.component').then(m => m.BookingDetailComponent)
+            },
+            {
+                path: 'booking/edit/:id',
+                loadComponent: () => import('./features/bookings/booking-edit/booking-edit.component').then(m => m.BookingEditComponent)
+            },
+            {
                 path: 'booking/cancel/:bookingId',
                 loadComponent: () => import('./features/bookings/booking-cancel/booking-cancel.component').then(m => m.BookingCancelComponent),
                 canActivate: [authGuard]
             },
+            // Companion Matching
+            {
+                path: 'companions',
+                loadComponent: () => import('./features/companions/companions-layout/companions-layout').then(m => m.CompanionsLayout),
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('./features/companions/companion-discovery/companion-discovery').then(m => m.CompanionDiscovery)
+                    },
+                    {
+                        path: 'profile',
+                        loadComponent: () => import('./features/companions/companion-profile-form/companion-profile-form').then(m => m.CompanionProfileForm)
+                    },
+                    {
+                        path: 'connections',
+                        loadComponent: () => import('./features/companions/companion-connections/companion-connections').then(m => m.CompanionConnections)
+                    }
+                ]
+            },
+            // Groups Management
+            {
+                path: 'groups/:id',
+                loadComponent: () => import('./features/groups/group-dashboard/group-dashboard.component').then(m => m.GroupDashboardComponent)
+            },
+            {
+                path: 'groups/:id/:tab',
+                loadComponent: () => import('./features/groups/group-dashboard/group-dashboard.component').then(m => m.GroupDashboardComponent)
+            },
             // Trip Planning Extended
+            {
+                path: 'trip-intents',
+                loadComponent: () => import('./features/trip-intents/trip-intent-feed/trip-intent-feed.component').then(m => m.TripIntentFeedComponent)
+            },
+            {
+                path: 'trip-intents/create',
+                loadComponent: () => import('./features/trip-intents/trip-intent-create/trip-intent-create.component').then(m => m.TripIntentCreateComponent)
+            },
+            {
+                path: 'trip-intents/edit/:id',
+                loadComponent: () => import('./features/trip-intents/trip-intent-edit/trip-intent-edit').then(m => m.TripIntentEditComponent)
+            },
+
+            {
+                path: 'my-trip-intents',
+                loadComponent: () => import('./features/trip-intents/my-trip-intents/my-trip-intents.component').then(m => m.MyTripIntentsComponent)
+            },
+
+            {
+                path: 'trip-intents/:id',
+                loadComponent: () => import('./features/trip-intents/trip-intent-detail/trip-intent-detail.component').then(m => m.TripIntentDetailComponent)
+            },
+            {
+                path: 'invites',
+                loadComponent: () => import('./features/trip-intents/group-invites-manager/group-invites-manager.component').then(m => m.GroupInvitesManagerComponent)
+            },
             {
                 path: 'plan-trip/create',
                 loadComponent: () => import('./features/trips/trip-create/trip-create.component').then(m => m.TripCreateComponent),

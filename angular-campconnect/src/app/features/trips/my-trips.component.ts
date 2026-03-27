@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { CardComponent, CardContentComponent, CardFooterComponent } from '../../shared/components/card.component';
 import { BadgeComponent } from '../../shared/components/badge.component';
 import { LucideAngularModule, Calendar, MapPin, Users, Plus, Edit, Trash2 } from 'lucide-angular';
+import { TripService } from './services/trip.service';
 
 interface Trip {
   id: string;
@@ -40,7 +41,7 @@ interface Trip {
         </p>
       </div>
       <button
-        (click)="router.navigate(['/plan-trip'])"
+        (click)="router.navigate(['/trip-intents/create'])"
         class="flex items-center gap-2 px-6 py-3 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors font-medium"
       >
         <lucide-icon [img]="PlusIcon" [size]="20"></lucide-icon>
@@ -136,7 +137,7 @@ interface Trip {
         Start planning your next outdoor adventure!
       </p>
       <button
-        (click)="router.navigate(['/plan-trip'])"
+        (click)="router.navigate(['/trip-intents/create'])"
         class="inline-flex items-center gap-2 px-6 py-3 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors font-medium"
       >
         <lucide-icon [img]="PlusIcon" [size]="20"></lucide-icon>
@@ -163,46 +164,14 @@ export class MyTripsComponent {
     { label: 'Completed', value: 'completed' },
   ];
 
-  trips: Trip[] = [
-    {
-      id: '1',
-      name: 'Yosemite Summer Adventure',
-      destination: 'Yosemite National Park',
-      startDate: '2026-06-15',
-      endDate: '2026-06-18',
-      groupSize: 4,
-      status: 'confirmed'
-    },
-    {
-      id: '2',
-      name: 'Grand Canyon Exploration',
-      destination: 'Grand Canyon National Park',
-      startDate: '2026-07-01',
-      endDate: '2026-07-05',
-      groupSize: 2,
-      status: 'planning'
-    },
-    {
-      id: '3',
-      name: 'Yellowstone Wildlife Tour',
-      destination: 'Yellowstone National Park',
-      startDate: '2026-08-10',
-      endDate: '2026-08-14',
-      groupSize: 6,
-      status: 'planning'
-    },
-    {
-      id: '4',
-      name: 'Spring Break Camping',
-      destination: 'Zion National Park',
-      startDate: '2026-03-20',
-      endDate: '2026-03-23',
-      groupSize: 3,
-      status: 'completed'
-    }
-  ];
+  get trips(): Trip[] {
+    return this.tripService.trips().map(t => ({
+      ...t,
+      groupSize: (t as any).participants || (t as any).groupSize || 1
+    })) as unknown as Trip[];
+  }
 
-  constructor(public router: Router) { }
+  constructor(public router: Router, private tripService: TripService) { }
 
   getTabClasses(tabValue: string): string {
     const baseClasses = 'px-4 py-2 font-medium transition-colors';

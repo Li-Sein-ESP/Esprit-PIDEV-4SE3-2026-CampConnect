@@ -8,6 +8,10 @@
     <p class="text-[var(--color-text-secondary)] mb-2">Your reservation has been successfully confirmed</p>
     <p class="text-sm text-[var(--color-text-tertiary)] mb-8">Booking ID: {{ bookingId }}</p>
 
+    <div class="mb-12">
+      <app-reservation-timeline [currentStep]="2"></app-reservation-timeline>
+    </div>
+
     <app-card variant="elevated" class="mb-8 text-left">
       <app-card-content class="p-8">
         <div class="flex gap-4 mb-6">
@@ -55,6 +59,6 @@
       </app-button>
     </div>
 
-    <app-button routerLink="/dashboard">View My Bookings</app-button>
+    <app-button routerLink="/dashboard/bookings">View My Bookings</app-button>
   </div>
 </div>

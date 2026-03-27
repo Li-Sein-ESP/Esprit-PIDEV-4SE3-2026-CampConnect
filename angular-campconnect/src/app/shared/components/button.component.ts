@@ -11,9 +11,10 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
   template: `
     <button
       [class]="getButtonClasses()"
-      [disabled]="disabled"
+      [disabled]="disabled || isLoading"
       [type]="type"
     >
+      <span *ngIf="isLoading" class="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></span>
       <ng-content></ng-content>
     </button>
   `,
@@ -24,6 +25,7 @@ export class ButtonComponent {
   @Input() size: ButtonSize = 'md';
   @Input() fullWidth: boolean = false;
   @Input() disabled: boolean = false;
+  @Input() isLoading: boolean = false;
   @Input() type: 'button' | 'submit' | 'reset' = 'button';
   @Input() customClass: string = '';
 

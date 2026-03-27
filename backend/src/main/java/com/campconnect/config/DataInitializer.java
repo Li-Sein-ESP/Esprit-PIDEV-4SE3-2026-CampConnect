@@ -68,6 +68,10 @@ public class DataInitializer implements CommandLineRunner {
             roles.add(userRole);
             camper.setRoles(roles);
             userRepository.save(camper);
+        } else {
+            User camper = userRepository.findByUsername("camper").get();
+            camper.setPassword(encoder.encode("camper123"));
+            userRepository.save(camper);
         }
     }
 }

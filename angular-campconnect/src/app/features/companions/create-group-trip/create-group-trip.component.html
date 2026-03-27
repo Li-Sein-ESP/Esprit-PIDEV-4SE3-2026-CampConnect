@@ -1,23 +1,73 @@
 <div class="min-h-screen bg-[var(--color-background)] py-12">
-  <div class="container max-w-6xl">
+  <div class="container max-w-3xl mx-auto px-4">
     <div class="mb-8">
-      <h2 class="mb-2">Create Group Trip</h2>
-      <p class="text-[var(--color-text-secondary)]">
-        This feature is coming soon
-      </p>
+      <button
+        class="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors mb-6"
+        routerLink="/companions/groups">
+        <lucide-icon [img]="ArrowLeft" size="20"></lucide-icon>
+        Retour à Mes Groupes
+      </button>
+
+      <div class="flex items-center gap-4 mb-4">
+        <div
+          class="w-12 h-12 rounded-xl bg-[var(--color-primary-light)] flex items-center justify-center text-[var(--color-primary)]">
+          <lucide-icon [img]="Users" size="28"></lucide-icon>
+        </div>
+        <div>
+          <h1 class="text-3xl font-bold text-[var(--color-text-primary)] m-0">Créer un Groupe</h1>
+          <p class="text-[var(--color-text-secondary)] mt-1">Créez un espace privé pour organiser vos prochaines
+            aventures entre amis.</p>
+        </div>
+      </div>
     </div>
 
     <app-card variant="elevated">
-      <app-card-content customClass="text-center py-16">
-        <div class="max-w-md mx-auto">
-          <h3 class="mb-4">Under Development</h3>
-          <p class="text-[var(--color-text-secondary)] mb-6">
-            This page is currently being developed and will be available soon.
-          </p>
-          <app-button routerLink="/">
-            Return Home
-          </app-button>
-        </div>
+      <app-card-content padding="xl">
+        <form [formGroup]="groupForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+          <!-- Name Section -->
+          <div class="space-y-4">
+            <h3 class="text-xl font-bold flex items-center gap-2 border-b border-[var(--color-border-light)] pb-2">
+              <lucide-icon [img]="Tent" size="20" class="text-[var(--color-primary)]"></lucide-icon>
+              Informations du Groupe
+            </h3>
+
+            <div class="space-y-2">
+              <label for="name" class="block text-sm font-semibold text-[var(--color-text-primary)]">
+                Nom du groupe <span class="text-red-500">*</span>
+              </label>
+              <input id="name" type="text" formControlName="name"
+                class="w-full px-4 py-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] focus:ring-2 focus:ring-[var(--color-primary-light)] focus:border-[var(--color-primary)] transition-all"
+                placeholder="ex: Les Aventuriers de l'Atlas"
+                [ngClass]="{'border-red-500': groupForm.get('name')?.invalid && groupForm.get('name')?.touched}">
+              <div *ngIf="groupForm.get('name')?.invalid && groupForm.get('name')?.touched"
+                class="text-sm text-red-500 mt-1">
+                Le nom du groupe est requis (min 3 caractères).
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label for="description" class="block text-sm font-semibold text-[var(--color-text-primary)]">
+                Description <span class="text-xs font-normal text-[var(--color-text-tertiary)]">(Optionnel)</span>
+              </label>
+              <textarea id="description" formControlName="description" rows="4"
+                class="w-full px-4 py-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] focus:ring-2 focus:ring-[var(--color-primary-light)] focus:border-[var(--color-primary)] transition-all resize-y"
+                placeholder="Quel est l'objectif de ce groupe ?"></textarea>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="pt-6 border-t border-[var(--color-border-light)] flex items-center justify-end gap-4 mt-8">
+            <app-button variant="ghost" type="button" routerLink="/companions/groups" [disabled]="isSubmitting">
+              Annuler
+            </app-button>
+            <app-button type="submit" [disabled]="groupForm.invalid || isSubmitting" customClass="shadow-md">
+              <lucide-icon [img]="Users" size="18" class="mr-2"></lucide-icon>
+              Créer le Groupe
+            </app-button>
+          </div>
+
+        </form>
       </app-card-content>
     </app-card>
   </div>

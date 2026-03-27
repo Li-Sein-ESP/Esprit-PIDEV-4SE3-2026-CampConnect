@@ -5,6 +5,10 @@ import { LucideAngularModule, Calendar, Users, MapPin, MoreVertical, Download, X
 import { ButtonComponent } from '../../../shared/components/button.component';
 import { BadgeComponent } from '../../../shared/components/badge.component';
 import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
+import { ReservationService } from '../../../core/services/reservation.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { Reservation, ReservationStatus } from '../../../core/models/reservation.model';
+import { take } from 'rxjs';
 
 interface Booking {
     id: string;
@@ -37,11 +41,7 @@ interface Booking {
         CardContentComponent
     ],
     templateUrl: './booking-management.component.html',
-    styles: [`
-    :host {
-      display: block;
-    }
-  `]
+    styleUrls: ['./booking-management.component.css']
 })
 export class BookingManagementComponent {
     readonly Calendar = Calendar;
@@ -59,99 +59,29 @@ export class BookingManagementComponent {
     readonly Search = Search;
 
     filter: 'all' | 'upcoming' | 'past' | 'cancelled' = 'all';
+    searchTerm: string = '';
     showMenu: string | null = null;
 
-    mockBookings: Booking[] = [
-        {
-            id: 'BK7XQMK9P',
-            campsite: {
-                name: 'Upper Pines Campground',
-                location: 'Yosemite National Park, CA',
-                imageUrl: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600&q=80',
-            },
-            checkIn: '2026-03-15',
-            checkOut: '2026-03-18',
-            guests: 4,
-            nights: 3,
-            total: 118.47,
-            status: 'confirmed',
-            bookedAt: '2026-02-01T10:30:00',
-            canCancel: true,
-            refundEligible: true,
-        },
-        {
-            id: 'BK5NWTR2L',
-            campsite: {
-                name: 'Big Sur Campground',
-                location: 'Big Sur, CA',
-                imageUrl: 'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=600&q=80',
-            },
-            checkIn: '2026-04-10',
-            checkOut: '2026-04-12',
-            guests: 2,
-            nights: 2,
-            total: 103.18,
-            status: 'pending',
-            bookedAt: '2026-02-01T14:15:00',
-            canCancel: true,
-            refundEligible: true,
-        },
-        {
-            id: 'BK3FLPM8D',
-            campsite: {
-                name: 'Joshua Tree Oasis',
-                location: 'Joshua Tree National Park, CA',
-                imageUrl: 'https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=600&q=80',
-            },
-            checkIn: '2025-12-20',
-            checkOut: '2025-12-23',
-            guests: 3,
-            nights: 3,
-            total: 103.47,
-            status: 'completed',
-            bookedAt: '2025-11-15T09:00:00',
-            canCancel: false,
-            refundEligible: false,
-        },
-        {
-            id: 'BK9HKYV4T',
-            campsite: {
-                name: 'Lake Tahoe Retreat',
-                location: 'Lake Tahoe, CA',
-                imageUrl: 'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=600&q=80',
-            },
-            checkIn: '2026-01-10',
-            checkOut: '2026-01-12',
-            guests: 2,
-            nights: 2,
-            total: 124.58,
-            status: 'cancelled',
-            bookedAt: '2025-12-15T16:45:00',
-            canCancel: false,
-            refundEligible: false,
-        },
-    ];
-
     statusConfig = {
-        confirmed: {
+        [ReservationStatus.CONFIRMED]: {
             label: 'Confirmed',
             variant: 'success' as const,
             icon: CheckCircle,
             color: 'text-green-600',
         },
-        pending: {
+        [ReservationStatus.PENDING]: {
             label: 'Pending',
             variant: 'warning' as const,
             icon: Clock,
             color: 'text-amber-600',
         },
-        cancelled: {
+        [ReservationStatus.CANCELLED]: {
             label: 'Cancelled',
             variant: 'default' as const,
             icon: X,
             color: 'text-[var(--color-text-tertiary)]',
         },
-        completed: {
+        [ReservationStatus.COMPLETED]: {
             label: 'Completed',
             variant: 'primary' as const,
             icon: CheckCircle,
@@ -159,43 +89,93 @@ export class BookingManagementComponent {
         },
     };
 
-    constructor(private router: Router) { }
+    reservations: Reservation[] = [];
+    isLoading = true;
+    currentUser: any = null;
 
-    get filteredBookings() {
-        return this.mockBookings.filter((booking) => {
-            const today = new Date();
-            const checkIn = new Date(booking.checkIn);
-            const checkOut = new Date(booking.checkOut);
+    constructor(
+        private router: Router,
+        private reservationService: ReservationService,
+        private authService: AuthService
+    ) { }
 
-            if (this.filter === 'upcoming') {
-                return checkIn > today && booking.status !== 'cancelled';
+    ngOnInit() {
+        this.loadReservations();
+    }
+
+    loadReservations() {
+        this.isLoading = true;
+        this.authService.getCurrentUser().pipe(take(1)).subscribe(user => {
+            this.currentUser = user;
+            if (user) {
+                this.reservationService.getUserReservations(user.id).subscribe({
+                    next: (data) => {
+                        this.reservations = data;
+                        this.isLoading = false;
+                    },
+                    error: (err) => {
+                        console.error('Error loading reservations', err);
+                        this.isLoading = false;
+                    }
+                });
+            } else {
+                this.isLoading = false;
+                this.router.navigate(['/login']);
             }
-            if (this.filter === 'past') {
-                return checkOut < today || booking.status === 'completed';
-            }
-            if (this.filter === 'cancelled') {
-                return booking.status === 'cancelled';
-            }
-            return true;
         });
     }
 
+    get filteredBookings() {
+        // Create a 'today' date at 00:00:00 for accurate day comparison
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        return this.reservations.filter((res) => {
+            const checkIn = new Date(res.startDate);
+            checkIn.setHours(0, 0, 0, 0);
+            const checkOut = new Date(res.endDate);
+            checkOut.setHours(0, 0, 0, 0);
+
+            // 1. Status/Date Filtering
+            let matchesTab = true;
+            if (this.filter === 'upcoming') {
+                matchesTab = checkIn >= today && res.status !== ReservationStatus.CANCELLED;
+            } else if (this.filter === 'past') {
+                matchesTab = checkOut < today || res.status === ReservationStatus.COMPLETED;
+            } else if (this.filter === 'cancelled') {
+                matchesTab = res.status === ReservationStatus.CANCELLED;
+            }
+
+            // 2. Search Filtering
+            const searchLower = this.searchTerm.toLowerCase().trim();
+            const matchesSearch = !searchLower || 
+                res.targetId.toLowerCase().includes(searchLower) ||
+                (res.id || '').toLowerCase().includes(searchLower);
+
+            return matchesTab && matchesSearch;
+        });
+    }
+
+    onSearch(event: any) {
+        this.searchTerm = event.target.value;
+    }
+
     get upcomingCount() {
-        return this.mockBookings.filter(
-            (b) => new Date(b.checkIn) > new Date() && b.status !== 'cancelled'
+        return this.reservations.filter(
+            (b) => new Date(b.startDate) > new Date() && b.status !== ReservationStatus.CANCELLED
         ).length;
     }
 
     get confirmedCount() {
-        return this.mockBookings.filter((b) => b.status === 'confirmed').length;
+        return this.reservations.filter((b) => b.status === ReservationStatus.CONFIRMED).length;
     }
 
     get pendingCount() {
-        return this.mockBookings.filter((b) => b.status === 'pending').length;
+        return this.reservations.filter((b) => b.status === ReservationStatus.PENDING).length;
     }
 
     get completedCount() {
-        return this.mockBookings.filter((b) => b.status === 'completed').length;
+        return this.reservations.filter((b) => b.status === ReservationStatus.COMPLETED).length;
     }
 
     setFilter(filter: string) {
@@ -223,15 +203,30 @@ export class BookingManagementComponent {
         });
     }
 
-    cancelBooking(bookingId: string, booking: Booking) {
-        this.closeMenu();
-        this.router.navigate([`/booking/cancel/${bookingId}`], {
+    cancelBooking(bookingId: string) {
+        if (confirm('Are you sure you want to cancel this reservation? It will be preserved in your history.')) {
+            this.reservationService.cancelReservation(bookingId).subscribe({
+                next: () => {
+                    this.loadReservations();
+                    this.closeMenu();
+                },
+                error: (err) => console.error('Error deleting reservation', err)
+            });
+        }
+    }
+
+    viewDetails(bookingId: any, booking: any) {
+        const id = bookingId || booking.id || booking._id;
+        console.log('DEBUG: Navigating to details with ID:', id, 'and record:', booking);
+        this.router.navigate([`/booking/details/${id}`], {
             state: { booking },
         });
     }
 
-    viewDetails(bookingId: string, booking: Booking) {
-        this.router.navigate([`/booking/details/${bookingId}`], {
+    editBooking(booking: any) {
+        const id = booking.id || booking._id;
+        console.log('DEBUG: Navigating to edit with ID:', id, 'and record:', booking);
+        this.router.navigate([`/booking/edit/${id}`], {
             state: { booking },
         });
     }

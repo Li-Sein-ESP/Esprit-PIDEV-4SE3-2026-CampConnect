@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { CardComponent, CardContentComponent, CardHeaderComponent, CardTitleComponent } from '../../shared/components/card.component';
 import { DropdownComponent, DropdownOption } from '../../shared/components/dropdown.component';
 import { LucideAngularModule, Calendar, MapPin, Users, DollarSign, Plus } from 'lucide-angular';
-
+import { TripService } from './services/trip.service';
 
 @Component({
   selector: 'app-plan-trip',
@@ -257,7 +257,7 @@ export class PlanTripComponent {
     { label: 'Glacier National Park', value: 'glacier' },
   ];
 
-  constructor(public router: Router) { }
+  constructor(public router: Router, private tripService: TripService) { }
 
   handleSubmit(): void {
     const tripData = {
@@ -265,11 +265,14 @@ export class PlanTripComponent {
       destination: this.destination,
       startDate: this.startDate,
       endDate: this.endDate,
-      groupSize: this.groupSize,
+      participants: this.groupSize,
       budget: this.budget,
       notes: this.notes
     };
-    console.log('Creating trip:', tripData);
+    
+    this.tripService.createTrip(tripData);
+    console.log('Created trip:', tripData);
+    
     this.router.navigate(['/trips']);
   }
 }

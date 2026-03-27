@@ -1,0 +1,163 @@
+<div class="invites-container animate-fade-in">
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Mes Invitations</h1>
+            <p class="page-subtitle">Gérez vos demandes pour rejoindre ou pour inviter des compagnons d'aventure.</p>
+        </div>
+    </div>
+
+    <!-- Custom Tabs -->
+    <div class="tabs-wrapper">
+        <button class="tab-btn" [class.active]="activeTab === 'received'" (click)="setTab('received')">
+            <lucide-icon [img]="Mail" size="18"></lucide-icon>
+            Reçues
+            <span class="badge" *ngIf="receivedPending.length > 0">{{ receivedPending.length }}</span>
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 'sent'" (click)="setTab('sent')">
+            <lucide-icon [img]="Send" size="18"></lucide-icon>
+            Envoyées
+        </button>
+    </div>
+
+    <!-- Content Area -->
+    <div class="tab-content" [ngSwitch]="activeTab">
+
+        <!-- Loading State -->
+        <div *ngIf="loading" class="state-container">
+            <div class="spinner"></div>
+            <p>Chargement de vos invitations...</p>
+        </div>
+
+        <!-- TAB: RECEIVED -->
+        <div *ngSwitchCase="'received'">
+
+            <div *ngIf="!loading && receivedPending.length === 0 && receivedHistory.length === 0" class="empty-state">
+                <div class="empty-icon-bg"><lucide-icon [img]="MailOpen" size="48" class="text-primary"></lucide-icon>
+                </div>
+                <h3>Boîte de réception vide</h3>
+                <p>Vous n'avez pas encore reçu d'invitations pour des projets de voyage.</p>
+                <button class="btn btn-primary mt-4" routerLink="/trip-intents">Explorer les projets</button>
+            </div>
+
+            <!-- Pending Received Requests -->
+            <div class="section-block" *ngIf="!loading && receivedPending.length > 0">
+                <h3 class="section-title">Nouvelles invitations ({{ receivedPending.length }})</h3>
+
+                <div class="invite-card pending-card" *ngFor="let item of receivedPending">
+                    <div class="sender-profile">
+                        <img [src]="item.sender.avatar || 'https://ui-avatars.com/api/?name=' + item.sender.name"
+                            alt="Avatar" class="avatar-lg">
+                        <div class="sender-info">
+                            <h4>{{ item.sender.name || item.sender.username }}</h4>
+                            <p class="time-ago">{{ formatTimeAgo(item.invite.createdAt) }}</p>
+                        </div>
+                    </div>
+
+                    <div class="invite-details">
+                        <div class="trip-context">
+                            <span class="context-label">Vous invite à rejoindre :</span>
+                            <a [routerLink]="['/trip-intents', item.invite.tripIntentId]" class="trip-link">
+                                <lucide-icon [img]="Tent" size="16"></lucide-icon>
+                                {{ item.trip.title }}
+                            </a>
+                            <div class="trip-meta text-muted">
+                                <lucide-icon [img]="Calendar" size="14"></lucide-icon>
+                                <span>Départ le {{ formatDate(item.trip.dateFrom) }}</span>
+                                <span class="dot">•</span>
+                                <span>{{ getStyleLabel(item.trip.campingStyle) }}</span>
+                            </div>
+                        </div>
+
+                        <div class="message-box" *ngIf="item.invite.message">
+                            <p>"{{ item.invite.message }}"</p>
+                        </div>
+                    </div>
+
+                    <div class="actions-column">
+                        <button class="btn btn-primary w-full shadow-md" (click)="acceptInvite(item.invite.id)">
+                            <lucide-icon [img]="Check" size="18"></lucide-icon>
+                            Accepter
+                        </button>
+                        <button class="btn btn-outline w-full mt-2" (click)="declineInvite(item.invite.id)">
+                            <lucide-icon [img]="XList" size="18"></lucide-icon>
+                            Décliner
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Received Requests -->
+            <div class="section-block mt-8" *ngIf="!loading && receivedHistory.length > 0">
+                <h3 class="section-title">Historique</h3>
+
+                <div class="history-list">
+                    <div class="history-item" *ngFor="let item of receivedHistory">
+                        <img [src]="item.sender.avatar || 'https://ui-avatars.com/api/?name=User'" class="avatar-sm">
+                        <div class="history-content">
+                            <div class="history-header">
+                                <span class="font-medium">{{ item.sender.name || item.sender.username }}</span> a pour <span
+                                    class="font-medium">{{ item.trip.title }}</span>
+                            </div>
+                            <span class="text-xs text-muted">{{ formatTimeAgo(item.invite.createdAt) }}</span>
+                        </div>
+                        <div class="status-pill" [ngClass]="getStatusClass(item.invite.status)">
+                            {{ item.invite.status }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TAB: SENT -->
+        <div *ngSwitchCase="'sent'">
+
+            <div *ngIf="!loading && sentInvites.length === 0" class="empty-state">
+                <div class="empty-icon-bg"><lucide-icon [img]="Navigation" size="48" class="text-primary"></lucide-icon>
+                </div>
+                <h3>Aucune invitation envoyée</h3>
+                <p>Allez sur le profil d'un campeur pour l'inviter dans votre groupe.</p>
+                <button class="btn btn-primary mt-4" routerLink="/companions">Trouver des compagnons</button>
+            </div>
+
+            <div class="invites-grid" *ngIf="!loading && sentInvites.length > 0">
+                <div class="sent-card" *ngFor="let item of sentInvites">
+                    <div class="sent-header">
+                        <div class="receiver-basic">
+                            <img [src]="item.receiver.avatar" class="avatar-md">
+                            <div>
+                                <h5>Invitation à <strong>{{ item.receiver.name || item.receiver.username }}</strong></h5>
+                                <p class="text-xs text-muted">Envoyée {{ formatTimeAgo(item.invite.createdAt) }}</p>
+                            </div>
+                        </div>
+                        <div class="status-pill" [ngClass]="getStatusClass(item.invite.status)">
+                            {{ item.invite.status }}
+                        </div>
+                    </div>
+
+                    <div class="sent-body">
+                        <div class="trip-context">
+                            <span class="context-label">Pour le projet :</span>
+                            <a [routerLink]="['/trip-intents', item.invite.tripIntentId]" class="trip-link-sm">
+                                {{ item.trip.title }}
+                            </a>
+                        </div>
+                        <div class="message-box message-sm mt-3" *ngIf="item.invite.message">
+                            <p>"{{ item.invite.message }}"</p>
+                        </div>
+                    </div>
+
+                    <div class="sent-footer" *ngIf="item.invite.status === 'PENDING'">
+                        <button class="btn btn-ghost text-danger action-text" (click)="cancelInvite(item.invite.id)">
+                            <lucide-icon [img]="XList" size="16"></lucide-icon>
+                            Annuler l'invitation
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>

@@ -85,3 +85,24 @@ export interface GroupTrip {
     participants: number;
     status: 'planning' | 'confirmed' | 'active' | 'completed';
 }
+
+// ─── ConnectionRequest CRUD ────────────────────────────────────────────────
+
+export type ConnectionStatus = 'pending' | 'accepted' | 'declined' | 'cancelled';
+
+export interface ConnectionRequest {
+    id: string;
+    fromUserId: string;
+    fromUserName: string;
+    fromUserAvatar: string;
+    toUserId: string;
+    toUserName: string;
+    toUserAvatar: string;
+    campingStyle: string;
+    experienceLevel: string;
+    matchScore: number;
+    message?: string;
+    status: ConnectionStatus;
+    createdAt: string;
+    updatedAt: string;
+}

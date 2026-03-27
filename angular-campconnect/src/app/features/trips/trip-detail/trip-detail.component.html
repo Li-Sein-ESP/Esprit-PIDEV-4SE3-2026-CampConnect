@@ -5,7 +5,7 @@
         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
 
         <div class="absolute inset-0 container flex flex-col justify-end pb-8">
-            <button (click)="navigate('/plan-trip')"
+            <button (click)="navigate('/trips')"
                 class="flex items-center gap-2 text-white/90 hover:text-white transition-colors mb-6 w-fit">
                 <lucide-icon [name]="ChevronLeft" class="w-5 h-5"></lucide-icon>
                 Back to Trips
@@ -328,7 +328,7 @@
     <div class="min-h-screen bg-[var(--color-background)] py-12">
         <div class="container text-center">
             <h3 class="mb-4">Trip not found</h3>
-            <app-button (click)="navigate('/plan-trip')">Back to Trips</app-button>
+            <app-button (click)="navigate('/trips')">Back to Trips</app-button>
         </div>
     </div>
 </ng-template>
