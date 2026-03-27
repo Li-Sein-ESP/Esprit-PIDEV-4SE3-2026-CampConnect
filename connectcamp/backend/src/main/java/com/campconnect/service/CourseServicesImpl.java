@@ -3,6 +3,7 @@ package com.campconnect.service;
 import com.campconnect.model.User;
 
 import com.campconnect.dto.CourseDTO;
+import com.campconnect.dto.UserSummaryDTO;
 import com.campconnect.entity.Course;
 import com.campconnect.repository.CourseRepository;
 import com.campconnect.repository.CategoryRepository;
@@ -35,9 +36,9 @@ public class CourseServicesImpl implements ICourseServices {
     }
 
     @Override
-    public List<com.campconnect.dto.UserSummaryDTO> getExperts() {
+    public List<UserSummaryDTO> getExperts() {
         return userRepository.findAll().stream()
-                .map(user -> new com.campconnect.dto.UserSummaryDTO(user.getId(), user.getUsername(), user.getName(), user.isVerifiedExpert()))
+                .map(user -> new UserSummaryDTO(user.getId(), user.getUsername(), user.getName(), user.isVerifiedExpert()))
                 .collect(Collectors.toList());
     }
 

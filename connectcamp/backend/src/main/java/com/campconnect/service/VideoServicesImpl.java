@@ -1,6 +1,7 @@
 package com.campconnect.service;
 
 import com.campconnect.dto.VideoDTO;
+import com.campconnect.dto.UserSummaryDTO;
 import com.campconnect.entity.Video;
 import com.campconnect.repository.VideoRepository;
 import com.campconnect.repository.UserRepository;
@@ -72,7 +73,7 @@ public class VideoServicesImpl implements IVideoServices {
         dto.setTakeaways(video.getTakeaways());
         
         if (video.getCreator() != null) {
-            com.campconnect.dto.UserSummaryDTO creatorDto = new com.campconnect.dto.UserSummaryDTO();
+            UserSummaryDTO creatorDto = new UserSummaryDTO();
             creatorDto.setId(video.getCreator().getId());
             creatorDto.setUsername(video.getCreator().getUsername());
             creatorDto.setName(video.getCreator().getName());
