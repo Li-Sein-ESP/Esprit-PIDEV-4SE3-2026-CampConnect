@@ -1,8 +1,10 @@
 package com.campconnect.gear.controller;
 
 import com.campconnect.common.PagedResponse;
+import com.campconnect.gear.dto.GearAnalyticsResponse;
 import com.campconnect.gear.dto.GearRequest;
 import com.campconnect.gear.dto.GearResponse;
+import com.campconnect.gear.dto.ProviderStatsResponse;
 import com.campconnect.gear.model.GearStatus;
 import com.campconnect.gear.service.GearService;
 import com.campconnect.service.UserDetailsImpl;
@@ -114,5 +116,21 @@ public class GearController {
             @PathVariable String imageId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(gearService.removeImage(id, imageId, userDetails.getId()));
+    }
+
+    @GetMapping("/{gearId}/analytics")
+    @PreAuthorize("hasRole('EQUIPMENT_PROVIDER') or hasRole('ADMIN')")
+    @Operation(summary = "Get analytics for a gear item")
+    public ResponseEntity<GearAnalyticsResponse> getGearAnalytics(
+            @PathVariable String gearId) {
+        return ResponseEntity.ok(gearService.getGearAnalytics(gearId));
+    }
+
+    @GetMapping("/provider/stats")
+    @PreAuthorize("hasRole('EQUIPMENT_PROVIDER') or hasRole('ADMIN')")
+    @Operation(summary = "Get aggregated stats for provider dashboard")
+    public ResponseEntity<ProviderStatsResponse> getProviderStats(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(gearService.getProviderStats(userDetails.getId()));
     }
 }

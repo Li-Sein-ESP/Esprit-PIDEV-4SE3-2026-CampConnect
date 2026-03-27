@@ -13,9 +13,11 @@ import java.time.LocalDate;
 @Schema(description = "Request body for creating/updating a delivery")
 public class DeliveryRequest {
 
-    @NotBlank(message = "Rental ID is required")
     @Schema(example = "64abc12345def67890")
     private String rentalId;
+
+    @Schema(example = "64abc12345def67891")
+    private String purchaseId;
 
     @NotBlank(message = "Driver ID is required")
     @Schema(example = "64abc123456789abc")

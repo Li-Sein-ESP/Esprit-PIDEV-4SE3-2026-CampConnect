@@ -180,3 +180,56 @@
         }
     }
 }
+
+// ── Listing Type Selector ────────────────────────────────────────────────────
+
+.gc-listing-type-group {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.gc-listing-type-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.85rem 1.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    background: #f9fafb;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+    min-width: 100px;
+    user-select: none;
+
+    &:hover {
+        border-color: #a5b4fc;
+        background: #eef2ff;
+    }
+
+    &--active {
+        border-color: #6366f1;
+        background: #eef2ff;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+}
+
+.gc-listing-type-icon {
+    font-size: 1.5rem;
+}
+
+.gc-listing-type-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.gc-hint {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin: 0.25rem 0 0;
+    font-style: italic;
+}

@@ -26,7 +26,7 @@ export class AuthService {
             try {
                 const user: User = JSON.parse(savedUser);
                 // Validate token hasn't expired
-                if (!this.isTokenExpired(savedToken)) {
+                if (!this.checkTokenExpired(savedToken)) {
                     user.token = savedToken;
                     this.currentUser$.next(user);
                     this.isAuthenticated$.next(true);
@@ -57,7 +57,7 @@ export class AuthService {
 
     isLoggedIn(): boolean {
         const token = this.getToken();
-        return !!token && !this.isTokenExpired(token);
+        return !!token && !this.checkTokenExpired(token);
     }
 
     getRoles(): string[] {
@@ -68,6 +68,13 @@ export class AuthService {
         const roles = this.getRoles();
         const normalized = role.startsWith('ROLE_') ? role : `ROLE_${role}`;
         return roles.includes(normalized) || roles.includes('ROLE_ADMIN');
+    }
+
+    // Public method for interceptor to check current token
+    isTokenExpired(): boolean {
+        const token = this.getToken();
+        if (!token) return true;
+        return this.checkTokenExpired(token);
     }
 
     // ─── Auth Actions ──────────────────────────────────────────────
@@ -122,7 +129,7 @@ export class AuthService {
         }
     }
 
-    private isTokenExpired(token: string): boolean {
+    private checkTokenExpired(token: string): boolean {
         const decoded = this.decodeToken(token);
         if (!decoded?.exp) return false;
         return decoded.exp * 1000 < Date.now();

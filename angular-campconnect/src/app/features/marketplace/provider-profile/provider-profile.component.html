@@ -1,5 +1,13 @@
 <div class="pp">
 
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+    </div>
+
+    <!-- Main Content -->
+    <ng-container *ngIf="!loading">
+
     <!-- ══════════════════════════════════════════════════════ -->
     <!-- HEADER                                                 -->
     <!-- ══════════════════════════════════════════════════════ -->
@@ -210,7 +218,7 @@
                         Product</button>
                 </div>
 
-                <div class="pp__products-grid">
+                <div class="pp__products-grid" *ngIf="products.length > 0">
                     <div class="pp__product-card" *ngFor="let p of products; trackBy: trackById"
                         [routerLink]="['/provider/products', p.id, 'edit']">
                         <div class="pp__product-img">{{ p.icon }}</div>
@@ -222,6 +230,7 @@
                         </div>
                     </div>
                 </div>
+                <div *ngIf="products.length === 0" class="text-center py-8 text-gray-500">No products found.</div>
             </div>
 
             <!-- ─── RENTALS ───────────────────────────────────── -->
@@ -234,7 +243,7 @@
                     </div>
                 </div>
 
-                <div class="pp__table-wrap">
+                <div class="pp__table-wrap" *ngIf="rentals.length > 0">
                     <table class="pp__table">
                         <thead>
                             <tr>
@@ -268,6 +277,7 @@
                         </tbody>
                     </table>
                 </div>
+                <div *ngIf="rentals.length === 0" class="text-center py-8 text-gray-500">No active rentals found.</div>
             </div>
 
             <!-- ─── REVIEWS ───────────────────────────────────── -->
@@ -417,4 +427,6 @@
 
         </div><!-- /tab-body -->
     </section>
+
+    </ng-container>
 </div>

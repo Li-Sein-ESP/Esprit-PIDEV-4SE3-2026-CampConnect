@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms'; // Required for ngModel on the search box and filter select
+import { FormsModule } from '@angular/forms';
+import { RentalApiService, RentalResponse, RentalStatus } from '../../gear/services/rental-api.service';
 
 export interface RentalItem {
     id: string;
     productName: string;
-    productImage: string; // Used in place of emoji for robust visual representation
+    productImage: string;
     renterName: string;
     startDate: string;
     endDate: string;
@@ -17,7 +18,56 @@ export interface RentalItem {
     isLate: boolean;
     lateDays?: number;
     baseStatus: 'active' | 'upcoming' | 'completed' | 'late';
-    avatarIndex?: number; // Pre-calculated for avatar color
+    avatarIndex?: number;
+    rentalStatus: RentalStatus;
+}
+
+function daysBetween(start: string, end: string): number {
+    const s = new Date(start + 'T00:00:00');
+    const e = new Date(end + 'T00:00:00');
+    return Math.max(1, Math.ceil((e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24)));
+}
+
+function toRentalItem(r: RentalResponse, index: number): RentalItem {
+    const now = new Date();
+    const endDate = new Date(r.endDate + 'T00:00:00');
+    let baseStatus: 'active' | 'upcoming' | 'completed' | 'late';
+
+    switch (r.status) {
+        case 'ACTIVE':
+            baseStatus = endDate < now ? 'late' : 'active';
+            break;
+        case 'PENDING':
+        case 'APPROVED':
+            baseStatus = 'upcoming';
+            break;
+        default:
+            baseStatus = 'completed';
+    }
+
+    const lateDays = baseStatus === 'late'
+        ? Math.ceil((now.getTime() - endDate.getTime()) / (1000 * 60 * 60 * 24))
+        : 0;
+
+    const days = daysBetween(r.startDate, r.endDate);
+
+    return {
+        id: r.id,
+        productName: r.gearName,
+        productImage: '📦',
+        renterName: r.renterName,
+        startDate: r.startDate,
+        endDate: r.endDate,
+        duration: `${days} day${days !== 1 ? 's' : ''}`,
+        deliveryStatus: '—',
+        paymentStatus: '—',
+        totalAmount: 0,
+        isLate: baseStatus === 'late',
+        lateDays: lateDays || undefined,
+        baseStatus,
+        avatarIndex: index % 6,
+        rentalStatus: r.status
+    };
 }
 
 @Component({
@@ -30,135 +80,34 @@ export interface RentalItem {
 export class ProviderRentalsComponent implements OnInit {
     filterStatus: string = 'all';
     searchQuery: string = '';
+    loading = true;
+    error: string | null = null;
 
-    rentals: RentalItem[] = [
-        {
-            id: 'RNT-4821',
-            productName: '4-Person Expedition Tent',
-            productImage: '⛺',
-            renterName: 'Sarah Mitchell',
-            startDate: '2025-06-01',
-            endDate: '2025-06-08',
-            duration: '7 days',
-            deliveryStatus: 'Delivered',
-            paymentStatus: 'Paid',
-            totalAmount: 245.00,
-            baseStatus: 'active',
-            isLate: false,
-        },
-        {
-            id: 'RNT-4819',
-            productName: 'Ultralight Sleeping Bag (-10°C)',
-            productImage: '🛏️',
-            renterName: 'James Cooper',
-            startDate: '2025-05-28',
-            endDate: '2025-06-03',
-            duration: '6 days',
-            deliveryStatus: 'Delivered',
-            paymentStatus: 'Paid',
-            totalAmount: 132.00,
-            baseStatus: 'late',
-            isLate: true,
-            lateDays: 3,
-        },
-        {
-            id: 'RNT-4815',
-            productName: 'Portable Camp Stove Pro',
-            productImage: '🔥',
-            renterName: 'Emily Zhang',
-            startDate: '2025-06-03',
-            endDate: '2025-06-10',
-            duration: '7 days',
-            deliveryStatus: 'In Transit',
-            paymentStatus: 'Paid',
-            totalAmount: 89.50,
-            baseStatus: 'active',
-            isLate: false,
-        },
-        {
-            id: 'RNT-4812',
-            productName: 'Trekking Backpack 65L',
-            productImage: '🎒',
-            renterName: 'David Okafor',
-            startDate: '2025-05-25',
-            endDate: '2025-06-01',
-            duration: '7 days',
-            deliveryStatus: 'Delivered',
-            paymentStatus: 'Partial',
-            totalAmount: 175.00,
-            baseStatus: 'late',
-            isLate: true,
-            lateDays: 5,
-        },
-        {
-            id: 'RNT-4808',
-            productName: 'LED Lantern Set (3-Pack)',
-            productImage: '🏕️',
-            renterName: 'Rachel Evans',
-            startDate: '2025-06-05',
-            endDate: '2025-06-12',
-            duration: '7 days',
-            deliveryStatus: 'Delivered',
-            paymentStatus: 'Paid',
-            totalAmount: 54.00,
-            baseStatus: 'active',
-            isLate: false,
-        },
-        {
-            id: 'RNT-4805',
-            productName: 'Inflatable Kayak 2-Person',
-            productImage: '🛶',
-            renterName: 'Tom Nguyen',
-            startDate: '2025-06-10',
-            endDate: '2025-06-15',
-            duration: '5 days',
-            deliveryStatus: 'Pickup',
-            paymentStatus: 'Pending',
-            totalAmount: 320.00,
-            baseStatus: 'upcoming',
-            isLate: false,
-        },
-        {
-            id: 'RNT-4800',
-            productName: 'Camping Hammock Double',
-            productImage: '🌲',
-            renterName: 'Lisa Patel',
-            startDate: '2025-05-20',
-            endDate: '2025-05-27',
-            duration: '7 days',
-            deliveryStatus: 'Delivered',
-            paymentStatus: 'Paid',
-            totalAmount: 68.00,
-            baseStatus: 'completed',
-            isLate: false,
-        },
-        {
-            id: 'RNT-4796',
-            productName: 'Portable Water Filter System',
-            productImage: '💧',
-            renterName: 'Mark Sullivan',
-            startDate: '2025-05-26',
-            endDate: '2025-06-02',
-            duration: '7 days',
-            deliveryStatus: 'Delivered',
-            paymentStatus: 'Paid',
-            totalAmount: 95.00,
-            baseStatus: 'late',
-            isLate: true,
-            lateDays: 4,
-        },
-    ];
-
+    rentals: RentalItem[] = [];
     filteredRentals: RentalItem[] = [];
 
-    constructor(private router: Router) { }
+    constructor(private router: Router, private rentalApi: RentalApiService) { }
 
     ngOnInit(): void {
-        // Generate avatar indices exactly matching JS logic
-        this.rentals.forEach((r, idx) => {
-            r.avatarIndex = idx % 6;
+        this.loadRentals();
+    }
+
+    loadRentals(): void {
+        this.loading = true;
+        this.error = null;
+        this.rentalApi.getAll(0, 100).subscribe({
+            next: (page) => {
+                this.rentals = page.content.map((r, i) => toRentalItem(r, i));
+                this.loading = false;
+                this.applyFilters();
+            },
+            error: (err) => {
+                this.error = err?.status === 403
+                    ? 'Access denied. Equipment Provider role required.'
+                    : 'Failed to load rentals. Please try again.';
+                this.loading = false;
+            }
         });
-        this.applyFilters();
     }
 
     /* ---- HELPERS ---- */
@@ -217,11 +166,11 @@ export class ProviderRentalsComponent implements OnInit {
     }
 
     markAsReturned(rental: RentalItem): void {
-        if (confirm(`Are you sure you want to mark rental ${rental.id} as returned?`)) {
-            rental.baseStatus = 'completed';
-            rental.isLate = false;
-            rental.lateDays = 0;
-            this.applyFilters();
+        if (confirm(`Mark rental ${rental.id} as COMPLETED?`)) {
+            this.rentalApi.updateStatus(rental.id, 'COMPLETED').subscribe({
+                next: () => this.loadRentals(),
+                error: () => alert('Failed to update rental status.')
+            });
         }
     }
 

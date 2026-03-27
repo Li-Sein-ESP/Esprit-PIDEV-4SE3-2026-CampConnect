@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
@@ -22,6 +22,8 @@ import {
     Compass,
     Check
 } from 'lucide-angular';
+import { Subject, combineLatest } from 'rxjs';
+import { takeUntil, switchMap } from 'rxjs/operators';
 
 // We'll map GearResponse to Product loosely for the UI
 export interface Product {
@@ -55,7 +57,8 @@ interface FilterState {
     templateUrl: './marketplace-category.component.html',
     styleUrls: ['./marketplace-category.component.scss']
 })
-export class MarketplaceCategoryComponent implements OnInit {
+export class MarketplaceCategoryComponent implements OnInit, OnDestroy {
+    private destroy$ = new Subject<void>();
     // Icons
     readonly Mountain = Mountain;
     readonly Tent = Tent;
@@ -115,33 +118,30 @@ export class MarketplaceCategoryComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.route.paramMap.subscribe(params => {
-            const id = params.get('id');
-            if (id) {
-                this.selectedCategory = id;
-            }
-            this.loadProducts();
-        });
-
-        this.route.queryParamMap.subscribe(params => {
-            // Handle query params if needed
-        });
-    }
-
-    loadProducts(): void {
-        this.isLoading = true;
-        // If category is "all", we don't pass a category filter to get everything.
-        // If it's a specific slug, we find the real name to query, or query directly if the backend accepts slugs.
-        // For simplicity, we just fetch all ACTIVE gear and filter locally to match the UI's instantaneous filtering.
-        this.gearService.getGear({ status: 'AVAILABLE' }).subscribe({
+        combineLatest([
+            this.route.paramMap,
+            this.route.queryParamMap
+        ]).pipe(
+            takeUntil(this.destroy$),
+            switchMap(([params, queryParams]) => {
+                const id = params.get('id');
+                if (id) {
+                    this.selectedCategory = id;
+                }
+                // Handle query params if needed in the future
+                
+                // Load products from API
+                return this.gearService.getGear({ status: 'AVAILABLE' });
+            })
+        ).subscribe({
             next: (page) => {
                 this.products = page.content.map((g: any) => ({
                     id: g.id,
                     name: g.name,
-                    brand: g.brand || 'ConnectCamp', // Backend might not have brand yet
+                    brand: g.brand || 'ConnectCamp',
                     category: g.category,
                     pricePerDay: g.price || g.pricePerDay || 0,
-                    originalPrice: (g.price || g.pricePerDay || 0) * 1.2, // mock value
+                    originalPrice: (g.price || g.pricePerDay || 0) * 1.2,
                     rating: g.rating || 4.5,
                     reviewCount: g.reviewCount || Math.floor(Math.random() * 50),
                     condition: g.condition,
@@ -157,6 +157,11 @@ export class MarketplaceCategoryComponent implements OnInit {
                 this.isLoading = false;
             }
         });
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     get filteredProducts(): Product[] {

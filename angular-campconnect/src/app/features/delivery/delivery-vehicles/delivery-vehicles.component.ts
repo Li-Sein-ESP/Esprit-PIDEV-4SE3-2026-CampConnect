@@ -1,17 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
-
-export interface Vehicle {
-    id: string;
-    type: 'MOTORCYCLE' | 'VAN' | '4X4';
-    maxWeight: number;
-    maxVolume: number;
-    fuelType: string;
-    status: 'AVAILABLE' | 'BUSY' | 'MAINTENANCE';
-    assignedDeliveries: number;
-}
+import { VehicleApiService, VehicleResponse, VehicleRequest, VehicleStatus } from '../services/vehicle-api.service';
 
 @Component({
     selector: 'app-delivery-vehicles',
@@ -21,76 +12,84 @@ export interface Vehicle {
     styleUrls: ['./delivery-vehicles.component.scss']
 })
 export class DeliveryVehiclesComponent implements OnInit {
-    // Original mock data formatted to match requested schema exactly
-    vehicles: Vehicle[] = [
-        { id: 'VEH-001', type: 'MOTORCYCLE', maxWeight: 80, maxVolume: 35, fuelType: 'gasoline', status: 'AVAILABLE', assignedDeliveries: 24 },
-        { id: 'VEH-002', type: 'MOTORCYCLE', maxWeight: 100, maxVolume: 45, fuelType: 'gasoline', status: 'AVAILABLE', assignedDeliveries: 18 },
-        { id: 'VEH-003', type: 'VAN', maxWeight: 800, maxVolume: 350, fuelType: 'diesel', status: 'BUSY', assignedDeliveries: 42 },
-        { id: 'VEH-004', type: '4X4', maxWeight: 650, maxVolume: 280, fuelType: 'diesel', status: 'AVAILABLE', assignedDeliveries: 31 },
-        { id: 'VEH-005', type: 'MOTORCYCLE', maxWeight: 75, maxVolume: 30, fuelType: 'electric', status: 'MAINTENANCE', assignedDeliveries: 12 },
-        { id: 'VEH-006', type: 'VAN', maxWeight: 750, maxVolume: 320, fuelType: 'diesel', status: 'AVAILABLE', assignedDeliveries: 56 },
-        { id: 'VEH-007', type: '4X4', maxWeight: 600, maxVolume: 250, fuelType: 'gasoline', status: 'BUSY', assignedDeliveries: 28 },
-        { id: 'VEH-008', type: 'MOTORCYCLE', maxWeight: 90, maxVolume: 40, fuelType: 'gasoline', status: 'AVAILABLE', assignedDeliveries: 37 }
-    ];
+    vehicles: VehicleResponse[] = [];
+    loading = true;
+    error: string | null = null;
 
     isModalOpen = false;
     isEditing = false;
     currentVehicleId: string | null = null;
     vehicleForm: FormGroup;
+    isSaving = false;
     isAdmin = false;
 
-    // New vehicles stats tracking
-    totalVehiclesAddedThisMonth = 2; // static mock to mimic design
-
-    constructor(private fb: FormBuilder, private authService: AuthService) {
+    constructor(
+        private fb: FormBuilder,
+        private authService: AuthService,
+        private vehicleApi: VehicleApiService
+    ) {
         this.vehicleForm = this.fb.group({
-            type: ['', Validators.required],
-            maxWeight: ['', [Validators.required, Validators.min(1)]],
-            maxVolume: ['', [Validators.required, Validators.min(1)]],
-            fuelType: ['', Validators.required],
-            isAvailable: [true]
+            plateNumber: ['', [Validators.required, Validators.minLength(3)]],
+            capacity: ['', [Validators.required, Validators.min(1)]],
+            status: ['AVAILABLE'],
+            driverId: ['']
         });
     }
 
     ngOnInit(): void {
         this.isAdmin = this.authService.hasRole('ROLE_ADMIN');
+        this.loadVehicles();
     }
 
-    // --- STATS ---
-
-    get totalVehicles(): number {
-        return this.vehicles.length;
+    loadVehicles(): void {
+        this.loading = true;
+        this.error = null;
+        this.vehicleApi.getAll(undefined, 0, 50).subscribe({
+            next: (page) => {
+                this.vehicles = page.content;
+                this.loading = false;
+            },
+            error: (err) => {
+                this.error = err?.status === 403
+                    ? 'Access denied. Admin or Delivery Provider role required.'
+                    : 'Failed to load vehicles.';
+                this.loading = false;
+            }
+        });
     }
+
+    // ─── Stats ────────────────────────────────────────────────────────────────
+
+    get totalVehicles(): number { return this.vehicles.length; }
 
     get availableVehicles(): number {
         return this.vehicles.filter(v => v.status === 'AVAILABLE').length;
     }
 
     get inUseVehicles(): number {
-        return this.vehicles.filter(v => v.status === 'BUSY').length;
+        return this.vehicles.filter(v => v.status === 'IN_USE').length;
     }
 
     get totalCapacity(): number {
-        return this.vehicles.reduce((sum, v) => sum + v.maxWeight, 0);
+        return this.vehicles.reduce((sum, v) => sum + v.capacity, 0);
     }
 
-    // --- ACTIONS ---
+    // ─── Modal ─────────────────────────────────────────────────────────────────
 
-    openModal(vehicle?: Vehicle): void {
+    openModal(vehicle?: VehicleResponse): void {
         if (vehicle) {
             this.isEditing = true;
             this.currentVehicleId = vehicle.id;
             this.vehicleForm.patchValue({
-                type: vehicle.type,
-                maxWeight: vehicle.maxWeight,
-                maxVolume: vehicle.maxVolume,
-                fuelType: vehicle.fuelType,
-                isAvailable: vehicle.status === 'AVAILABLE'
+                plateNumber: vehicle.plateNumber,
+                capacity: vehicle.capacity,
+                status: vehicle.status,
+                driverId: vehicle.driverId ?? ''
             });
         } else {
             this.isEditing = false;
             this.currentVehicleId = null;
-            this.vehicleForm.reset({ isAvailable: true, type: '', fuelType: '' });
+            this.vehicleForm.reset({ status: 'AVAILABLE' });
         }
         this.isModalOpen = true;
     }
@@ -101,63 +100,50 @@ export class DeliveryVehiclesComponent implements OnInit {
         this.currentVehicleId = null;
     }
 
-    toggleAvailability(field?: string): void {
-        if (field === 'form') {
-            const currentValue = this.vehicleForm.get('isAvailable')?.value;
-            this.vehicleForm.patchValue({ isAvailable: !currentValue });
-        }
-    }
-
-    toggleVehicleAvailability(id: string): void {
-        const v = this.vehicles.find(v => v.id === id);
-        if (v && v.status !== 'MAINTENANCE') {
-            v.status = v.status === 'AVAILABLE' ? 'BUSY' : 'AVAILABLE';
-        } else if (v && v.status === 'MAINTENANCE') {
-            alert("Cannot switch status directly. Vehicle is in Maintenance.");
-        }
-    }
-
-    deleteVehicle(id: string): void {
-        if (confirm(`Are you sure you want to delete vehicle ${id}?`)) {
-            this.vehicles = this.vehicles.filter(v => v.id !== id);
-        }
-    }
-
     saveVehicle(): void {
         if (this.vehicleForm.invalid) return;
 
-        const vData = this.vehicleForm.value;
-        const newVehicle: Vehicle = {
-            id: this.isEditing && this.currentVehicleId ? this.currentVehicleId : `VEH-${String(this.vehicles.length + 1).padStart(3, '0')}`,
-            type: vData.type as any,
-            maxWeight: Number(vData.maxWeight),
-            maxVolume: Number(vData.maxVolume),
-            fuelType: vData.fuelType,
-            status: vData.isAvailable ? 'AVAILABLE' : 'BUSY',
-            assignedDeliveries: this.isEditing ? (this.vehicles.find(v => v.id === this.currentVehicleId)?.assignedDeliveries || 0) : 0
+        this.isSaving = true;
+        const formValue = this.vehicleForm.value;
+        const request: VehicleRequest = {
+            plateNumber: formValue.plateNumber,
+            capacity: Number(formValue.capacity),
+            status: formValue.status as VehicleStatus,
+            driverId: formValue.driverId || undefined
         };
 
-        if (this.isEditing) {
-            const idx = this.vehicles.findIndex(v => v.id === this.currentVehicleId);
-            if (idx !== -1) {
-                this.vehicles[idx] = newVehicle;
+        const call$ = this.isEditing && this.currentVehicleId
+            ? this.vehicleApi.update(this.currentVehicleId, request)
+            : this.vehicleApi.create(request);
+
+        call$.subscribe({
+            next: () => {
+                this.isSaving = false;
+                this.closeModal();
+                this.loadVehicles();
+            },
+            error: (err) => {
+                this.isSaving = false;
+                alert(err?.error?.message || 'Failed to save vehicle.');
             }
-        } else {
-            this.vehicles.push(newVehicle);
-            this.totalVehiclesAddedThisMonth++;
-        }
-
-        this.closeModal();
+        });
     }
 
-    // --- HELPERS ---
-
-    getTypeLabel(type: string): string {
-        const map: any = { 'MOTORCYCLE': 'Motorcycle', 'VAN': 'Van', '4X4': '4x4' };
-        return map[type] || 'Motorcycle';
+    deleteVehicle(id: string): void {
+        if (!confirm('Are you sure you want to delete this vehicle?')) return;
+        this.vehicleApi.delete(id).subscribe({
+            next: () => this.loadVehicles(),
+            error: () => alert('Failed to delete vehicle.')
+        });
     }
 
-    getFuelTypeLabel(fuel: string): string {
-        return fuel.charAt(0).toUpperCase() + fuel.slice(1);
+    statusLabel(status: VehicleStatus): string {
+        const map: Record<VehicleStatus, string> = {
+            AVAILABLE: 'Available',
+            IN_USE: 'In Use',
+            MAINTENANCE: 'Maintenance',
+            RETIRED: 'Retired'
+        };
+        return map[status] ?? status;
     }
 }

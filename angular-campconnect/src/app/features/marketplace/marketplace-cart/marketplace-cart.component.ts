@@ -1,21 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, ChevronLeft, Calendar, Trash2, Edit2, ShieldCheck, Star, ArrowRight, ShoppingBag } from 'lucide-angular';
-
-interface CartItem {
-    id: number;
-    name: string;
-    image: string;
-    condition: string;
-    conditionColor: string;
-    startDate: string;
-    endDate: string;
-    pricePerDay: number;
-    deposit: number;
-    category: string;
-}
+import { LucideAngularModule, ChevronLeft, Calendar, Trash2, Edit2, ShieldCheck, Star, ArrowRight, ShoppingBag, Loader2, Truck } from 'lucide-angular';
+import { CartApiService } from '../../gear/services/cart-api.service';
+import { CartResponse, CartItemResponse } from '../../gear/models/cart.model';
 
 @Component({
     selector: 'app-marketplace-cart',
@@ -24,74 +13,65 @@ interface CartItem {
     templateUrl: './marketplace-cart.component.html',
     styleUrls: ['./marketplace-cart.component.scss']
 })
-export class MarketplaceCartComponent {
+export class MarketplaceCartComponent implements OnDestroy {
+    private navigationTimer?: number;
+    
     icons = {
-        ChevronLeft, Calendar, Trash2, Edit2, ShieldCheck, Star, ArrowRight, ShoppingBag
+        ChevronLeft, Calendar, Trash2, Edit2, ShieldCheck, Star, ArrowRight, ShoppingBag, Loader2, Truck
     };
 
-    cartItems: CartItem[] = [
-        {
-            id: 1,
-            name: "REI Co-op Base Camp 6 Tent",
-            image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=300&fit=crop",
-            condition: "Like New",
-            conditionColor: "bg-green-100 text-green-700",
-            startDate: "2024-06-15",
-            endDate: "2024-06-20",
-            pricePerDay: 45,
-            deposit: 200,
-            category: "Shelter"
-        },
-        {
-            id: 2,
-            name: "Thermarest sleeping bag (-20°F)",
-            image: "https://images.unsplash.com/photo-1445308394109-4ec2920981b1?w=400&h=300&fit=crop",
-            condition: "Excellent",
-            conditionColor: "bg-blue-100 text-blue-700",
-            startDate: "2024-06-15",
-            endDate: "2024-06-20",
-            pricePerDay: 18,
-            deposit: 80,
-            category: "Sleeping"
-        },
-        {
-            id: 3,
-            name: "Jetboil Flash Cooking System",
-            image: "https://images.unsplash.com/photo-1504851149312-7a075b496cc7?w=400&h=300&fit=crop",
-            condition: "Good",
-            conditionColor: "bg-amber-100 text-amber-700",
-            startDate: "2024-06-15",
-            endDate: "2024-06-20",
-            pricePerDay: 12,
-            deposit: 50,
-            category: "Kitchen"
-        },
-        {
-            id: 4,
-            name: "Black Diamond Headlamp 750",
-            image: "https://images.unsplash.com/photo-1551524559-8af4e6624178?w=400&h=300&fit=crop",
-            condition: "Like New",
-            conditionColor: "bg-green-100 text-green-700",
-            startDate: "2024-06-15",
-            endDate: "2024-06-20",
-            pricePerDay: 8,
-            deposit: 40,
-            category: "Lighting"
-        }
-    ];
+    cart: CartResponse | null = null;
+    loading = true;
+    error: string | null = null;
+    actionLoading = false;
+    successMessage: string | null = null;
 
-    constructor(private router: Router) { }
+    constructor(private router: Router, private cartApi: CartApiService) { }
+
+    ngOnInit(): void {
+        this.loadCart();
+    }
+
+    loadCart(): void {
+        this.loading = true;
+        this.error = null;
+        this.cartApi.getCart().subscribe({
+            next: (cart) => {
+                this.cart = cart;
+                this.loading = false;
+            },
+            error: (err) => {
+                this.error = 'Failed to load your cart. Make sure you are logged in.';
+                this.loading = false;
+            }
+        });
+    }
 
     get subtotal(): number {
-        return this.cartItems.reduce((sum, item) => sum + this.calculateItemTotal(item), 0);
+        return this.cart?.subtotal || 0;
     }
 
     get totalDeposit(): number {
-        return this.cartItems.reduce((sum, item) => sum + item.deposit, 0);
+        return this.cart?.totalDeposit || 0;
     }
 
     get deliveryCost(): number {
-        return this.subtotal > 100 ? 0 : 25;
+        if (!this.cart || this.cart.items.length === 0) return 0;
+
+        let cost = 0;
+        let requiresDeliveryCount = 0;
+
+        this.cart.items.forEach(item => {
+            if (item.requiresDelivery) {
+                requiresDeliveryCount++;
+            }
+        });
+
+        if (requiresDeliveryCount > 0) {
+            cost = requiresDeliveryCount * 15; // $15 per delivery item as handled earlier
+        }
+
+        return cost;
     }
 
     get taxes(): number {
@@ -99,34 +79,48 @@ export class MarketplaceCartComponent {
     }
 
     get grandTotal(): number {
-        return this.subtotal + this.deliveryCost + this.taxes;
+        return this.subtotal + this.totalDeposit + this.deliveryCost + this.taxes;
     }
 
-    calculateDuration(startDate: string, endDate: string): number {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        const diffTime = Math.abs(end.getTime() - start.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays || 1;
-    }
-
-    calculateItemTotal(item: CartItem): number {
-        const days = this.calculateDuration(item.startDate, item.endDate);
-        return item.pricePerDay * days;
-    }
-
-    removeItem(itemId: number) {
+    removeItem(itemId: string) {
         if (confirm('Remove this item from your cart?')) {
-            this.cartItems = this.cartItems.filter(i => i.id !== itemId);
+            this.actionLoading = true;
+            this.cartApi.removeFromCart(itemId).subscribe({
+                next: (cart) => {
+                    this.cart = cart;
+                    this.actionLoading = false;
+                },
+                error: (err) => {
+                    this.actionLoading = false;
+                    this.error = 'Could not remove item from cart.';
+                }
+            });
         }
     }
 
-    updateDate(item: CartItem) {
-        // In a real app, validation logic would go here
-        // Force angular change detection updates if needed, but [(ngModel)] handles it
+    proceedToCheckout() {
+        if (!this.cart || this.cart.items.length === 0) return;
+
+        this.actionLoading = true;
+        this.cartApi.checkoutCart().subscribe({
+            next: () => {
+                this.actionLoading = false;
+                this.successMessage = "Your checkout was successful! Your purchases and rentals are confirmed.";
+                this.cart = null; // Clear view
+                this.navigationTimer = window.setTimeout(() => {
+                    this.router.navigate(['/marketplace']);
+                }, 3000);
+            },
+            error: (err) => {
+                this.actionLoading = false;
+                this.error = err?.error?.message ?? 'Checkout failed. Please try again.';
+            }
+        });
     }
 
-    proceedToCheckout() {
-        this.router.navigate(['/checkout']);
+    ngOnDestroy(): void {
+        if (this.navigationTimer) {
+            clearTimeout(this.navigationTimer);
+        }
     }
 }

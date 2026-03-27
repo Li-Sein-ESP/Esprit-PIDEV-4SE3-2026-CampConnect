@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class DeliveryResponse {
     private String id;
     private String rentalId;
+    private String purchaseId;
     private String driverId;
     private String driverName;
     private String pickupAddress;

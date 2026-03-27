@@ -84,8 +84,10 @@
                 <!-- Form Actions -->
                 <div class="cc-edit__actions">
                     <a routerLink="/profile" class="cc-btn cc-btn--outline">Cancel</a>
-                    <button type="submit" class="cc-btn cc-btn--primary" [disabled]="editForm.invalid">Save
-                        Changes</button>
+                    <button type="submit" class="cc-btn cc-btn--primary" [disabled]="editForm.invalid || saving">
+                        <span *ngIf="saving" class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+                        {{ saving ? 'Saving...' : 'Save Changes' }}
+                    </button>
                 </div>
 
             </form>

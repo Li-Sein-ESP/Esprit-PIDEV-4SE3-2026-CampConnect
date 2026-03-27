@@ -1,6 +1,7 @@
 import { Component, HostListener, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { GearApiService } from '../../gear/services/gear-api.service';
 
 interface Category {
     id: string;
@@ -51,21 +52,8 @@ export class MarketplaceLandingComponent implements OnInit {
         { id: "accessories", name: "Accessories", image: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=600&q=80", count: 203 },
     ];
 
-    featuredProducts: Product[] = [
-        { id: "1", name: "REI Co-op Base Camp 6", category: "Tents", price: 45, rating: 4.9, reviewCount: 287, image: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=800&q=80" },
-        { id: "2", name: "Therm-a-Rest NeoAir XLite", category: "Sleeping Pads", price: 18, rating: 4.8, reviewCount: 412, image: "https://images.unsplash.com/photo-1445308394109-4ec2920981b1?w=800&q=80" },
-        { id: "3", name: "Jetboil Flash Cooking System", category: "Camp Kitchen", price: 12, rating: 4.7, reviewCount: 523, image: "https://images.unsplash.com/photo-1571687949921-1306bfb24b72?w=800&q=80" },
-        { id: "4", name: "Big Agnes Copper Spur HV UL2", category: "Tents", price: 52, rating: 4.9, reviewCount: 198, image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=80" },
-    ];
-
-    mostRented: Product[] = [
-        { id: "5", name: "MSR Hubba Hubba NX 2", category: "Tents", price: 38, rating: 4.9, reviewCount: 634, image: "https://images.unsplash.com/photo-1537905569824-f89f14cceb68?w=800&q=80" },
-        { id: "6", name: "Black Diamond Spot Headlamp", category: "Lighting", price: 8, rating: 4.8, reviewCount: 891, image: "https://images.unsplash.com/photo-1510312305653-8ed496efae75?w=800&q=80" },
-        { id: "7", name: "YETI Tundra 45 Hard Cooler", category: "Coolers", price: 25, rating: 4.9, reviewCount: 445, image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80" },
-        { id: "8", name: "ENO DoubleNest Hammock", category: "Hammocks", price: 14, rating: 4.7, reviewCount: 712, image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80" },
-        { id: "9", name: "Coleman 2-Burner Stove", category: "Camp Kitchen", price: 22, rating: 4.6, reviewCount: 567, image: "https://images.unsplash.com/photo-1571687949921-1306bfb24b72?w=800&q=80" },
-        { id: "10", name: "Osprey Atmos AG 65 Pack", category: "Backpacks", price: 28, rating: 4.8, reviewCount: 389, image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80" },
-    ];
+    featuredProducts: Product[] = [];
+    mostRented: Product[] = [];
 
     campingKits: Kit[] = [
         {
@@ -112,9 +100,31 @@ export class MarketplaceLandingComponent implements OnInit {
     footerCompany = ["About Us", "How It Works", "Become a Host", "Blog", "Careers"];
     footerSupport = ["Help Center", "Safety", "Contact Us", "Privacy Policy", "Terms"];
 
-    constructor() { }
+    constructor(private gearService: GearApiService) { }
 
     ngOnInit(): void {
+        this.loadDynamicProducts();
+    }
+
+    loadDynamicProducts() {
+        this.gearService.getGear({ status: 'AVAILABLE', size: 10 }).subscribe({
+            next: (page) => {
+                const mapped = page.content.map((g: any) => ({
+                    id: g.id,
+                    name: g.name,
+                    category: g.category || 'Gear',
+                    price: g.price || g.pricePerDay || 0,
+                    rating: g.rating || 4.5,
+                    reviewCount: g.reviewCount || Math.floor(Math.random() * 50),
+                    image: (g.images && g.images.length > 0) ? g.images[0].imageUrl :
+                        (g.imageUrls?.length > 0 ? g.imageUrls[0] : 'https://images.unsplash.com/photo-1525811902-f2342640856e?w=800&q=80')
+                }));
+                // Split dynamic products into featured and most rented
+                this.featuredProducts = mapped.slice(0, 4);
+                this.mostRented = mapped.slice(4, 10);
+            },
+            error: (err) => console.error("Failed to load featured products", err)
+        });
     }
 
     @HostListener('window:scroll', [])

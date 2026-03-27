@@ -7,6 +7,8 @@ import com.campconnect.gear.dto.*;
 import com.campconnect.gear.model.*;
 import com.campconnect.gear.repository.GearRepository;
 import com.campconnect.gear.repository.MaintenanceRecordRepository;
+import com.campconnect.gear.repository.PurchaseRepository;
+import com.campconnect.gear.repository.RentalRepository;
 import com.campconnect.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -15,7 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +30,8 @@ public class GearService {
     private final UserRepository userRepository;
     private final MaintenanceRecordRepository maintenanceRecordRepository;
     private final ModelMapper modelMapper;
+    private final RentalRepository rentalRepository;
+    private final PurchaseRepository purchaseRepository;
 
     // ---------- READ ----------
 
@@ -60,9 +66,20 @@ public class GearService {
     @Transactional
     public GearResponse create(GearRequest request, String ownerId) {
 
+        validatePricing(request);
+
         Gear gear = modelMapper.map(request, Gear.class);
         gear.setOwnerId(ownerId);
         gear.setDeleted(false);
+        gear.setListingType(request.getListingType());
+        gear.setDailyPrice(request.getDailyPrice());
+        gear.setSalePrice(request.getSalePrice());
+        // Keep backward-compat: price = dailyPrice (used by rental logic)
+        if (request.getDailyPrice() != null) {
+            gear.setPrice(request.getDailyPrice());
+        } else if (request.getPrice() != null) {
+            gear.setPrice(request.getPrice());
+        }
 
         if (request.getImageUrls() != null) {
             request.getImageUrls().forEach(url -> gear.getImages().add(new GearImage(url)));
@@ -88,11 +105,21 @@ public class GearService {
             throw new BadRequestException("You are not the owner of this gear");
         }
 
+        validatePricing(request);
+
         if (request.getPrice() != null && request.getPrice().compareTo(java.math.BigDecimal.ZERO) < 0) {
             throw new BadRequestException("Price cannot be negative");
         }
 
         modelMapper.map(request, gear);
+        gear.setListingType(request.getListingType());
+        gear.setDailyPrice(request.getDailyPrice());
+        gear.setSalePrice(request.getSalePrice());
+        if (request.getDailyPrice() != null) {
+            gear.setPrice(request.getDailyPrice());
+        } else if (request.getPrice() != null) {
+            gear.setPrice(request.getPrice());
+        }
 
         // Re-evaluate status after quantity change
         if (gear.getQuantity() == 0 && gear.getStatus() == GearStatus.AVAILABLE) {
@@ -155,6 +182,23 @@ public class GearService {
         return toResponse(gearRepository.save(gear));
     }
 
+    // ---------- VALIDATION ----------
+
+    private void validatePricing(GearRequest request) {
+        ListingType type = request.getListingType();
+        if (type == null) {
+            throw new BadRequestException("Listing type is required.");
+        }
+        boolean needsDaily = type == ListingType.FOR_RENT || type == ListingType.BOTH;
+        boolean needsSale = type == ListingType.FOR_SALE || type == ListingType.BOTH;
+        if (needsDaily && request.getDailyPrice() == null) {
+            throw new BadRequestException("Daily rental price is required for listing type " + type + ".");
+        }
+        if (needsSale && request.getSalePrice() == null) {
+            throw new BadRequestException("Sale price is required for listing type " + type + ".");
+        }
+    }
+
     // ---------- MAPPING ----------
 
     public GearResponse toResponse(Gear gear) {
@@ -174,5 +218,61 @@ public class GearService {
         }
 
         return response;
+    }
+
+    public GearAnalyticsResponse getGearAnalytics(String gearId) {
+        Gear gear = gearRepository.findById(gearId)
+                .filter(g -> !g.isDeleted())
+                .orElseThrow(() -> new ResourceNotFoundException("Gear", "id", gearId));
+
+        GearAnalyticsResponse resp = new GearAnalyticsResponse();
+        resp.setGearId(gear.getId());
+        resp.setGearName(gear.getName());
+        resp.setTotalRentals(rentalRepository.countByGearId(gearId));
+        resp.setTotalPurchases(purchaseRepository.countByGearId(gearId));
+
+        // Revenue from purchases only (rentals don't store total price)
+        List<Purchase> purchases = purchaseRepository.findByGearIdIn(List.of(gearId));
+        BigDecimal revenue = purchases.stream()
+                .map(Purchase::getTotalPrice)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        resp.setTotalRevenue(revenue);
+
+        resp.setAverageRating(0.0); // No review system yet
+        resp.setActiveRentals((int) rentalRepository.countByGearIdAndStatusIn(
+                gearId, List.of(RentalStatus.ACTIVE, RentalStatus.APPROVED)));
+        resp.setAvailableStock(gear.getQuantity());
+
+        return resp;
+    }
+
+    public ProviderStatsResponse getProviderStats(String ownerId) {
+        List<Gear> gearItems = gearRepository.findByOwnerIdAndDeletedFalse(ownerId);
+        List<String> gearIds = gearItems.stream().map(Gear::getId).collect(Collectors.toList());
+
+        ProviderStatsResponse resp = new ProviderStatsResponse();
+        resp.setTotalProducts(gearItems.size());
+
+        if (gearIds.isEmpty()) {
+            resp.setTotalRevenue(BigDecimal.ZERO);
+            resp.setActiveRentals(0);
+            resp.setPendingRequests(0);
+            resp.setAverageRating(0.0);
+            return resp;
+        }
+
+        resp.setActiveRentals(rentalRepository.countByGearIdInAndStatus(gearIds, RentalStatus.ACTIVE));
+        resp.setPendingRequests(rentalRepository.countByGearIdInAndStatus(gearIds, RentalStatus.PENDING));
+
+        List<Purchase> allPurchases = purchaseRepository.findByGearIdIn(gearIds);
+        BigDecimal revenue = allPurchases.stream()
+                .map(Purchase::getTotalPrice)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        resp.setTotalRevenue(revenue);
+        resp.setAverageRating(0.0);
+
+        return resp;
     }
 }

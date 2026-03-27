@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { GearApiService } from '../../gear/services/gear-api.service';
+import { PurchaseResponse, PagedResponse } from '../../gear/models/gear.model';
 
 @Component({
     selector: 'app-camper-orders',
@@ -13,87 +15,38 @@ export class CamperOrdersComponent implements OnInit {
 
     currentFilter: 'all' | 'active' | 'delivered' | 'cancelled' = 'all';
 
-    orders = [
-        {
-            id: 'CC-20250117-001',
-            date: 'Jan 17, 2025',
-            status: 'on-the-way',
-            statusLabel: 'On the Way',
-            totalAmount: 189.00,
-            rentalDuration: '5 nights',
-            eta: 'Today, 4:30 PM',
-            progress: 72,
-            items: [
-                { name: 'Alpine Tent 4P', icon: 'tent' },
-                { name: 'Sleeping Bag', icon: 'sleeping-bag' },
-                { name: 'Camp Stove', icon: 'stove' },
-            ]
-        },
-        {
-            id: 'CC-20250112-002',
-            date: 'Jan 12, 2025',
-            status: 'preparing',
-            statusLabel: 'Preparing',
-            totalAmount: 94.50,
-            rentalDuration: '3 nights',
-            eta: 'Jan 20, 10:00 AM',
-            progress: 25,
-            items: [
-                { name: 'Hiking Backpack', icon: 'backpack' },
-                { name: 'Trekking Poles', icon: 'poles' },
-            ]
-        },
-        {
-            id: 'CC-20250105-003',
-            date: 'Jan 5, 2025',
-            status: 'delivered',
-            statusLabel: 'Delivered',
-            totalAmount: 256.00,
-            rentalDuration: '7 nights',
-            eta: '',
-            progress: 100,
-            items: [
-                { name: 'Family Tent 6P', icon: 'tent' },
-                { name: 'Lantern Set', icon: 'lantern' },
-                { name: 'Cooler Box', icon: 'cooler' },
-                { name: 'Camp Chairs x2', icon: 'chair' },
-            ]
-        },
-        {
-            id: 'CC-20241228-004',
-            date: 'Dec 28, 2024',
-            status: 'delivered',
-            statusLabel: 'Delivered',
-            totalAmount: 62.00,
-            rentalDuration: '2 nights',
-            eta: '',
-            progress: 100,
-            items: [
-                { name: 'Hammock', icon: 'hammock' },
-                { name: 'Rain Fly', icon: 'tarp' },
-            ]
-        },
-        {
-            id: 'CC-20241220-005',
-            date: 'Dec 20, 2024',
-            status: 'cancelled',
-            statusLabel: 'Cancelled',
-            totalAmount: 135.00,
-            rentalDuration: '4 nights',
-            eta: '',
-            progress: 0,
-            items: [
-                { name: 'Winter Tent 2P', icon: 'tent' },
-                { name: 'Snow Shovel', icon: 'shovel' },
-                { name: 'Thermal Mat', icon: 'mat' },
-            ]
-        }
-    ];
+    loading = true;
+    error: string | null = null;
+
+    orders: any[] = [];
 
     filteredOrders = this.orders;
 
+    constructor(private gearApi: GearApiService) { }
+
     ngOnInit(): void {
-        this.applyFilter('all');
+        this.gearApi.getMyPurchases(0, 20).subscribe({
+            next: (page: PagedResponse<PurchaseResponse>) => {
+                this.orders = page.content.map((p: any) => ({
+                    id: p.id,
+                    date: new Date(p.purchaseDate || p.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                    status: p.status === 'CONFIRMED' ? 'delivered' : p.status === 'PENDING' ? 'preparing' : 'cancelled',
+                    statusLabel: p.status === 'CONFIRMED' ? 'Delivered' : p.status === 'PENDING' ? 'Preparing' : 'Cancelled',
+                    totalAmount: p.totalPrice,
+                    rentalDuration: '',
+                    eta: '',
+                    progress: p.status === 'CONFIRMED' ? 100 : p.status === 'PENDING' ? 25 : 0,
+                    items: [{ name: p.gearName, icon: 'gear' }]
+                }));
+                this.filteredOrders = this.orders;
+                this.loading = false;
+                this.applyFilter(this.currentFilter);
+            },
+            error: () => {
+                this.error = 'Failed to load orders.';
+                this.loading = false;
+            }
+        });
     }
 
     applyFilter(filter: 'all' | 'active' | 'delivered' | 'cancelled') {

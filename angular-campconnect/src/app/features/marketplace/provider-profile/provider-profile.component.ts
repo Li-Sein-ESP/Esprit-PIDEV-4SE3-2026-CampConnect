@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { GearApiService } from '../../gear/services/gear-api.service';
+import { RentalApiService } from '../../gear/services/rental-api.service';
+import { GearResponse } from '../../gear/models/gear.model';
 
 interface ProviderProduct {
     id: number;
@@ -70,23 +73,13 @@ export class ProviderProfileComponent implements OnInit {
         responseTime: '< 2 hrs'
     };
 
+    loading = true;
+
     activeTab = 'overview';
 
-    products: ProviderProduct[] = [
-        { id: 1, name: '4-Person Family Tent', category: 'Camping Essentials', pricePerDay: 45, available: 12, icon: '🏕️', rentals: 87 },
-        { id: 2, name: 'Portable Camping Stove', category: 'Cooking Equipment', pricePerDay: 15, available: 8, icon: '🔥', rentals: 64 },
-        { id: 3, name: 'Sleeping Bag Cold Weather', category: 'Sleeping Gear', pricePerDay: 20, available: 15, icon: '🛌', rentals: 52 },
-        { id: 4, name: 'Hiking Backpack 65L', category: 'Backpacks', pricePerDay: 18, available: 6, icon: '🎒', rentals: 48 },
-        { id: 5, name: 'LED Camping Lantern', category: 'Lighting', pricePerDay: 8, available: 20, icon: '🔦', rentals: 93 },
-        { id: 6, name: 'GPS Navigation Device', category: 'Navigation', pricePerDay: 25, available: 4, icon: '🧭', rentals: 31 }
-    ];
+    products: any[] = [];
 
-    rentals: ProviderRental[] = [
-        { id: 1, customer: 'John Doe', customerInitials: 'JD', customerEmail: 'john@example.com', product: '4-Person Family Tent', dates: 'Jan 15 – Jan 18', total: 135, status: 'Active', avatarColor: '#8B7355' },
-        { id: 2, customer: 'Sarah Miller', customerInitials: 'SM', customerEmail: 'sarah@example.com', product: 'Hiking Backpack 65L', dates: 'Jan 16 – Jan 20', total: 72, status: 'Pending', avatarColor: '#D4A574' },
-        { id: 3, customer: 'Mike Johnson', customerInitials: 'MJ', customerEmail: 'mike@example.com', product: 'Portable Camping Stove', dates: 'Jan 14 – Jan 17', total: 45, status: 'Completed', avatarColor: '#9CA3AF' },
-        { id: 4, customer: 'Emily Wilson', customerInitials: 'EW', customerEmail: 'emily@example.com', product: 'Sleeping Bag Cold Weather', dates: 'Jan 18 – Jan 22', total: 80, status: 'Active', avatarColor: '#8B7355' }
-    ];
+    rentals: any[] = [];
 
     reviews: ProviderReview[] = [
         { id: 1, customer: 'John Doe', customerInitials: 'JD', date: '2 days ago', rating: 5, text: 'Excellent service! The tent was in perfect condition and the pickup process was seamless. Will definitely rent again.', product: '4-Person Family Tent', avatarColor: '#8B7355', showResponse: false },
@@ -105,13 +98,52 @@ export class ProviderProfileComponent implements OnInit {
 
     starArray = [1, 2, 3, 4, 5];
 
-    constructor(private authService: AuthService) { }
+    constructor(
+        private authService: AuthService,
+        private gearApi: GearApiService,
+        private rentalApi: RentalApiService
+    ) { }
 
     ngOnInit(): void {
         // Fetch real provider username if available
         this.authService.getCurrentUser().subscribe(user => {
             if (user?.username) {
                 this.providerName = user.username;
+            }
+        });
+
+        this.gearApi.getMyGear({ size: 50 }).subscribe({
+            next: (page) => {
+                this.products = page.content.map((g: GearResponse) => ({
+                    id: g.id,
+                    name: g.name,
+                    category: g.category,
+                    pricePerDay: g.price,
+                    available: g.quantity,
+                    icon: '📦',
+                    rentals: 0
+                }));
+                this.loading = false;
+                this.stats.totalProducts = this.products.length;
+            }
+        });
+
+        this.rentalApi.getAll(0, 10).subscribe({
+            next: (page) => {
+                this.rentals = page.content.map(r => ({
+                    id: r.id,
+                    customer: r.renterName,
+                    customerInitials: r.renterName.split(' ').map((n: string) => n[0]).join(''),
+                    customerEmail: '',
+                    product: r.gearName,
+                    dates: `${r.startDate} – ${r.endDate}`,
+                    total: 0,
+                    status: r.status === 'ACTIVE' ? 'Active' : r.status === 'PENDING' ? 'Pending' : 'Completed',
+                    avatarColor: '#8B7355'
+                }));
+
+                this.stats.activeRentals = this.rentals.filter((r: any) => r.status === 'Active').length;
+                this.stats.totalRevenue = `$${this.rentals.reduce((sum: number, r: any) => sum + r.total, 0)}`;
             }
         });
     }

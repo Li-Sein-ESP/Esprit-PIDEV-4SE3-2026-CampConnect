@@ -105,6 +105,23 @@
     </div>
 
     <!-- Filters & Search Bar -->
+    <div *ngIf="loading" style="display: flex; justify-content: center; padding: 48px 0;">
+        <div style="width: 36px; height: 36px; border: 3px solid #e2e8f0; border-top-color: #4f46e5; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+    </div>
+
+    <div *ngIf="!loading && error" style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#dc2626" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+        <span style="font-size: 14px; color: #dc2626; font-weight: 500; flex: 1;">{{ error }}</span>
+        <button class="cc-btn cc-btn-secondary" (click)="loadProducts()" style="font-size: 13px; padding: 6px 16px;">Retry</button>
+    </div>
+
+    <ng-container *ngIf="!loading && !error">
+
+    <!-- Filters & Search Bar -->
     <div class="cc-card" style="padding: 16px 20px; margin-bottom: 20px;">
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
             <!-- Left: Tabs -->
@@ -369,8 +386,10 @@
                     <path d="M9 5l7 7-7 7" />
                 </svg>
             </button>
-        </div>
-    </div>
+    </div><!-- /pagination inner flex -->
+    </div><!-- /outer pagination wrapper -->
+
+    </ng-container><!-- /!loading && !error -->
 
 </div><!-- /page-content -->
 

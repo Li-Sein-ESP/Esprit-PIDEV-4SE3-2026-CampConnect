@@ -1,6 +1,17 @@
 <!-- We assume the MainLayoutComponent handles the Navbar, so we omit the original design's navbar -->
 <main class="cc-orders">
 
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!loading && error" class="text-center py-8 text-red-500">{{ error }}</div>
+
+    <!-- Main Content -->
+    <ng-container *ngIf="!loading && !error">
+
     <!-- Header -->
     <header class="cc-orders__header">
         <div class="cc-orders__title-group">
@@ -291,5 +302,7 @@
             Explore Marketplace
         </a>
     </section>
+
+    </ng-container>
 
 </main>

@@ -68,6 +68,7 @@ public class SecurityConfig {
             // Public marketplace browsing
             .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/gear/**").permitAll()
             .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/categories/**").permitAll()
+            .requestMatchers(org.springframework.http.HttpMethod.GET, "/uploads/**").permitAll()
             // Admin
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             // Gear management — provider or admin (method security via @PreAuthorize)

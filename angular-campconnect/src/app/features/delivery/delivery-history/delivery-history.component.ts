@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DeliveryApiService, DeliveryResponse } from '../services/delivery-api.service';
 
 export interface DeliveryHistory {
     id: string;
@@ -24,104 +25,7 @@ export interface DeliveryHistory {
 })
 export class DeliveryHistoryComponent implements OnInit {
 
-    history: DeliveryHistory[] = [
-        {
-            id: '#DEL-2024-001',
-            orderId: '#ORD-8942',
-            customerName: 'John Davidson',
-            customerInitials: 'JD',
-            date: 'Jan 15, 2024',
-            distanceKm: 24.5,
-            vehicleType: 'Van',
-            earnings: 85.00,
-            rating: 4.8,
-            status: 'COMPLETED'
-        },
-        {
-            id: '#DEL-2024-002',
-            orderId: '#ORD-8943',
-            customerName: 'Sarah Mitchell',
-            customerInitials: 'SM',
-            date: 'Jan 14, 2024',
-            distanceKm: 18.2,
-            vehicleType: 'Truck',
-            earnings: 120.00,
-            rating: 5.0,
-            status: 'COMPLETED'
-        },
-        {
-            id: '#DEL-2024-003',
-            orderId: '#ORD-8944',
-            customerName: 'Michael Kim',
-            customerInitials: 'MK',
-            date: 'Jan 14, 2024',
-            distanceKm: 32.8,
-            vehicleType: 'Van',
-            earnings: 95.00,
-            rating: 4.5,
-            status: 'CANCELLED'
-        },
-        {
-            id: '#DEL-2024-004',
-            orderId: '#ORD-8945',
-            customerName: 'Emily Watson',
-            customerInitials: 'EW',
-            date: 'Jan 13, 2024',
-            distanceKm: 15.3,
-            vehicleType: 'SUV',
-            earnings: 65.00,
-            rating: 4.9,
-            status: 'COMPLETED'
-        },
-        {
-            id: '#DEL-2024-005',
-            orderId: '#ORD-8946',
-            customerName: 'Robert Johnson',
-            customerInitials: 'RJ',
-            date: 'Jan 12, 2024',
-            distanceKm: 45.6,
-            vehicleType: 'Truck',
-            earnings: 150.00,
-            rating: 4.2,
-            status: 'FAILED'
-        },
-        {
-            id: '#DEL-2024-006',
-            orderId: '#ORD-8947',
-            customerName: 'Amanda Lee',
-            customerInitials: 'AL',
-            date: 'Jan 11, 2024',
-            distanceKm: 28.4,
-            vehicleType: 'Van',
-            earnings: 92.00,
-            rating: 5.0,
-            status: 'COMPLETED'
-        },
-        {
-            id: '#DEL-2024-007',
-            orderId: '#ORD-8948',
-            customerName: 'David Chen',
-            customerInitials: 'DC',
-            date: 'Jan 10, 2024',
-            distanceKm: 19.7,
-            vehicleType: 'SUV',
-            earnings: 78.00,
-            rating: 4.7,
-            status: 'COMPLETED'
-        },
-        {
-            id: '#DEL-2024-008',
-            orderId: '#ORD-8949',
-            customerName: 'Jessica Park',
-            customerInitials: 'JP',
-            date: 'Jan 9, 2024',
-            distanceKm: 52.1,
-            vehicleType: 'Truck',
-            earnings: 175.00,
-            rating: 4.6,
-            status: 'COMPLETED'
-        }
-    ];
+    history: DeliveryHistory[] = [];
 
     filteredHistory: DeliveryHistory[] = [];
 
@@ -139,8 +43,47 @@ export class DeliveryHistoryComponent implements OnInit {
     totalPages: number = 1;
     paginatedHistory: DeliveryHistory[] = [];
 
+    loading = true;
+    error: string | null = null;
+
+    constructor(private deliveryApi: DeliveryApiService) { }
+
     ngOnInit(): void {
-        this.applyFilters();
+        this.loading = true;
+        this.deliveryApi.getMyDeliveries(0, 50).subscribe({
+            next: (page) => {
+                this.history = page.content
+                    .filter(d => d.status === 'DELIVERED' || d.status === 'CANCELLED' || d.status === 'FAILED')
+                    .map((d, i) => this.mapToHistory(d));
+                this.loading = false;
+                this.applyFilters();
+            },
+            error: () => {
+                this.error = 'Failed to load delivery history.';
+                this.loading = false;
+            }
+        });
+    }
+
+    private mapToHistory(d: DeliveryResponse): DeliveryHistory {
+        const name = d.driverName || 'Unknown';
+        const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+        const date = d.deliveredDate
+            ? new Date(d.deliveredDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+            : d.scheduledDate;
+
+        return {
+            id: '#' + d.id.substring(0, 12),
+            orderId: d.rentalId || d.purchaseId || '—',
+            customerName: d.deliveryAddress.substring(0, 20),
+            customerInitials: d.deliveryAddress.substring(0, 2).toUpperCase(),
+            date,
+            distanceKm: 0, // No distance data in Delivery model
+            vehicleType: 'Van', // No vehicle type in Delivery model
+            earnings: 15.00, // Flat rate
+            rating: null, // No rating system yet
+            status: d.status === 'DELIVERED' ? 'COMPLETED' : d.status as 'CANCELLED' | 'FAILED'
+        };
     }
 
     get totalCompleted(): number {

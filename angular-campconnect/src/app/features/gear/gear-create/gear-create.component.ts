@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { GearApiService } from '../services/gear-api.service';
-import { GearCreateRequest } from '../models/gear.model';
+import { GearCreateRequest, ListingType } from '../models/gear.model';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-gear-create',
@@ -12,11 +14,18 @@ import { GearCreateRequest } from '../models/gear.model';
     templateUrl: './gear-create.component.html',
     styleUrls: ['./gear-create.component.scss']
 })
-export class GearCreateComponent implements OnInit {
+export class GearCreateComponent implements OnInit, OnDestroy {
+    private destroy$ = new Subject<void>();
     gearForm!: FormGroup;
     isSubmitting = false;
     serverError: string | null = null;
     validationErrors: { [key: string]: string } = {};
+
+    readonly listingTypes: { value: ListingType; label: string; icon: string }[] = [
+        { value: 'FOR_RENT', label: 'For Rent', icon: '🏕️' },
+        { value: 'FOR_SALE', label: 'For Sale', icon: '🏷️' },
+        { value: 'BOTH', label: 'Both', icon: '🔄' },
+    ];
 
     constructor(
         private fb: FormBuilder,
@@ -30,12 +39,60 @@ export class GearCreateComponent implements OnInit {
             description: ['', [Validators.required, Validators.maxLength(1000)]],
             category: ['', [Validators.required]],
             brand: ['', [Validators.required]],
-            pricePerDay: [0, [Validators.required, Validators.min(0)]],
-            purchasePrice: [0, [Validators.min(0)]],
+            listingType: ['FOR_RENT', [Validators.required]],
+            dailyPrice: [null],
+            salePrice: [null],
             condition: ['NEW', [Validators.required]],
             stockQuantity: [1, [Validators.required, Validators.min(1)]],
             location: ['', [Validators.required]],
         });
+
+        // Apply conditional validators whenever listingType changes
+        this.gearForm.get('listingType')!.valueChanges.pipe(
+            takeUntil(this.destroy$)
+        ).subscribe(type => {
+            this.applyPriceValidators(type);
+        });
+
+        // Apply initial validators based on default
+        this.applyPriceValidators('FOR_RENT');
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
+    get listingType(): ListingType {
+        return this.gearForm.get('listingType')!.value;
+    }
+
+    get showDailyPrice(): boolean {
+        return this.listingType === 'FOR_RENT' || this.listingType === 'BOTH';
+    }
+
+    get showSalePrice(): boolean {
+        return this.listingType === 'FOR_SALE' || this.listingType === 'BOTH';
+    }
+
+    private applyPriceValidators(type: ListingType): void {
+        const dailyPriceCtrl = this.gearForm.get('dailyPrice')!;
+        const salePriceCtrl = this.gearForm.get('salePrice')!;
+
+        if (type === 'FOR_RENT') {
+            dailyPriceCtrl.setValidators([Validators.required, Validators.min(0.01)]);
+            salePriceCtrl.clearValidators();
+        } else if (type === 'FOR_SALE') {
+            salePriceCtrl.setValidators([Validators.required, Validators.min(0.01)]);
+            dailyPriceCtrl.clearValidators();
+        } else {
+            // BOTH
+            dailyPriceCtrl.setValidators([Validators.required, Validators.min(0.01)]);
+            salePriceCtrl.setValidators([Validators.required, Validators.min(0.01)]);
+        }
+
+        dailyPriceCtrl.updateValueAndValidity();
+        salePriceCtrl.updateValueAndValidity();
     }
 
     onSubmit(): void {
@@ -48,7 +105,21 @@ export class GearCreateComponent implements OnInit {
         }
 
         this.isSubmitting = true;
-        const request: GearCreateRequest = this.gearForm.value;
+        const v = this.gearForm.value;
+
+        const request: GearCreateRequest = {
+            name: v.name,
+            description: v.description,
+            category: v.category,
+            condition: v.condition,
+            quantity: v.stockQuantity,
+            listingType: v.listingType,
+            // Backward-compat price = dailyPrice (or salePrice if FOR_SALE)
+            price: v.dailyPrice ?? v.salePrice ?? 0,
+            dailyPrice: v.dailyPrice ?? undefined,
+            salePrice: v.salePrice ?? undefined,
+            imageUrls: [],
+        };
 
         this.gearService.createGear(request).subscribe({
             next: () => {
@@ -58,7 +129,6 @@ export class GearCreateComponent implements OnInit {
             error: (err) => {
                 this.isSubmitting = false;
                 if (err.status === 400 && err.error?.errors) {
-                    // Backend validation errors format from GlobalExceptionHandler
                     this.validationErrors = err.error.errors;
                 } else if (err.error?.message) {
                     this.serverError = err.error.message;

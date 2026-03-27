@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideAngularModule, Bell, Plus, TrendingUp, DollarSign, CalendarCheck, Clock, Hourglass, Star, Tent, Backpack, Flame, Moon, Lamp, AlertTriangle, Truck, Wrench } from 'lucide-angular';
+import { GearApiService } from '../../gear/services/gear-api.service';
+import { ProviderStatsResponse } from '../models/provider-stats.model';
+import { GearResponse } from '../../gear/models/gear.model';
 
 @Component({
     selector: 'app-provider-dashboard',
@@ -10,65 +13,37 @@ import { LucideAngularModule, Bell, Plus, TrendingUp, DollarSign, CalendarCheck,
     templateUrl: './provider-dashboard.component.html',
     styleUrls: ['./provider-dashboard.component.scss']
 })
-export class ProviderDashboardComponent {
+export class ProviderDashboardComponent implements OnInit {
     icons = {
         Bell, Plus, TrendingUp, DollarSign, CalendarCheck, Clock, Hourglass, Star, Tent, Backpack, Flame, Moon, Lamp, AlertTriangle, Truck, Wrench
     };
 
-    stats = {
-        totalRevenue: 48250,
-        activeRentals: 127,
-        pendingRequests: 23,
-        averageRating: 4.8
-    };
+    stats: ProviderStatsResponse = { totalRevenue: 0, activeRentals: 0, pendingRequests: 0, totalProducts: 0, averageRating: 0 };
+    loading = true;
 
-    topProducts = [
-        {
-            id: 'PROD-001',
-            name: '4-Person Camping Tent',
-            category: 'Outdoor Gear',
-            rentals: 48,
-            revenue: 4320,
-            rating: 4.9,
-            icon: this.icons.Tent
-        },
-        {
-            id: 'PROD-002',
-            name: 'Hiking Backpack 65L',
-            category: 'Gear & Equipment',
-            rentals: 42,
-            revenue: 2940,
-            rating: 4.8,
-            icon: this.icons.Backpack
-        },
-        {
-            id: 'PROD-003',
-            name: 'Portable Camping Stove',
-            category: 'Cooking Equipment',
-            rentals: 38,
-            revenue: 1900,
-            rating: 4.7,
-            icon: this.icons.Flame
-        },
-        {
-            id: 'PROD-004',
-            name: 'Sleeping Bag -20°C',
-            category: 'Sleeping Gear',
-            rentals: 35,
-            revenue: 2450,
-            rating: 4.9,
-            icon: this.icons.Moon
-        },
-        {
-            id: 'PROD-005',
-            name: 'LED Camping Lantern',
-            category: 'Lighting',
-            rentals: 31,
-            revenue: 930,
-            rating: 4.6,
-            icon: this.icons.Lamp
-        }
-    ];
+    topProducts: any[] = [];
+
+    constructor(private gearApi: GearApiService) { }
+
+    ngOnInit(): void {
+        this.gearApi.getProviderStats().subscribe({
+            next: (data) => { this.stats = data; this.loading = false; },
+            error: () => { this.loading = false; }
+        });
+        this.gearApi.getMyGear({ size: 5, sort: 'createdAt,desc' }).subscribe({
+            next: (page) => {
+                this.topProducts = page.content.map(g => ({
+                    id: g.id,
+                    name: g.name,
+                    category: g.category,
+                    rentals: 0,
+                    revenue: 0,
+                    rating: 0,
+                    icon: this.icons.Tent
+                }));
+            }
+        });
+    }
 
     alerts = [
         {

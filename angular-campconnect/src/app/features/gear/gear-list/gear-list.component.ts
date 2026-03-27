@@ -43,9 +43,9 @@ export class GearListComponent implements OnInit, OnDestroy {
     readonly SORT_OPTIONS = [
         { label: 'Newest first', value: 'createdAt,desc' },
         { label: 'Oldest first', value: 'createdAt,asc' },
-        { label: 'Price: low → high', value: 'pricePerDay,asc' },
-        { label: 'Price: high → low', value: 'pricePerDay,desc' },
-        { label: 'Rating', value: 'rating,desc' }
+        { label: 'Price: low → high', value: 'price,asc' },
+        { label: 'Price: high → low', value: 'price,desc' },
+        { label: 'Name A–Z', value: 'name,asc' }
     ];
     readonly CATEGORIES = [
         '', 'Tents', 'Sleeping Bags', 'Backpacks', 'Cooking',
@@ -113,6 +113,10 @@ export class GearListComponent implements OnInit, OnDestroy {
         this.reload$.next();
     }
 
+    get isFirstPage(): boolean {
+        return !this.gearPage || this.gearPage.page === 0;
+    }
+
     onPageSizeChange(size: number): void {
         this.pageSize = size;
         this.currentPage = 0;
@@ -123,7 +127,7 @@ export class GearListComponent implements OnInit, OnDestroy {
     get pageNumbers(): number[] {
         if (!this.gearPage) return [];
         const total = this.gearPage.totalPages;
-        const current = this.gearPage.number;
+        const current = this.gearPage.page;
         const range: number[] = [];
         const start = Math.max(0, current - 2);
         const end = Math.min(total - 1, current + 2);
@@ -178,14 +182,19 @@ export class GearListComponent implements OnInit, OnDestroy {
     }
 
     firstImage(gear: GearResponse): string {
-        return gear.imageUrls?.[0] ?? 'assets/images/gear-placeholder.jpg';
+        return gear.images?.[0]?.imageUrl ?? 'assets/images/gear-placeholder.jpg';
+    }
+
+    isAvailable(gear: GearResponse): boolean {
+        return gear.status === 'AVAILABLE' && gear.quantity > 0;
     }
 
     get resultSummary(): string {
         if (!this.gearPage) return '';
-        const { number, size, totalElements, numberOfElements } = this.gearPage;
-        const from = number * size + 1;
-        const to = number * size + numberOfElements;
+        const { page, size, totalElements } = this.gearPage;
+        const count = this.gearPage.content.length;
+        const from = page * size + 1;
+        const to = page * size + count;
         return `Showing ${from}–${to} of ${totalElements} items`;
     }
 

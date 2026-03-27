@@ -26,8 +26,12 @@ public class Delivery {
     @Id
     private String id;
 
+    // A delivery is linked to EITHER a rental OR a purchase
     @Indexed
     private String rentalId;
+
+    @Indexed
+    private String purchaseId;
 
     @Indexed
     private String driverId;

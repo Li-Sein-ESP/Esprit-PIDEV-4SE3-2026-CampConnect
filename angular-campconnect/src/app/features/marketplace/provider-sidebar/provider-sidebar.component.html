@@ -3,7 +3,7 @@
     <div class="p-6 border-b border-stone-200">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-amber-600 rounded-xl flex items-center justify-center">
-                <lucide-icon [name]="icons.Tent" class="w-5 h-5 text-white"></lucide-icon>
+                <lucide-icon [img]="icons.Tent" class="w-5 h-5 text-white"></lucide-icon>
             </div>
             <div>
                 <h1 class="font-semibold text-lg text-stone-900">CampConnect</h1>
@@ -16,32 +16,32 @@
     <nav class="flex-1 p-4 space-y-1">
         <a routerLink="/provider/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
             class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600">
-            <lucide-icon [name]="icons.LayoutDashboard" class="w-5 h-5"></lucide-icon>
+            <lucide-icon [img]="icons.LayoutDashboard" class="w-5 h-5"></lucide-icon>
             Dashboard
         </a>
         <a routerLink="/provider/products" routerLinkActive="active"
             class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600">
-            <lucide-icon [name]="icons.Package" class="w-5 h-5"></lucide-icon>
+            <lucide-icon [img]="icons.Package" class="w-5 h-5"></lucide-icon>
             Manage Products
         </a>
         <a routerLink="/provider/products/new" routerLinkActive="active"
             class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600">
-            <lucide-icon [name]="icons.PlusCircle" class="w-5 h-5"></lucide-icon>
+            <lucide-icon [img]="icons.PlusCircle" class="w-5 h-5"></lucide-icon>
             Add Product
         </a>
         <a routerLink="/provider/rentals" routerLinkActive="active"
             class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600">
-            <lucide-icon [name]="icons.Calendar" class="w-5 h-5"></lucide-icon>
+            <lucide-icon [img]="icons.Calendar" class="w-5 h-5"></lucide-icon>
             Rentals
         </a>
         <a routerLink="/provider/profile" routerLinkActive="active"
             class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600">
-            <lucide-icon [name]="icons.User" class="w-5 h-5"></lucide-icon>
+            <lucide-icon [img]="icons.User" class="w-5 h-5"></lucide-icon>
             My Profile
         </a>
         <a href="#"
             class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600">
-            <lucide-icon [name]="icons.BarChart3" class="w-5 h-5"></lucide-icon>
+            <lucide-icon [img]="icons.BarChart3" class="w-5 h-5"></lucide-icon>
             Analytics
         </a>
     </nav>
@@ -51,13 +51,13 @@
         <a routerLink="/provider/profile"
             class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-stone-200 cursor-pointer transition-colors">
             <div class="w-9 h-9 bg-stone-300 rounded-full flex items-center justify-center">
-                <lucide-icon [name]="icons.User" class="w-4 h-4 text-stone-600"></lucide-icon>
+                <lucide-icon [img]="icons.User" class="w-4 h-4 text-stone-600"></lucide-icon>
             </div>
             <div class="flex-1 min-w-0">
                 <p class="text-sm font-medium text-stone-900 truncate">{{ providerName }}</p>
                 <p class="text-xs text-stone-500 truncate">Provider Account</p>
             </div>
-            <lucide-icon [name]="icons.ChevronDown" class="w-4 h-4 text-stone-400"></lucide-icon>
+            <lucide-icon [img]="icons.ChevronDown" class="w-4 h-4 text-stone-400"></lucide-icon>
         </a>
     </div>
 </aside>

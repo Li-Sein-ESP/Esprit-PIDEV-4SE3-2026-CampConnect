@@ -18,8 +18,9 @@ public class FileStorageService {
     private final Path fileStorageLocation;
 
     public FileStorageService() {
-        // Create an "uploads" directory in the application's root directory
-        this.fileStorageLocation = Paths.get("uploads").toAbsolutePath().normalize();
+        // Use a stable absolute path inside the backend project directory
+        String projectDir = System.getProperty("user.dir");
+        this.fileStorageLocation = Paths.get(projectDir, "uploads").toAbsolutePath().normalize();
         try {
             Files.createDirectories(this.fileStorageLocation);
         } catch (Exception ex) {

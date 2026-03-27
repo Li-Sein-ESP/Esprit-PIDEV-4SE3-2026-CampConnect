@@ -33,10 +33,10 @@
         <div class="mg-card" *ngIf="false"></div> <!-- Dummy template item -->
         <article class="mg-card" *ngFor="let gear of gearPage.content">
             <div class="mg-card-img"
-                [style.backgroundImage]="'url(' + (gear.imageUrls && gear.imageUrls.length > 0 ? gear.imageUrls[0] : 'assets/images/gear-placeholder.jpg') + ')'">
-                <span class="mg-badge" [class.mg-badge--active]="gear.available"
-                    [class.mg-badge--inactive]="!gear.available">
-                    {{ gear.available ? 'Active' : 'Draft/Unavailable' }}
+                [style.backgroundImage]="'url(' + (gear.images && gear.images.length > 0 ? gear.images[0].imageUrl : 'assets/images/gear-placeholder.jpg') + ')'">
+                <span class="mg-badge" [class.mg-badge--active]="gear.status === 'AVAILABLE'"
+                    [class.mg-badge--inactive]="gear.status !== 'AVAILABLE'">
+                    {{ gear.status === 'AVAILABLE' ? 'Active' : gear.status }}
                 </span>
             </div>
 
@@ -46,11 +46,11 @@
 
                 <div class="mg-card-details">
                     <div class="mg-card-price">
-                        <span class="mg-price-value">${{ gear.pricePerDay | number:'1.2-2' }}</span>
+                        <span class="mg-price-value">${{ gear.price | number:'1.2-2' }}</span>
                         <span class="mg-price-unit">/day</span>
                     </div>
                     <div class="mg-card-stock">
-                        Stock: <strong>{{ gear.stockQuantity }}</strong>
+                        Stock: <strong>{{ gear.quantity }}</strong>
                     </div>
                 </div>
 
@@ -69,12 +69,12 @@
 
     <!-- Pagination -->
     <div class="mg-pagination" *ngIf="gearPage && gearPage.totalPages > 1">
-        <button class="mg-pager-btn" [disabled]="gearPage.first" (click)="loadMyGear(gearPage.number - 1)">&laquo;
+        <button class="mg-pager-btn" [disabled]="gearPage.page === 0" (click)="loadMyGear(gearPage.page - 1)">&laquo;
             Prev</button>
 
-        <span class="mg-pager-info">Page {{ gearPage.number + 1 }} of {{ gearPage.totalPages }}</span>
+        <span class="mg-pager-info">Page {{ gearPage.page + 1 }} of {{ gearPage.totalPages }}</span>
 
-        <button class="mg-pager-btn" [disabled]="gearPage.last" (click)="loadMyGear(gearPage.number + 1)">Next
+        <button class="mg-pager-btn" [disabled]="gearPage.last" (click)="loadMyGear(gearPage.page + 1)">Next
             &raquo;</button>
     </div>
 </div>

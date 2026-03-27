@@ -1,5 +1,6 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DeliveryApiService, EarningsResponse } from '../services/delivery-api.service';
 
 export interface PaymentItem {
     id: string;
@@ -69,13 +70,60 @@ export class DeliveryEarningsComponent implements OnInit, AfterViewInit {
     filteredPayments: PaymentItem[] = [];
     resizeTimer: any;
 
+    loading = true;
+
+    constructor(private deliveryApi: DeliveryApiService) { }
+
     ngOnInit(): void {
+        this.loadRealData();
+    }
+
+    loadRealData(): void {
+        this.deliveryApi.getEarnings().subscribe({
+            next: (data: EarningsResponse) => {
+                this.earnings.total = data.totalEarnings;
+                this.earnings.weekly = data.weeklyEarnings;
+                this.earnings.monthly = data.monthlyEarnings;
+                this.earnings.deliveriesCompleted = data.deliveriesCompleted;
+
+                // Build recent payments from daily breakdown
+                if (data.dailyBreakdown && data.dailyBreakdown.length > 0) {
+                    this.earnings.recentPayments = data.dailyBreakdown.map((day, i) => ({
+                        id: `DL-${i + 1}`,
+                        date: day.date,
+                        zone: 'Zone',
+                        vehicle: i % 2 === 0 ? 'van' : '4x4' as any,
+                        distance: 0,
+                        duration: '—',
+                        amount: day.amount,
+                        status: 'completed' as any,
+                        rating: null,
+                        customer: `${day.count} deliveries`
+                    }));
+                }
+
+                this.generateMockChartData();
+                this.filteredPayments = [...this.earnings.recentPayments];
+                this.loading = false;
+                setTimeout(() => this.drawCharts(), 100);
+            },
+            error: () => {
+                this.loadMockData(); // fallback
+            }
+        });
+    }
+
+    loadMockData(): void {
         this.generateMockChartData();
         this.filteredPayments = [...this.earnings.recentPayments];
+        this.loading = false;
+        setTimeout(() => this.drawCharts(), 100);
     }
 
     ngAfterViewInit(): void {
-        this.drawCharts();
+        if (!this.loading) {
+            this.drawCharts();
+        }
     }
 
     @HostListener('window:resize')

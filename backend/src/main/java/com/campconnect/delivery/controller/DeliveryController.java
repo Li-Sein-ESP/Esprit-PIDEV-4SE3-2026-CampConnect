@@ -3,6 +3,7 @@ package com.campconnect.delivery.controller;
 import com.campconnect.common.PagedResponse;
 import com.campconnect.delivery.dto.DeliveryRequest;
 import com.campconnect.delivery.dto.DeliveryResponse;
+import com.campconnect.delivery.dto.EarningsResponse;
 import com.campconnect.delivery.dto.RouteDto;
 import com.campconnect.delivery.model.DeliveryPriority;
 import com.campconnect.delivery.model.DeliveryStatus;
@@ -71,6 +72,14 @@ public class DeliveryController {
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(deliveryService.findByDateRange(
                 from, to, PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "scheduledDate"))));
+    }
+
+    @GetMapping("/earnings")
+    @PreAuthorize("hasRole('DELIVERY_PROVIDER') or hasRole('ADMIN')")
+    @Operation(summary = "Get earnings summary for current driver")
+    public ResponseEntity<EarningsResponse> getEarnings(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(deliveryService.calculateEarnings(userDetails.getId()));
     }
 
     @GetMapping("/{id}")

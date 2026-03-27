@@ -21,6 +21,28 @@
             </div>
         </header>
 
+        <!-- Loading State -->
+        <div *ngIf="loading" class="flex justify-center items-center py-16">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="!loading && error"
+            class="rounded-lg bg-red-50 border border-red-200 p-6 mb-8 flex items-start gap-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="#DC2626" stroke-width="2" class="flex-shrink-0 mt-0.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+            <div class="flex-1">
+                <p class="text-sm font-medium text-red-800">{{ error }}</p>
+            </div>
+            <button class="btn btn-sm btn-outline" (click)="loadVehicles()">Retry</button>
+        </div>
+
+        <ng-container *ngIf="!loading && !error">
+
         <!-- Quick Stats Row -->
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <!-- Total Vehicles -->
@@ -29,10 +51,7 @@
                     <div>
                         <p class="text-sm font-medium text-gray-500">Total Vehicles</p>
                         <p class="stat-value mt-1">{{ totalVehicles }}</p>
-                        <p class="text-xs text-gray-400 mt-2">
-                            <span class="text-emerald-600 font-medium">+{{ totalVehiclesAddedThisMonth }}</span> this
-                            month
-                        </p>
+                        <p class="text-xs text-gray-400 mt-2">Fleet size</p>
                     </div>
                     <div class="icon-container" style="background-color: #EEF2FF;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
@@ -102,63 +121,6 @@
             </article>
         </section>
 
-        <!-- Smart Insights Section -->
-        <section class="mb-8">
-            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Fleet Insights</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="insight-card">
-                    <div class="flex items-start gap-3">
-                        <div class="icon-container flex-shrink-0" style="background-color: #DBEAFE;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="12" y1="16" x2="12" y2="12"></line>
-                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold text-gray-900">Motorcycles handle 60% of deliveries</p>
-                            <p class="text-xs text-gray-500 mt-1">Under 15kg — fastest delivery times</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="insight-card">
-                    <div class="flex items-start gap-3">
-                        <div class="icon-container flex-shrink-0" style="background-color: #D1FAE5;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold text-gray-900">4x4 recommended for off-road</p>
-                            <p class="text-xs text-gray-500 mt-1">Remote campsites & rough terrain</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="insight-card">
-                    <div class="flex items-start gap-3">
-                        <div class="icon-container flex-shrink-0" style="background-color: #EDE9FE;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <rect x="1" y="3" width="15" height="13"></rect>
-                                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                                <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                                <circle cx="18.5" cy="18.5" r="2.5"></circle>
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="text-sm font-semibold text-gray-900">Vans best for bulk orders</p>
-                            <p class="text-xs text-gray-500 mt-1">Max 800kg or 12 camping sets</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- Vehicles Grid -->
         <section>
             <div class="flex items-center justify-between mb-4">
@@ -170,85 +132,40 @@
                 <article class="dashboard-card vehicle-card p-5" *ngFor="let vehicle of vehicles">
                     <div class="flex items-start justify-between mb-4">
                         <div class="flex items-center gap-3">
-                            <div class="icon-container" [ngStyle]="{
-                                'background-color': vehicle.type === 'MOTORCYCLE' ? '#DBEAFE' : vehicle.type === 'VAN' ? '#EDE9FE' : '#D1FAE5'
-                            }">
-                                <!-- Icons by type -->
-                                <svg *ngIf="vehicle.type === 'MOTORCYCLE'" xmlns="http://www.w3.org/2000/svg" width="28"
-                                    height="28" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2"
+                            <div class="icon-container" style="background-color: #EEF2FF;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"
+                                    viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2"
                                     stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="5.5" cy="17.5" r="3.5" />
-                                    <circle cx="18.5" cy="17.5" r="3.5" />
-                                    <path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2l-2.5 3.5z" />
-                                </svg>
-                                <svg *ngIf="vehicle.type === 'VAN'" xmlns="http://www.w3.org/2000/svg" width="28"
-                                    height="28" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="1" y="3" width="15" height="13" />
-                                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-                                    <circle cx="5.5" cy="18.5" r="2.5" />
-                                    <circle cx="18.5" cy="18.5" r="2.5" />
-                                </svg>
-                                <svg *ngIf="vehicle.type === '4X4'" xmlns="http://www.w3.org/2000/svg" width="28"
-                                    height="28" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round">
-                                    <path
-                                        d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2" />
-                                    <circle cx="6.5" cy="16.5" r="2.5" />
-                                    <circle cx="16.5" cy="16.5" r="2.5" />
+                                    <rect x="1" y="3" width="15" height="13"></rect>
+                                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                                    <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                    <circle cx="18.5" cy="18.5" r="2.5"></circle>
                                 </svg>
                             </div>
                             <div>
-                                <span class="text-xs text-gray-400 font-medium">{{ vehicle.id }}</span>
-                                <span class="vehicle-type-badge" [ngClass]="{
-                                    'vehicle-type-motorcycle': vehicle.type === 'MOTORCYCLE',
-                                    'vehicle-type-van': vehicle.type === 'VAN',
-                                    'vehicle-type-4x4': vehicle.type === '4X4'
-                                }">
-                                    {{ vehicle.type === 'MOTORCYCLE' ? '🏍️' : vehicle.type === 'VAN' ? '🚐' : '🚙' }}
-                                    {{ getTypeLabel(vehicle.type) }}
-                                </span>
+                                <p class="text-sm font-semibold text-gray-900">{{ vehicle.plateNumber }}</p>
+                                <p class="text-xs text-gray-400">ID: {{ vehicle.id | slice:0:8 }}</p>
                             </div>
                         </div>
                         <!-- Status Badge -->
                         <span class="status-badge" [ngClass]="{
-                            'status-available': vehicle.status === 'AVAILABLE',
-                            'status-busy': vehicle.status === 'BUSY',
-                            'status-maintenance': vehicle.status === 'MAINTENANCE'
+                            'status-available':   vehicle.status === 'AVAILABLE',
+                            'status-busy':        vehicle.status === 'IN_USE',
+                            'status-maintenance': vehicle.status === 'MAINTENANCE',
+                            'status-retired':     vehicle.status === 'RETIRED'
                         }">
-                            {{ vehicle.status === 'AVAILABLE' ? 'Available' : vehicle.status === 'BUSY' ? 'Busy' :
-                            'Maintenance' }}
+                            {{ statusLabel(vehicle.status) }}
                         </span>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="bg-gray-50 rounded-lg p-3">
-                            <p class="text-xs text-gray-500">Max Weight</p>
-                            <p class="text-sm font-semibold text-gray-900">{{ vehicle.maxWeight }} kg</p>
+                            <p class="text-xs text-gray-500">Capacity</p>
+                            <p class="text-sm font-semibold text-gray-900">{{ vehicle.capacity }} kg</p>
                         </div>
                         <div class="bg-gray-50 rounded-lg p-3">
-                            <p class="text-xs text-gray-500">Max Volume</p>
-                            <p class="text-sm font-semibold text-gray-900">{{ vehicle.maxVolume }} L</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between text-sm mb-4">
-                        <div class="flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                fill="none" stroke="#6B7280" stroke-width="2">
-                                <path d="M3 22h12M5 22V8l4-4 4 4v14" />
-                            </svg>
-                            <span class="text-gray-600">{{ getFuelTypeLabel(vehicle.fuelType) }}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                fill="none" stroke="#6B7280" stroke-width="2">
-                                <rect x="1" y="3" width="15" height="13"></rect>
-                                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                                <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                                <circle cx="18.5" cy="18.5" r="2.5"></circle>
-                            </svg>
-                            <span class="text-gray-600">{{ vehicle.assignedDeliveries }} deliveries</span>
+                            <p class="text-xs text-gray-500">Driver ID</p>
+                            <p class="text-sm font-semibold text-gray-900">{{ vehicle.driverId || '—' }}</p>
                         </div>
                     </div>
 
@@ -260,12 +177,6 @@
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                             </svg>
                             Edit
-                        </button>
-                        <button class="btn btn-sm flex-1"
-                            [ngClass]="vehicle.status === 'AVAILABLE' ? 'btn-secondary' : 'btn-primary'"
-                            (click)="toggleVehicleAvailability(vehicle.id)"
-                            [disabled]="vehicle.status === 'MAINTENANCE'">
-                            {{ vehicle.status === 'AVAILABLE' ? 'Mark Busy' : 'Mark Available' }}
                         </button>
                         <button class="btn btn-danger btn-sm" (click)="deleteVehicle(vehicle.id)">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
@@ -281,9 +192,12 @@
             </div>
 
             <div *ngIf="vehicles.length === 0" class="text-center py-12">
-                <p class="text-gray-500">No vehicles added yet.</p>
+                <p class="text-gray-500 mb-4">No vehicles added yet.</p>
+                <button *ngIf="isAdmin" class="btn btn-primary" (click)="openModal()">Add your first vehicle</button>
             </div>
         </section>
+
+        </ng-container>
     </div>
 
     <!-- Add/Edit Vehicle Modal -->
@@ -304,57 +218,52 @@
             <!-- Modal Body -->
             <form [formGroup]="vehicleForm" (ngSubmit)="saveVehicle()" class="p-6">
 
+                <!-- Plate Number -->
                 <div class="form-group">
-                    <label class="form-label">Vehicle Type</label>
-                    <select formControlName="type" class="form-select">
-                        <option value="" disabled>Select vehicle type</option>
-                        <option value="MOTORCYCLE">Motorcycle</option>
-                        <option value="VAN">Van</option>
-                        <option value="4X4">4x4</option>
+                    <label class="form-label">Plate Number <span class="text-red-500">*</span></label>
+                    <input type="text" formControlName="plateNumber" class="form-input"
+                        placeholder="e.g., ABC-1234">
+                    <p *ngIf="vehicleForm.get('plateNumber')?.invalid && vehicleForm.get('plateNumber')?.touched"
+                        class="text-xs text-red-500 mt-1">Plate number is required (min 3 characters).</p>
+                </div>
+
+                <!-- Capacity -->
+                <div class="form-group">
+                    <label class="form-label">Capacity (kg) <span class="text-red-500">*</span></label>
+                    <input type="number" formControlName="capacity" class="form-input"
+                        placeholder="e.g., 500" min="1">
+                    <p *ngIf="vehicleForm.get('capacity')?.invalid && vehicleForm.get('capacity')?.touched"
+                        class="text-xs text-red-500 mt-1">Capacity must be at least 1 kg.</p>
+                </div>
+
+                <!-- Status -->
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select formControlName="status" class="form-select">
+                        <option value="AVAILABLE">Available</option>
+                        <option value="IN_USE">In Use</option>
+                        <option value="MAINTENANCE">Maintenance</option>
+                        <option value="RETIRED">Retired</option>
                     </select>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="form-group">
-                        <label class="form-label">Max Weight (kg)</label>
-                        <input type="number" formControlName="maxWeight" class="form-input" placeholder="e.g., 150">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Max Volume (L)</label>
-                        <input type="number" formControlName="maxVolume" class="form-input" placeholder="e.g., 50">
-                    </div>
-                </div>
-
+                <!-- Driver ID (optional) -->
                 <div class="form-group">
-                    <label class="form-label">Fuel Type</label>
-                    <select formControlName="fuelType" class="form-select">
-                        <option value="" disabled>Select fuel type</option>
-                        <option value="gasoline">Gasoline</option>
-                        <option value="diesel">Diesel</option>
-                        <option value="electric">Electric</option>
-                        <option value="hybrid">Hybrid</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Availability</label>
-                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                        (click)="toggleAvailability('form')" style="cursor: pointer;">
-                        <div>
-                            <p class="text-sm font-medium text-gray-900">Set as Available</p>
-                            <p class="text-xs text-gray-500">Vehicle can be assigned to deliveries</p>
-                        </div>
-                        <div class="toggle-switch" [class.active]="vehicleForm.get('isAvailable')?.value"></div>
-                    </div>
+                    <label class="form-label">Driver ID <span class="text-gray-400 text-xs">(optional)</span></label>
+                    <input type="text" formControlName="driverId" class="form-input"
+                        placeholder="Driver user ID">
                 </div>
 
                 <!-- Modal Footer -->
                 <div class="flex gap-3 mt-6">
                     <button type="button" class="btn btn-secondary flex-1" (click)="closeModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary flex-1" [disabled]="vehicleForm.invalid">
-                        {{ isEditing ? 'Save Changes' : 'Add Vehicle' }}
+                    <button type="submit" class="btn btn-primary flex-1"
+                        [disabled]="vehicleForm.invalid || isSaving">
+                        <span *ngIf="isSaving">Saving…</span>
+                        <span *ngIf="!isSaving">{{ isEditing ? 'Save Changes' : 'Add Vehicle' }}</span>
                     </button>
                 </div>
+
             </form>
         </div>
     </div>

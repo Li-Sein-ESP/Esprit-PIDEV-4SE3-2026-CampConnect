@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../../../core/services/auth.service';
+import { UserApiService } from '../services/user-api.service';
+import { UpdateProfileRequest } from '../models/user.model';
 
 @Component({
     selector: 'app-camper-edit-profile',
@@ -14,44 +15,35 @@ import { AuthService } from '../../../core/services/auth.service';
 export class CamperEditProfileComponent implements OnInit {
     editForm!: FormGroup;
     profileImagePreview: string = 'https://images.unsplash.com/photo-1535930749574-1399327ce78f?w=300&h=300&fit=crop&crop=face';
-
-    // Mock current user data that isn't saved in the backend yet
-    currentUserMockData = {
-        bio: 'Nature enthusiast & weekend adventurer. Passionate about sustainable camping, trail cooking, and finding hidden gems off the beaten path. 🌲⛺',
-        location: 'Portland, Oregon',
-        profileImage: 'https://images.unsplash.com/photo-1535930749574-1399327ce78f?w=300&h=300&fit=crop&crop=face'
-    };
+    saving = false;
 
     constructor(
         private fb: FormBuilder,
-        private authService: AuthService,
+        private userApi: UserApiService,
         private router: Router
     ) { }
 
     ngOnInit(): void {
-        // Initialize form with mock data
         this.editForm = this.fb.group({
             firstName: ['', Validators.required],
             lastName: ['', Validators.required],
-            bio: [this.currentUserMockData.bio],
-            location: [this.currentUserMockData.location],
-            profileImage: [this.currentUserMockData.profileImage]
+            bio: [''],
+            location: [''],
+            profileImage: ['']
         });
 
-        // Populate standard user data if available
-        this.authService.getCurrentUser().subscribe(user => {
-            if (user) {
-                if ((user as any).firstName || (user as any).lastName) {
-                    this.editForm.patchValue({
-                        firstName: (user as any).firstName || '',
-                        lastName: (user as any).lastName || ''
-                    });
-                } else if (user.username) {
-                    const parts = user.username.split(' ');
-                    this.editForm.patchValue({
-                        firstName: parts[0] || '',
-                        lastName: parts.slice(1).join(' ') || ''
-                    });
+        this.userApi.getProfile().subscribe(profile => {
+            if (profile) {
+                const parts = (profile.name || '').split(' ');
+                this.editForm.patchValue({
+                    firstName: parts[0] || '',
+                    lastName: parts.slice(1).join(' ') || '',
+                    bio: profile.profileDetails?.['bio'] || '',
+                    location: profile.profileDetails?.['location'] || '',
+                    profileImage: profile.profileDetails?.['profileImage'] || ''
+                });
+                if (profile.profileDetails?.['profileImage']) {
+                    this.profileImagePreview = profile.profileDetails['profileImage'] as string;
                 }
             }
         });
@@ -65,15 +57,29 @@ export class CamperEditProfileComponent implements OnInit {
     }
 
     onSubmit() {
-        if (this.editForm.valid) {
-            console.log('Profile update simulation:', this.editForm.value);
-            // Here you would normally call a service to update the user in the backend
-            // e.g. this.userService.updateProfile(this.editForm.value).subscribe(...)
-
-            // Simulate success and navigate back
-            this.router.navigate(['/profile']);
+        if (this.editForm.valid && !this.saving) {
+            this.saving = true;
+            const val = this.editForm.value;
+            const request: UpdateProfileRequest = {
+                name: `${val.firstName} ${val.lastName}`.trim(),
+                profileDetails: {
+                    bio: val.bio,
+                    location: val.location,
+                    profileImage: val.profileImage
+                }
+            };
+            this.userApi.updateProfile(request).subscribe({
+                next: () => {
+                    this.saving = false;
+                    this.router.navigate(['/profile']);
+                },
+                error: (err) => {
+                    this.saving = false;
+                    console.error('Profile update failed:', err);
+                    // Optionally show error to user
+                }
+            });
         } else {
-            // Mark all fields as touched to trigger validation errors
             this.editForm.markAllAsTouched();
         }
     }

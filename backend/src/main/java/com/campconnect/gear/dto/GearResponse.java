@@ -1,6 +1,7 @@
 package com.campconnect.gear.dto;
 
 import com.campconnect.gear.model.GearStatus;
+import com.campconnect.gear.model.ListingType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -15,6 +16,9 @@ public class GearResponse {
     private String name;
     private String description;
     private BigDecimal price;
+    private BigDecimal dailyPrice;
+    private BigDecimal salePrice;
+    private ListingType listingType;
     private int quantity;
     private String condition;
     private GearStatus status;

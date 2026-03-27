@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -42,6 +43,12 @@ public class Rental {
 
     @Indexed
     private RentalStatus status = RentalStatus.PENDING;
+
+    /** Number of rental days (endDate - startDate). */
+    private int rentalDays;
+
+    /** Total cost = rentalDays × dailyPrice at time of booking. */
+    private BigDecimal totalPrice;
 
     @CreatedDate
     private LocalDateTime createdAt;

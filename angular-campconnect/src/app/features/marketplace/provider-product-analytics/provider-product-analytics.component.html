@@ -13,6 +13,19 @@
             </a>
         </nav>
 
+        <!-- Loading State -->
+        <div *ngIf="loading" class="flex justify-center py-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="error" class="text-center py-8 text-red-500">
+            {{ error }}
+        </div>
+
+        <!-- Main Content -->
+        <ng-container *ngIf="!loading && !error && analytics">
+
         <!-- ═══ 1. HEADER SECTION ═══ -->
         <header class="cc-header">
             <div class="cc-product-thumb">
@@ -86,7 +99,7 @@
                         </svg>
                     </div>
                 </div>
-                <div class="cc-kpi-value">${{ analytics.totalRevenue | number }}</div>
+                <div class="cc-kpi-value">{{ analytics.totalRevenue | currency:'USD':'symbol':'1.0-0' }}</div>
                 <span class="cc-kpi-change cc-kpi-change--up">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -108,7 +121,7 @@
                         </svg>
                     </div>
                 </div>
-                <div class="cc-kpi-value">{{ analytics.averageRating }}<span
+                <div class="cc-kpi-value">{{ analytics.averageRating | number:'1.1-1' }}<span
                         style="font-size:18px;color:var(--cc-text-tertiary);font-weight:600;letter-spacing:0">/5</span>
                 </div>
                 <span class="cc-kpi-change cc-kpi-change--up">
@@ -123,7 +136,7 @@
             <!-- Cancellation Rate -->
             <article class="cc-kpi-card cc-kpi-card--cancel">
                 <div class="cc-kpi-header">
-                    <span class="cc-kpi-label">Cancellation Rate</span>
+                    <span class="cc-kpi-label">Active Rentals</span>
                     <div class="cc-kpi-icon cc-kpi-icon--cancel">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -133,8 +146,8 @@
                         </svg>
                     </div>
                 </div>
-                <div class="cc-kpi-value">{{ analytics.cancellationRate }}<span
-                        style="font-size:18px;color:var(--cc-text-tertiary);font-weight:600;letter-spacing:0">%</span>
+                <div class="cc-kpi-value">{{ analytics.activeRentals | number }}<span
+                        style="font-size:18px;color:var(--cc-text-tertiary);font-weight:600;letter-spacing:0"></span>
                 </div>
                 <span class="cc-kpi-change cc-kpi-change--down">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -194,7 +207,7 @@
                     </div>
                 </div>
                 <div class="cc-chart-wrapper cc-bar-chart">
-                    <div class="cc-bar-container" *ngFor="let item of analytics.rentalsTrend">
+                    <div class="cc-bar-container" *ngFor="let item of rentalsTrend">
                         <div class="cc-bar-fill-wrap">
                             <div class="cc-bar-fill" [style.height]="getRentalsHeight(item.value)">
                                 <span class="cc-bar-tooltip">{{ item.value }}</span>
@@ -220,7 +233,7 @@
                 </div>
 
                 <div class="cc-rating-summary">
-                    <span class="cc-rating-big">{{ analytics.averageRating }}</span>
+                    <span class="cc-rating-big">{{ analytics.averageRating | number:'1.1-1' }}</span>
                     <div>
                         <div class="cc-rating-stars" aria-label="4.7 out of 5 stars">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#d4a017" stroke="#d4a017"
@@ -254,7 +267,7 @@
                 </div>
 
                 <!-- Star Rows -->
-                <div class="cc-rating-row" *ngFor="let row of analytics.ratingBreakdown">
+                <div class="cc-rating-row" *ngFor="let row of ratingBreakdown">
                     <span class="cc-rating-row-label">{{ row.stars }} <svg xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1">
                             <polygon
@@ -278,7 +291,7 @@
 
                 <div class="cc-insight-list">
 
-                    <div class="cc-insight-item" *ngFor="let insight of analytics.insights">
+                    <div class="cc-insight-item" *ngFor="let insight of insights">
                         <!-- Dynamic SVG Icon Based on Type -->
                         <div class="cc-insight-icon" [ngClass]="{
                             'cc-insight-icon--weekend': insight.icon === 'weekend',
@@ -337,6 +350,8 @@
             </article>
 
         </section>
+
+        </ng-container><!-- end of !loading && !error && analytics -->
 
     </div>
 </section>

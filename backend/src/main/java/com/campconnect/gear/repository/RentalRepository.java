@@ -27,4 +27,8 @@ public interface RentalRepository extends MongoRepository<Rental, String> {
     Page<Rental> findByStartDateBetween(LocalDate from, LocalDate to, Pageable pageable);
 
     Page<Rental> findByEndDateBetween(LocalDate from, LocalDate to, Pageable pageable);
+
+    long countByGearId(String gearId);
+    long countByGearIdAndStatusIn(String gearId, java.util.List<RentalStatus> statuses);
+    long countByGearIdInAndStatus(java.util.List<String> gearIds, RentalStatus status);
 }

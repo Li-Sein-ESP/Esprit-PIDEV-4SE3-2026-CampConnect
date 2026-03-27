@@ -1,4 +1,16 @@
 <div class="cc-profile">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="text-center py-8 text-red-500">
+        {{ error }}
+    </div>
+
+    <!-- Main Content -->
+    <div *ngIf="!loading && !error">
     <!-- ═══════════════════════════════════════════════════ -->
     <!-- 1️⃣  PROFILE HEADER SECTION                        -->
     <!-- ═══════════════════════════════════════════════════ -->
@@ -304,4 +316,5 @@
             </div>
         </div>
     </main>
+    </div><!-- end of !loading && !error wrapper -->
 </div>

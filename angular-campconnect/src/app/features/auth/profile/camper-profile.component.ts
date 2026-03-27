@@ -1,16 +1,23 @@
-import { Component, HostListener, OnInit, AfterViewInit } from '@angular/core';
+import { Component, HostListener, OnInit, AfterViewInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
+import { Subject, takeUntil } from 'rxjs';
+import { UserApiService } from '../services/user-api.service';
+import { UserProfileResponse } from '../models/user.model';
 
 @Component({
     selector: 'app-camper-profile',
     standalone: true,
     imports: [CommonModule, RouterModule],
     templateUrl: './camper-profile.component.html',
-    styleUrl: './camper-profile.component.scss'
+    styleUrl: './camper-profile.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CamperProfileComponent implements OnInit, AfterViewInit {
+export class CamperProfileComponent implements OnInit, AfterViewInit, OnDestroy {
+    profile: UserProfileResponse | null = null;
+    loading = true;
+    error: string | null = null;
+    private destroy$ = new Subject<void>();
     // Mock User Object
     user = {
         name: 'Jordan Mitchell', // Fallback name
@@ -66,14 +73,31 @@ export class CamperProfileComponent implements OnInit, AfterViewInit {
     gearRentedAnimated: number = 0;
     animated: boolean = false;
 
-    constructor(private authService: AuthService) { }
+    constructor(
+        private userApi: UserApiService,
+        private cdr: ChangeDetectorRef
+    ) { }
 
     ngOnInit(): void {
-        this.authService.getCurrentUser().subscribe(currentUser => {
-            if (currentUser && currentUser.username) {
-                this.user.name = currentUser.username;
-            }
-        });
+        this.userApi.getProfile()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (data) => {
+                    this.profile = data;
+                    this.user.name = data.name || data.username;
+                    this.user.role = data.roles?.[0]?.replace('ROLE_', '') || 'CAMPER';
+                    if (data.profileDetails) {
+                        this.user.bio = (data.profileDetails['bio'] as string) || this.user.bio;
+                    }
+                    this.loading = false;
+                    this.cdr.markForCheck();
+                },
+                error: () => {
+                    this.error = 'Failed to load profile.';
+                    this.loading = false;
+                    this.cdr.markForCheck();
+                }
+            });
     }
 
     setActiveTab(tab: string) {
@@ -112,5 +136,10 @@ export class CamperProfileComponent implements OnInit, AfterViewInit {
             }
             this[propName] = current;
         }, 25);
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }

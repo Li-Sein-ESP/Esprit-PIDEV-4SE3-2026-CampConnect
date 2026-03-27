@@ -1,25 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-
-interface DeliveryStat {
-    activeDeliveries: number;
-    pendingRequests: number;
-    todaysEarnings: number;
-    averageRating: number;
-}
-
-interface Delivery {
-    id: string;
-    orderNumber: string;
-    pickupLocation: string;
-    dropoffLocation: string;
-    vehicleType: string;
-    weight: number;
-    urgency: 'Standard' | 'Urgent';
-    status: string;
-    dueIn: string;
-}
+import { DeliveryApiService, DeliveryResponse } from '../services/delivery-api.service';
 
 @Component({
     selector: 'app-delivery-dashboard',
@@ -28,40 +10,59 @@ interface Delivery {
     templateUrl: './delivery-dashboard.component.html',
     styleUrls: ['./delivery-dashboard.component.scss']
 })
-export class DeliveryDashboardComponent {
+export class DeliveryDashboardComponent implements OnInit {
     isSidebarOpen = false;
+    loading = true;
+    error: string | null = null;
 
-    stats: DeliveryStat = {
-        activeDeliveries: 12,
-        pendingRequests: 5,
-        todaysEarnings: 284.50,
-        averageRating: 4.9
-    };
+    deliveries: DeliveryResponse[] = [];
 
-    deliveries: Delivery[] = [
-        {
-            id: '7782',
-            orderNumber: '#ORD-7782',
-            pickupLocation: 'Camping World, 4500 E Speedway Blvd',
-            dropoffLocation: 'Yosemite Pines RV Resort, Site 42',
-            vehicleType: 'Van Required',
-            weight: 45,
-            urgency: 'Urgent',
-            status: 'active',
-            dueIn: '2h 15m'
-        },
-        {
-            id: '7785',
-            orderNumber: '#ORD-7785',
-            pickupLocation: 'REI Co-op, 2455 E Tamarack Ave',
-            dropoffLocation: 'Lake Tahoe State Park, North Entrance',
-            vehicleType: 'SUV / Car',
-            weight: 12,
-            urgency: 'Standard',
-            status: 'active',
-            dueIn: '4h 30m'
-        }
-    ];
+    get activeDeliveries(): DeliveryResponse[] {
+        return this.deliveries.filter(d =>
+            d.status === 'ASSIGNED' || d.status === 'PICKED_UP' || d.status === 'IN_TRANSIT'
+        );
+    }
+
+    get pendingDeliveries(): DeliveryResponse[] {
+        return this.deliveries.filter(d => d.status === 'CREATED' || d.status === 'PENDING');
+    }
+
+    get completedDeliveries(): DeliveryResponse[] {
+        return this.deliveries.filter(d => d.status === 'DELIVERED');
+    }
+
+    constructor(private deliveryApi: DeliveryApiService) { }
+
+    ngOnInit(): void {
+        this.loadDeliveries();
+    }
+
+    loadDeliveries(): void {
+        this.loading = true;
+        this.error = null;
+        this.deliveryApi.getMyDeliveries(0, 20).subscribe({
+            next: (page) => {
+                this.deliveries = page.content;
+                this.loading = false;
+            },
+            error: (err) => {
+                this.error = err?.status === 403
+                    ? 'Access denied. Delivery provider role required.'
+                    : 'Failed to load deliveries.';
+                this.loading = false;
+            }
+        });
+    }
+
+    updateStatus(id: string, status: 'ASSIGNED' | 'PICKED_UP' | 'IN_TRANSIT' | 'DELIVERED'): void {
+        this.deliveryApi.updateStatus(id, status).subscribe({
+            next: (updated) => {
+                const idx = this.deliveries.findIndex(d => d.id === id);
+                if (idx !== -1) this.deliveries[idx] = updated;
+            },
+            error: () => alert('Failed to update delivery status.')
+        });
+    }
 
     toggleSidebar(): void {
         this.isSidebarOpen = !this.isSidebarOpen;

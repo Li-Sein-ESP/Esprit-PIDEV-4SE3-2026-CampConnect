@@ -1,6 +1,7 @@
 package com.campconnect.gear.dto;
 
 import com.campconnect.gear.model.GearStatus;
+import com.campconnect.gear.model.ListingType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -22,10 +23,21 @@ public class GearRequest {
     @Schema(example = "Waterproof dome tent suitable for 4 people")
     private String description;
 
-    @NotNull(message = "Price is required")
+    /**
+     * Backward-compat field. For new listings use dailyPrice (FOR_RENT) and/or
+     * salePrice (FOR_SALE).
+     */
     @Positive(message = "Price must be positive")
     @Schema(example = "25.00")
     private BigDecimal price;
+
+    @Positive(message = "Daily rental price must be positive")
+    @Schema(example = "15.00", description = "Required when listingType is FOR_RENT or BOTH")
+    private BigDecimal dailyPrice;
+
+    @Positive(message = "Sale price must be positive")
+    @Schema(example = "250.00", description = "Required when listingType is FOR_SALE or BOTH")
+    private BigDecimal salePrice;
 
     @Min(value = 0, message = "Quantity cannot be negative")
     @Schema(example = "5")
@@ -41,6 +53,10 @@ public class GearRequest {
 
     // Status is set to AVAILABLE by default; provider can override only on update
     private GearStatus status;
+
+    @NotNull(message = "Listing type is required")
+    @Schema(example = "FOR_RENT", description = "FOR_SALE, FOR_RENT, or BOTH")
+    private ListingType listingType;
 
     @NotEmpty(message = "At least one initial image URL is required")
     @Schema(example = "[\"https://images.unsplash.com/photo-1525811902-f2342640856e\"]")

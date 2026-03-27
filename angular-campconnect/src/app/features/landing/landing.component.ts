@@ -2,6 +2,8 @@ import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChildren, 
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { Subject, fromEvent } from 'rxjs';
+import { takeUntil, debounceTime } from 'rxjs/operators';
 
 @Component({
     selector: 'app-landing',
@@ -15,6 +17,10 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChildren('reveal') revealElements!: QueryList<ElementRef>;
     @ViewChildren('statNumber') statNumbers!: QueryList<ElementRef>;
 
+    private destroy$ = new Subject<void>();
+    private timeouts: number[] = [];
+    private animationFrames: number[] = [];
+    
     isScrolled = false;
     isMobileMenuOpen = false;
 
@@ -34,8 +40,10 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     ngOnInit() {
         this.initNavbar();
 
-        // Setup auth state
-        this.authService.isAuthenticated().subscribe((isAuth: boolean) => {
+        // Setup auth state with proper cleanup
+        this.authService.isAuthenticated().pipe(
+            takeUntil(this.destroy$)
+        ).subscribe((isAuth: boolean) => {
             this.isAuthenticated = isAuth;
             if (isAuth) {
                 const roles = this.authService.getRoles();
@@ -47,11 +55,20 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
                 else this.dashboardRoute = '/dashboard';
             }
         });
+
+        // Optimize scroll listener with debounce
+        fromEvent(window, 'scroll').pipe(
+            debounceTime(10),
+            takeUntil(this.destroy$)
+        ).subscribe(() => {
+            this.initNavbar();
+            this.initParallax();
+        });
     }
 
     ngAfterViewInit() {
-        // Slight delay to ensure paint
-        setTimeout(() => {
+        // Track timeout with proper cleanup
+        this.addTimeout(() => {
             this.initHeroReveal();
             this.initScrollReveal();
             this.initParallax();
@@ -61,15 +78,31 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+        
         if (this.observer) {
             this.observer.disconnect();
         }
+        
+        // Cleanup all timeouts
+        this.timeouts.forEach(timer => clearTimeout(timer));
+        this.timeouts = [];
+        
+        // Cleanup animation frames
+        this.animationFrames.forEach(frame => cancelAnimationFrame(frame));
+        this.animationFrames = [];
     }
 
-    @HostListener('window:scroll')
-    onWindowScroll() {
-        this.initNavbar();
-        this.initParallax();
+    // Remove HostListener since we're using fromEvent now
+    // @HostListener('window:scroll') - REMOVED
+
+    private addTimeout(callback: () => void, delay: number): void {
+        const timer = window.setTimeout(() => {
+            callback();
+            this.timeouts = this.timeouts.filter(t => t !== timer);
+        }, delay);
+        this.timeouts.push(timer);
     }
 
     toggleMobileMenu() {
@@ -87,7 +120,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
         this.revealElements.forEach(elRef => {
             const el = elRef.nativeElement;
             const delay = parseInt(el.getAttribute('data-delay') || '0', 10);
-            setTimeout(() => {
+            this.addTimeout(() => {
                 el.classList.add('cc-visible');
             }, 300 + delay);
         });
@@ -107,7 +140,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
                 if (entry.isIntersecting) {
                     const el = entry.target as HTMLElement;
                     const delay = parseInt(el.getAttribute('data-delay') || '0', 10);
-                    setTimeout(() => {
+                    this.addTimeout(() => {
                         el.classList.add('cc-visible');
                     }, delay);
                     this.observer?.unobserve(el);
@@ -231,17 +264,19 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
                     }
 
                     if (progress < 1) {
-                        requestAnimationFrame(step);
+                        const frameId = requestAnimationFrame(step);
+                        this.animationFrames.push(frameId);
                     } else {
                         stat.textContent = text;
                     }
                 };
 
-                requestAnimationFrame(step);
+                const frameId = requestAnimationFrame(step);
+                this.animationFrames.push(frameId);
             });
         };
 
-        setTimeout(animateCounters, 1200);
+        this.addTimeout(animateCounters, 1200);
     }
 
     scrollToTarget(targetId: string, event: Event) {

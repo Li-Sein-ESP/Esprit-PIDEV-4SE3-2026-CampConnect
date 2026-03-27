@@ -26,4 +26,6 @@ public interface DeliveryRepository extends MongoRepository<Delivery, String> {
     Page<Delivery> findByScheduledDateBetweenAndDeletedFalse(LocalDate from, LocalDate to, Pageable pageable);
 
     boolean existsByRentalIdAndStatusAndDeletedFalse(String rentalId, DeliveryStatus status);
+
+    java.util.List<Delivery> findByDriverIdAndStatusAndDeletedFalse(String driverId, DeliveryStatus status);
 }

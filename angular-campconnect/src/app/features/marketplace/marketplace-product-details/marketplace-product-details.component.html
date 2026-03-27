@@ -2,7 +2,7 @@
 
     <!-- Loading State -->
     <div *ngIf="!product" class="flex items-center justify-center min-h-[60vh]">
-        <lucide-icon name="loader-2" class="w-10 h-10 animate-spin text-[#1a3d2e]"></lucide-icon>
+        <lucide-icon [img]="icons.Loader2" class="w-10 h-10 animate-spin text-[#1a3d2e]"></lucide-icon>
     </div>
 
     <ng-container *ngIf="product">
@@ -11,12 +11,12 @@
             <ol class="cc-breadcrumb__list">
                 <li>
                     <a routerLink="/">Home</a>
-                    <span class="cc-breadcrumb__separator"><lucide-icon [name]="icons.ChevronRight"
+                    <span class="cc-breadcrumb__separator"><lucide-icon [img]="icons.ChevronRight"
                             class="w-[14px] h-[14px]"></lucide-icon></span>
                 </li>
                 <li>
                     <a routerLink="/marketplace">Marketplace</a>
-                    <span class="cc-breadcrumb__separator"><lucide-icon [name]="icons.ChevronRight"
+                    <span class="cc-breadcrumb__separator"><lucide-icon [img]="icons.ChevronRight"
                             class="w-[14px] h-[14px]"></lucide-icon></span>
                 </li>
                 <li>
@@ -39,7 +39,7 @@
                         </div>
 
                         <button class="cc-gallery__favorite" aria-label="Save to favorites">
-                            <lucide-icon [name]="icons.Heart" class="w-[20px] h-[20px]"
+                            <lucide-icon [img]="icons.Heart" class="w-[20px] h-[20px]"
                                 style="color: var(--stone-500)"></lucide-icon>
                         </button>
 
@@ -65,7 +65,7 @@
 
                     <!-- Brand -->
                     <div class="cc-info__brand">
-                        <lucide-icon [name]="icons.Mountain" class="w-[13px] h-[13px]"></lucide-icon>
+                        <lucide-icon [img]="icons.Mountain" class="w-[13px] h-[13px]"></lucide-icon>
                         {{product.brand}}
                     </div>
 
@@ -85,45 +85,185 @@
 
                     <!-- Condition -->
                     <div class="cc-info__condition">
-                        <lucide-icon [name]="icons.BadgeCheck" class="w-[15px] h-[15px]"></lucide-icon>
+                        <lucide-icon [img]="icons.BadgeCheck" class="w-[15px] h-[15px]"></lucide-icon>
                         {{product.condition}}
                     </div>
 
                     <div class="cc-info__divider"></div>
 
-                    <!-- Pricing -->
-                    <div class="cc-pricing">
-                        <span class="cc-pricing__amount">\${{product.pricePerDay}}</span>
-                        <span class="cc-pricing__period">/ day</span>
-                    </div>
-                    <div class="cc-pricing__deposit">
-                        <lucide-icon [name]="icons.ShieldCheck" class="w-[14px] h-[14px]"
-                            style="color:var(--forest-green)"></lucide-icon>
-                        Refundable deposit: <strong>$150</strong>
+                    <!-- Buy / Rent Tabs -->
+                    <div *ngIf="product.listingType === 'BOTH'" class="flex p-1 bg-gray-100 rounded-xl mb-6">
+                        <button (click)="selectedAction = 'rent'" [class.bg-white]="selectedAction === 'rent'"
+                            [class.shadow-sm]="selectedAction === 'rent'"
+                            [class.text-stone-900]="selectedAction === 'rent'"
+                            [class.text-stone-500]="selectedAction !== 'rent'"
+                            class="flex-1 py-2.5 text-sm font-medium rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1">
+                            Rent Gear
+                        </button>
+                        <button (click)="selectedAction = 'buy'" [class.bg-white]="selectedAction === 'buy'"
+                            [class.shadow-sm]="selectedAction === 'buy'"
+                            [class.text-stone-900]="selectedAction === 'buy'"
+                            [class.text-stone-500]="selectedAction !== 'buy'"
+                            class="flex-1 py-2.5 text-sm font-medium rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1">
+                            Buy Gear
+                        </button>
                     </div>
 
-                    <!-- Date Selector -->
-                    <div class="cc-dates">
-                        <div class="cc-dates__row">
-                            <div class="cc-dates__field">
-                                <label class="cc-dates__label" for="startDate">Pick-up Date</label>
-                                <input type="date" id="startDate" class="cc-dates__input">
-                            </div>
-                            <div class="cc-dates__field">
-                                <label class="cc-dates__label" for="endDate">Return Date</label>
-                                <input type="date" id="endDate" class="cc-dates__input">
+                    <!-- Render Rent UI -->
+                    <div *ngIf="selectedAction === 'rent'"
+                        class="bg-emerald-50/50 rounded-2xl p-5 border border-emerald-100 mb-6">
+                        <div class="flex items-baseline gap-2 mb-1">
+                            <span class="text-3xl font-bold text-stone-900">${{ product.pricePerDay }}</span>
+                            <span class="text-stone-500">/ day</span>
+                        </div>
+                        <div class="cc-pricing__deposit mb-6">
+                            <lucide-icon [img]="icons.ShieldCheck" class="w-[14px] h-[14px]"
+                                style="color:var(--forest-green)"></lucide-icon>
+                            Refundable deposit: <strong>$150</strong>
+                        </div>
+
+                        <!-- Date Selector / Number of Days -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-stone-700 mb-2">Duration (Days)</label>
+                            <div class="flex items-center gap-4">
+                                <div class="flex items-center border border-stone-200 rounded-xl bg-white w-32 p-1">
+                                    <button type="button" (click)="rentalDays = rentalDays - 1"
+                                        [disabled]="rentalDays <= 1"
+                                        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-600 disabled:opacity-50 transition-colors">
+                                        -
+                                    </button>
+                                    <input type="number" [(ngModel)]="rentalDays" min="1" max="60"
+                                        class="w-full text-center font-medium bg-transparent border-none focus:ring-0 p-0 text-stone-900 appearance-none">
+                                    <button type="button" (click)="rentalDays = rentalDays + 1"
+                                        [disabled]="rentalDays >= 60"
+                                        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-600 disabled:opacity-50 transition-colors">
+                                        +
+                                    </button>
+                                </div>
+                                <div class="text-right flex-1">
+                                    <div class="text-sm text-stone-500">Total Rental Price</div>
+                                    <div class="font-bold text-lg text-emerald-700">${{ rentalTotal | number:'1.2-2' }}
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- Delivery Options -->
+                        <div class="mb-6 p-4 bg-stone-50 rounded-xl border border-stone-200">
+                            <label class="flex items-center gap-3 cursor-pointer mb-2">
+                                <input type="checkbox" [(ngModel)]="requiresDelivery"
+                                    class="w-5 h-5 text-emerald-600 border-stone-300 rounded focus:ring-emerald-500">
+                                <span class="text-sm font-medium text-stone-800 flex items-center gap-2">
+                                    <lucide-icon [img]="icons.Truck" class="w-4 h-4"></lucide-icon>
+                                    Add Delivery ($15 base fee)
+                                </span>
+                            </label>
+
+                            <div *ngIf="requiresDelivery" class="mt-3 pl-8 animate-fade-in-down">
+                                <label class="block text-xs font-medium text-stone-500 mb-1">Delivery Address</label>
+                                <input type="text" [(ngModel)]="deliveryAddress" placeholder="123 Base Camp Road..."
+                                    class="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors">
+                            </div>
+                        </div>
+
+                        <button (click)="onRent()"
+                            [disabled]="actionLoading || !canRent || (requiresDelivery && !deliveryAddress)"
+                            class="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                            <lucide-icon *ngIf="actionLoading" [img]="icons.Loader2"
+                                class="w-5 h-5 animate-spin"></lucide-icon>
+                            {{ actionLoading ? 'Adding...' : 'Add Rental to Cart' }}
+                        </button>
                     </div>
 
-                    <!-- CTA Buttons -->
-                    <div class="cc-actions">
-                        <button class="cc-btn cc-btn--primary">
-                            <lucide-icon [name]="icons.ShoppingBag" class="w-[18px] h-[18px]"></lucide-icon>
-                            Add to Cart
+                    <!-- Render Buy UI -->
+                    <div *ngIf="selectedAction === 'buy'"
+                        class="bg-blue-50/50 rounded-2xl p-5 border border-blue-100 mb-6">
+                        <div class="flex items-baseline gap-2 mb-1">
+                            <span class="text-3xl font-bold text-stone-900">${{ product.salePrice }}</span>
+                            <span class="text-stone-500">purchase price</span>
+                        </div>
+                        <div class="cc-pricing__deposit mb-6 text-blue-700">
+                            <lucide-icon [img]="icons.Package" class="w-[14px] h-[14px]"
+                                style="color:var(--text-blue-700)"></lucide-icon>
+                            Brand new / Pre-owned purchase
+                        </div>
+
+                        <!-- Quantity Selector -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-stone-700 mb-2">Quantity</label>
+                            <div class="flex items-center gap-4">
+                                <div class="flex items-center border border-stone-200 rounded-xl bg-white w-32 p-1">
+                                    <button type="button" (click)="purchaseQty = purchaseQty - 1"
+                                        [disabled]="purchaseQty <= 1"
+                                        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-600 disabled:opacity-50 transition-colors">
+                                        -
+                                    </button>
+                                    <input type="number" [(ngModel)]="purchaseQty" min="1" max="99"
+                                        class="w-full text-center font-medium bg-transparent border-none focus:ring-0 p-0 text-stone-900 appearance-none">
+                                    <button type="button" (click)="purchaseQty = purchaseQty + 1"
+                                        [disabled]="purchaseQty >= 99"
+                                        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-600 disabled:opacity-50 transition-colors">
+                                        +
+                                    </button>
+                                </div>
+                                <div class="text-right flex-1">
+                                    <div class="text-sm text-stone-500">Purchase Total</div>
+                                    <div class="font-bold text-lg text-blue-700">${{ purchaseTotal | number:'1.2-2' }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delivery Options -->
+                        <div class="mb-6 p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+                            <label class="flex items-center gap-3 cursor-pointer mb-2">
+                                <input type="checkbox" [(ngModel)]="requiresDelivery"
+                                    class="w-5 h-5 text-blue-600 border-blue-200 rounded focus:ring-blue-500">
+                                <span class="text-sm font-medium text-blue-900 flex items-center gap-2">
+                                    <lucide-icon [img]="icons.Truck" class="w-4 h-4"></lucide-icon>
+                                    Add Delivery ($15 flat rate)
+                                </span>
+                            </label>
+
+                            <div *ngIf="requiresDelivery" class="mt-3 pl-8 animate-fade-in-down">
+                                <label class="block text-xs font-medium text-blue-700/70 mb-1">Delivery Address</label>
+                                <input type="text" [(ngModel)]="deliveryAddress" placeholder="45 Forest Trail..."
+                                    class="w-full px-3 py-2 border border-blue-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors">
+                            </div>
+                        </div>
+
+                        <button (click)="onBuy()"
+                            [disabled]="actionLoading || !canBuy || (requiresDelivery && !deliveryAddress)"
+                            class="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                            <lucide-icon *ngIf="actionLoading" [img]="icons.Loader2"
+                                class="w-5 h-5 animate-spin"></lucide-icon>
+                            {{ actionLoading ? 'Adding...' : 'Add Purchase to Cart' }}
                         </button>
-                        <button class="cc-btn cc-btn--secondary">
-                            <lucide-icon [name]="icons.Heart" class="w-[18px] h-[18px]"></lucide-icon>
+                    </div>
+
+                    <!-- Status Messages -->
+                    <div *ngIf="successMessage"
+                        class="mb-6 p-4 bg-emerald-50 text-emerald-800 rounded-xl border border-emerald-200 flex items-start gap-3">
+                        <lucide-icon [img]="icons.CheckCircle"
+                            class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5"></lucide-icon>
+                        <p class="text-sm font-medium">{{ successMessage }}</p>
+                    </div>
+
+                    <div *ngIf="actionError"
+                        class="mb-6 p-4 bg-rose-50 text-rose-800 rounded-xl border border-rose-200 flex items-start gap-3">
+                        <p class="text-sm font-medium">{{ actionError }}</p>
+                    </div>
+
+                    <!-- Additional Actions -->
+                    <div class="flex items-center gap-3">
+                        <button routerLink="/marketplace/cart"
+                            class="w-full py-2.5 px-4 bg-white border border-stone-200 text-stone-700 hover:bg-stone-50 font-medium rounded-xl shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-stone-200 flex items-center justify-center gap-2">
+                            <lucide-icon [img]="icons.ShoppingBag" class="w-[18px] h-[18px]"></lucide-icon>
+                            View Cart
+                        </button>
+                        <button
+                            class="w-full py-2.5 px-4 bg-white border border-stone-200 text-stone-700 hover:bg-stone-50 font-medium rounded-xl shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-stone-200 flex items-center justify-center gap-2">
+                            <lucide-icon [img]="icons.Heart" class="w-[18px] h-[18px]"></lucide-icon>
                             Save for Later
                         </button>
                     </div>
@@ -131,15 +271,15 @@
                     <!-- Trust Signals -->
                     <div class="cc-trust">
                         <div class="cc-trust__item">
-                            <lucide-icon [name]="icons.Truck" class="cc-trust__icon"></lucide-icon>
+                            <lucide-icon [img]="icons.Truck" class="cc-trust__icon"></lucide-icon>
                             <div class="cc-trust__text">Free delivery<br>over $75</div>
                         </div>
                         <div class="cc-trust__item">
-                            <lucide-icon [name]="icons.ShieldCheck" class="cc-trust__icon"></lucide-icon>
+                            <lucide-icon [img]="icons.ShieldCheck" class="cc-trust__icon"></lucide-icon>
                             <div class="cc-trust__text">Gear protection<br>included</div>
                         </div>
                         <div class="cc-trust__item">
-                            <lucide-icon [name]="icons.RotateCcw" class="cc-trust__icon"></lucide-icon>
+                            <lucide-icon [img]="icons.RotateCcw" class="cc-trust__icon"></lucide-icon>
                             <div class="cc-trust__text">Free cancellation<br>48h before</div>
                         </div>
                     </div>
@@ -171,7 +311,7 @@
                     <ul class="cc-description__features">
                         <li *ngFor="let feature of product.features" class="cc-description__feature">
                             <div class="cc-description__feature-icon">
-                                <lucide-icon [name]="feature.icon" class="w-[18px] h-[18px]"
+                                <lucide-icon [img]="feature.icon" class="w-[18px] h-[18px]"
                                     style="color:var(--forest-green)"></lucide-icon>
                             </div>
                             <span class="cc-description__feature-text">{{feature.text}}</span>

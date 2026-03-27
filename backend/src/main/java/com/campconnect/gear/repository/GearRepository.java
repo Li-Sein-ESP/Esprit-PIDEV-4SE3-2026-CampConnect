@@ -25,4 +25,6 @@ public interface GearRepository extends MongoRepository<Gear, String> {
     Page<Gear> findByStatusAndCategoryAndDeletedFalse(GearStatus status, String category, Pageable pageable);
 
     Page<Gear> findByPriceBetweenAndDeletedFalse(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable);
+
+    java.util.List<Gear> findByOwnerIdAndDeletedFalse(String ownerId);
 }

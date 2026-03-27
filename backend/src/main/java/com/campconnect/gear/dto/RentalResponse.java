@@ -4,6 +4,7 @@ import com.campconnect.gear.model.RentalStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -18,6 +19,8 @@ public class RentalResponse {
     private LocalDate startDate;
     private LocalDate endDate;
     private RentalStatus status;
+    private int rentalDays;
+    private BigDecimal totalPrice;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

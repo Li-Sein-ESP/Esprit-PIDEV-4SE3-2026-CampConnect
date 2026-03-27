@@ -2,7 +2,7 @@
     <div class="gc-header">
         <a routerLink="/gear" class="gc-back">&larr; Back to Gear List</a>
         <h1 class="gc-title">Create New Gear Listing</h1>
-        <p class="gc-subtitle">Add your equipment to the marketplace and start renting.</p>
+        <p class="gc-subtitle">Add your equipment to the marketplace — for rent, for sale, or both.</p>
     </div>
 
     <form [formGroup]="gearForm" (ngSubmit)="onSubmit()" class="gc-form">
@@ -26,13 +26,13 @@
                 <select id="category" formControlName="category" class="gc-input"
                     [class.gc-input--error]="hasError('category')">
                     <option value="">Select Category</option>
-                    <option value="Tents & Shelters">Tents & Shelters</option>
-                    <option value="Sleeping Bags & Pads">Sleeping Bags & Pads</option>
-                    <option value="Backpacks & Bags">Backpacks & Bags</option>
-                    <option value="Cooking & Kitchen">Cooking & Kitchen</option>
-                    <option value="Lighting & Power">Lighting & Power</option>
+                    <option value="Tents &amp; Shelters">Tents &amp; Shelters</option>
+                    <option value="Sleeping Bags &amp; Pads">Sleeping Bags &amp; Pads</option>
+                    <option value="Backpacks &amp; Bags">Backpacks &amp; Bags</option>
+                    <option value="Cooking &amp; Kitchen">Cooking &amp; Kitchen</option>
+                    <option value="Lighting &amp; Power">Lighting &amp; Power</option>
                     <option value="Climbing Gear">Climbing Gear</option>
-                    <option value="Navigation & Safety">Navigation & Safety</option>
+                    <option value="Navigation &amp; Safety">Navigation &amp; Safety</option>
                     <option value="Other">Other</option>
                 </select>
                 <span class="gc-error" *ngIf="hasError('category')">{{ getErrorMessage('category') }}</span>
@@ -46,20 +46,40 @@
                 <span class="gc-error" *ngIf="hasError('brand')">{{ getErrorMessage('brand') }}</span>
             </div>
 
-            <!-- Price Per Day -->
-            <div class="gc-field">
-                <label for="pricePerDay">Price Per Day ($) *</label>
-                <input id="pricePerDay" type="number" formControlName="pricePerDay" class="gc-input"
-                    [class.gc-input--error]="hasError('pricePerDay')">
-                <span class="gc-error" *ngIf="hasError('pricePerDay')">{{ getErrorMessage('pricePerDay') }}</span>
+            <!-- ═══════════ LISTING TYPE ═══════════ -->
+            <div class="gc-field gc-col-2">
+                <label>Listing Type *</label>
+                <div class="gc-listing-type-group" formControlName="listingType">
+                    <label *ngFor="let lt of listingTypes" class="gc-listing-type-card"
+                        [class.gc-listing-type-card--active]="listingType === lt.value">
+                        <input type="radio" [value]="lt.value" formControlName="listingType"
+                            style="position:absolute;opacity:0;pointer-events:none;">
+                        <span class="gc-listing-type-icon">{{ lt.icon }}</span>
+                        <span class="gc-listing-type-label">{{ lt.label }}</span>
+                    </label>
+                </div>
+                <p class="gc-hint" *ngIf="listingType === 'FOR_RENT'">Campers will rent this item and return it. Set a
+                    daily price.</p>
+                <p class="gc-hint" *ngIf="listingType === 'FOR_SALE'">Campers will purchase this item outright. Set a
+                    sale price.</p>
+                <p class="gc-hint" *ngIf="listingType === 'BOTH'">Campers can choose to rent or buy. Set both prices.
+                </p>
             </div>
 
-            <!-- Purchase Price -->
-            <div class="gc-field">
-                <label for="purchasePrice">Purchase Price / Value ($)</label>
-                <input id="purchasePrice" type="number" formControlName="purchasePrice" class="gc-input"
-                    [class.gc-input--error]="hasError('purchasePrice')">
-                <span class="gc-error" *ngIf="hasError('purchasePrice')">{{ getErrorMessage('purchasePrice') }}</span>
+            <!-- Daily Price (shown for FOR_RENT or BOTH) -->
+            <div class="gc-field" *ngIf="showDailyPrice">
+                <label for="dailyPrice">Daily Rental Price ($) *</label>
+                <input id="dailyPrice" type="number" formControlName="dailyPrice" class="gc-input" min="0" step="0.01"
+                    [class.gc-input--error]="hasError('dailyPrice')" placeholder="e.g. 15.00">
+                <span class="gc-error" *ngIf="hasError('dailyPrice')">{{ getErrorMessage('dailyPrice') }}</span>
+            </div>
+
+            <!-- Sale Price (shown for FOR_SALE or BOTH) -->
+            <div class="gc-field" *ngIf="showSalePrice">
+                <label for="salePrice">Sale Price ($) *</label>
+                <input id="salePrice" type="number" formControlName="salePrice" class="gc-input" min="0" step="0.01"
+                    [class.gc-input--error]="hasError('salePrice')" placeholder="e.g. 250.00">
+                <span class="gc-error" *ngIf="hasError('salePrice')">{{ getErrorMessage('salePrice') }}</span>
             </div>
 
             <!-- Condition -->

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { GearApiService } from '../../gear/services/gear-api.service';
-import { GearCreateRequest } from '../../gear/models/gear.model';
+import { GearCreateRequest, ListingType } from '../../gear/models/gear.model';
 import { LucideAngularModule, Camera, X, Loader2 } from 'lucide-angular';
 
 @Component({
@@ -40,6 +40,12 @@ export class ProviderAddProductComponent implements OnInit {
         'Safety & First Aid'
     ];
 
+    readonly listingTypes: { value: ListingType; label: string; icon: string }[] = [
+        { value: 'FOR_RENT', label: 'For Rent', icon: '🏕️' },
+        { value: 'FOR_SALE', label: 'For Sale', icon: '🏷️' },
+        { value: 'BOTH', label: 'Both', icon: '🔄' },
+    ];
+
     constructor(
         private fb: FormBuilder,
         private router: Router,
@@ -52,12 +58,56 @@ export class ProviderAddProductComponent implements OnInit {
             name: ['', Validators.required],
             category: ['', Validators.required],
             description: ['', Validators.required],
-            pricePerDay: [0, [Validators.required, Validators.min(0)]],
+            listingType: ['FOR_RENT', Validators.required],
+            dailyPrice: [null],
+            salePrice: [null],
             stockQuantity: [1, [Validators.required, Validators.min(1)]],
             condition: ['NEW', Validators.required],
             imageUrls: [[], Validators.required],
             status: ['active']
         });
+
+        // Apply conditional validators whenever listingType changes
+        this.addProductForm.get('listingType')!.valueChanges.subscribe(type => {
+            this.applyPriceValidators(type);
+        });
+
+        // Apply initial validators based on default
+        this.applyPriceValidators('FOR_RENT');
+    }
+
+    get listingType(): ListingType {
+        return this.addProductForm.get('listingType')!.value;
+    }
+
+    get showDailyPrice(): boolean {
+        return this.listingType === 'FOR_RENT' || this.listingType === 'BOTH';
+    }
+
+    get showSalePrice(): boolean {
+        return this.listingType === 'FOR_SALE' || this.listingType === 'BOTH';
+    }
+
+    private applyPriceValidators(type: ListingType): void {
+        const dailyPriceCtrl = this.addProductForm.get('dailyPrice')!;
+        const salePriceCtrl = this.addProductForm.get('salePrice')!;
+
+        if (type === 'FOR_RENT') {
+            dailyPriceCtrl.setValidators([Validators.required, Validators.min(0.01)]);
+            salePriceCtrl.clearValidators();
+            salePriceCtrl.setValue(null);
+        } else if (type === 'FOR_SALE') {
+            salePriceCtrl.setValidators([Validators.required, Validators.min(0.01)]);
+            dailyPriceCtrl.clearValidators();
+            dailyPriceCtrl.setValue(null);
+        } else {
+            // BOTH
+            dailyPriceCtrl.setValidators([Validators.required, Validators.min(0.01)]);
+            salePriceCtrl.setValidators([Validators.required, Validators.min(0.01)]);
+        }
+
+        dailyPriceCtrl.updateValueAndValidity();
+        salePriceCtrl.updateValueAndValidity();
     }
 
     get specifications() {
@@ -83,7 +133,7 @@ export class ProviderAddProductComponent implements OnInit {
         if (vals.name?.trim()) filled++;
         if (vals.category) filled++;
         if (vals.description?.trim()) filled++;
-        if (vals.pricePerDay > 0) filled++;
+        if (vals.dailyPrice > 0 || vals.salePrice > 0) filled++;
         if (vals.stockQuantity > 0) filled++;
 
         return Math.round((filled / total) * 100);
@@ -241,7 +291,10 @@ export class ProviderAddProductComponent implements OnInit {
         const request = {
             name: formValue.name,
             description: formValue.description,
-            price: formValue.pricePerDay,
+            price: formValue.dailyPrice ?? formValue.salePrice ?? 0,
+            dailyPrice: formValue.dailyPrice ?? undefined,
+            salePrice: formValue.salePrice ?? undefined,
+            listingType: formValue.listingType,
             quantity: formValue.stockQuantity,
             condition: formValue.condition,
             category: formValue.category,

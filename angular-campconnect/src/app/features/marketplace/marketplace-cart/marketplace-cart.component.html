@@ -8,68 +8,93 @@
             <p class="text-stone-500">Review your gear and proceed to checkout</p>
         </div>
 
+        <!-- Loading State -->
+        <div *ngIf="loading" class="flex flex-col items-center justify-center py-20">
+            <lucide-icon [img]="icons.Loader2" class="w-10 h-10 text-emerald-600 animate-spin mb-4"></lucide-icon>
+            <p class="text-stone-500 font-medium">Loading your cart...</p>
+        </div>
+
         <!-- Cart Content -->
-        <div *ngIf="cartItems.length > 0; else emptyCart" class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+        <div *ngIf="!loading && cart && cart.items && cart.items.length > 0; else emptyCart"
+            class="flex flex-col lg:flex-row gap-8 lg:gap-12">
             <!-- Left Side - Cart Items -->
             <div class="flex-1">
                 <div class="space-y-6">
-                    <div *ngFor="let item of cartItems; let i = index"
+                    <div *ngFor="let item of cart.items; let i = index"
                         class="cart-item fade-in bg-white rounded-2xl card-shadow p-6"
                         [style.animation-delay]="i * 0.1 + 's'">
                         <div class="flex flex-col sm:flex-row gap-6">
                             <!-- Product Image -->
                             <div class="sm:w-48 h-36 rounded-xl overflow-hidden flex-shrink-0 cursor-pointer"
-                                [routerLink]="['/marketplace/product', item.id]">
-                                <img [src]="item.image" [alt]="item.name" class="w-full h-full object-cover">
+                                [routerLink]="['/marketplace/product', item.gearId]">
+                                <img [src]="item.gearImage || 'https://images.unsplash.com/photo-1525811902-f2342640856e?w=800&q=80'"
+                                    [alt]="item.gearName" class="w-full h-full object-cover">
                             </div>
 
                             <!-- Item Details -->
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-start justify-between gap-4 mb-3">
                                     <div>
-                                        <span class="inline-block px-2 py-1 rounded-md font-medium condition-badge mb-2"
-                                            [ngClass]="item.conditionColor">
-                                            {{item.condition}}
+                                        <span
+                                            class="inline-block px-2 py-1 rounded-md font-medium text-xs mb-2 uppercase"
+                                            [ngClass]="item.itemType === 'RENT' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'">
+                                            {{item.itemType}}
                                         </span>
                                         <h3 class="font-semibold text-stone-800 text-lg leading-tight cursor-pointer hover:text-[var(--forest-600)] transition-colors"
-                                            [routerLink]="['/marketplace/product', item.id]">{{item.name}}</h3>
-                                        <p class="text-stone-500 text-sm mt-1">{{item.category}}</p>
+                                            [routerLink]="['/marketplace/product', item.gearId]">{{item.gearName}}</h3>
+                                        <p class="text-stone-500 text-sm mt-1">Condition: {{item.gearCondition}} |
+                                            {{item.gearCategory}}</p>
                                     </div>
                                     <div class="text-right flex-shrink-0">
-                                        <p class="text-2xl font-bold text-stone-800">{{calculateItemTotal(item) |
-                                            currency}}</p>
-                                        <p class="text-stone-500 text-sm">{{item.pricePerDay | currency}}/day ×
-                                            {{calculateDuration(item.startDate, item.endDate)}} days</p>
+                                        <p class="text-2xl font-bold text-stone-800">{{item.lineTotal | currency}}</p>
+                                        <p class="text-stone-500 text-sm" *ngIf="item.itemType === 'RENT'">
+                                            {{item.unitPrice | currency}}/day × {{item.rentalDays}} days
+                                        </p>
+                                        <p class="text-stone-500 text-sm" *ngIf="item.itemType !== 'RENT'">
+                                            {{item.unitPrice | currency}} × {{item.quantity}}
+                                        </p>
                                     </div>
                                 </div>
 
-                                <!-- Date Selection -->
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                                    <div>
-                                        <label class="block text-xs font-medium text-stone-500 mb-1">Start Date</label>
-                                        <input type="date" [(ngModel)]="item.startDate" (change)="updateDate(item)"
-                                            class="date-input w-full px-3 py-2.5 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-colors">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-medium text-stone-500 mb-1">End Date</label>
-                                        <input type="date" [(ngModel)]="item.endDate" (change)="updateDate(item)"
-                                            class="date-input w-full px-3 py-2.5 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-colors">
+                                <!-- Date Selection / Info -->
+                                <div class="mb-4" *ngIf="item.itemType === 'RENT'">
+                                    <p class="text-sm text-stone-600">
+                                        <lucide-icon [img]="icons.Calendar"
+                                            class="w-4 h-4 inline-block mr-1 text-stone-400"></lucide-icon>
+                                        <span class="font-medium text-stone-800">{{item.startDate | date:'MMM d,
+                                            y'}}</span> - <span class="font-medium text-stone-800">{{item.endDate |
+                                            date:'MMM d, y'}}</span>
+                                    </p>
+                                </div>
+
+                                <!-- Delivery Info -->
+                                <div class="mb-4" *ngIf="item.requiresDelivery">
+                                    <div
+                                        class="inline-flex items-center gap-2 px-3 py-2 bg-stone-50 rounded-lg border border-stone-200">
+                                        <lucide-icon [img]="icons.Truck" class="w-4 h-4 text-emerald-600"></lucide-icon>
+                                        <div class="text-xs">
+                                            <span class="font-medium text-stone-800 block">Delivery Requested</span>
+                                            <span class="text-stone-500">{{item.deliveryAddress}}</span>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Duration & Actions -->
                                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <div class="flex items-center gap-2">
-                                        <span
-                                            class="px-3 py-1.5 bg-stone-100 rounded-lg text-sm font-medium text-stone-600">
-                                            📅 {{calculateDuration(item.startDate, item.endDate)}}
-                                            day{{calculateDuration(item.startDate, item.endDate) > 1 ? 's' : ''}} rental
+                                        <span *ngIf="item.itemType === 'RENT'"
+                                            class="px-3 py-1.5 bg-emerald-50 rounded-lg text-sm font-medium text-emerald-700">
+                                            📅 {{item.rentalDays}} day{{ (item.rentalDays || 0) > 1 ? 's' : ''}} rental
+                                        </span>
+                                        <span *ngIf="item.itemType === 'BUY'"
+                                            class="px-3 py-1.5 bg-blue-50 rounded-lg text-sm font-medium text-blue-700">
+                                            🛒 Qty: {{item.quantity}}
                                         </span>
                                     </div>
                                     <div class="flex items-center gap-3">
                                         <button (click)="removeItem(item.id)"
                                             class="remove-btn flex items-center gap-2 px-4 py-2 rounded-lg border border-stone-200 text-stone-500 font-medium text-sm">
-                                            <lucide-icon [name]="icons.Trash2" class="w-4 h-4"></lucide-icon>
+                                            <lucide-icon [img]="icons.Trash2" class="w-4 h-4"></lucide-icon>
                                             Remove
                                         </button>
                                     </div>
@@ -88,7 +113,7 @@
                     <!-- Summary Details -->
                     <div class="space-y-4 border-b border-stone-100 pb-6 mb-6">
                         <div class="flex justify-between text-sm">
-                            <span class="text-stone-500">Subtotal ({{cartItems.length}} item{{cartItems.length !== 1 ?
+                            <span class="text-stone-500">Subtotal ({{cart.items.length}} item{{cart.items.length !== 1 ?
                                 's' : ''}})</span>
                             <span class="text-stone-800 font-medium">{{subtotal | currency}}</span>
                         </div>
@@ -126,12 +151,28 @@
                         </div>
                     </div>
 
+                    <!-- Error and Success Messages -->
+                    <div *ngIf="error"
+                        class="mb-4 p-4 rounded-xl bg-red-50 border border-red-100 flex gap-3 text-red-800">
+                        <lucide-icon [img]="icons.ShieldCheck"
+                            class="w-5 h-5 flex-shrink-0 mt-0.5 text-red-500"></lucide-icon>
+                        <p class="text-sm font-medium">{{error}}</p>
+                    </div>
+                    <div *ngIf="successMessage"
+                        class="mb-4 p-4 rounded-xl bg-green-50 border border-green-100 flex gap-3 text-green-800">
+                        <lucide-icon [img]="icons.ShieldCheck"
+                            class="w-5 h-5 flex-shrink-0 mt-0.5 text-green-500"></lucide-icon>
+                        <p class="text-sm font-medium">{{successMessage}}</p>
+                    </div>
+
                     <!-- Buttons -->
                     <div class="space-y-3">
-                        <button (click)="proceedToCheckout()"
-                            class="primary-btn w-full py-4 px-6 rounded-xl text-white font-semibold text-lg flex justify-center items-center gap-2">
-                            Proceed to Checkout
-                            <lucide-icon [name]="icons.ArrowRight" class="w-5 h-5"></lucide-icon>
+                        <button (click)="proceedToCheckout()" [disabled]="actionLoading"
+                            class="primary-btn w-full py-4 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-lg flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                            <lucide-icon *ngIf="actionLoading" [img]="icons.Loader2"
+                                class="w-5 h-5 animate-spin"></lucide-icon>
+                            {{ actionLoading ? 'Processing...' : 'Proceed to Checkout' }}
+                            <lucide-icon *ngIf="!actionLoading" [img]="icons.ArrowRight" class="w-5 h-5"></lucide-icon>
                         </button>
                         <a routerLink="/marketplace"
                             class="secondary-btn block w-full py-3 px-6 rounded-xl text-stone-600 font-medium text-center hover:bg-stone-100 transition-colors">
@@ -143,11 +184,11 @@
                     <div class="mt-6 pt-6 border-t border-stone-100">
                         <div class="flex items-center justify-center gap-4 text-stone-400">
                             <div class="flex items-center gap-1">
-                                <lucide-icon [name]="icons.ShieldCheck" class="w-4 h-4"></lucide-icon>
+                                <lucide-icon [img]="icons.ShieldCheck" class="w-4 h-4"></lucide-icon>
                                 <span class="text-xs">Secure checkout</span>
                             </div>
                             <div class="flex items-center gap-1">
-                                <lucide-icon [name]="icons.Star" class="w-4 h-4"></lucide-icon>
+                                <lucide-icon [img]="icons.Star" class="w-4 h-4"></lucide-icon>
                                 <span class="text-xs">4.9★ rating</span>
                             </div>
                         </div>
@@ -162,7 +203,7 @@
                 <div class="max-w-md mx-auto">
                     <div
                         class="w-40 h-40 mx-auto mb-8 bg-gradient-to-br from-stone-100 to-stone-200 rounded-full flex items-center justify-center">
-                        <lucide-icon [name]="icons.ShoppingBag" class="w-20 h-20 text-stone-400"></lucide-icon>
+                        <lucide-icon [img]="icons.ShoppingBag" class="w-20 h-20 text-stone-400"></lucide-icon>
                     </div>
 
                     <h2 class="font-display text-2xl font-semibold text-stone-800 mb-3">Your gear bag is empty</h2>
@@ -170,7 +211,7 @@
 
                     <a routerLink="/marketplace"
                         class="primary-btn inline-flex items-center gap-2 px-8 py-4 rounded-xl text-white font-semibold">
-                        <lucide-icon [name]="icons.ArrowRight" class="w-5 h-5"></lucide-icon>
+                        <lucide-icon [img]="icons.ArrowRight" class="w-5 h-5"></lucide-icon>
                         Explore Marketplace
                     </a>
                 </div>

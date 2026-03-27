@@ -22,3 +22,11 @@ lerna-debug.log*
 *.tmp
 *.temp
 build_*.txt
+nul
+stat.txt
+
+# Documentation and notes
+CONSTITUTION.md
+PATTERNS.md
+PROJECT_OVERVIEW.txt
+PROJECT_STATE.md

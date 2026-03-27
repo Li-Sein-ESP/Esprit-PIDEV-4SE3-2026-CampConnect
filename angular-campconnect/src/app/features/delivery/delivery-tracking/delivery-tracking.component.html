@@ -10,8 +10,12 @@
                 <span class="cc-tracking__pulse-dot"></span>
                 <span class="cc-tracking__status-badge">Live Tracking</span>
             </div>
-            <h1 class="cc-tracking__status-title">Your gear is on the way</h1>
-            <p class="cc-tracking__status-subtitle">Arriving in approximately</p>
+            <h1 class="cc-tracking__status-title">
+                {{ delivery.status === 'DELIVERED' ? 'Your gear has arrived' : 'Your gear is on the way' }}
+            </h1>
+            <p class="cc-tracking__status-subtitle" *ngIf="delivery.status !== 'DELIVERED'">Arriving in approximately
+            </p>
+            <p class="cc-tracking__status-subtitle" *ngIf="delivery.status === 'DELIVERED'">Successfully delivered</p>
             <div class="cc-tracking__eta">
                 <div class="cc-tracking__eta-block">
                     <span class="cc-tracking__eta-number">{{ etaHours }}</span>
@@ -28,7 +32,8 @@
                     <span class="cc-tracking__eta-unit">sec</span>
                 </div>
             </div>
-            <p class="cc-tracking__status-eta-time">Estimated arrival — <strong>{{ delivery.estimatedArrival }}</strong>
+            <p class="cc-tracking__status-eta-time" *ngIf="delivery.status !== 'DELIVERED'">
+                Estimated arrival — <strong>{{ delivery.estimatedArrival }}</strong>
             </p>
         </div>
     </section>

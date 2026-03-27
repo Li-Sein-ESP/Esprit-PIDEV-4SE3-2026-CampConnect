@@ -42,7 +42,7 @@ export class MyGearComponent implements OnInit {
         if (confirm('Are you sure you want to delete this gear listing?')) {
             this.gearService.deleteGear(id).subscribe({
                 next: () => {
-                    this.loadMyGear(this.gearPage?.number || 0);
+                    this.loadMyGear(this.gearPage?.page || 0);
                 },
                 error: (err) => {
                     alert('Failed to delete gear.');

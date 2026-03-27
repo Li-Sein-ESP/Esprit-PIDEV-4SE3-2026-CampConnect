@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { WaveInputComponent } from './wave-input.component';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +14,8 @@ import { WaveInputComponent } from './wave-input.component';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   loginForm: FormGroup;
   signupForm: FormGroup;
   activeTab: 'login' | 'signup' | 'role_selection' = 'login';
@@ -92,15 +95,27 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(params => {
       if (params['mode'] === 'signup') {
         this.activeTab = 'signup';
       }
     });
 
     // Clear error message on tab switch or form change
-    this.loginForm.valueChanges.subscribe(() => this.errorMessage = '');
-    this.signupForm.valueChanges.subscribe(() => this.errorMessage = '');
+    this.loginForm.valueChanges.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(() => this.errorMessage = '');
+    
+    this.signupForm.valueChanges.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(() => this.errorMessage = '');
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
@@ -153,7 +168,7 @@ export class LoginComponent implements OnInit {
           // Redirect to the first specific role dashboard found
           this.router.navigate([this.getRedirectUrlForRole(roles[0])]);
         } else {
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/marketplace']);
         }
       },
       error: (err) => {
@@ -207,7 +222,8 @@ export class LoginComponent implements OnInit {
       case 'ROLE_ORGANIZER': return '/organizer-dashboard';
       case 'ROLE_DELIVERY_PROVIDER': return '/delivery/dashboard';
       case 'ROLE_CAMPER': return '/profile'; // User asked for /profile for CAMPER
-      default: return '/dashboard'; // Fallback
+      case 'ROLE_USER': return '/marketplace';
+      default: return '/marketplace'; // Fallback
     }
   }
 }

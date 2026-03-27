@@ -1,6 +1,9 @@
 import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { DeliveryApiService, DeliveryResponse, DeliveryStatus } from '../services/delivery-api.service';
+import { Subject, interval, EMPTY } from 'rxjs';
+import { takeUntil, switchMap, startWith, retry, catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-delivery-tracking',
@@ -12,6 +15,10 @@ import { ActivatedRoute } from '@angular/router';
 export class DeliveryTrackingComponent implements OnInit, OnDestroy {
     orderId: string = '';
     isMapHidden = false;
+    private destroy$ = new Subject<void>();
+    private stopPolling$ = new Subject<void>();
+    private errorCount = 0;
+    private readonly MAX_ERRORS = 3;
 
     // ETA countdown
     etaHours = 0;
@@ -19,43 +26,99 @@ export class DeliveryTrackingComponent implements OnInit, OnDestroy {
     etaSeconds = 47;
     etaInterval: any;
 
-    delivery = {
+    delivery: any = {
         id: '',
-        status: 'ON_THE_WAY',
-        estimatedArrival: '2:45 PM today',
-        distance: 12.6,
-        weight: 18.4,
-        vehicleType: 'Van',
+        status: 'PENDING',
+        estimatedArrival: 'Calculating...',
+        distance: 0,
+        weight: 0,
+        vehicleType: 'System Assigning',
         provider: {
-            name: 'Marcus Rivera',
-            rating: 4.8
+            name: 'Awaiting Driver',
+            rating: 5.0
         },
-        items: [
-            { name: 'Alpine Pro 4-Season Tent', detail: '4-person · Waterproof', category: 'tent' },
-            { name: 'ThermaRest Sleeping Bag', detail: '-15°C rated · Mummy style', category: 'bag' },
-            { name: 'Osprey 65L Backpack', detail: 'Adjustable frame · Rain cover', category: 'pack' },
-            { name: 'Portable Camp Stove + Kit', detail: '2-burner · Fuel included', category: 'stove' }
-        ],
-        timeline: [
-            { label: 'Confirmed', time: '1:02 PM', completed: true },
-            { label: 'Preparing', time: '1:18 PM', completed: true },
-            { label: 'Picked Up', time: '1:35 PM', completed: true },
-            { label: 'On the Way', time: 'Now', completed: false },
-            { label: 'Delivered', time: '~2:45 PM', completed: false }
-        ]
+        items: [],
+        timeline: []
     };
 
     isVisible = false;
+    loadingError: string | null = null;
 
     constructor(
         private route: ActivatedRoute,
+        private deliveryApi: DeliveryApiService,
         @Inject(PLATFORM_ID) private platformId: Object
     ) { }
 
     ngOnInit() {
-        this.route.paramMap.subscribe(params => {
-            this.orderId = params.get('orderId') || 'CC-48291';
-            this.delivery.id = this.orderId;
+        // Handle route param changes with proper cleanup
+        this.route.paramMap.pipe(
+            takeUntil(this.destroy$),
+            switchMap(params => {
+                // Reset error state on new order
+                this.loadingError = null;
+                this.errorCount = 0;
+                
+                // Clear previous polling
+                this.stopPolling$.next();
+                
+                this.orderId = params.get('orderId') || 'CC-48291';
+                this.delivery.id = this.orderId;
+
+                // Poll every 15 seconds with automatic error handling
+                if (isPlatformBrowser(this.platformId)) {
+                    return interval(15000).pipe(
+                        startWith(0), // Load immediately
+                        takeUntil(this.stopPolling$),
+                        switchMap(() => this.deliveryApi.getById(this.orderId)),
+                        retry({
+                            count: 2,
+                            delay: 3000
+                        }),
+                        catchError(err => {
+                            this.errorCount++;
+                            console.error(`Failed to load delivery status (attempt ${this.errorCount}):`, err);
+                            
+                            // Stop polling after too many errors
+                            if (this.errorCount >= this.MAX_ERRORS) {
+                                this.loadingError = 'Unable to load delivery status. Please refresh the page.';
+                                this.stopPolling$.next();
+                                return EMPTY;
+                            }
+                            
+                            return EMPTY;
+                        })
+                    );
+                }
+                
+                // Fallback for non-browser platforms
+                return this.deliveryApi.getById(this.orderId);
+            })
+        ).subscribe({
+            next: (data: DeliveryResponse) => {
+                this.errorCount = 0; // Reset error count on success
+                this.delivery.id = data.id;
+                this.delivery.status = data.status;
+                this.delivery.provider.name = data.driverName || 'Dispatch';
+                this.delivery.items = [
+                    { name: 'Ordered Gear', detail: 'Refer to your portal for full manifest', category: 'bag' }
+                ];
+
+                this.updateTimeline(data);
+
+                // Stop polling when delivered
+                if (data.status === 'DELIVERED') {
+                    this.etaHours = 0;
+                    this.etaMinutes = 0;
+                    this.etaSeconds = 0;
+                    if (this.etaInterval) clearInterval(this.etaInterval);
+                    this.stopPolling$.next();
+                }
+            },
+            error: (err) => {
+                console.error('Failed to load delivery tracking:', err);
+                this.loadingError = 'Failed to load delivery information.';
+            }
         });
 
         if (isPlatformBrowser(this.platformId)) {
@@ -68,9 +131,29 @@ export class DeliveryTrackingComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+        this.stopPolling$.next();
+        this.stopPolling$.complete();
+        
         if (this.etaInterval) {
             clearInterval(this.etaInterval);
         }
+    }
+
+
+    updateTimeline(data: DeliveryResponse) {
+        const statuses = ['CREATED', 'ASSIGNED', 'PICKED_UP', 'IN_TRANSIT', 'DELIVERED'];
+        let currentIndex = statuses.indexOf(data.status);
+        if (currentIndex === -1) currentIndex = 0; // Handle PENDING same as CREATED for now
+
+        this.delivery.timeline = [
+            { label: 'Confirmed', time: 'Done', completed: currentIndex >= 0 },
+            { label: 'Assigned', time: currentIndex >= 1 ? 'Done' : 'Pending', completed: currentIndex >= 1 },
+            { label: 'Picked Up', time: currentIndex >= 2 ? 'Done' : 'Pending', completed: currentIndex >= 2 },
+            { label: 'On the Way', time: currentIndex >= 3 ? 'Now' : 'Upcoming', completed: currentIndex >= 3 },
+            { label: 'Delivered', time: data.status === 'DELIVERED' ? 'Complete' : 'Pending', completed: data.status === 'DELIVERED' }
+        ];
     }
 
     startCountdown() {

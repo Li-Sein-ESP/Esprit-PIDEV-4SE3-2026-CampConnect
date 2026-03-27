@@ -34,6 +34,12 @@ public class Gear {
     @Indexed
     private BigDecimal price;
 
+    /** Price per day when listed for rent. */
+    private BigDecimal dailyPrice;
+
+    /** Price when listed for sale. */
+    private BigDecimal salePrice;
+
     private int quantity;
     private String condition;
 
@@ -42,6 +48,13 @@ public class Gear {
 
     @Indexed
     private String category;
+
+    /**
+     * Whether this item is FOR_SALE, FOR_RENT, or BOTH. Defaults to FOR_RENT for
+     * backward-compat.
+     */
+    @Indexed
+    private ListingType listingType = ListingType.FOR_RENT;
 
     @Indexed
     private String ownerId;

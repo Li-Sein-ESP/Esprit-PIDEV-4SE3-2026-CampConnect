@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { LucideAngularModule, ChevronLeft, Calendar, Users, MapPin, Clock, List, Package, DollarSign, Map as MapIcon, Edit, Share2, Download, CheckCircle, Circle, ChevronRight } from 'lucide-angular';
 import { ButtonComponent } from '../../../shared/components/button.component';
 import { BadgeComponent } from '../../../shared/components/badge.component';
 import { CardComponent, CardHeaderComponent, CardTitleComponent, CardDescriptionComponent, CardContentComponent } from '../../../shared/components/card.component';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-trip-detail',
@@ -28,7 +30,8 @@ import { CardComponent, CardHeaderComponent, CardTitleComponent, CardDescription
     }
   `]
 })
-export class TripDetailComponent implements OnInit {
+export class TripDetailComponent implements OnInit, OnDestroy {
+    private destroy$ = new Subject<void>();
     tripId: string | null = null;
     trip: any = null;
 
@@ -101,10 +104,17 @@ export class TripDetailComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.route.paramMap.subscribe(params => {
+        this.route.paramMap.pipe(
+            takeUntil(this.destroy$)
+        ).subscribe(params => {
             this.tripId = params.get('id');
             this.loadTrip();
         });
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     loadTrip() {

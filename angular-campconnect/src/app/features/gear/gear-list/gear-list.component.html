@@ -87,8 +87,8 @@
                 <div class="gl__card-img-wrap">
                     <img class="gl__card-img" [src]="firstImage(gear)" [alt]="gear.name" loading="lazy"
                         onError="this.src='assets/images/gear-placeholder.jpg'">
-                    <span class="gl__badge gl__badge--avail" *ngIf="gear.available">Available</span>
-                    <span class="gl__badge gl__badge--unavail" *ngIf="!gear.available">Unavailable</span>
+                    <span class="gl__badge gl__badge--avail" *ngIf="isAvailable(gear)">Available</span>
+                    <span class="gl__badge gl__badge--unavail" *ngIf="!isAvailable(gear)">Unavailable</span>
                     <span class="gl__badge gl__badge--condition" [class]="conditionClass(gear.condition)">
                         {{ conditionLabel(gear.condition) }}
                     </span>
@@ -98,25 +98,22 @@
                 <div class="gl__card-body">
                     <p class="gl__card-category">{{ gear.category }}</p>
                     <h3 class="gl__card-title">{{ gear.name }}</h3>
-                    <p class="gl__card-brand text-muted">{{ gear.brand }}</p>
-                    <p class="gl__card-location">📍 {{ gear.location }}</p>
+                    <p class="gl__card-owner text-muted">{{ gear.ownerName }}</p>
 
-                    <!-- Rating -->
-                    <div class="gl__card-rating" *ngIf="gear.rating">
-                        <span class="gl__star">★</span>
-                        <span>{{ gear.rating | number:'1.1-1' }}</span>
-                        <span class="gl__card-reviews">({{ gear.reviewCount ?? 0 }})</span>
-                    </div>
+                    <!-- Stock indicator -->
+                    <p class="gl__card-stock" *ngIf="gear.quantity > 0">
+                        {{ gear.quantity }} in stock
+                    </p>
 
                     <!-- Price + CTA -->
                     <div class="gl__card-footer">
                         <div class="gl__card-price">
-                            <span class="gl__card-price-val">{{ gear.pricePerDay | currency }}</span>
+                            <span class="gl__card-price-val">{{ gear.price | currency }}</span>
                             <span class="gl__card-price-unit">/day</span>
                         </div>
-                        <button class="gl__btn gl__btn--primary gl__btn--sm" [disabled]="!gear.available"
+                        <button class="gl__btn gl__btn--primary gl__btn--sm" [disabled]="!isAvailable(gear)"
                             (click)="$event.stopPropagation()" [routerLink]="['/gear', gear.id]">
-                            {{ gear.available ? 'Rent' : 'Unavailable' }}
+                            {{ isAvailable(gear) ? 'Rent' : 'Unavailable' }}
                         </button>
                     </div>
                 </div>
@@ -125,14 +122,14 @@
 
         <!-- ── Pagination ── -->
         <nav class="gl__pager" *ngIf="gearPage.totalPages > 1" aria-label="Gear pagination">
-            <button class="gl__pager-btn" [disabled]="gearPage.first" (click)="goToPage(gearPage.number - 1)"
+            <button class="gl__pager-btn" [disabled]="isFirstPage" (click)="goToPage(gearPage.page - 1)"
                 aria-label="Previous page">‹</button>
 
             <button *ngFor="let p of pageNumbers" class="gl__pager-btn"
-                [class.gl__pager-btn--active]="p === gearPage.number" (click)="goToPage(p)"
-                [attr.aria-current]="p === gearPage.number ? 'page' : null">{{ p + 1 }}</button>
+                [class.gl__pager-btn--active]="p === gearPage.page" (click)="goToPage(p)"
+                [attr.aria-current]="p === gearPage.page ? 'page' : null">{{ p + 1 }}</button>
 
-            <button class="gl__pager-btn" [disabled]="gearPage.last" (click)="goToPage(gearPage.number + 1)"
+            <button class="gl__pager-btn" [disabled]="gearPage.last" (click)="goToPage(gearPage.page + 1)"
                 aria-label="Next page">›</button>
         </nav>
 

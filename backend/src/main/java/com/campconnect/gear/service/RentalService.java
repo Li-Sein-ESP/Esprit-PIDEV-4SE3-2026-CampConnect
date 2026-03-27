@@ -83,6 +83,12 @@ public class RentalService {
 
         Gear gearCheck = gearRepository.findById(request.getGearId())
                 .orElseThrow(() -> new ResourceNotFoundException("Gear", "id", request.getGearId()));
+
+        // Validate that the item allows rental
+        if (gearCheck.getListingType() == ListingType.FOR_SALE) {
+            throw new BadRequestException("This item is only available for purchase, not for rent.");
+        }
+
         if (gearCheck.getQuantity() == 1) {
             Query overlapQuery = new Query(
                     Criteria.where("gearId").is(request.getGearId())
@@ -119,6 +125,13 @@ public class RentalService {
         User renter = userRepository.findById(renterId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", renterId));
 
+        // Compute cost
+        int rentalDays = (int) days;
+        java.math.BigDecimal dailyPrice = updatedGear.getDailyPrice() != null
+                ? updatedGear.getDailyPrice()
+                : (updatedGear.getPrice() != null ? updatedGear.getPrice() : java.math.BigDecimal.ZERO);
+        java.math.BigDecimal totalPrice = dailyPrice.multiply(java.math.BigDecimal.valueOf(rentalDays));
+
         Rental rental = new Rental();
         rental.setGearId(updatedGear.getId());
         rental.setGearName(updatedGear.getName());
@@ -127,6 +140,8 @@ public class RentalService {
         rental.setStartDate(request.getStartDate());
         rental.setEndDate(request.getEndDate());
         rental.setStatus(RentalStatus.PENDING);
+        rental.setRentalDays(rentalDays);
+        rental.setTotalPrice(totalPrice);
 
         return toResponse(rentalRepository.save(rental));
     }

@@ -14,7 +14,7 @@
                     [class.text-stone-600]="selectedCategory !== cat.id"
                     [class.hover:bg-stone-100]="selectedCategory !== cat.id"
                     class="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all">
-                    <lucide-icon [name]="cat.icon" class="w-4 h-4"></lucide-icon>
+                    <lucide-icon [img]="cat.icon" class="w-4 h-4"></lucide-icon>
                     {{cat.name}}
                 </button>
             </div>
@@ -36,7 +36,7 @@
                     <!-- Mobile filter toggle -->
                     <button (click)="showMobileFilters = true"
                         class="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-white border border-stone-200 rounded-full text-sm font-medium text-stone-700 hover:border-stone-300 transition-colors">
-                        <lucide-icon [name]="SlidersHorizontal" class="w-4 h-4"></lucide-icon>
+                        <lucide-icon [img]="SlidersHorizontal" class="w-4 h-4"></lucide-icon>
                         Filters
                         <span *ngIf="activeFiltersCount > 0"
                             class="w-5 h-5 bg-[#1a3d2e] text-white text-xs rounded-full flex items-center justify-center">
@@ -49,7 +49,7 @@
                         <button
                             class="flex items-center gap-2 px-4 py-2.5 bg-white border border-stone-200 rounded-full text-sm font-medium text-stone-700 hover:border-stone-300 transition-colors">
                             <span>Sort: {{ getSortLabel(sortBy) }}</span>
-                            <lucide-icon [name]="ChevronDown" class="w-4 h-4 text-stone-400"></lucide-icon>
+                            <lucide-icon [img]="ChevronDown" class="w-4 h-4 text-stone-400"></lucide-icon>
                         </button>
                         <div
                             class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-stone-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
@@ -163,7 +163,7 @@
                             <!-- Rating Badge -->
                             <div
                                 class="absolute top-4 right-4 flex items-center gap-1.5 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm">
-                                <lucide-icon [name]="Star"
+                                <lucide-icon [img]="Star"
                                     class="w-3.5 h-3.5 fill-amber-400 text-amber-400"></lucide-icon>
                                 <span class="text-sm font-semibold text-stone-800">{{product.rating}}</span>
                                 <span class="text-xs text-stone-500">({{product.reviewCount}})</span>
@@ -172,7 +172,7 @@
                             <!-- Like button -->
                             <button (click)="toggleLike($event, product)"
                                 class="absolute bottom-4 right-4 p-2.5 bg-white/95 backdrop-blur-sm rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-white hover:scale-110">
-                                <lucide-icon [name]="Heart" [class.fill-red-500]="product.isLiked"
+                                <lucide-icon [img]="Heart" [class.fill-red-500]="product.isLiked"
                                     [class.text-red-500]="product.isLiked" [class.text-stone-600]="!product.isLiked"
                                     class="w-5 h-5 transition-colors"></lucide-icon>
                             </button>
@@ -197,7 +197,7 @@
                             </div>
 
                             <div class="flex items-center gap-1.5 text-sm text-stone-500">
-                                <lucide-icon [name]="MapPin" class="w-3.5 h-3.5"></lucide-icon>
+                                <lucide-icon [img]="MapPin" class="w-3.5 h-3.5"></lucide-icon>
                                 <span>{{product.location}}</span>
                             </div>
 
@@ -215,7 +215,7 @@
                 <ng-template #noResults>
                     <div class="flex flex-col items-center justify-center py-20 text-center">
                         <div class="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mb-4">
-                            <lucide-icon [name]="Search" class="w-8 h-8 text-stone-400"></lucide-icon>
+                            <lucide-icon [img]="Search" class="w-8 h-8 text-stone-400"></lucide-icon>
                         </div>
                         <h3 class="text-lg font-semibold text-stone-900 mb-2">No items found</h3>
                         <p class="text-stone-500 max-w-sm">
@@ -241,7 +241,7 @@
                 <button (click)="showMobileFilters = false"
                     class="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-full transition-colors">
                     <span class="sr-only">Close</span>
-                    <lucide-icon [name]="Check" class="w-5 h-5"></lucide-icon>
+                    <lucide-icon [img]="Check" class="w-5 h-5"></lucide-icon>
                     <!-- Using Check as Close/X replacement if X not available or just standard X -->
                     <!-- Wait, close icon isn't imported. I will just use standard SVG for close or text -->
                     <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

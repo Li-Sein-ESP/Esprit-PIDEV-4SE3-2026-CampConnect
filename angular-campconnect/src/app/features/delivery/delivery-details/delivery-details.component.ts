@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { Location } from '@angular/common';
+import { DeliveryApiService, DeliveryResponse, DeliveryStatus } from '../services/delivery-api.service';
 
 @Component({
   selector: 'app-delivery-details',
@@ -15,9 +16,9 @@ export class DeliveryDetailsComponent implements OnInit {
   isMobileMenuOpen = false;
   toast = { show: false, msg: '' };
 
-  statusOrder = ['confirmed', 'preparing', 'pickedup', 'ontheway', 'delivered'];
+  statusOrder = ['created', 'assigned', 'pickedup', 'ontheway', 'delivered'];
 
-  delivery = {
+  delivery: any = {
     id: 'ORD-3921',
     status: 'ontheway',
     urgency: 'Urgent',
@@ -54,21 +55,91 @@ export class DeliveryDetailsComponent implements OnInit {
     driver: {
       initials: 'AW',
       name: 'Alex Walker',
-      role: 'Pro Driver'
+      role: 'Provider'
     }
   };
 
+  loading = true;
+  error: string | null = null;
+
   constructor(
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    private router: Router,
+    private deliveryApi: DeliveryApiService
   ) { }
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
-      this.deliveryId = params.get('deliveryId') || this.delivery.id;
-      // Extract numeric part or use as is
-      this.delivery.id = this.deliveryId.replace('DEL-', 'ORD-');
+      this.deliveryId = params.get('deliveryId') || '';
+      if (this.deliveryId) {
+        this.loadDelivery();
+      } else {
+        this.error = "No Delivery ID provided.";
+        this.loading = false;
+      }
     });
+  }
+
+  loadDelivery(): void {
+    this.loading = true;
+    this.error = null;
+    this.deliveryApi.getById(this.deliveryId).subscribe({
+      next: (data: DeliveryResponse) => {
+        this.mapApiToUi(data);
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = "Could not load delivery details.";
+        this.loading = false;
+      }
+    });
+  }
+
+  mapApiToUi(data: DeliveryResponse): void {
+    this.delivery.id = data.id.substring(0, 8); // Display short ID
+    this.delivery.status = this.mapStatusToUi(data.status);
+    this.delivery.urgency = data.priority;
+    this.delivery.pickup.addressLine1 = data.pickupAddress;
+    this.delivery.pickup.addressLine2 = '';
+    this.delivery.dropoff.addressLine1 = data.deliveryAddress;
+    this.delivery.dropoff.addressLine2 = '';
+
+    this.delivery.driver.name = data.driverName || 'Dispatch';
+    this.delivery.driver.initials = (data.driverName || 'DP').substring(0, 2).toUpperCase();
+    this.delivery.estimatedArrival = data.scheduledDate;
+
+    // Reset static timeline completed times if moving backward (simple reset for now)
+    this.syncTimeline();
+  }
+
+  mapStatusToUi(apiStatus: DeliveryStatus): string {
+    switch (apiStatus) {
+      case 'CREATED':
+      case 'PENDING': return 'created';
+      case 'ASSIGNED': return 'assigned';
+      case 'PICKED_UP': return 'pickedup';
+      case 'IN_TRANSIT': return 'ontheway';
+      case 'DELIVERED': return 'delivered';
+      case 'CANCELLED':
+      case 'FAILED': return 'created'; // Fallback
+    }
+    return 'created';
+  }
+
+  mapUiToApi(uiStatus: string): DeliveryStatus {
+    switch (uiStatus) {
+      case 'created': return 'CREATED';
+      case 'assigned': return 'ASSIGNED';
+      case 'pickedup': return 'PICKED_UP';
+      case 'ontheway': return 'IN_TRANSIT';
+      case 'delivered': return 'DELIVERED';
+    }
+    return 'PENDING';
+  }
+
+  syncTimeline(): void {
+    // Just visually update the statuses based on current index
   }
 
   toggleMobileMenu() {
@@ -80,31 +151,23 @@ export class DeliveryDetailsComponent implements OnInit {
   }
 
   advanceStatus(targetStatus: string) {
-    const currentIndex = this.statusOrder.indexOf(this.delivery.status);
-    const targetIndex = this.statusOrder.indexOf(targetStatus);
+    const apiStatus = this.mapUiToApi(targetStatus);
 
-    if (targetIndex === -1 || targetIndex <= currentIndex) return;
-
-    this.delivery.status = targetStatus;
-
-    // Optional timeline updates
-    if (targetStatus === 'delivered') {
-      const deliveredStep = this.delivery.timeline.find(t => t.statusId === 'delivered');
-      if (deliveredStep) {
-        const now = new Date();
-        deliveredStep.time = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    this.deliveryApi.updateStatus(this.deliveryId, apiStatus).subscribe({
+      next: (updated: DeliveryResponse) => {
+        this.mapApiToUi(updated);
+        this.showToast('Status updated to "' + this.formatStatus(targetStatus) + '"');
+      },
+      error: (err) => {
+        this.showToast('Failed to update status.');
       }
-      const onthewayStep = this.delivery.timeline.find(t => t.statusId === 'ontheway');
-      if (onthewayStep) onthewayStep.time = '10:45 AM'; // static shift for layout
-    }
-
-    this.showToast('Status updated to "' + this.formatStatus(targetStatus) + '"');
+    });
   }
 
   formatStatus(key: string): string {
     const map: any = {
-      'confirmed': 'Order Confirmed',
-      'preparing': 'Preparing Package',
+      'created': 'Awaiting Provider',
+      'assigned': 'Assigned',
       'pickedup': 'Picked Up',
       'ontheway': 'In Transit',
       'delivered': 'Delivered'
@@ -116,17 +179,16 @@ export class DeliveryDetailsComponent implements OnInit {
     return this.statusOrder.indexOf(this.delivery.status);
   }
 
-  // Button disability states
   get isPickedUpDisabled(): boolean {
-    return this.currentStatusIndex >= 2;
+    return this.currentStatusIndex >= 2 || this.currentStatusIndex < 1; // Needs to be assigned first
   }
 
   get isOnTheWayDisabled(): boolean {
-    return this.currentStatusIndex >= 3;
+    return this.currentStatusIndex >= 3 || this.currentStatusIndex < 2;
   }
 
   get isDeliveredDisabled(): boolean {
-    return this.currentStatusIndex >= 4;
+    return this.currentStatusIndex >= 4 || this.currentStatusIndex < 3;
   }
 
   showToast(msg: string) {
