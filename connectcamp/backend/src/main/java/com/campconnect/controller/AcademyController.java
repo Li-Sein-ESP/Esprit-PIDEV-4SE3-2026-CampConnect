@@ -11,6 +11,7 @@ import com.campconnect.service.ICertificationServices;
 import com.campconnect.service.IVideoServices;
 import com.campconnect.dto.VideoDTO;
 import com.campconnect.dto.UserSummaryDTO;
+import com.campconnect.dto.CommentDTO;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -174,7 +175,7 @@ public class AcademyController {
     }
 
     @DeleteMapping("/videos/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EXPERT')")
     public ResponseEntity<Void> deleteVideo(@PathVariable String id) {
         videoService.deleteVideo(id);
         return ResponseEntity.noContent().build();
@@ -183,5 +184,15 @@ public class AcademyController {
     @GetMapping("/videos/category/{category}")
     public List<VideoDTO> getVideosByCategory(@PathVariable String category) {
         return videoService.getVideosByCategory(category);
+    }
+
+    @PostMapping("/videos/{id}/comments")
+    public ResponseEntity<CommentDTO> addCommentToVideo(@PathVariable String id, @Valid @RequestBody CommentDTO commentDTO) {
+        return ResponseEntity.ok(videoService.addComment(id, commentDTO));
+    }
+
+    @PostMapping("/videos/{id}/helpful")
+    public ResponseEntity<VideoDTO> toggleVideoHelpful(@PathVariable String id) {
+        return ResponseEntity.ok(videoService.toggleHelpful(id));
     }
 }

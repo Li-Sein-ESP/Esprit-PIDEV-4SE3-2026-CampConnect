@@ -158,4 +158,12 @@ export class AcademyService {
     getVideosByCategory(category: string): Observable<Video[]> {
         return this.http.get<Video[]>(`${API_URL}/videos/category/${category}`);
     }
+
+    addVideoComment(videoId: string, content: string): Observable<any> {
+        return this.http.post<any>(`${API_URL}/videos/${videoId}/comments`, { content });
+    }
+
+    toggleVideoHelpful(videoId: string): Observable<Video> {
+        return this.http.post<Video>(`${API_URL}/videos/${videoId}/helpful`, {});
+    }
 }

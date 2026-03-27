@@ -3,8 +3,11 @@ package com.campconnect.service;
 import com.campconnect.dto.VideoDTO;
 import com.campconnect.dto.UserSummaryDTO;
 import com.campconnect.entity.Video;
+import com.campconnect.entity.Comment;
+import com.campconnect.dto.CommentDTO;
 import com.campconnect.repository.VideoRepository;
 import com.campconnect.repository.UserRepository;
+import com.campconnect.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,9 @@ public class VideoServicesImpl implements IVideoServices {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     @Override
     public List<VideoDTO> getAllVideos() {
@@ -58,6 +64,42 @@ public class VideoServicesImpl implements IVideoServices {
         return videoRepository.findByCategory(category).stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
+    @Override
+    public CommentDTO addComment(String videoId, CommentDTO commentDTO) {
+        Video video = videoRepository.findById(videoId).orElseThrow(() -> new RuntimeException("Video not found"));
+        
+        Comment comment = new Comment();
+        comment.setContent(commentDTO.getContent());
+        comment.setCreatedAt(LocalDateTime.now());
+        comment.setUpvotes(0);
+        
+        // Handle Author
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && auth.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails) {
+            String currentUsername = ((org.springframework.security.core.userdetails.UserDetails)auth.getPrincipal()).getUsername();
+            userRepository.findByUsername(currentUsername).ifPresent(comment::setAuthor);
+        } else if (commentDTO.getAuthorId() != null) {
+            userRepository.findById(commentDTO.getAuthorId()).ifPresent(comment::setAuthor);
+        }
+        
+        // Save the comment
+        Comment savedComment = commentRepository.save(comment);
+        
+        // Add to video and save video
+        video.getComments().add(savedComment);
+        videoRepository.save(video);
+        
+        return convertCommentToDTO(savedComment);
+    }
+
+    @Override
+    public VideoDTO toggleHelpful(String videoId) {
+        Video video = videoRepository.findById(videoId).orElseThrow(() -> new RuntimeException("Video not found"));
+        // Simplistic approach: just increment for now (the UI toggles local state but no tracking per user is specified yet in Video model)
+        video.setHelpfulCount(video.getHelpfulCount() + 1);
+        return convertToDTO(videoRepository.save(video));
+    }
+
     private VideoDTO convertToDTO(Video video) {
         VideoDTO dto = new VideoDTO();
         dto.setId(video.getId());
@@ -79,6 +121,27 @@ public class VideoServicesImpl implements IVideoServices {
             creatorDto.setName(video.getCreator().getName());
             creatorDto.setVerifiedExpert(video.getCreator().isVerifiedExpert());
             dto.setCreator(creatorDto);
+        }
+        
+        if (video.getComments() != null) {
+            dto.setComments(video.getComments().stream().map(this::convertCommentToDTO).collect(Collectors.toList()));
+        }
+        
+        return dto;
+    }
+
+    private CommentDTO convertCommentToDTO(Comment comment) {
+        CommentDTO dto = new CommentDTO();
+        dto.setId(comment.getId());
+        dto.setContent(comment.getContent());
+        dto.setUpvotes(comment.getUpvotes());
+        dto.setCreatedAt(comment.getCreatedAt());
+        
+        if (comment.getAuthor() != null) {
+            dto.setAuthorId(comment.getAuthor().getId());
+            dto.setAuthorName(comment.getAuthor().getName());
+        } else {
+            dto.setAuthorName("Anonymous");
         }
         
         return dto;

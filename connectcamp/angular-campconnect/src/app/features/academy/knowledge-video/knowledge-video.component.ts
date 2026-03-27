@@ -64,6 +64,7 @@ export class KnowledgeVideoComponent implements OnInit {
   isLoading = true;
   isPlaying = false;
   newComment: string = '';
+  commentError: string = '';
   isHelpful: boolean = false;
   isSaved: boolean = false;
 
@@ -203,6 +204,17 @@ export class KnowledgeVideoComponent implements OnInit {
     this.isHelpful = !this.isHelpful;
     if (this.video) {
       this.video.helpfulCount += this.isHelpful ? 1 : -1;
+      // Persist the helpful count update to the server
+      this.academyService.toggleVideoHelpful(this.video.id).subscribe({
+        error: (err) => {
+          console.error('Failed to update helpful count', err);
+          // Revert on error
+          this.isHelpful = !this.isHelpful;
+          if (this.video) {
+             this.video.helpfulCount -= this.isHelpful ? 1 : -1;
+          }
+        }
+      });
     }
   }
 
@@ -211,14 +223,56 @@ export class KnowledgeVideoComponent implements OnInit {
   }
 
   postComment() {
+    this.commentError = '';
+    
     if (!this.newComment.trim() || !this.video) return;
-    this.video.comments.unshift({
+    
+    // Controle de Saisie (Bad Words Filter)
+    const badWords = ['merde', 'putain', 'salope', 'fuck', 'shit', 'bitch', 'connard', 'con', 'stupid', 'idiot'];
+    const commentLower = this.newComment.toLowerCase();
+    
+    for (let word of badWords) {
+      if (commentLower.includes(word)) {
+        this.commentError = 'Votre commentaire contient du langage inapproprié.';
+        return;
+      }
+    }
+
+    if (!this.video.comments) {
+      this.video.comments = [];
+    }
+    
+    // Add comment locally for instant UI update
+    const tempComment = {
       id: String(Date.now()),
       content: this.newComment.trim(),
       authorId: 'current-user',
       authorName: 'You',
       createdAt: new Date().toISOString()
+    };
+    this.video.comments.unshift(tempComment);
+    
+    // Persist to backend
+    this.academyService.addVideoComment(this.video.id, tempComment.content).subscribe({
+      next: (savedComment) => {
+        // Replace with the real saved comment id
+        if (this.video && this.video.comments) {
+          const idx = this.video.comments.findIndex(c => c.id === tempComment.id);
+          if (idx !== -1) {
+             this.video.comments[idx] = savedComment;
+          }
+        }
+      },
+      error: (err) => {
+        console.error('Failed to save comment', err);
+        // Rollback local change if failed
+        if (this.video && this.video.comments) {
+          const idx = this.video.comments.findIndex(c => c.id === tempComment.id);
+          if (idx !== -1) this.video.comments.splice(idx, 1);
+        }
+      }
     });
+
     this.newComment = '';
   }
 

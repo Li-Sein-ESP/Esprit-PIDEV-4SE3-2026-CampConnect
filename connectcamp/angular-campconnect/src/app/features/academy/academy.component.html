@@ -150,6 +150,18 @@
                         </span>
                     </div>
 
+                    <!-- Management Actions (Visible to Owner/Admin) -->
+                    <div *ngIf="canManage(video)" class="absolute top-6 right-6 flex items-center gap-2 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 z-30">
+                        <button (click)="editVideo(video, $event)" 
+                            class="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-[#2d6a4f] hover:scale-110 transition-all shadow-xl border border-white/20">
+                            <lucide-icon [img]="Pencil" class="w-4 h-4"></lucide-icon>
+                        </button>
+                        <button (click)="deleteVideo(video.id || '', $event)" 
+                            class="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-red-600 hover:scale-110 transition-all shadow-xl border border-white/20">
+                            <lucide-icon [img]="Trash2" class="w-4 h-4"></lucide-icon>
+                        </button>
+                    </div>
+
                     <!-- Content Overlay -->
                     <div
                         class="absolute bottom-8 left-8 right-8 text-white transition-all duration-500 translate-y-4 group-hover/card:translate-y-0">
@@ -343,9 +355,12 @@
             <div class="relative z-10">
                 <div class="flex justify-between items-start mb-10">
                     <div>
-                        <h3 class="font-serif text-4xl font-medium tracking-tight mb-2">Share Your Adventure</h3>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-white/40">Contribute to the
-                            collective intelligence</p>
+                        <h3 class="font-serif text-4xl font-medium tracking-tight mb-2">
+                            {{ isEditingVideo ? 'Refine Your Adventure' : 'Share Your Adventure' }}
+                        </h3>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-white/40">
+                            {{ isEditingVideo ? 'Updating the collective intelligence' : 'Contribute to the collective intelligence' }}
+                        </p>
                     </div>
                     <button (click)="closeVideoModal()" class="p-2 hover:bg-white/10 rounded-full transition-colors">
                         <lucide-icon [img]="Plus" class="w-6 h-6 rotate-45"></lucide-icon>
@@ -434,7 +449,7 @@
                     <button type="submit" [disabled]="isSubmittingVideo"
                         class="w-full py-5 bg-[#2d6a4f] text-white rounded-full font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl disabled:opacity-50 disabled:scale-100 flex items-center justify-center gap-3">
                         <lucide-icon *ngIf="isSubmittingVideo" [img]="Clock" class="w-5 h-5 animate-spin"></lucide-icon>
-                        {{ isSubmittingVideo ? 'Broadcasting...' : 'Broadcast to Academy' }}
+                        {{ isSubmittingVideo ? (isEditingVideo ? 'Updating...' : 'Broadcasting...') : (isEditingVideo ? 'Update Broadcast' : 'Broadcast to Academy') }}
                     </button>
                 </form>
             </div>

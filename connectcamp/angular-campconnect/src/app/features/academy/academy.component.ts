@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { LucideAngularModule, BookOpen, Clock, Users, Award, Search, Star, TrendingUp, Play, ChevronRight, CheckCircle, ShieldCheck, Medal, GraduationCap, Eye, ArrowRight, Compass, Plus, Video as VideoIcon, Upload, File as FileIcon, CheckSquare, AlertCircle } from 'lucide-angular';
+import { LucideAngularModule, BookOpen, Clock, Users, Award, Search, Star, TrendingUp, Play, ChevronRight, CheckCircle, ShieldCheck, Medal, GraduationCap, Eye, ArrowRight, Compass, Plus, Video as VideoIcon, Upload, File as FileIcon, CheckSquare, AlertCircle, Pencil, Trash2 } from 'lucide-angular';
 import { ButtonComponent } from '../../shared/components/button.component';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -106,6 +106,8 @@ export class AcademyComponent implements OnInit, AfterViewInit {
   readonly FileIcon = FileIcon;
   readonly CheckSquare = CheckSquare;
   readonly AlertCircle = AlertCircle;
+  readonly Pencil = Pencil;
+  readonly Trash2 = Trash2;
 
   selectedCategory = 'all';
   searchQuery = '';
@@ -121,10 +123,21 @@ export class AcademyComponent implements OnInit, AfterViewInit {
     // 3. Check if any featured video is from this user and marked expert (fallback)
     const userId = currentUser?.id;
     if (userId) {
-       return this.featuredVideos().some(v => v.creator.id === userId && v.creator.verifiedExpert);
+       return this.featuredVideos().some(v => v.creator?.id === userId && v.creator?.verifiedExpert);
     }
 
     return false;
+  }
+
+  canManage(video: Video): boolean {
+    const currentUser = JSON.parse(localStorage.getItem('cc_user') || '{}');
+    if (!currentUser || !currentUser.id) return false;
+    
+    // Admin can manage everything
+    if (this.authService.hasRole('ADMIN')) return true;
+    
+    // Creator can manage their own content
+    return video.creator?.id === currentUser.id;
   }
 
   stats = [
@@ -138,8 +151,10 @@ export class AcademyComponent implements OnInit, AfterViewInit {
   toast: { message: string; type: 'success' | 'error' } | null = null;
   private toastTimeout: any;
 
-  // Video Creation Modal
+  // Video Creation/Edit Modal
   showVideoModal = false;
+  isEditingVideo = false;
+  editingVideoId: string | null = null;
   isSubmittingVideo = false;
   selectedFile: File | null = null;
   selectedFilePreview: string | null = null;
@@ -199,6 +214,8 @@ export class AcademyComponent implements OnInit, AfterViewInit {
   }
 
   uploadReel() {
+    this.isEditingVideo = false;
+    this.editingVideoId = null;
     this.videoForm = {
       title: '',
       videoUrl: '',
@@ -210,6 +227,39 @@ export class AcademyComponent implements OnInit, AfterViewInit {
     this.selectedFile = null;
     this.selectedFilePreview = null;
     this.showVideoModal = true;
+  }
+
+  editVideo(video: Video, event: Event) {
+    event.stopPropagation();
+    this.isEditingVideo = true;
+    this.editingVideoId = video.id || null;
+    this.videoForm = {
+      title: video.title,
+      videoUrl: video.videoUrl,
+      thumbnailUrl: video.thumbnailUrl,
+      category: video.category,
+      type: video.type,
+      description: video.description
+    };
+    this.selectedFile = null;
+    this.selectedFilePreview = null;
+    this.showVideoModal = true;
+  }
+
+  deleteVideo(id: string, event: Event) {
+    event.stopPropagation();
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce contenu ?')) {
+      this.academyService.deleteVideo(id).subscribe({
+        next: () => {
+          this.showToast('Contenu supprimé avec succès.', 'success');
+          this.loadAcademyData();
+        },
+        error: (err) => {
+          console.error('Delete failed:', err);
+          this.showToast('Erreur lors de la suppression.', 'error');
+        }
+      });
+    }
   }
 
   onFileSelected(event: any) {
@@ -275,19 +325,35 @@ export class AcademyComponent implements OnInit, AfterViewInit {
           : { id: 'admin', username: 'admin', name: 'Explorer', verifiedExpert: true }
       };
 
-      this.academyService.createVideo(newVideo).subscribe({
-        next: () => {
-          this.isSubmittingVideo = false;
-          this.showVideoModal = false;
-          this.showToast('Contenu ajouté avec succès ! 🎉', 'success');
-          this.loadAcademyData();
-        },
-        error: (err) => {
-          this.isSubmittingVideo = false;
-          console.error('Failed to create video:', err);
-          this.showToast('Erreur lors de l\'ajout du contenu.', 'error');
-        }
-      });
+      if (this.isEditingVideo && this.editingVideoId) {
+        this.academyService.updateVideo(this.editingVideoId, newVideo).subscribe({
+          next: () => {
+            this.isSubmittingVideo = false;
+            this.showVideoModal = false;
+            this.showToast('Contenu mis à jour ! 🛠️', 'success');
+            this.loadAcademyData();
+          },
+          error: (err) => {
+            this.isSubmittingVideo = false;
+            console.error('Failed to update video:', err);
+            this.showToast('Erreur lors de la mise à jour.', 'error');
+          }
+        });
+      } else {
+        this.academyService.createVideo(newVideo).subscribe({
+          next: () => {
+            this.isSubmittingVideo = false;
+            this.showVideoModal = false;
+            this.showToast('Contenu ajouté avec succès ! 🎉', 'success');
+            this.loadAcademyData();
+          },
+          error: (err) => {
+            this.isSubmittingVideo = false;
+            console.error('Failed to create video:', err);
+            this.showToast('Erreur lors de l\'ajout du contenu.', 'error');
+          }
+        });
+      }
     };
 
     if (this.selectedFile) {
