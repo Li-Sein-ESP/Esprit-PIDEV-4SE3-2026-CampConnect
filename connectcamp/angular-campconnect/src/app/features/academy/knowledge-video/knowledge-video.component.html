@@ -54,7 +54,51 @@
 
   <!-- Video Content -->
   <div *ngIf="!isLoading && video" class="container mx-auto px-6 max-w-7xl pt-32 pb-40">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+    <!-- Immersive Photo Layout (Single Column) -->
+    <div *ngIf="isImage()" class="flex flex-col items-center max-w-5xl mx-auto gap-12 text-center">
+      <!-- Media Player Area -->
+      <div class="w-full relative group">
+        <div class="absolute -inset-8 opacity-10 blur-3xl"
+          style="background: radial-gradient(circle, rgba(45, 106, 79, 0.4) 0%, transparent 70%)"></div>
+        <div class="relative z-10 rounded-[3rem] overflow-hidden border-[12px] border-[#0A1F1C]/5 shadow-3xl bg-[#0A1F1C] aspect-video flex items-center justify-center">
+          <img [src]="video.videoUrl" [alt]="video.title"
+            onerror="this.src='https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=80'"
+            class="max-w-full max-h-full object-contain shadow-2xl rounded-lg transition-transform duration-700 hover:scale-[1.01]" />
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="space-y-8">
+        <div class="flex flex-col items-center gap-4">
+          <span class="px-6 py-2 rounded-full text-[10px] font-black tracking-[0.2em] uppercase border border-[#0A1F1C]/10 bg-[#2d6a4f]/10 text-[#2d6a4f]">
+            {{ video.category }}
+          </span>
+          <h1 class="font-serif text-6xl md:text-8xl font-medium text-[#0A1F1C] leading-none tracking-tight">
+            {{ video.title }}
+          </h1>
+          <p class="text-xl text-[#0A1F1C]/50 max-w-2xl leading-relaxed italic">"{{ video.description }}"</p>
+        </div>
+
+        <div class="flex items-center justify-center gap-6">
+           <div class="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[#0A1F1C]/30">
+             <lucide-icon [img]="Eye" class="w-4 h-4"></lucide-icon>
+             {{ video.views }} Views
+           </div>
+           <div class="h-4 w-px bg-[#0A1F1C]/10"></div>
+           <div class="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-[#22c55e]">
+             <lucide-icon [img]="ThumbsUp" class="w-4 h-4"></lucide-icon>
+             {{ video.helpfulCount }} Helpful
+           </div>
+        </div>
+        
+        <button (click)="goBack()" class="px-10 py-4 bg-[#2d6a4f] text-white rounded-full font-bold uppercase tracking-widest text-[10px] hover:scale-105 transition-all shadow-xl">
+          Back to Explorations
+        </button>
+      </div>
+    </div>
+
+    <!-- Standard Video Layout (Two Columns) -->
+    <div *ngIf="!isImage()" class="grid grid-cols-1 lg:grid-cols-12 gap-16">
 
       <!-- ====== LEFT COLUMN: Player & Main Content ====== -->
       <div class="lg:col-span-8 flex flex-col gap-12">
@@ -74,9 +118,19 @@
                 allowfullscreen>
               </iframe>
 
-              <video *ngIf="!isExternalVideo()" [src]="video.videoUrl" class="w-full h-full object-contain" controls
+              <video *ngIf="!isExternalVideo() && !isImage()" [src]="video.videoUrl" class="w-full h-full object-contain" controls
                 autoplay muted>
               </video>
+
+              <div *ngIf="isImage()" class="w-full h-full bg-[#0A1F1C] flex items-center justify-center relative overflow-hidden group/img">
+                <!-- Subtle backlight effect -->
+                <div class="absolute inset-0 bg-gradient-to-br from-[#2d6a4f]/20 via-transparent to-transparent opacity-50"></div>
+                
+                <img [src]="video.videoUrl" 
+                    [alt]="video.title"
+                    onerror="this.src='/assets/placeholders/wilderness-placeholder.jpg'"
+                    class="relative z-10 max-w-[90%] max-h-[90%] object-contain shadow-2xl rounded-lg transition-transform duration-700 group-hover/img:scale-[1.02]" />
+              </div>
             </ng-container>
 
             <!-- Thumbnail (Before Playing) -->

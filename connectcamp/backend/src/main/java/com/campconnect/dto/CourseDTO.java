@@ -38,6 +38,7 @@ public class CourseDTO {
     @PositiveOrZero(message = "Price must be 0 or positive")
     private double price;
     private String imageUrl;
+    private String documentUrl;
     private List<String> tags;
     private List<String> prerequisites;
     

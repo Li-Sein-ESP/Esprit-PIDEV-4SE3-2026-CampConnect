@@ -78,11 +78,34 @@
                         }
                     },
                     "defaultConfiguration": "development"
+                },
+                "test": {
+                    "builder": "@angular-devkit/build-angular:karma",
+                    "options": {
+                        "polyfills": [
+                            "zone.js",
+                            "zone.js/testing"
+                        ],
+                        "tsConfig": "tsconfig.spec.json",
+                        "inlineStyleLanguage": "css",
+                        "assets": [
+                            {
+                                "glob": "**/*",
+                                "input": "public"
+                            },
+                            "src/assets"
+                        ],
+                        "styles": [
+                            "src/styles/globals.css"
+                        ],
+                        "scripts": [],
+                        "karmaConfig": "karma.conf.js"
+                    }
                 }
             }
         }
     },
     "cli": {
-      "analytics": "96745b0a-52ab-481a-bd27-cf1602ee96a8"
+        "analytics": "96745b0a-52ab-481a-bd27-cf1602ee96a8"
     }
 }

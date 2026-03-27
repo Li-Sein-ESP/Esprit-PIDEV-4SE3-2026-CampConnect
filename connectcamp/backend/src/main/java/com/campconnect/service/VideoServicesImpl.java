@@ -76,6 +76,7 @@ public class VideoServicesImpl implements IVideoServices {
             creatorDto.setId(video.getCreator().getId());
             creatorDto.setUsername(video.getCreator().getUsername());
             creatorDto.setName(video.getCreator().getName());
+            creatorDto.setVerifiedExpert(video.getCreator().isVerifiedExpert());
             dto.setCreator(creatorDto);
         }
         

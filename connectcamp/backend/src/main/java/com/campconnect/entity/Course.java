@@ -54,6 +54,7 @@ public class Course {
     private double price;
     
     private String imageUrl;
+    private String documentUrl;
     private List<String> tags;
     private List<String> prerequisites;
     

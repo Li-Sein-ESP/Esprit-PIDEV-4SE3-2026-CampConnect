@@ -17,9 +17,11 @@ public class FileStorageService {
 
     private final Path fileStorageLocation;
 
-    public FileStorageService() {
-        // Create an "uploads" directory in the application's root directory
-        this.fileStorageLocation = Paths.get("uploads").toAbsolutePath().normalize();
+    public FileStorageService(@org.springframework.beans.factory.annotation.Value("${app.upload.dir:#{null}}") String uploadDir) {
+        // Fallback to "uploads" if not specified
+        String path = (uploadDir != null && !uploadDir.isEmpty()) ? uploadDir : "uploads";
+        this.fileStorageLocation = Paths.get(path).toAbsolutePath().normalize();
+        
         try {
             Files.createDirectories(this.fileStorageLocation);
         } catch (Exception ex) {
@@ -47,11 +49,8 @@ public class FileStorageService {
             Path targetLocation = this.fileStorageLocation.resolve(uniqueFileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-            // Generate the URL to return to the client
-            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/uploads/")
-                    .path(uniqueFileName)
-                    .toUriString();
+            // Generate a relative path to return to the client
+            String fileDownloadUri = "/uploads/" + uniqueFileName;
 
             return fileDownloadUri;
         } catch (IOException ex) {

@@ -108,6 +108,7 @@ public class CertificationServicesImpl implements ICertificationServices {
 
         if (cert.getRequiredCourses() != null) {
             dto.setRequiredCourseIds(cert.getRequiredCourses().stream()
+                .filter(course -> course != null && course.getId() != null)
                 .map(Course::getId)
                 .collect(Collectors.toList()));
         }

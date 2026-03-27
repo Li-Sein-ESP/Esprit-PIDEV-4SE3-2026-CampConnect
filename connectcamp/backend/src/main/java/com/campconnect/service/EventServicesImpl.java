@@ -50,6 +50,7 @@ public class EventServicesImpl implements IEventServices {
 
     @Override
     public EventDTO createEvent(EventDTO dto) {
+        validateEventDates(dto);
         Event event = convertToEntity(dto);
         return convertToDTO(eventRepository.save(event));
     }
@@ -57,9 +58,18 @@ public class EventServicesImpl implements IEventServices {
     @Override
     public EventDTO updateEvent(String id, EventDTO dto) {
         if (!eventRepository.existsById(id)) return null;
+        validateEventDates(dto);
         Event event = convertToEntity(dto);
         event.setId(id);
         return convertToDTO(eventRepository.save(event));
+    }
+
+    private void validateEventDates(EventDTO dto) {
+        if (dto.getStartDate() != null && dto.getEndDate() != null) {
+            if (dto.getEndDate().isBefore(dto.getStartDate())) {
+                throw new IllegalArgumentException("Event end date cannot be before start date");
+            }
+        }
     }
 
     @Override

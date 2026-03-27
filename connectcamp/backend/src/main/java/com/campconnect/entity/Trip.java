@@ -33,7 +33,6 @@ public class Trip {
     private TripStatus status;
     
     @NotNull(message = "Start date is required")
-    @FutureOrPresent(message = "Start date must be in the future")
     private LocalDateTime startDate;
     
     @NotNull(message = "End date is required")

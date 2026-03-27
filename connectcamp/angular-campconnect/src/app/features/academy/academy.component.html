@@ -1,5 +1,15 @@
 <div class="academy-container relative min-h-screen bg-[#F1EDE1] text-[#0A1F1C] font-sans overflow-x-hidden">
 
+    <!-- TOAST NOTIFICATION -->
+    <div *ngIf="toast" class="fixed top-6 right-6 z-[200] flex items-center gap-4 px-6 py-4 rounded-2xl shadow-2xl transition-all duration-300"
+        [ngClass]="{
+            'bg-[#2d6a4f] text-white': toast.type === 'success',
+            'bg-red-600 text-white': toast.type === 'error'
+        }">
+        <lucide-icon [img]="toast.type === 'success' ? CheckSquare : AlertCircle" class="w-5 h-5 flex-shrink-0"></lucide-icon>
+        <span class="font-bold text-sm">{{ toast.message }}</span>
+    </div>
+
     <!-- SECTION 1: HERO "WILDERNESS CANVAS" -->
     <section class="hero-section relative h-screen w-full flex flex-col items-center justify-center overflow-hidden">
         <!-- Cinematic Background Image Overlay -->
@@ -85,12 +95,19 @@
                     </p>
                 </div>
                 <div class="flex items-center gap-4">
-                    <button (click)="uploadReel()"
+                    <!-- Share Button (Restricted to Experts) -->
+                    <button *ngIf="isExpert" (click)="uploadReel()"
                         class="flex items-center gap-3 px-8 py-4 bg-[#e85d04] text-white rounded-full font-bold uppercase tracking-widest hover:scale-105 transition-all shadow-xl active:scale-95 group/btn">
                         <lucide-icon [img]="Plus"
-                            class="w-5 h-5 transition-transform group-hover/btn:rotate-90"></lucide-icon>
+                            class="w-4 h-4 group-hover/btn:rotate-90 transition-transform duration-300"></lucide-icon>
                         Share Your Adventure
                     </button>
+                    
+                    <!-- Expert Hint for Regular Users -->
+                    <div *ngIf="!isExpert" class="hidden md:flex items-center gap-3 px-6 py-3 bg-[#0A1F1C]/5 rounded-full opacity-40">
+                        <lucide-icon [img]="ShieldCheck" class="w-3.5 h-3.5"></lucide-icon>
+                        <span class="text-[8px] font-black uppercase tracking-widest">Expert Access Required</span>
+                    </div>
                 </div>
             </div>
 
@@ -110,6 +127,7 @@
                     <!-- Thumbnail -->
                     <div class="absolute inset-0 overflow-hidden">
                         <img [src]="video.thumbnailUrl" [alt]="video.title"
+                            onerror="this.src='https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=80'"
                             class="w-full h-full object-cover transition-transform duration-1000 group-hover/card:scale-110">
                         <div
                             class="absolute inset-0 bg-gradient-to-t from-[#0A1F1C] via-transparent to-transparent opacity-40 group-hover/card:opacity-70 transition-opacity">
@@ -350,21 +368,57 @@
                             <label
                                 class="text-[9px] font-black uppercase tracking-widest text-white/40 ml-4">Category</label>
                             <select name="category" [(ngModel)]="videoForm.category"
-                                class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-[#2d6a4f] transition-all font-medium appearance-none">
-                                <option value="Experience">Experience</option>
-                                <option value="Tutorial">Tutorial</option>
-                                <option value="Survival">Survival</option>
-                                <option value="Navigation">Navigation</option>
+                                class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-[#2d6a4f] transition-all font-medium appearance-none text-white">
+                                <option value="Experience" class="bg-[#0A1F1C] text-white">Experience</option>
+                                <option value="Tutorial" class="bg-[#0A1F1C] text-white">Tutorial</option>
+                                <option value="Survival" class="bg-[#0A1F1C] text-white">Survival</option>
+                                <option value="Navigation" class="bg-[#0A1F1C] text-white">Navigation</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- Video URL -->
-                    <div class="space-y-2">
-                        <label class="text-[9px] font-black uppercase tracking-widest text-white/40 ml-4">Video URL
-                            (Unsplash/MP4/YouTube)</label>
-                        <input type="text" name="videoUrl" [(ngModel)]="videoForm.videoUrl" placeholder="https://..."
-                            class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-[#2d6a4f] transition-all font-medium">
+                    <!-- Media Selection -->
+                    <div class="space-y-4">
+                        <label class="text-[9px] font-black uppercase tracking-widest text-white/40 ml-4">Media Selection (Photo, Video, Vlog)</label>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                             <!-- File Upload Trigger -->
+                            <div (click)="fileInput.value = ''; fileInput.click()" 
+                                class="relative group cursor-pointer border-2 border-dashed border-white/10 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 hover:border-[#2d6a4f]/50 hover:bg-[#2d6a4f]/5 transition-all">
+                                <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*,video/*" class="hidden">
+                                
+                                <div class="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center text-white/40 group-hover:text-[#2d6a4f] group-hover:bg-[#2d6a4f]/10 transition-all">
+                                    <lucide-icon [img]="Upload" class="w-6 h-6"></lucide-icon>
+                                </div>
+                                <span class="text-[10px] font-black uppercase tracking-widest text-white/40">Select Local File</span>
+                                
+                                <div *ngIf="selectedFile" class="absolute inset-0 bg-[#0A1F1C] rounded-2xl p-2 flex items-center gap-3 z-50">
+                                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-black/20">
+                                        <img *ngIf="selectedFilePreview" [src]="selectedFilePreview" class="w-full h-full object-cover">
+                                        <div *ngIf="!selectedFilePreview" class="w-full h-full flex items-center justify-center">
+                                            <lucide-icon [img]="FileIcon" class="w-5 h-5 text-white/20"></lucide-icon>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-[10px] font-bold truncate">{{ selectedFile.name }}</div>
+                                        <div class="text-[8px] font-black text-white/40 uppercase tracking-widest">{{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB</div>
+                                    </div>
+                                    <button (click)="$event.stopPropagation(); removeSelectedFile()" class="p-2 hover:bg-white/10 rounded-full">
+                                        <lucide-icon [img]="Plus" class="w-4 h-4 rotate-45 text-red-400"></lucide-icon>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- URL Input Alternative -->
+                            <div class="space-y-2">
+                                <div class="relative h-full">
+                                    <input type="text" name="videoUrl" [(ngModel)]="videoForm.videoUrl" 
+                                        placeholder="Or paste URL here (Unsplash/MP4/YouTube)"
+                                        [disabled]="!!selectedFile"
+                                        class="w-full h-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-[#2d6a4f] transition-all font-medium text-xs disabled:opacity-30">
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Description -->

@@ -120,31 +120,79 @@ export class KnowledgeVideoComponent implements OnInit {
   getSafeVideoUrl(): SafeResourceUrl {
     if (!this.video || !this.video.videoUrl) return '';
 
-    let url = this.video.videoUrl;
-
-    // YouTube Support
-    if (url.includes('youtube.com/watch?v=')) {
-      url = url.replace('watch?v=', 'embed/');
-    } else if (url.includes('youtu.be/')) {
-      url = url.replace('youtu.be/', 'youtube.com/embed/');
+    let url = this.video.videoUrl.trim();
+    
+    // Ensure absolute protocol for external URLs
+    if (this.isExternalVideo() && !url.startsWith('http') && !url.startsWith('//')) {
+      url = 'https://' + url;
+    } else if (url.startsWith('//')) {
+      url = 'https:' + url;
     }
 
-    // Vimeo Support
-    if (url.includes('vimeo.com/')) {
-      url = url.replace('vimeo.com/', 'player.vimeo.com/video/');
+    let transformedUrl = url;
+
+    // YouTube Detection & Extraction
+    const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([^"&?\/\s]{11})/;
+    const ytMatch = url.match(ytRegex);
+    
+    if (ytMatch && ytMatch[1]) {
+      transformedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
+    } else if (url.includes('vimeo.com/')) {
+      // Vimeo Detection & Extraction
+      const vimeoRegex = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/;
+      const vimeoMatch = url.match(vimeoRegex);
+      if (vimeoMatch && vimeoMatch[1]) {
+        transformedUrl = `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+      }
     }
 
-    // Add autoplay parameter (requires mute in most browsers to work automatically)
-    const separator = url.includes('?') ? '&' : '?';
-    url = `${url}${separator}autoplay=1&mute=1`;
+    // Add necessary parameters
+    const separator = transformedUrl.includes('?') ? '&' : '?';
+    transformedUrl = `${transformedUrl}${separator}autoplay=1&rel=0`;
+    
+    // Only add origin if it's an external embed
+    if (transformedUrl.includes('youtube.com') || transformedUrl.includes('vimeo.com')) {
+      transformedUrl += `&origin=${window.location.origin}`;
+    }
 
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    return this.sanitizer.bypassSecurityTrustResourceUrl(transformedUrl);
   }
 
   isExternalVideo(): boolean {
     if (!this.video || !this.video.videoUrl) return false;
-    const url = this.video.videoUrl.toLowerCase();
-    return url.includes('youtube.com') || url.includes('youtu.be') || url.includes('vimeo.com');
+    const url = this.video.videoUrl.toLowerCase().trim();
+    
+    // Check for known external providers
+    const isExternalProvider = url.includes('youtube.com') || 
+                               url.includes('youtu.be') || 
+                               url.includes('vimeo.com') || 
+                               url.includes('player.vimeo.com') ||
+                               url.includes('www.youtube') ||
+                               url.includes('m.youtube');
+    
+    if (isExternalProvider) return true;
+
+    // Fallback: If it's a remote URL (starts with http, but NOT localhost or your current origin)
+    // and doesn't have a direct video extension, treat as external
+    const isRemote = (url.startsWith('http') && !url.includes(window.location.hostname)) || url.startsWith('www.');
+    const hasDirectExtension = url.match(/\.(mp4|webm|ogg|mov|m4v)$/i);
+    
+    if (isRemote && !hasDirectExtension) {
+      return true;
+    }
+
+    return false;
+  }
+
+  isImage(): boolean {
+    if (!this.video || !this.video.videoUrl) return false;
+    const url = this.video.videoUrl.toLowerCase().trim();
+    
+    // Check for common image extensions, even with query params
+    const hasImageExtension = url.match(/\.(jpeg|jpg|gif|png|webp|avif|svg)(\?.*)?$/i) != null;
+    const isUploadImage = url.includes('/uploads/') && !url.match(/\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i);
+    
+    return hasImageExtension || isUploadImage;
   }
 
   goBack() {

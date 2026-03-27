@@ -1,7 +1,7 @@
-import { Component, OnInit, AfterViewInit, signal } from '@angular/core';
+import { Component, OnInit, AfterViewInit, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { LucideAngularModule, BookOpen, Clock, Users, Award, Search, Star, TrendingUp, Play, ChevronRight, CheckCircle, ShieldCheck, Medal, GraduationCap, Eye, ArrowRight, Compass, Plus, Video as VideoIcon } from 'lucide-angular';
+import { LucideAngularModule, BookOpen, Clock, Users, Award, Search, Star, TrendingUp, Play, ChevronRight, CheckCircle, ShieldCheck, Medal, GraduationCap, Eye, ArrowRight, Compass, Plus, Video as VideoIcon, Upload, File as FileIcon, CheckSquare, AlertCircle } from 'lucide-angular';
 import { ButtonComponent } from '../../shared/components/button.component';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -102,9 +102,30 @@ export class AcademyComponent implements OnInit, AfterViewInit {
   readonly BookOpen = BookOpen;
   readonly Users = Users;
   readonly ShieldCheck = ShieldCheck;
+  readonly Upload = Upload;
+  readonly FileIcon = FileIcon;
+  readonly CheckSquare = CheckSquare;
+  readonly AlertCircle = AlertCircle;
 
   selectedCategory = 'all';
   searchQuery = '';
+
+  get isExpert(): boolean {
+    // 1. Admin bypass
+    if (this.authService.hasRole('ADMIN')) return true;
+    
+    // 2. Check current user expert flag if available
+    const currentUser = JSON.parse(localStorage.getItem('cc_user') || '{}');
+    if (currentUser && currentUser.verifiedExpert) return true;
+    
+    // 3. Check if any featured video is from this user and marked expert (fallback)
+    const userId = currentUser?.id;
+    if (userId) {
+       return this.featuredVideos().some(v => v.creator.id === userId && v.creator.verifiedExpert);
+    }
+
+    return false;
+  }
 
   stats = [
     { label: 'Video Lessons', value: 0, target: 0, icon: BookOpen, shadow: 'rgba(34, 197, 94, 0.15)', class: 'card-asymmetric-1' },
@@ -113,13 +134,20 @@ export class AcademyComponent implements OnInit, AfterViewInit {
     { label: 'Certifications', value: 0, target: 0, icon: Medal, shadow: 'rgba(212, 165, 116, 0.15)', class: 'card-asymmetric-4' },
   ];
 
-  featuredVideos = signal<Video[]>([]);
-  courses = signal<Course[]>([]);
-  certifications = signal<Certification[]>([]);
+  // Toast notification state
+  toast: { message: string; type: 'success' | 'error' } | null = null;
+  private toastTimeout: any;
 
   // Video Creation Modal
   showVideoModal = false;
   isSubmittingVideo = false;
+  selectedFile: File | null = null;
+  selectedFilePreview: string | null = null;
+
+  featuredVideos = signal<Video[]>([]);
+  courses = signal<Course[]>([]);
+  certifications = signal<Certification[]>([]);
+
   videoForm = {
     title: '',
     videoUrl: '',
@@ -132,7 +160,8 @@ export class AcademyComponent implements OnInit, AfterViewInit {
   constructor(
     private router: Router,
     private academyService: AcademyService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
@@ -163,8 +192,13 @@ export class AcademyComponent implements OnInit, AfterViewInit {
     });
   }
 
+  showToast(message: string, type: 'success' | 'error') {
+    clearTimeout(this.toastTimeout);
+    this.toast = { message, type };
+    this.toastTimeout = setTimeout(() => this.toast = null, 3500);
+  }
+
   uploadReel() {
-    // Reset form and show modal
     this.videoForm = {
       title: '',
       videoUrl: '',
@@ -173,7 +207,39 @@ export class AcademyComponent implements OnInit, AfterViewInit {
       type: 'REEL',
       description: ''
     };
+    this.selectedFile = null;
+    this.selectedFilePreview = null;
     this.showVideoModal = true;
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      // Cleanup previous preview if it was an object URL
+      if (this.selectedFilePreview?.startsWith('blob:')) {
+        URL.revokeObjectURL(this.selectedFilePreview);
+      }
+
+      this.selectedFile = file;
+      
+      // Create preview using object URL (more reliable for large files/videos)
+      if (file.type.startsWith('image/')) {
+        this.selectedFilePreview = URL.createObjectURL(file);
+      } else {
+        this.selectedFilePreview = null; // Don't try to preview videos as images
+      }
+      
+      this.cdr.detectChanges();
+    }
+  }
+
+  removeSelectedFile() {
+    if (this.selectedFilePreview?.startsWith('blob:')) {
+      URL.revokeObjectURL(this.selectedFilePreview);
+    }
+    this.selectedFile = null;
+    this.selectedFilePreview = null;
+    this.cdr.detectChanges();
   }
 
   closeVideoModal() {
@@ -181,47 +247,64 @@ export class AcademyComponent implements OnInit, AfterViewInit {
   }
 
   submitVideo() {
-    if (!this.videoForm.title || !this.videoForm.videoUrl) {
-      alert('Veuillez remplir au moins le titre et l\'URL de la vidéo.');
+    if (!this.videoForm.title) {
+      this.showToast('Veuillez entrer un titre.', 'error');
       return;
     }
 
     this.isSubmittingVideo = true;
 
-    // Auto-generate thumbnail if missing
-    if (!this.videoForm.thumbnailUrl) {
-      this.videoForm.thumbnailUrl = this.videoForm.videoUrl.includes('unsplash')
-        ? this.videoForm.videoUrl
-        : 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=80';
-    }
+    const createVideoEntry = (mediaUrl: string) => {
+      const currentUser = this.authService.getToken() ? JSON.parse(localStorage.getItem('cc_user') || '{}') : null;
 
-    const currentUser = this.authService.getToken() ? JSON.parse(localStorage.getItem('cc_user') || '{}') : null;
+      const newVideo: Partial<Video> = {
+        title: this.videoForm.title.trim(),
+        videoUrl: mediaUrl.trim(),
+        thumbnailUrl: this.videoForm.thumbnailUrl || (mediaUrl.match(/\.(jpeg|jpg|gif|png|webp|avif|svg)(\?.*)?$/i) != null ? mediaUrl : 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=80'),
+        category: this.videoForm.category,
+        description: this.videoForm.description,
+        type: 'REEL',
+        takeaways: [],
+        creator: currentUser 
+          ? { 
+              id: currentUser.id, 
+              username: currentUser.username, 
+              name: currentUser.name || currentUser.username,
+              verifiedExpert: currentUser.verifiedExpert || false
+            }
+          : { id: 'admin', username: 'admin', name: 'Explorer', verifiedExpert: true }
+      };
 
-    const newVideo: Partial<Video> = {
-      ...this.videoForm,
-      takeaways: [],
-      creator: currentUser
-        ? { id: currentUser.id, username: currentUser.username, name: currentUser.name || currentUser.username }
-        : { id: 'admin', username: 'admin', name: 'Explorer' }
+      this.academyService.createVideo(newVideo).subscribe({
+        next: () => {
+          this.isSubmittingVideo = false;
+          this.showVideoModal = false;
+          this.showToast('Contenu ajouté avec succès ! 🎉', 'success');
+          this.loadAcademyData();
+        },
+        error: (err) => {
+          this.isSubmittingVideo = false;
+          console.error('Failed to create video:', err);
+          this.showToast('Erreur lors de l\'ajout du contenu.', 'error');
+        }
+      });
     };
 
-    this.academyService.createVideo(newVideo).subscribe({
-      next: () => {
-        this.isSubmittingVideo = false;
-        this.showVideoModal = false;
-        alert('Vidéo ajoutée avec succès ! 🎉');
-        this.loadAcademyData();
-      },
-      error: (err) => {
-        this.isSubmittingVideo = false;
-        console.error('Failed to create video:', err);
-        if (err.status === 403 || err.status === 401) {
-          alert('Session expirée ou accès refusé. Veuillez vous reconnecter.');
-        } else {
-          alert('Erreur lors de l\'ajout de la vidéo.');
+    if (this.selectedFile) {
+      this.academyService.uploadFile(this.selectedFile).subscribe({
+        next: (resp) => createVideoEntry(resp.url),
+        error: (err) => {
+          this.isSubmittingVideo = false;
+          console.error('File upload failed:', err);
+          this.showToast('Échec de l\'envoi du fichier.', 'error');
         }
-      }
-    });
+      });
+    } else if (this.videoForm.videoUrl) {
+      createVideoEntry(this.videoForm.videoUrl);
+    } else {
+      this.isSubmittingVideo = false;
+      this.showToast('Vezillez choisir un fichier ou une URL.', 'error');
+    }
   }
 
   ngAfterViewInit() {

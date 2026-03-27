@@ -4,7 +4,7 @@ import { Event, EventRegistration } from '../models/event.model';
 import { Observable, of, throwError } from 'rxjs';
 import { tap, catchError, map } from 'rxjs/operators';
 
-const API_URL = 'http://localhost:8081/api/events';
+const API_URL = 'http://localhost:8082/api/events';
 
 @Injectable({
     providedIn: 'root'
@@ -202,7 +202,7 @@ export class EventService {
                 // Normalize casing for frontend matching
                 return events.map(e => ({
                     ...e,
-                    type: e.type?.toLowerCase(),
+                    type: e.type?.toLowerCase().replace(/_/g, '-'),
                     difficulty: e.difficulty?.toLowerCase(),
                     status: e.status?.toLowerCase()
                 }));
@@ -219,7 +219,7 @@ export class EventService {
         return this.http.get<Event>(`${API_URL}/${id}`).pipe(
             map((e: any) => ({
                 ...e,
-                type: e.type?.toLowerCase(),
+                type: e.type?.toLowerCase().replace(/_/g, '-'),
                 difficulty: e.difficulty?.toLowerCase(),
                 status: e.status?.toLowerCase()
             })),
@@ -245,8 +245,8 @@ export class EventService {
         return this.http.delete<void>(`${API_URL}/${id}`);
     }
 
-    registerForEvent(eventId: string, participants: number): Observable<EventRegistration> {
-        return this.http.post<EventRegistration>(`${API_URL}/${eventId}/register`, { eventId, participants, userId: 'current-user', status: 'CONFIRMED' });
+    registerForEvent(eventId: string, participants: number, userId: string): Observable<EventRegistration> {
+        return this.http.post<EventRegistration>(`${API_URL}/${eventId}/register`, { eventId, participants, userId, status: 'CONFIRMED' });
     }
 
     assignUserToEvent(eventId: string, userId: string, participants: number = 1): Observable<EventRegistration> {

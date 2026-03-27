@@ -4,9 +4,10 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import {
   LucideAngularModule, Calendar, Users, MapPin, Clock, DollarSign, ChevronLeft,
   ArrowRight, Star, CheckCircle, Shield, Mountain, Award, Share2, Heart,
-  ChevronRight, Play, Tent, Info, Backpack, HelpCircle, AlertTriangle
+  ChevronRight, Play, Tent, Info, Backpack, HelpCircle, AlertTriangle, BadgeCheck, Ban
 } from 'lucide-angular';
 import { EventService } from '../services/event.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Event } from '../models/event.model';
 
 @Component({
@@ -47,10 +48,13 @@ export class EventDetailsComponent implements OnInit {
   readonly Backpack = Backpack;
   readonly HelpCircle = HelpCircle;
   readonly AlertTriangle = AlertTriangle;
+  readonly BadgeCheck = BadgeCheck;
+  readonly Ban = Ban;
 
   event = signal<Event | null>(null);
   isRegistered = signal<boolean>(false);
   isFavorited = signal<boolean>(false);
+  toast = signal<{ message: string, type: 'success' | 'error' } | null>(null);
 
   highlights = [
     'Expert-led instruction',
@@ -63,7 +67,8 @@ export class EventDetailsComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private eventService: EventService
+    private eventService: EventService,
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
@@ -87,10 +92,24 @@ export class EventDetailsComponent implements OnInit {
   }
 
   formatTime(dateString: string): string {
-    return new Date(dateString).toLocaleTimeString('en-US', {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+    return date.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit'
     });
+  }
+
+  isSameTime(start: string, end: string): boolean {
+    if (!start || !end) return true;
+    return this.formatTime(start) === this.formatTime(end);
+  }
+
+  getCapacityColor(): string {
+    const percent = this.getCapacityPercent();
+    if (percent >= 100) return '#9D4A4A'; // Red
+    if (percent >= 80) return '#C77D48';  // Orange
+    return '#2d6a4f';                     // Green
   }
 
   getCapacityPercent(): number {
@@ -102,7 +121,14 @@ export class EventDetailsComponent implements OnInit {
   getSpotsLeft(): number {
     const evt = this.event();
     if (!evt) return 0;
-    return evt.capacity - evt.registered;
+    return Math.max(0, evt.capacity - evt.registered);
+  }
+
+  getCapacitySegments(): number[] {
+    // Returns an array of 10 segments representing the capacity status
+    const percent = this.getCapacityPercent();
+    const activeSegments = Math.ceil(percent / 10);
+    return Array(10).fill(0).map((_, i) => i < activeSegments ? 1 : 0);
   }
 
   getTypeEmoji(type: string): string {
@@ -119,9 +145,34 @@ export class EventDetailsComponent implements OnInit {
   register() {
     const evt = this.event();
     if (evt) {
-      this.eventService.registerForEvent(evt.id, 1);
-      this.isRegistered.set(true);
+      this.authService.getCurrentUser().subscribe(user => {
+        if (!user || !user.id) {
+          this.showToast('Authentication Required: Protocol Halted', 'error');
+          return;
+        }
+
+        this.eventService.registerForEvent(evt.id, 1, user.id).subscribe({
+          next: () => {
+            this.isRegistered.set(true);
+            // REACTIVE UPDATE: Create a new object to trigger the signal effect
+            this.event.set({
+              ...evt,
+              registered: evt.registered + 1
+            });
+            this.showToast('Sector Authorized: Deployment Confirmed', 'success');
+          },
+          error: (err) => {
+            console.error('Registration failed:', err);
+            this.showToast('Clearance Denied: Authorization Failed', 'error');
+          }
+        });
+      });
     }
+  }
+
+  showToast(message: string, type: 'success' | 'error') {
+    this.toast.set({ message, type });
+    setTimeout(() => this.toast.set(null), 4000);
   }
 
   toggleFavorite() {

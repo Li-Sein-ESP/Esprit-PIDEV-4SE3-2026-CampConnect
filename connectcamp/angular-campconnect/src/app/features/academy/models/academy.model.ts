@@ -14,6 +14,7 @@ export interface Course {
     reviews: number;
     price: number;
     imageUrl: string;
+    documentUrl?: string;
     tags: string[];
     prerequisites: string[];
     passingScore: number;
@@ -45,6 +46,7 @@ export interface UserSummary {
     id: string;
     username: string;
     name: string;
+    verifiedExpert: boolean;
 }
 
 // ─── CommentDTO (mirrors CommentDTO.java) ───

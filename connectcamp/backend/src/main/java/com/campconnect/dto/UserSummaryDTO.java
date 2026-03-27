@@ -11,4 +11,5 @@ public class UserSummaryDTO {
     private String id;
     private String username;
     private String name;
+    private boolean verifiedExpert;
 }

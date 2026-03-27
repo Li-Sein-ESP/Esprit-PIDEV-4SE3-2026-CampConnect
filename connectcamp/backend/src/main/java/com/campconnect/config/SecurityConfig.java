@@ -87,6 +87,7 @@ public class SecurityConfig {
             // Public academy and events browsing
             .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/academy/**").permitAll()
             .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/events/**").permitAll()
+            .requestMatchers(org.springframework.http.HttpMethod.GET, "/uploads/**").permitAll()
             // Admin
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             // Events

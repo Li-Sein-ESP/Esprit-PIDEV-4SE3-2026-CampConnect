@@ -17,7 +17,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.FutureOrPresent;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Document(collection = "events")
 @Data
@@ -30,7 +30,6 @@ public class Event {
     @NotBlank(message = "Title is required")
     private String title;
     
-    @NotBlank(message = "Description is required")
     private String description;
     
     @NotBlank(message = "Type is required")
@@ -40,10 +39,9 @@ public class Event {
     private Location location;
     
     @NotNull(message = "Start date is required")
-    @FutureOrPresent(message = "Start date must be in the future")
     private LocalDateTime startDate;
     
-    @NotNull(message = "End date is required")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime endDate;
     
     @Positive(message = "Duration must be positive")

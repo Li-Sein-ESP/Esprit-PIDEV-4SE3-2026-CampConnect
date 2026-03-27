@@ -41,7 +41,7 @@
                     <div class="text-sm text-[var(--color-text-secondary)]">Delivered to your site</div>
                   </div>
                 </div>
-                <span class="font-medium">+\$25</span>
+                <span class="font-medium">+ 25 DT</span>
               </label>
               <label class="flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer">
                 <div class="flex items-center gap-3">
@@ -51,7 +51,7 @@
                     <div class="text-sm text-[var(--color-text-secondary)]">12:00 PM instead of 2:00 PM</div>
                   </div>
                 </div>
-                <span class="font-medium">+\$15</span>
+                <span class="font-medium">+ 15 DT</span>
               </label>
             </div>
           </app-card-content>
@@ -76,15 +76,15 @@
           </app-card-header>
           <app-card-content>
             <div class="space-y-3 mb-6">
-              <div class="flex justify-between"><span>Base Price</span><span>\${{ basePrice }}</span></div>
+              <div class="flex justify-between"><span>Base Price</span><span>{{ basePrice }} DT</span></div>
               @if (addOns.firewood) {
-              <div class="flex justify-between"><span>Firewood</span><span>\$25</span></div>
+              <div class="flex justify-between"><span>Firewood</span><span>25 DT</span></div>
               }
               @if (addOns.earlyCheckIn) {
-              <div class="flex justify-between"><span>Early Check-in</span><span>\$15</span></div>
+              <div class="flex justify-between"><span>Early Check-in</span><span>15 DT</span></div>
               }
               <div class="flex justify-between pt-3 border-t-2"><span class="font-bold">Total</span><span
-                  class="text-2xl font-bold text-[var(--color-primary-600)]">\${{ calculateTotal() }}</span></div>
+                  class="text-2xl font-bold text-[var(--color-primary-600)]">{{ calculateTotal() }} DT</span></div>
             </div>
             <app-button size="lg" [fullWidth]="true" (click)="continueToPayment()" [disabled]="!canProceed()">
               Continue to Payment

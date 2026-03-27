@@ -88,6 +88,7 @@ public class CourseServicesImpl implements ICourseServices {
         dto.setReviews(course.getReviews());
         dto.setPrice(course.getPrice());
         dto.setImageUrl(course.getImageUrl());
+        dto.setDocumentUrl(course.getDocumentUrl());
         dto.setTags(course.getTags());
         dto.setPrerequisites(course.getPrerequisites());
         dto.setPassingScore(course.getPassingScore());
@@ -129,6 +130,7 @@ public class CourseServicesImpl implements ICourseServices {
         course.setDuration(dto.getDuration());
         course.setPrice(dto.getPrice());
         course.setImageUrl(dto.getImageUrl());
+        course.setDocumentUrl(dto.getDocumentUrl());
         course.setTags(dto.getTags());
         course.setPrerequisites(dto.getPrerequisites());
         course.setPassingScore(dto.getPassingScore());

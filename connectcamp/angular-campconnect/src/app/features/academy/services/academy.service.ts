@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap, map } from 'rxjs';
 import { Course, Badge, Certification, UserCertification, Video } from '../models/academy.model';
 
-const API_URL = 'http://localhost:8081/api/academy';
+const API_URL = 'http://localhost:8082/api/academy';
 
 @Injectable({
     providedIn: 'root'
@@ -13,6 +13,13 @@ export class AcademyService {
     private badgesCache = signal<Badge[]>([]);
 
     constructor(private http: HttpClient) { }
+
+    // ─── FIle Uploads ───
+    uploadFile(file: File): Observable<{url: string}> {
+        const formData = new FormData();
+        formData.append('file', file);
+        return this.http.post<{url: string}>(`http://localhost:8082/api/upload`, formData);
+    }
 
     // ─── Courses ───
     getCourses(): Observable<Course[]> {
@@ -96,15 +103,43 @@ export class AcademyService {
     }
 
     // ─── Videos ───
+    private normalizeUrl(url: string | undefined): string {
+        if (!url) return '';
+        
+        const host = window.location.hostname;
+        const backendBase = `http://${host}:8082`;
+        const timestamp = new Date().getTime();
+
+        // If it's a relative path OR it's an absolute path containing /uploads/
+        // we force it to use the current host's backend port
+        if (url.includes('/uploads/')) {
+            const pathParts = url.split('/uploads/');
+            const filename = pathParts[pathParts.length - 1];
+            return `${backendBase}/uploads/${filename}?t=${timestamp}`;
+        }
+
+        return url;
+    }
+
     getVideos(): Observable<Video[]> {
         return this.http.get<Video[]>(`${API_URL}/videos`).pipe(
-            map(videos => videos.map(v => ({ ...v, id: (v as any)._id || v.id })))
+            map(videos => videos.map(v => ({ 
+                ...v, 
+                id: (v as any)._id || v.id,
+                videoUrl: this.normalizeUrl(v.videoUrl),
+                thumbnailUrl: this.normalizeUrl(v.thumbnailUrl)
+            })))
         );
     }
 
     getVideoById(id: string): Observable<Video> {
         return this.http.get<Video>(`${API_URL}/videos/${id}`).pipe(
-            map(v => ({ ...v, id: (v as any)._id || v.id }))
+            map(v => ({ 
+                ...v, 
+                id: (v as any)._id || v.id,
+                videoUrl: this.normalizeUrl(v.videoUrl),
+                thumbnailUrl: this.normalizeUrl(v.thumbnailUrl)
+            }))
         );
     }
 

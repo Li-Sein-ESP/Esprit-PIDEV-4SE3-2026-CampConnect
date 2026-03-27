@@ -4,10 +4,11 @@ import { RouterModule } from '@angular/router';
 import {
   LucideAngularModule, Calendar, Users, MapPin, Star, Filter, Search,
   ChevronRight, Clock, Mountain, Tent, ArrowRight, Compass, Flame,
-  Award, TrendingUp, Eye, BookOpen
+  Award, TrendingUp, Eye, BookOpen, Plus, X, CheckSquare, AlertCircle, Ban
 } from 'lucide-angular';
 import { EventService } from '../services/event.service';
 import { Event } from '../models/event.model';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-events-home',
@@ -15,6 +16,7 @@ import { Event } from '../models/event.model';
   imports: [
     CommonModule,
     RouterModule,
+    ReactiveFormsModule,
     LucideAngularModule
   ],
   templateUrl: './events-home.component.html',
@@ -53,10 +55,14 @@ export class EventsHomeComponent implements OnInit {
   readonly TrendingUp = TrendingUp;
   readonly Eye = Eye;
   readonly BookOpen = BookOpen;
+  readonly CheckSquare = CheckSquare;
+  readonly AlertCircle = AlertCircle;
+  readonly Ban = Ban;
 
   allEvents = signal<Event[]>([]);
   selectedType = signal<string>('all');
   searchQuery = signal<string>('');
+  toast: { message: string; type: 'success' | 'error' } | null = null;
 
   categories = [
     { id: 'all', label: 'All Events' },
@@ -79,7 +85,10 @@ export class EventsHomeComponent implements OnInit {
     const query = this.searchQuery().toLowerCase();
 
     if (type !== 'all') {
-      events = events.filter(e => e.type === type);
+      events = events.filter(e => {
+        const normalizedType = e.type?.toLowerCase().replace('_', '-');
+        return normalizedType === type;
+      });
     }
     if (query) {
       events = events.filter(e =>
@@ -90,19 +99,13 @@ export class EventsHomeComponent implements OnInit {
     return events;
   });
 
-  stats = computed(() => {
-    const events = this.allEvents();
-    return [
-      { label: 'Total Events', value: events.length, suffix: '' },
-      { label: 'Upcoming', value: events.filter(e => e.status === 'upcoming').length, suffix: '' },
-      { label: 'Participants', value: events.reduce((sum, e) => sum + e.registered, 0), suffix: '+' },
-      { label: 'Locations', value: new Set(events.map(e => e.location.name)).size, suffix: '' }
-    ];
-  });
-
   constructor(private eventService: EventService) { }
 
   ngOnInit(): void {
+    this.loadEvents();
+  }
+
+  loadEvents(): void {
     this.eventService.getEvents().subscribe({
       next: (events) => this.allEvents.set(events),
       error: (err) => console.error('EventsHomeComponent: Failed to load events', err)
@@ -113,8 +116,9 @@ export class EventsHomeComponent implements OnInit {
     this.selectedType.set(type);
   }
 
-  onSearch(event: any): void {
-    this.searchQuery.set((event.target as HTMLInputElement).value);
+  showToast(message: string, type: 'success' | 'error'): void {
+    this.toast = { message, type };
+    setTimeout(() => this.toast = null, 3000);
   }
 
   formatDate(dateString: string): string {
@@ -133,14 +137,15 @@ export class EventsHomeComponent implements OnInit {
     });
   }
 
-  getTypeEmoji(type: string): string {
-    const emojis: Record<string, string> = {
-      'workshop': '🔥',
-      'expedition': '🏔️',
-      'meetup': '🤝',
-      'training': '🎯',
-      'festival': '🎪'
-    };
-    return emojis[type] || '🌿';
+  getCapacitySegments(event: Event): boolean[] {
+    const percent = (event.registered / event.capacity) * 10;
+    return Array.from({ length: 10 }, (_, i) => i < percent);
+  }
+
+  getCapacityColor(event: Event): string {
+    const percent = (event.registered / event.capacity);
+    if (percent > 0.9) return '#ef4444'; // Red alert
+    if (percent > 0.7) return '#f59e0b'; // Amber warning
+    return '#10b981'; // Emerald secure
   }
 }
