@@ -35,7 +35,7 @@ describe('EventService', () => {
       expect(events[0].title).toBe('Test Event');
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8081/api/events');
+    const req = httpTestingController.expectOne('http://localhost:8082/api/events');
     expect(req.request.method).toBe('GET');
     req.flush(mockEventsResponse);
   });
@@ -45,7 +45,7 @@ describe('EventService', () => {
       expect(res).toBeNull();
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8081/api/events/1');
+    const req = httpTestingController.expectOne('http://localhost:8082/api/events/1');
     expect(req.request.method).toBe('DELETE');
     req.flush(null);
   });

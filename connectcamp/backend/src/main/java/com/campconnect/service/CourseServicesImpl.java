@@ -37,7 +37,7 @@ public class CourseServicesImpl implements ICourseServices {
     @Override
     public List<com.campconnect.dto.UserSummaryDTO> getExperts() {
         return userRepository.findAll().stream()
-                .map(user -> new com.campconnect.dto.UserSummaryDTO(user.getId(), user.getUsername(), user.getName()))
+                .map(user -> new com.campconnect.dto.UserSummaryDTO(user.getId(), user.getUsername(), user.getName(), user.isVerifiedExpert()))
                 .collect(Collectors.toList());
     }
 

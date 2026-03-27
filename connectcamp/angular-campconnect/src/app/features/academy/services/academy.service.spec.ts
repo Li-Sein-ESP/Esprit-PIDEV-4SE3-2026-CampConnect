@@ -35,7 +35,7 @@ describe('AcademyService', () => {
       expect(courses).toEqual(mockCourses as any);
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8081/api/academy/courses');
+    const req = httpTestingController.expectOne('http://localhost:8082/api/academy/courses');
     expect(req.request.method).toBe('GET');
     req.flush(mockCourses);
   });
@@ -49,7 +49,7 @@ describe('AcademyService', () => {
       expect(course.title).toBe('New Course');
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8081/api/academy/courses');
+    const req = httpTestingController.expectOne('http://localhost:8082/api/academy/courses');
     expect(req.request.method).toBe('POST');
     req.flush(mockResponse);
   });
@@ -59,7 +59,7 @@ describe('AcademyService', () => {
       expect(res).toBeNull();
     });
 
-    const req = httpTestingController.expectOne('http://localhost:8081/api/academy/courses/1');
+    const req = httpTestingController.expectOne('http://localhost:8082/api/academy/courses/1');
     expect(req.request.method).toBe('DELETE');
     req.flush(null);
   });
