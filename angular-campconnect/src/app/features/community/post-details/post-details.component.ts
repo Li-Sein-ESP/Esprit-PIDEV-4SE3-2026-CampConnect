@@ -6,6 +6,7 @@ import { TrustScoreComponent } from '../../../shared/components/trust-score/trus
 import { CampBadgeComponent } from '../../../shared/components/badge/badge.component';
 import { Post, Comment, AuthorPreview, UserRole } from '../models/community.model';
 import { CommunityService } from '../../../core/services/community.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface PostUser extends AuthorPreview {
     verified: boolean;
@@ -75,7 +76,8 @@ export class PostDetailsComponent implements OnInit {
     constructor(
         private route: ActivatedRoute,
         private router: Router,
-        private communityService: CommunityService
+        private communityService: CommunityService,
+        private authService: AuthService
     ) { }
 
     ngOnInit() {
@@ -91,11 +93,37 @@ export class PostDetailsComponent implements OnInit {
         this.communityService.getPostById(id).subscribe({
             next: (realPost) => {
                 this.post = realPost;
+                this.loadComments(id);
             },
             error: (err) => {
                 console.error('Error loading real post', err);
                 this.showToast('Error loading post: ' + err.message);
             }
+        });
+    }
+
+    loadComments(postId: string) {
+        this.communityService.getRepliesByPostId(postId).subscribe({
+            next: (replies) => {
+                // Map backend PostDTO to UI ThreadComment format
+                this.post.comments = (replies || []).map(r => ({
+                    id: r.id,
+                    author: {
+                        id: r.authorId || '0',
+                        name: r.authorName || 'Explorer',
+                        username: r.authorUsername || 'explorer',
+                        avatar: `https://ui-avatars.com/api/?name=${r.authorName || 'User'}&background=random`,
+                        role: 'Camper' as UserRole,
+                        trustScore: 85
+                    },
+                    text: r.description || r.content || '',
+                    time: r.createdAt ? new Date(r.createdAt).toLocaleDateString() : 'Long ago',
+                    likes: r.likes || 0,
+                    liked: false,
+                    replies: []
+                }));
+            },
+            error: (err) => console.error('Error loading comments', err)
         });
     }
 
@@ -145,27 +173,48 @@ export class PostDetailsComponent implements OnInit {
         const text = this.newCommentText.trim();
         if (!text) return;
 
-        if (Array.isArray(this.post.comments)) {
-            const comments = this.post.comments as any[];
-            comments.unshift({
-                id: Date.now().toString(),
-                author: {
-                    id: '100', // Current user
-                    name: 'You',
-                    username: 'you',
-                    avatar: 'https://images.unsplash.com/photo-1535930749574-1399327ce78f?w=100&h=100&fit=crop&crop=face',
-                    role: 'Camper' as UserRole,
-                    trustScore: 100
-                },
-                text: text,
-                time: 'Just now',
-                likes: 0,
-                liked: false,
-                replies: []
-            });
-        }
-        this.newCommentText = '';
-        this.showToast('💬 Comment posted!');
+        const currentUser = this.authService.currentUserValue;
+        
+        const commentData = {
+            threadId: this.post.id,
+            content: text,
+            authorId: currentUser?.id || '1',
+            authorName: currentUser?.username || 'Explorer',
+            authorUsername: currentUser?.username || 'explorer'
+        };
+
+        this.communityService.createReply(commentData).subscribe({
+            next: (savedComment) => {
+                if (!Array.isArray(this.post.comments)) {
+                    this.post.comments = [];
+                }
+                
+                const comments = this.post.comments as any[];
+                comments.unshift({
+                    id: savedComment.id || Date.now().toString(),
+                    author: {
+                        id: currentUser?.id || '100',
+                        name: currentUser?.username || 'Explorer',
+                        username: currentUser?.username || 'explorer',
+                        avatar: `https://ui-avatars.com/api/?name=${currentUser?.username || 'User'}&background=2f5d44&color=fff`,
+                        role: (currentUser?.roles && currentUser.roles.length > 0 ? currentUser.roles[0] : 'Camper') as UserRole,
+                        trustScore: 100
+                    },
+                    text: text,
+                    time: 'Just now',
+                    likes: 0,
+                    liked: false,
+                    replies: []
+                });
+                
+                this.newCommentText = '';
+                this.showToast('💬 Comment posted!');
+            },
+            error: (err) => {
+                console.error('Error posting comment', err);
+                this.showToast('❌ Failed to post comment. Try again.');
+            }
+        });
     }
 
     handleEnter(event: Event) {

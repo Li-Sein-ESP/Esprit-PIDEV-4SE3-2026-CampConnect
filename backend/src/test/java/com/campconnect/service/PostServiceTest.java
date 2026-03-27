@@ -56,20 +56,22 @@ public class PostServiceTest {
         post = new Post();
         post.setId("p1");
         post.setContent("This is a post.");
-        post.setAuthor(user);
-        post.setThread(thread);
+        post.setAuthorId("u1");
+        post.setAuthorName("testuser");
+        post.setAuthorUsername("testuser");
+        post.setThreadId("t1");
 
         postDTO = new PostDTO();
         postDTO.setId("p1");
         postDTO.setContent("This is a post.");
         postDTO.setAuthorId("u1");
+        postDTO.setAuthorName("testuser");
+        postDTO.setAuthorUsername("testuser");
         postDTO.setThreadId("t1");
     }
 
     @Test
     void testCreatePost_Success() {
-        when(threadRepository.findById("t1")).thenReturn(Optional.of(thread));
-        when(userRepository.findById("u1")).thenReturn(Optional.of(user));
         when(postRepository.save(any(Post.class))).thenReturn(post);
 
         PostDTO result = postService.createPost(postDTO);
@@ -77,20 +79,6 @@ public class PostServiceTest {
         assertNotNull(result);
         assertEquals("This is a post.", result.getContent());
         verify(postRepository, times(1)).save(any(Post.class));
-        verify(threadRepository, times(1)).save(thread);
-    }
-
-    @Test
-    void testCreatePost_AuthorNotFound() {
-        when(threadRepository.findById("t1")).thenReturn(Optional.of(thread));
-        when(userRepository.findById("u1")).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            postService.createPost(postDTO);
-        });
-
-        assertEquals("Author not found", exception.getMessage());
-        verify(postRepository, never()).save(any(Post.class));
     }
 
     @Test
@@ -123,7 +111,7 @@ public class PostServiceTest {
         Post updatedPost = new Post();
         updatedPost.setId("p1");
         updatedPost.setContent("Updated content.");
-        updatedPost.setAuthor(user);
+        updatedPost.setAuthorId("u1");
 
         when(postRepository.findById("p1")).thenReturn(Optional.of(post));
         when(postRepository.save(any(Post.class))).thenReturn(updatedPost);

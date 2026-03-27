@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class PostDTO {
     private String id;
     private String content;
+    private String description; // Support for alternate naming from frontend
     private String threadId;
     private String authorId;
     private String authorName;

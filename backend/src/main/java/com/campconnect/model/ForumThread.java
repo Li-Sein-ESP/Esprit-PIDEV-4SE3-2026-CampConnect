@@ -32,16 +32,15 @@ public class ForumThread {
     private int likes = 0;
     private int views = 0;
 
-    @DBRef
     private List<Post> posts = new ArrayList<>();
 
     public void addPost(Post post) {
         posts.add(post);
-        post.setThread(this);
+        post.setThreadId(this.id);
     }
 
     public void removePost(Post post) {
         posts.remove(post);
-        post.setThread(null);
+        post.setThreadId(null);
     }
 }

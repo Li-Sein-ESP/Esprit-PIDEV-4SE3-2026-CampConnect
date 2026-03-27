@@ -26,15 +26,10 @@ public class CommentServiceImpl implements CommentService {
     public CommentDTO createComment(CommentDTO commentDTO) {
         Comment comment = new Comment();
         comment.setContent(commentDTO.getContent());
-
-        Post post = postRepository.findById(commentDTO.getPostId())
-            .orElseThrow(() -> new RuntimeException("Post not found"));
-        post.addComment(comment);
-        postRepository.save(post);
-
-        User author = userRepository.findById(commentDTO.getAuthorId())
-            .orElseThrow(() -> new RuntimeException("Author not found"));
-        comment.setAuthor(author);
+        comment.setPostId(commentDTO.getPostId());
+        comment.setAuthorId(commentDTO.getAuthorId());
+        comment.setAuthorName(commentDTO.getAuthorName() != null ? commentDTO.getAuthorName() : "Explorer");
+        comment.setAuthorUsername(commentDTO.getAuthorUsername() != null ? commentDTO.getAuthorUsername() : "explorer");
 
         Comment savedComment = commentRepository.save(comment);
         return mapToDTO(savedComment);
@@ -50,7 +45,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<CommentDTO> getCommentsByPostId(String postId) {
         return commentRepository.findAll().stream()
-            .filter(c -> c.getPost() != null && c.getPost().getId().equals(postId))
+            .filter(c -> c.getPostId() != null && c.getPostId().equals(postId))
             .map(this::mapToDTO)
             .collect(Collectors.toList());
     }
@@ -65,12 +60,10 @@ public class CommentServiceImpl implements CommentService {
         dto.setId(comment.getId());
         dto.setContent(comment.getContent());
         dto.setCreatedAt(comment.getCreatedAt());
-        if (comment.getPost() != null) {
-            dto.setPostId(comment.getPost().getId());
-        }
-        if (comment.getAuthor() != null) {
-            dto.setAuthorId(comment.getAuthor().getId());
-        }
+        dto.setPostId(comment.getPostId());
+        dto.setAuthorId(comment.getAuthorId());
+        dto.setAuthorName(comment.getAuthorName());
+        dto.setAuthorUsername(comment.getAuthorUsername());
         return dto;
     }
 }

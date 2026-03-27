@@ -19,22 +19,18 @@ import java.util.stream.Collectors;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
-    private final ForumThreadRepository threadRepository;
-    private final UserRepository userRepository;
 
     @Override
     public PostDTO createPost(PostDTO postDTO) {
         Post post = new Post();
-        post.setContent(postDTO.getContent());
+        // Fallback for content/description mismatch
+        post.setContent(postDTO.getContent() != null ? postDTO.getContent() : postDTO.getDescription());
 
-        ForumThread thread = threadRepository.findById(postDTO.getThreadId())
-            .orElseThrow(() -> new RuntimeException("Thread not found"));
-        thread.addPost(post);
-        threadRepository.save(thread);
-
-        User author = userRepository.findById(postDTO.getAuthorId())
-            .orElseThrow(() -> new RuntimeException("Author not found"));
-        post.setAuthor(author);
+        // Use manual string references instead of DBRef
+        post.setThreadId(postDTO.getThreadId());
+        post.setAuthorId(postDTO.getAuthorId());
+        post.setAuthorName(postDTO.getAuthorName() != null ? postDTO.getAuthorName() : "Explorer");
+        post.setAuthorUsername(postDTO.getAuthorUsername() != null ? postDTO.getAuthorUsername() : "explorer");
 
         Post savedPost = postRepository.save(post);
         return mapToDTO(savedPost);
@@ -50,7 +46,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostDTO> getPostsByThreadId(String threadId) {
         return postRepository.findAll().stream()
-            .filter(p -> p.getThread() != null && p.getThread().getId().equals(threadId))
+            .filter(p -> p.getThreadId() != null && p.getThreadId().equals(threadId))
             .map(this::mapToDTO)
             .collect(Collectors.toList());
     }
@@ -73,14 +69,10 @@ public class PostServiceImpl implements PostService {
         dto.setId(post.getId());
         dto.setContent(post.getContent());
         dto.setCreatedAt(post.getCreatedAt());
-        if (post.getThread() != null) {
-            dto.setThreadId(post.getThread().getId());
-        }
-        if (post.getAuthor() != null) {
-            dto.setAuthorId(post.getAuthor().getId());
-            dto.setAuthorName(post.getAuthor().getName());
-            dto.setAuthorUsername(post.getAuthor().getUsername());
-        }
+        dto.setThreadId(post.getThreadId());
+        dto.setAuthorId(post.getAuthorId());
+        dto.setAuthorName(post.getAuthorName());
+        dto.setAuthorUsername(post.getAuthorUsername());
         return dto;
     }
 }

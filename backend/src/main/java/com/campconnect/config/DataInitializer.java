@@ -126,20 +126,24 @@ public class DataInitializer implements CommandLineRunner {
 
             Post post = new Post();
             post.setContent("N'oubliez pas d'apporter une lampe frontale !");
-            post.setAuthor(camperUser);
-            post.setThread(thread);
+            post.setAuthorId(camperUser.getId());
+            post.setAuthorName(camperUser.getName());
+            post.setAuthorUsername(camperUser.getUsername());
+            post.setThreadId(thread.getId());
             post = postRepository.save(post);
 
-            thread.getPosts().add(post);
+            thread.addPost(post);
             forumThreadRepository.save(thread);
 
             Comment comment = new Comment();
             comment.setContent("Très bon conseil, merci !");
-            comment.setAuthor(adminUser);
-            comment.setPost(post);
+            comment.setAuthorId(adminUser.getId());
+            comment.setAuthorName(adminUser.getName());
+            comment.setAuthorUsername(adminUser.getUsername());
+            comment.setPostId(post.getId());
             commentRepository.save(comment);
 
-            post.getComments().add(comment);
+            post.addComment(comment);
             postRepository.save(post);
         }
 

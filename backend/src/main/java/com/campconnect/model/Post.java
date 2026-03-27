@@ -20,25 +20,22 @@ public class Post {
     private String id;
 
     private String content;
-
-    @DBRef
-    private ForumThread thread;
-
-    @DBRef
-    private User author;
+    private String threadId;
+    private String authorId;
+    private String authorName;
+    private String authorUsername;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @DBRef
     private List<Comment> comments = new ArrayList<>();
 
     public void addComment(Comment comment) {
         comments.add(comment);
-        comment.setPost(this);
+        comment.setPostId(this.id);
     }
 
     public void removeComment(Comment comment) {
         comments.remove(comment);
-        comment.setPost(null);
+        comment.setPostId(null);
     }
 }

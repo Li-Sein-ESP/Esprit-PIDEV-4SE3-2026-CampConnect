@@ -19,11 +19,10 @@ public class Comment {
 
     private String content;
 
-    @DBRef
-    private Post post;
-
-    @DBRef
-    private User author;
+    private String postId;
+    private String authorId;
+    private String authorName;
+    private String authorUsername;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 }

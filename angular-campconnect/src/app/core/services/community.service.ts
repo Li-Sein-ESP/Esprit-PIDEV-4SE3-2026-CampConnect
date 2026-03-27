@@ -31,23 +31,24 @@ export class CommunityService {
             title: thread.title,
             content: thread.description,
             author: {
-                id: thread.authorId || 0,
+                id: thread.authorId || '0',
                 username: thread.authorUsername || ('user_' + thread.authorId),
-                name: thread.authorName || (thread.authorId ? 'User ' + thread.authorId : 'Anonymous Camper'),
-                avatar: `https://ui-avatars.com/api/?name=${thread.authorName || 'Guest'}&background=random`,
+                name: thread.authorName || 'Explorer',
+                avatar: `https://ui-avatars.com/api/?name=${thread.authorName || 'User'}&background=2f5d44&color=fff`,
                 role: 'Camper',
-                trustScore: 80
+                trustScore: 85
             },
             category: thread.category || 'General',
             tags: thread.tags || [],
             createdAt: thread.createdAt,
             likes: thread.likes || 0,
-            comments: 0,
+            comments: [], // Initialized as array to support reactive updates
             views: thread.views || 0,
             isLiked: false,
             isBookmarked: false,
             isPinned: false,
-            status: 'active'
+            status: 'active',
+            location: 'Wilderness Area' // Default location for UI
         };
     }
 
