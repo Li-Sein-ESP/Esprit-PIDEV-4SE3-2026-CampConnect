@@ -1,13 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CardComponent, CardHeaderComponent, CardTitleComponent, CardDescriptionComponent, CardContentComponent } from '../../shared/components/card.component';
 import { BadgeComponent } from '../../shared/components/badge.component';
 import { DropdownComponent, DropdownOption } from '../../shared/components/dropdown.component';
-import { LucideAngularModule, MapPin, Star, DollarSign, Users, Wifi, Flame, Droplet, Search } from 'lucide-angular';
+import { LucideAngularModule, MapPin, Star, DollarSign, Users, Wifi, Flame, Droplet, Search, Loader2 } from 'lucide-angular';
+import { CampsiteService, Campsite } from '../../core/services/campsite.service';
 
-interface Campsite {
+interface CampsiteDisplay {
   id: string;
   name: string;
   location: string;
@@ -177,7 +178,7 @@ interface Campsite {
   `,
   styles: []
 })
-export class CampsitesComponent {
+export class CampsitesComponent implements OnInit {
   MapPinIcon = MapPin;
   StarIcon = Star;
   DollarSignIcon = DollarSign;
@@ -186,10 +187,13 @@ export class CampsitesComponent {
   FlameIcon = Flame;
   DropletIcon = Droplet;
   SearchIcon = Search;
+  LoaderIcon = Loader2;
 
   searchQuery = '';
   sortBy = 'rating';
   priceRange = '';
+  isLoading = true;
+  error: string | null = null;
 
   sortOptions: DropdownOption[] = [
     { label: 'Highest Rated', value: 'rating' },
@@ -206,78 +210,88 @@ export class CampsitesComponent {
     { label: 'Over $150', value: '150+' },
   ];
 
-  campsites: Campsite[] = [
-    {
-      id: '1',
-      name: 'Half Dome Village',
-      location: 'Yosemite National Park, CA',
-      rating: 4.8,
-      reviews: 342,
-      price: 125,
-      amenities: ['WiFi', 'Fire Pit', 'Water', 'Restrooms'],
-      image: '',
-      featured: true
-    },
-    {
-      id: '2',
-      name: 'Mather Campground',
-      location: 'Grand Canyon, AZ',
-      rating: 4.6,
-      reviews: 289,
-      price: 85,
-      amenities: ['Fire Pit', 'Water', 'Restrooms', 'Showers'],
-      image: '',
-      featured: false
-    },
-    {
-      id: '3',
-      name: 'Madison Campground',
-      location: 'Yellowstone National Park, WY',
-      rating: 4.7,
-      reviews: 215,
-      price: 95,
-      amenities: ['Fire Pit', 'Water', 'Restrooms'],
-      image: '',
-      featured: true
-    },
-    {
-      id: '4',
-      name: 'Watchman Campground',
-      location: 'Zion National Park, UT',
-      rating: 4.9,
-      reviews: 412,
-      price: 110,
-      amenities: ['WiFi', 'Fire Pit', 'Water', 'Restrooms', 'Showers'],
-      image: '',
-      featured: false
-    },
-    {
-      id: '5',
-      name: 'Moraine Park',
-      location: 'Rocky Mountain National Park, CO',
-      rating: 4.5,
-      reviews: 178,
-      price: 75,
-      amenities: ['Fire Pit', 'Water', 'Restrooms'],
-      image: '',
-      featured: false
-    },
-    {
-      id: '6',
-      name: 'Many Glacier',
-      location: 'Glacier National Park, MT',
-      rating: 4.8,
-      reviews: 256,
-      price: 105,
-      amenities: ['Fire Pit', 'Water', 'Restrooms', 'Showers'],
-      image: '',
-      featured: true
-    }
-  ];
+  campsites: CampsiteDisplay[] = [];
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private campsiteService: CampsiteService
+  ) { }
 
-  getFilteredCampsites(): Campsite[] {
+  ngOnInit(): void {
+    this.loadCampsites();
+  }
+
+  loadCampsites(): void {
+    this.isLoading = true;
+    this.error = null;
+    
+    this.campsiteService.getAllCampsites().subscribe({
+      next: (data) => {
+        this.campsites = data.map(campsite => this.mapToDisplay(campsite));
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading campsites:', err);
+        this.error = 'Failed to load campsites. Showing sample data.';
+        this.campsites = this.getFallbackCampsites();
+        this.isLoading = false;
+      }
+    });
+  }
+
+  private mapToDisplay(campsite: Campsite): CampsiteDisplay {
+    return {
+      id: campsite.id,
+      name: campsite.name,
+      location: campsite.location,
+      rating: campsite.rating || 0,
+      reviews: campsite.reviewCount || 0,
+      price: campsite.price,
+      amenities: campsite.amenities || [],
+      image: campsite.images?.[0] || '',
+      featured: campsite.rating >= 4.7
+    };
+  }
+
+  private getFallbackCampsites(): CampsiteDisplay[] {
+    return [
+      {
+        id: '1',
+        name: 'Half Dome Village',
+        location: 'Yosemite National Park, CA',
+        rating: 4.8,
+        reviews: 342,
+        price: 125,
+        amenities: ['WiFi', 'Fire Pit', 'Water', 'Restrooms'],
+        image: '',
+        featured: true
+      },
+      {
+        id: '2',
+        name: 'Mather Campground',
+        location: 'Grand Canyon, AZ',
+        rating: 4.6,
+        reviews: 289,
+        price: 85,
+        amenities: ['Fire Pit', 'Water', 'Restrooms', 'Showers'],
+        image: '',
+        featured: false
+      },
+      {
+        id: '3',
+        name: 'Madison Campground',
+        location: 'Yellowstone National Park, WY',
+        rating: 4.7,
+        reviews: 215,
+        price: 95,
+        amenities: ['Fire Pit', 'Water', 'Restrooms'],
+        image: '',
+        featured: true
+      }
+    ];
+  }
+
+  getFilteredCampsites(): CampsiteDisplay[] {
     let filtered = [...this.campsites];
 
     // Search filter

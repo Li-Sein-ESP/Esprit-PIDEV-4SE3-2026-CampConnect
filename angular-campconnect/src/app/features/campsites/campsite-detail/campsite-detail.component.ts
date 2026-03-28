@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { LucideAngularModule, ChevronLeft, ChevronRight, ImageIcon, MapPin, Star, Share2, Heart, Accessibility, Sun, Info, Calendar, Map as MapIcon, Users, CheckCircle, AlertTriangle, Wifi, Zap, Droplets, Flame, TreePine, Mountain, Waves, ThumbsUp, MessageSquare, Filter } from 'lucide-angular';
+import { LucideAngularModule, ChevronLeft, ChevronRight, ImageIcon, MapPin, Star, Share2, Heart, Accessibility, Sun, Info, Calendar, Map as MapIcon, Users, CheckCircle, AlertTriangle, Wifi, Zap, Droplets, Flame, TreePine, Mountain, Waves, ThumbsUp, MessageSquare, Filter, Loader2 } from 'lucide-angular';
 import { ButtonComponent } from '../../../shared/components/button.component';
 import { BadgeComponent } from '../../../shared/components/badge.component';
 import { CardComponent, CardHeaderComponent, CardTitleComponent, CardDescriptionComponent, CardContentComponent } from '../../../shared/components/card.component';
 import { MapViewComponent } from '../../../shared/components/map-view/map-view.component';
 import { WriteReviewComponent } from '../write-review/write-review.component';
+import { CampsiteService, Campsite } from '../../../core/services/campsite.service';
 
 @Component({
     selector: 'app-campsite-detail',
@@ -38,6 +39,8 @@ export class CampsiteDetailComponent implements OnInit {
     showAllPhotos = false;
     reviewSort: 'recent' | 'helpful' | 'rating' = 'recent';
     showWriteReview = false;
+    isLoading = true;
+    error: string | null = null;
 
     // Icons
     readonly ChevronLeft = ChevronLeft;
@@ -64,6 +67,7 @@ export class CampsiteDetailComponent implements OnInit {
     readonly Waves = Waves;
     readonly ThumbsUp = ThumbsUp;
     readonly MessageSquare = MessageSquare;
+    readonly Loader2 = Loader2;
 
     terrainIcons: Record<string, any> = {
         forest: TreePine,
@@ -80,53 +84,8 @@ export class CampsiteDetailComponent implements OnInit {
         fire: Flame,
     };
 
-    // Mock Data
-    campsite: any = {
-        id: 'site-1',
-        name: 'Upper Pines Campground',
-        location: 'Yosemite National Park, CA',
-        coordinates: { lat: 37.7365, lng: -119.5691 },
-        terrain: 'forest',
-        accessibility: 'easy',
-        priceRange: '$',
-        basePrice: 35,
-        rating: 4.8,
-        reviewCount: 1243,
-        amenities: ['wifi', 'power', 'water', 'fire'],
-        images: [
-            'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1200&q=80',
-            'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=1200&q=80',
-            'https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=1200&q=80',
-        ],
-        description:
-            'Nestled in the heart of Yosemite Valley, Upper Pines Campground offers stunning views of Half Dome and easy access to world-class hiking trails. This family-friendly campground features well-maintained sites, modern facilities, and ranger-led programs.',
-        highlights: [
-            'Direct views of Half Dome',
-            'Close to Yosemite Valley trails',
-            'Ranger programs available',
-            'Pet-friendly sites',
-            'ADA accessible facilities',
-        ],
-        rules: [
-            'Quiet hours: 10:00 PM - 7:00 AM',
-            'Maximum 6 people per site',
-            'Pets must be on leash at all times',
-            'No generators after 8:00 PM',
-            'Bear-proof food storage required',
-        ],
-        seasonal: {
-            bestTime: 'May - September',
-            winterAccess: 'Limited (snow conditions)',
-            peakSeason: 'June - August',
-        },
-        ratings: {
-            overall: 4.8,
-            cleanliness: 4.7,
-            location: 4.9,
-            value: 4.6,
-            amenities: 4.8,
-        },
-    };
+    // Campsite Data (loaded from API or fallback)
+    campsite: any = null;
 
     mockReviews: any[] = [
         {
@@ -210,14 +169,130 @@ export class CampsiteDetailComponent implements OnInit {
 
     constructor(
         private route: ActivatedRoute,
-        private router: Router
+        private router: Router,
+        private campsiteService: CampsiteService
     ) { }
 
     ngOnInit(): void {
         this.route.paramMap.subscribe(params => {
             this.siteId = params.get('id');
-            // In real app, load data here
+            if (this.siteId) {
+                this.loadCampsite(this.siteId);
+            }
         });
+    }
+
+    loadCampsite(id: string): void {
+        this.isLoading = true;
+        this.error = null;
+
+        this.campsiteService.getCampsiteById(id).subscribe({
+            next: (data) => {
+                if (data) {
+                    this.campsite = this.mapToDetailView(data);
+                } else {
+                    this.campsite = this.getFallbackCampsite();
+                }
+                this.isLoading = false;
+            },
+            error: (err) => {
+                console.error('Error loading campsite:', err);
+                this.error = 'Failed to load campsite details.';
+                this.campsite = this.getFallbackCampsite();
+                this.isLoading = false;
+            }
+        });
+    }
+
+    private mapToDetailView(data: Campsite): any {
+        return {
+            id: data.id,
+            name: data.name,
+            location: data.location,
+            coordinates: { lat: 37.7365, lng: -119.5691 }, // Default coordinates
+            terrain: 'forest',
+            accessibility: 'easy',
+            priceRange: data.price < 50 ? '$' : data.price < 100 ? '$$' : '$$$',
+            basePrice: data.price,
+            rating: data.rating || 0,
+            reviewCount: data.reviewCount || 0,
+            amenities: (data.amenities || []).map(a => a.toLowerCase()),
+            images: data.images?.length ? data.images : [
+                'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1200&q=80',
+            ],
+            description: data.description || 'A beautiful campsite waiting to be explored.',
+            highlights: [
+                'Well-maintained facilities',
+                'Beautiful natural surroundings',
+                'Easy access to trails',
+            ],
+            rules: [
+                'Quiet hours: 10:00 PM - 7:00 AM',
+                'Maximum 6 people per site',
+                'Pets must be on leash at all times',
+            ],
+            seasonal: {
+                bestTime: 'May - September',
+                winterAccess: 'Limited',
+                peakSeason: 'June - August',
+            },
+            ratings: {
+                overall: data.rating || 0,
+                cleanliness: data.rating ? data.rating - 0.1 : 0,
+                location: data.rating ? data.rating + 0.1 : 0,
+                value: data.rating ? data.rating - 0.2 : 0,
+                amenities: data.rating || 0,
+            },
+        };
+    }
+
+    private getFallbackCampsite(): any {
+        return {
+            id: 'site-1',
+            name: 'Upper Pines Campground',
+            location: 'Yosemite National Park, CA',
+            coordinates: { lat: 37.7365, lng: -119.5691 },
+            terrain: 'forest',
+            accessibility: 'easy',
+            priceRange: '$',
+            basePrice: 35,
+            rating: 4.8,
+            reviewCount: 1243,
+            amenities: ['wifi', 'power', 'water', 'fire'],
+            images: [
+                'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1200&q=80',
+                'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=1200&q=80',
+                'https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=1200&q=80',
+            ],
+            description:
+                'Nestled in the heart of Yosemite Valley, Upper Pines Campground offers stunning views of Half Dome and easy access to world-class hiking trails.',
+            highlights: [
+                'Direct views of Half Dome',
+                'Close to Yosemite Valley trails',
+                'Ranger programs available',
+                'Pet-friendly sites',
+                'ADA accessible facilities',
+            ],
+            rules: [
+                'Quiet hours: 10:00 PM - 7:00 AM',
+                'Maximum 6 people per site',
+                'Pets must be on leash at all times',
+                'No generators after 8:00 PM',
+                'Bear-proof food storage required',
+            ],
+            seasonal: {
+                bestTime: 'May - September',
+                winterAccess: 'Limited (snow conditions)',
+                peakSeason: 'June - August',
+            },
+            ratings: {
+                overall: 4.8,
+                cleanliness: 4.7,
+                location: 4.9,
+                value: 4.6,
+                amenities: 4.8,
+            },
+        };
     }
 
     navigate(path: string, extras?: any) {

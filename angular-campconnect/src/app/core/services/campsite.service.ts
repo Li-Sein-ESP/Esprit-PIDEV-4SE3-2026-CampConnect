@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, of, map, catchError } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface Campsite {
     id: string;
@@ -19,89 +21,102 @@ export interface Campsite {
     providedIn: 'root'
 })
 export class CampsiteService {
-    private campsites: Campsite[] = this.getMockCampsites();
 
+    private readonly apiUrl = `${environment.apiUrl}/campsites`;
+
+    constructor(private http: HttpClient) { }
+
+    /**
+     * GET /api/campsites
+     * Récupère tous les campings.
+     */
+    getAllCampsites(): Observable<Campsite[]> {
+        return this.http.get<Campsite[]>(this.apiUrl);
+    }
+
+    /**
+     * GET /api/campsites with optional filters
+     * Retrieves campsites with optional filtering (client-side for now).
+     */
     getCampsites(filters?: { location?: string; minPrice?: number; maxPrice?: number }): Observable<Campsite[]> {
-        let filtered = [...this.campsites];
+        return this.http.get<Campsite[]>(this.apiUrl).pipe(
+            map(campsites => {
+                let filtered = [...campsites];
 
-        if (filters?.location) {
-            filtered = filtered.filter(c =>
-                c.location.toLowerCase().includes(filters.location!.toLowerCase())
-            );
-        }
+                if (filters?.location) {
+                    filtered = filtered.filter(c =>
+                        c.location.toLowerCase().includes(filters.location!.toLowerCase())
+                    );
+                }
 
-        if (filters?.minPrice !== undefined) {
-            filtered = filtered.filter(c => c.price >= filters.minPrice!);
-        }
+                if (filters?.minPrice !== undefined) {
+                    filtered = filtered.filter(c => c.price >= filters.minPrice!);
+                }
 
-        if (filters?.maxPrice !== undefined) {
-            filtered = filtered.filter(c => c.price <= filters.maxPrice!);
-        }
+                if (filters?.maxPrice !== undefined) {
+                    filtered = filtered.filter(c => c.price <= filters.maxPrice!);
+                }
 
-        return of(filtered).pipe(delay(300));
-    }
-
-    getCampsiteById(id: string): Observable<Campsite | undefined> {
-        return of(this.campsites.find(c => c.id === id)).pipe(delay(300));
-    }
-
-    searchCampsites(query: string): Observable<Campsite[]> {
-        const results = this.campsites.filter(c =>
-            c.name.toLowerCase().includes(query.toLowerCase()) ||
-            c.location.toLowerCase().includes(query.toLowerCase()) ||
-            c.description.toLowerCase().includes(query.toLowerCase())
+                return filtered;
+            }),
+            catchError(error => {
+                console.error('Error fetching campsites:', error);
+                return of([]);
+            })
         );
-        return of(results).pipe(delay(300));
     }
 
-    private getMockCampsites(): Campsite[] {
-        return [
-            {
-                id: 'site-1',
-                name: 'Pine Valley Campground',
-                location: 'Yosemite National Park, CA',
-                description: 'Nestled among towering pines with stunning valley views',
-                price: 45,
-                rating: 4.8,
-                reviewCount: 234,
-                images: [
-                    'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=80',
-                    'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=800&q=80'
-                ],
-                amenities: ['Restrooms', 'Fire Pits', 'Picnic Tables', 'Water'],
-                capacity: 6,
-                available: true
-            },
-            {
-                id: 'site-2',
-                name: 'Riverside Retreat',
-                location: 'Grand Canyon, AZ',
-                description: 'Peaceful riverside camping with canyon views',
-                price: 55,
-                rating: 4.9,
-                reviewCount: 189,
-                images: [
-                    'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=800&q=80'
-                ],
-                amenities: ['Restrooms', 'Showers', 'Fire Pits', 'Water', 'Electricity'],
-                capacity: 8,
-                available: true
-            },
-            {
-                id: 'site-3',
-                name: 'Mountain Peak Camp',
-                location: 'Rocky Mountains, CO',
-                description: 'High-altitude camping with breathtaking mountain vistas',
-                price: 40,
-                rating: 4.7,
-                reviewCount: 156,
-                images: [
-                    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80'
-                ],
-                amenities: ['Restrooms', 'Fire Pits', 'Picnic Tables'],
-                capacity: 4,
-                available: false
-            }
-        ];
+    /**
+     * GET /api/campsites/{id}
+     * Récupère un camping par son identifiant.
+     */
+    getCampsiteById(id: string): Observable<Campsite | undefined> {
+        return this.http.get<Campsite>(`${this.apiUrl}/${id}`).pipe(
+            catchError(error => {
+                console.error('Error fetching campsite:', error);
+                return of(undefined);
+            })
+        );
+    }
+
+    /**
+     * Search campsites by query string (client-side filtering)
+     */
+    searchCampsites(query: string): Observable<Campsite[]> {
+        return this.http.get<Campsite[]>(this.apiUrl).pipe(
+            map(campsites => campsites.filter(c =>
+                c.name.toLowerCase().includes(query.toLowerCase()) ||
+                c.location.toLowerCase().includes(query.toLowerCase()) ||
+                c.description.toLowerCase().includes(query.toLowerCase())
+            )),
+            catchError(error => {
+                console.error('Error searching campsites:', error);
+                return of([]);
+            })
+        );
+    }
+
+    /**
+     * POST /api/campsites
+     * Crée un nouveau camping.
+     */
+    createCampsite(campsite: Campsite): Observable<Campsite> {
+        return this.http.post<Campsite>(this.apiUrl, campsite);
+    }
+
+    /**
+     * PUT /api/campsites/{id}
+     * Met à jour un camping existant.
+     */
+    updateCampsite(id: string, campsite: Campsite): Observable<Campsite> {
+        return this.http.put<Campsite>(`${this.apiUrl}/${id}`, campsite);
+    }
+
+    /**
+     * DELETE /api/campsites/{id}
+     * Supprime un camping par son identifiant.
+     */
+    deleteCampsite(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
 }
