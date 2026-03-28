@@ -3,7 +3,7 @@ package com.campconnect.config;
 import java.security.Key;
 import java.util.Date;
 
-import com.campconnect.user.service.impl.UserDetailsImpl;
+import com.campconnect.service.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
