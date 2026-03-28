@@ -3,7 +3,8 @@ export interface Event {
     id: string;
     title: string;
     description: string;
-    type: 'workshop' | 'expedition' | 'meetup' | 'training' | 'festival';
+    categoryName: string;
+    type: 'workshop' | 'expedition' | 'meetup' | 'training' | 'festival' | 'retreat' | 'skills-course' | 'group-camp' | 'certification' | 'guided-hike';
     location: {
         name: string;
         address: string;
@@ -24,20 +25,26 @@ export interface Event {
     capacity: number;
     registered: number;
     price: number;
-    difficulty: 'beginner' | 'intermediate' | 'advanced';
+    difficulty: 'beginner' | 'intermediate' | 'advanced' | 'moderate' | 'all-levels';
     tags: string[];
     imageUrl: string;
     status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
+    whatToExpect?: string[];
+    whatToBring?: string[];
+    whatsIncluded?: string[];
+    safetyNotes?: string[];
+    cancellationPolicy?: string;
 }
 
 export interface EventRegistration {
-    eventId: string;
+    id: string;
     userId: string;
-    registeredAt: string;
-    status: 'pending' | 'confirmed' | 'cancelled';
-    paymentStatus: 'pending' | 'paid' | 'refunded';
+    username: string;
+    eventId: string;
+    eventTitle?: string;
+    registrationDate: string;
+    status: string;
     participants: number;
-    totalAmount: number;
 }
 
 export interface EventSchedule {
