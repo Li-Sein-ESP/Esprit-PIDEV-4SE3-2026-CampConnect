@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { LucideAngularModule, Phone, Shield, Cloud, Wind, Droplets, AlertTriangle, MapPin } from 'lucide-angular';
+import { LucideAngularModule, Phone, Shield, Cloud, Wind, Droplets, AlertTriangle, MapPin, BarChart2 } from 'lucide-angular';
 import { CardComponent, CardHeaderComponent, CardTitleComponent, CardContentComponent } from '../../shared/components/card.component';
 import { AlertComponent } from '../../shared/components/alert.component';
 
@@ -24,9 +24,19 @@ import { AlertComponent } from '../../shared/components/alert.component';
       <div class="container">
         <div class="max-w-3xl">
           <h1 class="mb-4 text-white"> Safety & Emergency Information </h1>
-            <p class="text-xl text-white/90">
+            <p class="text-xl text-white/90 mb-6">
               Stay safe in the wilderness. Essential guidelines, emergency contacts, and real-time alerts.
             </p>
+            <div class="flex gap-4">
+              <a routerLink="/safety/report" class="bg-white text-red-600 px-6 py-3 rounded-xl font-bold hover:bg-red-50 transition-colors shadow-lg inline-flex items-center gap-2 cursor-pointer">
+                <lucide-icon [img]="AlertTriangle" class="w-5 h-5"></lucide-icon>
+                Report an Incident
+              </a>
+              <a routerLink="/safety/analytics" class="bg-white/10 border border-white/20 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/20 transition-colors inline-flex items-center gap-2 cursor-pointer backdrop-blur-sm">
+                <lucide-icon [img]="BarChartIcon" class="w-5 h-5"></lucide-icon>
+                View Analytics
+              </a>
+            </div>
         </div>
       </div>
     </div>
@@ -93,12 +103,15 @@ import { AlertComponent } from '../../shared/components/alert.component';
               </app-card-title>
             </app-card-header>
             <app-card-content>
-              <div class="space-y-4">
+              <div class="space-y-4 mb-4">
                 <div *ngFor="let contact of emergencyContacts">
                   <div class="font-medium text-red-900">{{ contact.name }}</div>
                   <div class="text-sm text-red-700">{{ contact.number }}</div>
                 </div>
               </div>
+              <a routerLink="/safety/emergency" class="w-full bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors shadow-sm inline-flex items-center justify-center gap-2 cursor-pointer">
+                View All Emergency Contacts
+              </a>
             </app-card-content>
           </app-card>
         </div>
@@ -120,6 +133,7 @@ export class SafetyComponent {
   readonly Cloud = Cloud;
   readonly Wind = Wind;
   readonly Droplets = Droplets;
+  readonly BarChartIcon = BarChart2;
 
   guidelines = [
     {

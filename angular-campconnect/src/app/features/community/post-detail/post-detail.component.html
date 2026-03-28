@@ -10,10 +10,15 @@
         </div>
     </div>
 
-    <div class="container py-8">
+    <div *ngIf="loading" class="container py-20 flex justify-center items-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary-600)]"></div>
+    </div>
+
+    <div *ngIf="!loading && post" class="container py-8">
         <div class="max-w-4xl mx-auto">
             <!-- Main Post -->
             <app-card variant="elevated" customClass="mb-6">
+                <!-- ... header and content ... -->
                 <app-card-content customClass="p-8">
                     <!-- Post Header -->
                     <div class="flex items-start justify-between mb-6">
@@ -66,7 +71,7 @@
                         <button
                             class="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
                             <lucide-icon [name]="MessageSquare" class="w-5 h-5"></lucide-icon>
-                            <span class="font-medium">{{ post.replies }} replies</span>
+                            <span class="font-medium">{{ replies.length }} replies</span>
                         </button>
                     </div>
                 </app-card-content>
@@ -74,16 +79,17 @@
 
             <!-- Replies Section -->
             <div class="mb-6">
-                <h4 class="mb-4">{{ post.replies }} Replies</h4>
+                <h4 class="mb-4">{{ replies.length }} Replies</h4>
 
                 <div class="space-y-4">
-                    <app-card *ngFor="let reply of mockReplies" variant="bordered">
+                    <app-card *ngFor="let reply of replies" variant="bordered">
                         <app-card-content customClass="p-6">
+                            <!-- ... reply content ... -->
                             <div class="flex items-start gap-4 mb-4">
-                                <img [src]="reply.author.avatar" [alt]="reply.author.name"
+                                <img [src]="reply.author?.avatar" [alt]="reply.author?.name"
                                     class="w-10 h-10 rounded-full object-cover" />
                                 <div class="flex-1">
-                                    <h6 class="mb-1">{{ reply.author.name }}</h6>
+                                    <h6 class="mb-1">{{ reply.author?.name }}</h6>
                                     <span class="text-sm text-[var(--color-text-tertiary)]">
                                         {{ reply.createdAt | date:'medium' }}
                                     </span>
@@ -98,7 +104,7 @@
                                 <button
                                     class="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
                                     <lucide-icon [name]="ThumbsUp" class="w-4 h-4"></lucide-icon>
-                                    <span>{{ reply.likes }}</span>
+                                    <span>{{ reply.likes || 0 }}</span>
                                 </button>
                                 <button
                                     class="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
@@ -112,6 +118,7 @@
 
             <!-- Reply Form -->
             <app-card variant="elevated">
+                <!-- ... -->
                 <app-card-content customClass="p-6">
                     <h5 class="mb-4">Add a Reply</h5>
                     <textarea placeholder="Share your thoughts..." rows="4"
@@ -122,5 +129,10 @@
                 </app-card-content>
             </app-card>
         </div>
+    </div>
+
+    <div *ngIf="!loading && !post" class="container py-20 text-center">
+        <h4 class="text-[var(--color-text-tertiary)]">Post not found</h4>
+        <app-button variant="primary" customClass="mt-4" (click)="navigate('/community')">Back to Community</app-button>
     </div>
 </div>

@@ -1,4 +1,18 @@
 // Safety Module Interfaces
+export interface IncidentReport {
+    id: string;
+    type: string;
+    level: string;
+    regionName: string;
+    latitude: number;
+    longitude: number;
+    description: string;
+    mediaUrl?: string;
+    reporterId: string;
+    createdAt: string;
+    status: 'pending' | 'reviewed' | 'resolved';
+}
+
 export interface SafetyAlert {
     id: string;
     type: 'weather' | 'wildlife' | 'fire' | 'flood' | 'closure' | 'advisory';
@@ -118,3 +132,12 @@ export interface SafetyItemCheck {
     available: boolean;
     condition?: 'good' | 'fair' | 'poor';
 }
+
+export interface PublicEmergencyContact {
+    id: string;
+    serviceName: string;
+    phoneNumber: string;
+    region: string;
+    category: 'fire' | 'medical' | 'police' | 'rescue' | 'ranger';
+}
+

@@ -1,13 +1,26 @@
 // Community Module Interfaces
+
+export type UserRole = 'Camper' | 'Verified Camper' | 'Moderator' | 'Admin';
+
+export interface AuthorPreview {
+    id: string;
+    username: string;
+    name: string;
+    avatar: string;
+    role: UserRole;
+    trustScore: number;
+    badges?: {
+        title: string;
+        description: string;
+        icon: string;
+        unlocked: boolean;
+        theme?: string;
+    }[];
+}
+
 export interface Post {
     id: string;
-    author: {
-        id: string;
-        name: string;
-        avatar?: string;
-        role: 'user' | 'moderator' | 'admin';
-        verified: boolean;
-    };
+    author: AuthorPreview;
     title: string;
     content: string;
     category: string;
@@ -15,24 +28,24 @@ export interface Post {
     createdAt: string;
     updatedAt?: string;
     likes: number;
-    comments: number;
+    comments: number | any[]; // Support both count and array
     views: number;
     isLiked: boolean;
     isBookmarked: boolean;
     isPinned: boolean;
     status: 'active' | 'locked' | 'archived';
+    location?: string;
+    timestamp?: string; // For display
+    media?: string[];
+    videoLength?: string;
+    products?: { icon: string; name: string }[];
+    saved?: boolean; // For display/UI state
 }
 
 export interface Comment {
     id: string;
     postId: string;
-    author: {
-        id: string;
-        name: string;
-        avatar?: string;
-        role: 'user' | 'moderator' | 'admin';
-        verified: boolean;
-    };
+    author: AuthorPreview;
     content: string;
     createdAt: string;
     updatedAt?: string;
@@ -40,16 +53,12 @@ export interface Comment {
     isLiked: boolean;
     isEdited: boolean;
     replies?: Comment[];
-    parentId?: string;
+    parentId?: number;
 }
 
 export interface TripStory {
     id: string;
-    author: {
-        id: string;
-        name: string;
-        avatar?: string;
-    };
+    author: AuthorPreview;
     title: string;
     summary: string;
     content: string;
@@ -67,11 +76,7 @@ export interface TripStory {
 
 export interface HelpRequest {
     id: string;
-    author: {
-        id: string;
-        name: string;
-        avatar?: string;
-    };
+    author: AuthorPreview;
     title: string;
     description: string;
     category: 'gear' | 'planning' | 'safety' | 'location' | 'other';
@@ -85,12 +90,7 @@ export interface HelpRequest {
 export interface HelpResponse {
     id: string;
     requestId: string;
-    author: {
-        id: string;
-        name: string;
-        avatar?: string;
-        expert: boolean;
-    };
+    author: AuthorPreview & { expert: boolean };
     content: string;
     helpful: number;
     isAccepted: boolean;
@@ -105,4 +105,87 @@ export interface ModerationAction {
     reason: string;
     moderator: string;
     createdAt: string;
+}
+
+export interface UserProfile {
+    id: string;
+    username: string;
+    name: string;
+    avatar: string;
+    banner?: string;
+    role: UserRole;
+    trustScore: number;
+    bio: string;
+    location: string;
+    joinDate: string;
+    isFollowed?: boolean;
+    stats: {
+        posts: number;
+        topics: number;
+        replies: number;
+        followers: number;
+        following: number;
+    };
+    badges: {
+        id: number;
+        title: string;
+        description: string;
+        icon: string;
+        theme: string;
+        unlockedAt: string;
+    }[];
+}
+
+export interface ForumTopic {
+    id: string;
+    categoryId: string;
+    categoryName: string;
+    title: string;
+    content: string[];
+    tags: string[];
+    author: AuthorPreview;
+    date: string;
+    dateIso: string;
+    media: { url: string; alt: string }[];
+    likes: number;
+    isLiked: boolean;
+    views: string;
+    replyCount: number;
+    bulletPoints?: { label: string; value: string }[];
+}
+
+export interface ForumReply {
+    id: string;
+    parentReplyId: string | null;
+    author: AuthorPreview;
+    date: string;
+    content: string;
+    likes: number;
+    isLiked: boolean;
+    isOP: boolean;
+}
+export interface CategoryMeta {
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    topicsCount: number;
+    membersCount: string;
+    lastActive: string;
+    lastUser?: string;
+}
+
+export interface CategoryTopic {
+    id: string;
+    title: string;
+    author: string;
+    avatar: string;
+    trustScore: number;
+    replies: number;
+    views: number;
+    lastActivity: string;
+    lastUser: string;
+    pinned: boolean;
+    locked: boolean;
+    hot: boolean;
 }

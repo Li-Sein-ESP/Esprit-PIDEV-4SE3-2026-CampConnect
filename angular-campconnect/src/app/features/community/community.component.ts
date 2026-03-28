@@ -6,31 +6,31 @@ import { BadgeComponent } from '../../shared/components/badge.component';
 import { LucideAngularModule, MessageSquare, Heart, Share2, User, TrendingUp } from 'lucide-angular';
 
 interface Post {
-    id: string;
-    author: string;
-    title: string;
-    excerpt: string;
-    category: string;
-    likes: number;
-    comments: number;
-    date: string;
-    trending: boolean;
+  id: string;
+  author: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  likes: number;
+  comments: number;
+  date: string;
+  trending: boolean;
 }
 
 @Component({
-    selector: 'app-community',
-    standalone: true,
-    imports: [
-        CommonModule,
-        RouterModule,
-        CardComponent,
-        CardHeaderComponent,
-        CardTitleComponent,
-        CardContentComponent,
-        BadgeComponent,
-        LucideAngularModule
-    ],
-    template: `
+  selector: 'app-community',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    CardComponent,
+    CardHeaderComponent,
+    CardTitleComponent,
+    CardContentComponent,
+    BadgeComponent,
+    LucideAngularModule
+  ],
+  template: `
     <div class="container py-8">
       <!-- Header -->
       <div class="mb-8">
@@ -72,7 +72,7 @@ interface Post {
               <!-- Content -->
               <div class="flex-1">
                 <div class="flex items-center gap-2 mb-2">
-                  <span class="font-semibold text-[var(--color-text-heading)]">{{ post.author }}</span>
+                  <span class="font-semibold text-[var(--color-text-heading)] cursor-pointer hover:underline" [routerLink]="['/community/profile', post.id]">{{ post.author }}</span>
                   <span class="text-sm text-[var(--color-text-tertiary)]">{{ formatDate(post.date) }}</span>
                   <app-badge *ngIf="post.trending" variant="warning" size="sm">
                     <lucide-icon [img]="TrendingUpIcon" [size]="12"></lucide-icon>
@@ -156,101 +156,101 @@ interface Post {
       </div>
     </div>
   `,
-    styles: []
+  styles: []
 })
 export class CommunityComponent {
-    MessageSquareIcon = MessageSquare;
-    HeartIcon = Heart;
-    Share2Icon = Share2;
-    UserIcon = User;
-    TrendingUpIcon = TrendingUp;
+  MessageSquareIcon = MessageSquare;
+  HeartIcon = Heart;
+  Share2Icon = Share2;
+  UserIcon = User;
+  TrendingUpIcon = TrendingUp;
 
-    activeTab = 'all';
+  activeTab = 'all';
 
-    tabs = [
-        { label: 'All Posts', value: 'all' },
-        { label: 'Trip Stories', value: 'stories' },
-        { label: 'Q&A', value: 'qa' },
-        { label: 'Gear Reviews', value: 'reviews' },
-    ];
+  tabs = [
+    { label: 'All Posts', value: 'all' },
+    { label: 'Trip Stories', value: 'stories' },
+    { label: 'Q&A', value: 'qa' },
+    { label: 'Gear Reviews', value: 'reviews' },
+  ];
 
-    popularTopics = [
-        { name: 'Beginner Tips', count: 234 },
-        { name: 'Gear Recommendations', count: 189 },
-        { name: 'Trail Conditions', count: 156 },
-        { name: 'Safety & Wildlife', count: 142 },
-        { name: 'Photography', count: 98 },
-    ];
+  popularTopics = [
+    { name: 'Beginner Tips', count: 234 },
+    { name: 'Gear Recommendations', count: 189 },
+    { name: 'Trail Conditions', count: 156 },
+    { name: 'Safety & Wildlife', count: 142 },
+    { name: 'Photography', count: 98 },
+  ];
 
-    posts: Post[] = [
-        {
-            id: '1',
-            author: 'Sarah Johnson',
-            title: 'My First Solo Backpacking Trip in Yosemite',
-            excerpt: 'Just completed my first solo backpacking adventure in Yosemite Valley. Here are my top 5 lessons learned...',
-            category: 'Trip Stories',
-            likes: 156,
-            comments: 23,
-            date: '2026-02-15',
-            trending: true
-        },
-        {
-            id: '2',
-            author: 'Mike Chen',
-            title: 'Best Budget Camping Gear for Beginners',
-            excerpt: 'After years of camping, here\'s my guide to getting started without breaking the bank...',
-            category: 'Gear Reviews',
-            likes: 234,
-            comments: 45,
-            date: '2026-02-14',
-            trending: true
-        },
-        {
-            id: '3',
-            author: 'Emily Rodriguez',
-            title: 'How to Handle Wildlife Encounters Safely',
-            excerpt: 'Important tips for staying safe when encountering bears, mountain lions, and other wildlife...',
-            category: 'Q&A',
-            likes: 189,
-            comments: 34,
-            date: '2026-02-13',
-            trending: false
-        },
-        {
-            id: '4',
-            author: 'David Park',
-            title: 'Grand Canyon Rim-to-Rim Hike Report',
-            excerpt: 'Completed the rim-to-rim hike last week. Trail conditions, water sources, and what I wish I knew...',
-            category: 'Trip Stories',
-            likes: 145,
-            comments: 28,
-            date: '2026-02-12',
-            trending: false
-        },
-    ];
+  posts: Post[] = [
+    {
+      id: '1',
+      author: 'Sarah Johnson',
+      title: 'My First Solo Backpacking Trip in Yosemite',
+      excerpt: 'Just completed my first solo backpacking adventure in Yosemite Valley. Here are my top 5 lessons learned...',
+      category: 'Trip Stories',
+      likes: 156,
+      comments: 23,
+      date: '2026-02-15',
+      trending: true
+    },
+    {
+      id: '2',
+      author: 'Mike Chen',
+      title: 'Best Budget Camping Gear for Beginners',
+      excerpt: 'After years of camping, here\'s my guide to getting started without breaking the bank...',
+      category: 'Gear Reviews',
+      likes: 234,
+      comments: 45,
+      date: '2026-02-14',
+      trending: true
+    },
+    {
+      id: '3',
+      author: 'Emily Rodriguez',
+      title: 'How to Handle Wildlife Encounters Safely',
+      excerpt: 'Important tips for staying safe when encountering bears, mountain lions, and other wildlife...',
+      category: 'Q&A',
+      likes: 189,
+      comments: 34,
+      date: '2026-02-13',
+      trending: false
+    },
+    {
+      id: '4',
+      author: 'David Park',
+      title: 'Grand Canyon Rim-to-Rim Hike Report',
+      excerpt: 'Completed the rim-to-rim hike last week. Trail conditions, water sources, and what I wish I knew...',
+      category: 'Trip Stories',
+      likes: 145,
+      comments: 28,
+      date: '2026-02-12',
+      trending: false
+    },
+  ];
 
-    getTabClasses(tabValue: string): string {
-        const baseClasses = 'px-4 py-2 font-medium transition-colors';
-        const activeClasses = 'text-[var(--color-primary-600)] border-b-2 border-[var(--color-primary-600)]';
-        const inactiveClasses = 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]';
+  getTabClasses(tabValue: string): string {
+    const baseClasses = 'px-4 py-2 font-medium transition-colors';
+    const activeClasses = 'text-[var(--color-primary-600)] border-b-2 border-[var(--color-primary-600)]';
+    const inactiveClasses = 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]';
 
-        return `${baseClasses} ${this.activeTab === tabValue ? activeClasses : inactiveClasses}`;
-    }
+    return `${baseClasses} ${this.activeTab === tabValue ? activeClasses : inactiveClasses}`;
+  }
 
-    getFilteredPosts(): Post[] {
-        if (this.activeTab === 'all') return this.posts;
-        return this.posts.filter(p => p.category.toLowerCase().includes(this.activeTab));
-    }
+  getFilteredPosts(): Post[] {
+    if (this.activeTab === 'all') return this.posts;
+    return this.posts.filter(p => p.category.toLowerCase().includes(this.activeTab));
+  }
 
-    formatDate(dateString: string): string {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffTime = Math.abs(now.getTime() - date.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-        if (diffDays === 0) return 'Today';
-        if (diffDays === 1) return 'Yesterday';
-        if (diffDays < 7) return `${diffDays} days ago`;
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    }
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
 }
