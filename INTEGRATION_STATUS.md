@@ -107,12 +107,44 @@ This document tracks the status of integrating all feature branches into the mai
 - **Priority:** Completed
 
 ### 6. **Wilderness_Academy&Events**
-- **Status:** 🔜 Not yet integrated
-- **Expected Features:** 
-  - Academy/training modules
-  - Event management system
-- **Special Notes:** Files located in `connectcamp/` subdirectory (requires extraction)
-- **Priority:** High (LAST REMAINING BRANCH)
+- **Status:** ✅ Integrated on March 28, 2026
+- **Features:**
+  - Academy Module (Wilderness training/education)
+    - Course management
+    - Badge system
+    - Certification tracking
+    - Video content
+  - Events Module
+    - Event management
+    - Event registration
+- **Integration Strategy:**
+  - Files were in `connectcamp/` subdirectory (different structure)
+  - Manually extracted Academy and Events modules into modular packages
+  - Created `com.campconnect.academy.*` and `com.campconnect.events.*` packages
+- **Files Created:**
+  - Academy: `AcademyController`, `Course`, `Badge`, `Certification`, `UserCertification`, `Video` entities
+  - Academy DTOs: `CourseDTO`, `BadgeDTO`, `CertificationDTO`, `UserCertificationDTO`, `VideoDTO`, `UserSummaryDTO`
+  - Academy Services: `ICourseServices`, `IBadgeServices`, `ICertificationServices`, `IVideoServices` + impls
+  - Academy Repositories: `CourseRepository`, `BadgeRepository`, `CertificationRepository`, `UserCertificationRepository`, `VideoRepository`
+  - Events: `EventsController`, `Event`, `EventRegistration` entities
+  - Events DTOs: `EventDTO`, `EventRegistrationDTO`
+  - Events Services: `IEventServices` + impl
+  - Events Repositories: `EventRepository`, `EventRegistrationRepository`
+  - Shared: `Category`, `Location` models, `CategoryRepository`
+  - Enums: `BadgeRarity`, `CertificationStatus`, `DifficultyLevel`, `EventStatus`, `EventType`
+- **API Endpoints Added:**
+  - `/api/academy/courses` - Course CRUD
+  - `/api/academy/badges` - Badge management
+  - `/api/academy/certifications` - Certification tracking
+  - `/api/academy/videos` - Video content
+  - `/api/events` - Event CRUD
+  - `/api/events/{id}/register` - Event registration
+  - `/api/events/{id}/participants` - View participants
+- **Backend Status:**
+  - ✅ Compiles successfully
+  - ✅ Backend starts successfully
+  - ✅ 41 MongoDB repositories found (added 8 new repositories)
+- **Priority:** Completed
 
 ---
 
@@ -178,9 +210,9 @@ For each branch integration:
 ## 📊 Progress Summary
 
 - **Total Branches:** 6 (excluding main)
-- **Completed:** 5 (83%) - Market+Delivery, rayene_booking+matching, mariemlassoued-persona6, Nawres_Persona2, koussay
+- **Completed:** 6 (100%) - Market+Delivery, rayene_booking+matching, mariemlassoued-persona6, Nawres_Persona2, koussay, Wilderness_Academy&Events
 - **In Progress:** 0 (0%)
-- **Remaining:** 1 (17%) - Wilderness_Academy&Events
+- **Remaining:** 0 (0%) - ALL INTEGRATIONS COMPLETE!
 
 ---
 
