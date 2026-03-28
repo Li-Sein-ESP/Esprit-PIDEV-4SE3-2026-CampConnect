@@ -76,17 +76,43 @@ This document tracks the status of integrating all feature branches into the mai
   - `/api/trip-itineraries` - Trip itinerary details
 - **Priority:** Completed
 
-### 5. **Wilderness_Academy&Events**
+### 5. **koussay**
+- **Status:** ✅ Integrated on March 28, 2026 (Partial - Manual Extraction)
+- **Features:**
+  - Campsite Management (CRUD operations)
+  - Season Management (pricing and availability by season)
+- **Integration Strategy:**
+  - Branch had 88 merge conflicts due to being based on very old main
+  - **Decision:** Manually extracted only NEW features instead of full merge
+  - Extracted Campsite and Season management (skipped Community features due to conflicts with existing Post/Comment system)
+- **Files Created:**
+  - Models: `Campsite.java`, `Season.java`
+  - Repositories: `CampsiteRepository.java`, `SeasonRepository.java`
+  - Controllers: `CampsiteController.java`, `SeasonController.java`
+- **API Endpoints Added:**
+  - `/api/campsites` - Campsite CRUD (GET all, GET by id, POST create, PUT update, DELETE)
+  - `/api/campsites/search?location={location}` - Search by location
+  - `/api/campsites/filter?minPrice={price}&maxPrice={price}&minRating={rating}` - Filter by price/rating
+  - `/api/seasons` - Season CRUD (GET all, GET by id, POST create, PUT update, DELETE)
+  - `/api/seasons/campsite/{campsiteId}` - Get seasons for specific campsite
+  - `/api/seasons/current/{campsiteId}` - Get current active season
+- **Backend Status:** 
+  - ✅ Compiles successfully
+  - ✅ Backend starts successfully
+  - ✅ 35 MongoDB repositories found (was 33, added 2 new: CampsiteRepository, SeasonRepository)
+- **Technical Notes:**
+  - Fixed Lombok Boolean field issue: `isAvailable()` → `getAvailable()` naming
+  - Campsite model has: name, location, description, price, rating, capacity, amenities, images
+  - Season model has: name, dates, priceModifier, isOpen status, linked to campsite
+- **Priority:** Completed
+
+### 6. **Wilderness_Academy&Events**
 - **Status:** 🔜 Not yet integrated
 - **Expected Features:** 
   - Academy/training modules
   - Event management system
-- **Priority:** High
-
-### 6. **koussay**
-- **Status:** 🔜 Not yet integrated
-- **Expected Features:** Feature set TBD
-- **Priority:** Medium
+- **Special Notes:** Files located in `connectcamp/` subdirectory (requires extraction)
+- **Priority:** High (LAST REMAINING BRANCH)
 
 ---
 
@@ -140,8 +166,7 @@ For each branch integration:
    - Run full test suite
 
 2. **Short-term:**
-   - Integrate `Wilderness_Academy&Events` branch
-   - Integrate `koussay` branch
+   - Integrate `Wilderness_Academy&Events` branch (LAST REMAINING)
 
 3. **Medium-term:**
    - Final integration testing
@@ -153,9 +178,9 @@ For each branch integration:
 ## 📊 Progress Summary
 
 - **Total Branches:** 6 (excluding main)
-- **Completed:** 4 (67%) - Market+Delivery, rayene_booking+matching, mariemlassoued-persona6, Nawres_Persona2
+- **Completed:** 5 (83%) - Market+Delivery, rayene_booking+matching, mariemlassoued-persona6, Nawres_Persona2, koussay
 - **In Progress:** 0 (0%)
-- **Remaining:** 2 (33%) - Wilderness_Academy&Events, koussay
+- **Remaining:** 1 (17%) - Wilderness_Academy&Events
 
 ---
 
