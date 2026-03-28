@@ -49,9 +49,32 @@ This document tracks the status of integrating all feature branches into the mai
 - **Priority:** N/A (Already done)
 
 ### 4. **Nawres_Persona2**
-- **Status:** 🔜 Not yet integrated
-- **Expected Features:** User persona #2 functionality
-- **Priority:** High
+- **Status:** ✅ Integrated on March 28, 2026
+- **Features:**
+  - Trip Itinerary Planning (individual trips, not group trips)
+  - Route Optimization
+  - Transport Management
+  - Point of Interest Management
+  - Activity Planning
+  - Route Segment Management
+  - Transport Safety Alerts (route-specific)
+- **Packages Added:**
+  - `com.campconnect.trip.*` - Trip itinerary module
+  - `com.campconnect.transport.*` - Transport module
+- **Key Architectural Decisions:**
+  - **Trip Itinerary vs Group Trip:** Nawres's `trip` package handles individual trip itineraries (stored in `trip_itineraries_main` collection), while main's `Trip` model in `com.campconnect.model` handles group trips (stored in `trips` collection)
+  - **Transport SafetyAlert vs Group SafetyAlert:** Nawres's transport SafetyAlert (route segment alerts, stored in `transport_safety_alerts`) is separate from main's SafetyAlert (trip-wide alerts, stored in `safety_alerts`)
+  - Bean names qualified with `@Repository("itineraryTripRepository")` and `@Service("itineraryTripService")` to avoid conflicts with main's beans
+- **API Endpoints Added:**
+  - `/api/trips` - Trip itinerary CRUD
+  - `/api/transports` - Transport management
+  - `/api/safetyalerts` - Route segment safety alerts
+  - `/api/activities` - Activity management
+  - `/api/pois` - Points of Interest
+  - `/api/route-segments` - Route segment management
+  - `/api/route-optimizations` - Route optimization
+  - `/api/trip-itineraries` - Trip itinerary details
+- **Priority:** Completed
 
 ### 5. **Wilderness_Academy&Events**
 - **Status:** 🔜 Not yet integrated
@@ -111,19 +134,16 @@ For each branch integration:
 
 ## 🎯 Next Steps
 
-1. **Immediate (Post-persona6):**
-   - Fix all compilation errors in persona6 integration
-   - Update model classes with missing fields
-   - Ensure all DTOs match expected API contracts
+1. **Immediate (Post-Nawres_Persona2):**
+   - Test backend startup to verify no bean conflicts
+   - Verify API endpoints work correctly
    - Run full test suite
 
 2. **Short-term:**
-   - Integrate `Nawres_Persona2` branch
-   - Integrate `rayene_booking+matching` branch
    - Integrate `Wilderness_Academy&Events` branch
+   - Integrate `koussay` branch
 
 3. **Medium-term:**
-   - Integrate `koussay` branch
    - Final integration testing
    - Performance optimization
    - Documentation updates
@@ -133,9 +153,9 @@ For each branch integration:
 ## 📊 Progress Summary
 
 - **Total Branches:** 6 (excluding main)
-- **Completed:** 3 (50%) - Market+Delivery, rayene_booking+matching, mariemlassoued-persona6
+- **Completed:** 4 (67%) - Market+Delivery, rayene_booking+matching, mariemlassoued-persona6, Nawres_Persona2
 - **In Progress:** 0 (0%)
-- **Remaining:** 3 (50%) - Nawres_Persona2, Wilderness_Academy&Events, koussay
+- **Remaining:** 2 (33%) - Wilderness_Academy&Events, koussay
 
 ---
 
