@@ -62,7 +62,7 @@ import { filter } from 'rxjs/operators';
               <ul class="space-y-2 text-sm text-gray-400">
                 <li><a routerLink="/community" class="hover:text-white transition-colors">Forums</a></li>
                 <li><a routerLink="/community/stories" class="hover:text-white transition-colors">Trip Stories</a></li>
-                <li><a routerLink="/community/help" class="hover:text-white transition-colors">Help Center</a></li>
+                <li><a routerLink="/community/ask-for-help" class="hover:text-white transition-colors">Help Center</a></li>
               </ul>
             </div>
           </div>

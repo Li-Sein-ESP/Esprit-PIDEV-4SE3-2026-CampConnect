@@ -46,11 +46,12 @@ export class AuthInterceptor implements HttpInterceptor {
 
         return next.handle(request).pipe(
             catchError((error: HttpErrorResponse) => {
-                if (!isAuthEndpoint && (error.status === 401 || error.status === 403)) {
-                    console.warn('Auth error detected, clearing session');
+                if (!isAuthEndpoint && error.status === 401) {
+                    console.warn('Auth error (401) detected, clearing session');
                     this.authService.logout();
                     this.router.navigate(['/login']);
                 }
+                // 403 = Forbidden (wrong role) — do NOT logout, just propagate the error
                 return throwError(() => error);
             })
         );

@@ -6,6 +6,7 @@ import com.campconnect.model.GroupStatus;
 import com.campconnect.model.User;
 import com.campconnect.repository.GroupRepository;
 import com.campconnect.repository.UserRepository;
+import com.campconnect.service.impl.IGroupServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +32,7 @@ class GroupServiceImplTest {
     private UserRepository userRepository;
 
     @InjectMocks
-    private GroupServiceImpl groupService;
+    private IGroupServiceImpl groupService;
 
     private Group sampleGroup;
 

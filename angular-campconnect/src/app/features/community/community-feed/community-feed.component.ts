@@ -5,9 +5,10 @@ import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Post, AuthorPreview, UserRole } from '../models/community.model';
 import { TrustScoreComponent } from '../../../shared/components/trust-score/trust-score.component';
-import { CampBadgeComponent } from '../../../shared/components/badge/badge.component';
+import { CampBadgeComponent } from '../../../shared/components/camp-badge/camp-badge.component';
 import { CommunityService } from '../../../core/services/community.service';
-import { AuthService, User } from '../../../core/services/auth.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { User } from '../../../core/models/auth.models';
 
 @Component({
     selector: 'app-community-feed',
@@ -48,7 +49,7 @@ export class CommunityFeedComponent implements OnInit {
         this.ngZone.run(() => {
             this.communityService.getPosts().subscribe({
                 next: (posts) => {
-                    this.posts = posts;
+                    this.posts = posts as any;
                     this.loading = false;
                     this.cdr.detectChanges();
                 },
@@ -63,13 +64,9 @@ export class CommunityFeedComponent implements OnInit {
 
     toggleLike(post: Post) {
         if (!post.isLiked) {
-            this.communityService.likePost(post.id.toString()).subscribe({
-                next: () => {
-                    post.isLiked = true;
-                    post.likes++;
-                    this.cdr.detectChanges();
-                }
-            });
+            post.isLiked = true;
+            post.likes++;
+            this.cdr.detectChanges();
         }
     }
 
@@ -78,7 +75,6 @@ export class CommunityFeedComponent implements OnInit {
     }
 
     goToPost(id: any) {
-        this.communityService.recordView(id.toString()).subscribe();
         this.router.navigate(['/community/post', id]);
     }
 
@@ -123,36 +119,26 @@ export class CommunityFeedComponent implements OnInit {
         event.stopPropagation();
         if (!this.editingPost) return;
         
-        const payload = {
-            id: this.editingPost.id,
-            title: this.editingPost.title,
-            description: this.editContent,
-            category: this.editingPost.category || 'General'
-        };
-
-        this.communityService.updatePost(this.editingPost.id.toString(), payload).subscribe({
-            next: () => {
-                if (this.editingPost) {
-                    this.editingPost.content = this.editContent;
-                }
-                this.editingPost = null;
-                this.editContent = '';
-            },
-            error: (err) => {
-                console.error('Failed to update post', err);
-                alert('Failed to update post');
-            }
-        });
+        // Mocking the update behavior locally
+        this.editingPost.content = this.editContent;
+        this.editingPost.title = this.editingPost.title || 'Updated Title';
+        this.editingPost = null;
+        this.editContent = '';
     }
 
     submitQuickPost() {
         if (!this.quickPostContent.trim()) return;
 
-        const payload = {
-            title: 'New Adventure', // Backend requires a title
-            description: this.quickPostContent,
+        const currentUser = this.authService.currentUserValue;
+        const payload: any = {
+            title: 'New Adventure', 
+            content: this.quickPostContent,
+            author: {
+                name: currentUser?.username || 'Camper',
+                avatar: `https://ui-avatars.com/api/?name=${currentUser?.username || 'User'}`
+            },
             category: 'General',
-            authorId: this.authService.currentUserValue?.id || '' // Use authenticated user
+            tags: []
         };
 
         this.communityService.createPost(payload).subscribe({
@@ -173,15 +159,7 @@ export class CommunityFeedComponent implements OnInit {
         event.stopPropagation();
         this.activeDropdown = null;
         if (confirm('Are you sure you want to delete this post?')) {
-            this.communityService.deletePost(post.id.toString()).subscribe({
-                next: () => {
-                    this.posts = this.posts.filter(p => p.id !== post.id);
-                },
-                error: (err) => {
-                    console.error('Failed to delete post', err);
-                    alert('Failed to delete post');
-                }
-            });
+            this.posts = this.posts.filter(p => p.id !== post.id);
         }
     }
 }

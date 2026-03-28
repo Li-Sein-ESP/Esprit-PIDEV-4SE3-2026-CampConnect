@@ -230,6 +230,56 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/community/community.component').then(m => m.CommunityComponent)
             },
             {
+                path: 'community/feed',
+                loadComponent: () => import('./features/community/community-feed/community-feed.component').then(m => m.CommunityFeedComponent)
+            },
+            {
+                path: 'community/forums',
+                loadComponent: () => import('./features/community/forum-home/forum-home.component').then(m => m.ForumHomeComponent)
+            },
+            {
+                path: 'community/forums/:id',
+                loadComponent: () => import('./features/community/forum-category/forum-category.component').then(m => m.ForumCategoryComponent)
+            },
+            {
+                path: 'community/forums/:forumId/topics/:topicId',
+                loadComponent: () => import('./features/community/forum-topic-details/forum-topic-details.component').then(m => m.ForumTopicDetailsComponent)
+            },
+            {
+                path: 'community/events',
+                loadComponent: () => import('./features/community/community-events/community-events.component').then(m => m.CommunityEventsComponent)
+            },
+            {
+                path: 'community/messaging',
+                loadComponent: () => import('./features/community/messaging/messaging.component').then(m => m.MessagingComponent),
+                canActivate: [authGuard]
+            },
+            {
+                path: 'community/stories',
+                loadComponent: () => import('./features/community/trip-stories/trip-stories.component').then(m => m.TripStoriesComponent)
+            },
+            {
+                path: 'community/leaderboard',
+                loadComponent: () => import('./features/community/leaderboard/leaderboard.component').then(m => m.LeaderboardComponent)
+            },
+            {
+                path: 'community/ask-for-help',
+                loadComponent: () => import('./features/community/ask-for-help/ask-for-help.component').then(m => m.AskForHelpComponent)
+            },
+            {
+                path: 'community/create-post',
+                loadComponent: () => import('./features/community/create-post/create-post.component').then(m => m.CreatePostComponent),
+                canActivate: [authGuard]
+            },
+            {
+                path: 'community/profile/:id',
+                loadComponent: () => import('./features/community/public-profile/public-profile.component').then(m => m.PublicProfileComponent)
+            },
+            {
+                path: 'community/post/:id',
+                loadComponent: () => import('./features/community/post-details/post-details.component').then(m => m.PostDetailsComponent)
+            },
+            {
                 path: 'community/:id',
                 loadComponent: () => import('./features/community/post-detail/post-detail.component').then(m => m.PostDetailComponent)
             },

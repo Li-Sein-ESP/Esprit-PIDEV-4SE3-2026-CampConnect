@@ -14,7 +14,10 @@ public class PostDTO {
     private String threadId;
     private String authorId;
     private String authorName;
+    private String authorUsername;
+    private String title;
     private String content;
+    private String description;
     private List<String> imageUrls;
     private int likes;
     private int commentCount;

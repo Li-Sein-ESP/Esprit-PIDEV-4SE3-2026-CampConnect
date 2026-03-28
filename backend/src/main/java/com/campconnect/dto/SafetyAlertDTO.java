@@ -12,8 +12,11 @@ public class SafetyAlertDTO {
     private String id;
     private String title;
     private String description;
+    private String type;
     private String severity;
     private String location;
+    private String locationName;
+    private String regionName;
     private Double latitude;
     private Double longitude;
     private String tripId;

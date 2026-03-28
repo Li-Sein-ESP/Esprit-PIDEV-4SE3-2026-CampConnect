@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TrustScoreComponent } from '../../../shared/components/trust-score/trust-score.component';
-import { CampBadgeComponent } from '../../../shared/components/badge/badge.component';
+import { CampBadgeComponent } from '../../../shared/components/camp-badge/camp-badge.component';
 import { Post, Comment, AuthorPreview, UserRole } from '../models/community.model';
 import { CommunityService } from '../../../core/services/community.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -92,8 +92,10 @@ export class PostDetailsComponent implements OnInit {
     loadPost(id: string) {
         this.communityService.getPostById(id).subscribe({
             next: (realPost) => {
-                this.post = realPost;
-                this.loadComments(id);
+                if (realPost) {
+                    this.post = realPost as any;
+                    this.loadComments(id);
+                }
             },
             error: (err) => {
                 console.error('Error loading real post', err);
@@ -105,18 +107,18 @@ export class PostDetailsComponent implements OnInit {
     loadComments(postId: string) {
         this.communityService.getRepliesByPostId(postId).subscribe({
             next: (replies) => {
-                // Map backend PostDTO to UI ThreadComment format
+                // Map backend Reply to UI ThreadComment format
                 this.post.comments = (replies || []).map(r => ({
                     id: r.id,
                     author: {
-                        id: r.authorId || '0',
-                        name: r.authorName || 'Explorer',
-                        username: r.authorUsername || 'explorer',
-                        avatar: `https://ui-avatars.com/api/?name=${r.authorName || 'User'}&background=random`,
+                        id: '0',
+                        name: r.author?.name || 'Explorer',
+                        username: r.author?.name?.toLowerCase().replace(' ', '_') || 'explorer',
+                        avatar: r.author?.avatar || `https://ui-avatars.com/api/?name=User&background=random`,
                         role: 'Camper' as UserRole,
                         trustScore: 85
                     },
-                    text: r.description || r.content || '',
+                    text: r.content || '',
                     time: r.createdAt ? new Date(r.createdAt).toLocaleDateString() : 'Long ago',
                     likes: r.likes || 0,
                     liked: false,
@@ -176,11 +178,12 @@ export class PostDetailsComponent implements OnInit {
         const currentUser = this.authService.currentUserValue;
         
         const commentData = {
-            threadId: this.post.id,
+            postId: this.post.id,
             content: text,
-            authorId: currentUser?.id || '1',
-            authorName: currentUser?.username || 'Explorer',
-            authorUsername: currentUser?.username || 'explorer'
+            author: {
+                name: currentUser?.username || 'Explorer',
+                avatar: `https://ui-avatars.com/api/?name=${currentUser?.username || 'User'}&background=random`
+            }
         };
 
         this.communityService.createReply(commentData).subscribe({

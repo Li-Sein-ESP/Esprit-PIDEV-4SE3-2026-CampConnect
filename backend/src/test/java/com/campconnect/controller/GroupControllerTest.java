@@ -1,7 +1,7 @@
 package com.campconnect.controller;
 
 import com.campconnect.dto.GroupDetailDto;
-import com.campconnect.dto.GroupDto;
+import com.campconnect.dto.GroupDTO;
 import com.campconnect.model.Group;
 import com.campconnect.service.IGroupService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,7 +39,7 @@ class GroupControllerTest {
     @Test
     void createGroup_ShouldReturnCreated() throws Exception {
         // Arrange
-        GroupDto dto = new GroupDto();
+        GroupDTO dto = new GroupDTO();
         dto.setName("New Group");
         dto.setCreatorUserId("user-1");
 

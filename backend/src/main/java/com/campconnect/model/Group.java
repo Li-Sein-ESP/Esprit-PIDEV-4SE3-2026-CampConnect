@@ -24,6 +24,8 @@ public class Group {
 
     private String name;
 
+    private String description;
+
     private String creatorUserId;
 
     private String tripId;
@@ -35,4 +37,8 @@ public class Group {
 
     @CreatedDate
     private LocalDateTime createdAt;
+    
+    public void addTrip(Trip trip) {
+        this.tripId = trip.getId();
+    }
 }

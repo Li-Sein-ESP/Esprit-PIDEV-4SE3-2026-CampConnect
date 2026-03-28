@@ -257,7 +257,7 @@ export class CreatePostComponent implements OnInit {
     console.log('Sending Post to Backend:', payload);
 
     this.isPosting = true;
-    this.communityService.createPost(payload).subscribe({
+    this.communityService.createPost(payload as any).subscribe({
       next: () => {
         this.isPosting = false;
         this.showSuccess = true;

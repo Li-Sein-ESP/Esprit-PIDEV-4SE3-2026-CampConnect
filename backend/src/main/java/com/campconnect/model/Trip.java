@@ -21,10 +21,12 @@ public class Trip {
     
     private String name;
     private String description;
+    private String notes;
     private String destination;
     private LocalDate startDate;
     private LocalDate endDate;
     private String creatorId;
+    @Builder.Default
     private List<String> participants = new ArrayList<>();
     private String status;
     private LocalDateTime createdAt;
@@ -34,4 +36,13 @@ public class Trip {
     private Double longitude;
     private String difficulty;
     private Integer maxParticipants;
+    private String groupId;
+    private Group group;
+    
+    @Builder.Default
+    private List<Incident> incidents = new ArrayList<>();
+
+    public void addIncident(Incident incident) {
+        this.incidents.add(incident);
+    }
 }

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -12,9 +13,12 @@ public class ForumThreadDTO {
     private String id;
     private String title;
     private String content;
+    private String description;
     private String authorId;
     private String authorName;
+    private String authorUsername;
     private String category;
+    private List<String> tags;
     private int views;
     private int likes;
     private LocalDateTime createdAt;

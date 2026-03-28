@@ -57,18 +57,18 @@ export class ForumCategoryComponent implements OnInit {
             next: (posts) => {
                 // Filter posts by category name
                 this.allTopics = posts
-                    .filter(p => p.category === this.category.name)
-                    .map(p => ({
+                    .filter((p: any) => p.category === this.category.name)
+                    .map((p: any) => ({
                         id: p.id.toString(),
                         title: p.title,
                         author: p.author.name,
                         avatar: p.author.avatar,
-                        trustScore: p.author.trustScore,
+                        trustScore: p.author.trustScore || 0,
                         replies: typeof p.comments === 'number' ? p.comments : (p.comments?.length || 0),
                         views: p.views || 0,
                         lastActivity: 'Recent',
                         lastUser: 'User',
-                        pinned: p.isPinned,
+                        pinned: p.isPinned || false,
                         locked: p.status === 'locked',
                         hot: (p.likes + (typeof p.comments === 'number' ? p.comments : (p.comments?.length || 0))) > 20
                     }));

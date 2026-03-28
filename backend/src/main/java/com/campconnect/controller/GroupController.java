@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.campconnect.dto.GroupDto;
+import com.campconnect.dto.GroupDTO;
+import com.campconnect.model.GroupStatus;
 import com.campconnect.model.Group;
 import com.campconnect.service.IGroupService;
 
@@ -31,13 +32,13 @@ public class GroupController {
     private final IGroupService groupService;
 
     @PostMapping
-    public ResponseEntity<Group> createGroup(@Valid @RequestBody GroupDto dto) {
+    public ResponseEntity<Group> createGroup(@Valid @RequestBody GroupDTO dto) {
         Group group = Group.builder()
                 .name(dto.getName())
                 .creatorUserId(dto.getCreatorUserId())
                 .tripId(dto.getTripId())
                 .memberUserIds(dto.getMemberUserIds())
-                .status(dto.getStatus())
+                .status(dto.getStatus() != null ? GroupStatus.valueOf(dto.getStatus().toUpperCase()) : GroupStatus.ACTIVE)
                 .build();
         Group created = groupService.createGroup(group);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
@@ -66,12 +67,12 @@ public class GroupController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Group> updateGroup(@PathVariable("id") String id, @Valid @RequestBody GroupDto dto) {
+    public ResponseEntity<Group> updateGroup(@PathVariable("id") String id, @Valid @RequestBody GroupDTO dto) {
         Group group = Group.builder()
                 .name(dto.getName())
                 .tripId(dto.getTripId())
                 .memberUserIds(dto.getMemberUserIds())
-                .status(dto.getStatus())
+                .status(dto.getStatus() != null ? GroupStatus.valueOf(dto.getStatus().toUpperCase()) : GroupStatus.ACTIVE)
                 .build();
         return ResponseEntity.ok(groupService.updateGroup(id, group));
     }

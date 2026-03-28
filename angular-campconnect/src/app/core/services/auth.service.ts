@@ -45,6 +45,11 @@ export class AuthService {
         return this.currentUser$.asObservable();
     }
 
+    /** Synchronous snapshot of the current user (null if not logged in). */
+    get currentUserValue(): User | null {
+        return this.currentUser$.value;
+    }
+
     isAuthenticated(): Observable<boolean> {
         return this.isAuthenticated$.asObservable();
     }

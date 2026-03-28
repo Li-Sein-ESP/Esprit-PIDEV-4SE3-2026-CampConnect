@@ -13,6 +13,7 @@ public class CommentDTO {
     private String postId;
     private String authorId;
     private String authorName;
+    private String authorUsername;
     private String content;
     private int likes;
     private LocalDateTime createdAt;

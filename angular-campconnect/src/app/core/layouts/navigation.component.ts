@@ -140,7 +140,7 @@ export class NavigationComponent implements OnInit {
         children: [
           { label: 'Browse', link: '/marketplace' },
           { label: 'Cart', link: '/cart' },
-          { label: 'Track Delivery', link: '/delivery/track/CC-12345' }
+          { label: 'Track Delivery', link: '/profile/orders' }
         ]
       },
       {
@@ -148,10 +148,10 @@ export class NavigationComponent implements OnInit {
         children: [
           { label: 'Feed', link: '/community/feed' },
           { label: 'Forums', link: '/community/forums' },
-          { label: 'Events', link: '/community/events' },
-          { label: 'Messaging', link: '/community/messaging' },
           { label: 'Trip Stories', link: '/community/stories' },
-          { label: 'Leaderboard', link: '/community/leaderboard' }
+          { label: 'Leaderboard', link: '/community/leaderboard' },
+          { label: 'Events', link: '/community/events' },
+          { label: 'Messaging', link: '/community/messaging' }
         ]
       }
     ];

@@ -4,6 +4,8 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Document(collection = "forum_threads")
 @Data
@@ -15,8 +17,12 @@ public class ForumThread {
     private String id;
     private String title;
     private String content;
+    private String description;
     private String authorId;
+    private User author;
     private String category;
+    @Builder.Default
+    private List<String> tags = new ArrayList<>();
     private int views;
     private int likes;
     private LocalDateTime createdAt;
