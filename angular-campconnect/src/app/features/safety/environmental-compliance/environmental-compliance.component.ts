@@ -11,52 +11,51 @@ import {
   Info,
   ArrowRight,
   CheckCircle,
+  CheckCircle2,
   AlertTriangle,
+  AlertCircle,
   XCircle,
   Calendar,
   Ban,
   Mountain,
   Fish,
   TreePine,
-  ChevronRight
+  ChevronRight,
+  Trees
 } from 'lucide-angular';
-import { ButtonComponent } from '../../../shared/components/button.component';
-import { CardComponent, CardHeaderComponent, CardTitleComponent, CardContentComponent, CardDescriptionComponent } from '../../../shared/components/card.component';
-import { BadgeComponent } from '../../../shared/components/badge.component';
 
 interface EnvironmentalZone {
   id: string;
   name: string;
-  type: 'wilderness' | 'wildlife-protection' | 'restricted' | 'seasonal-closure';
-  restrictions: string[];
+  status: 'Open' | 'Closed';
   permitRequired: boolean;
-  status: 'open' | 'restricted' | 'closed';
-}
-
-interface TripCompliance {
-  tripId: string;
-  tripName: string;
-  destination: string;
-  dates: string;
-  overallStatus: 'compliant' | 'needs-review' | 'restricted';
-  issues: string[];
-  lastChecked: string;
+  restrictions: string[];
 }
 
 interface FireBan {
   id: string;
   location: string;
-  level: string;
+  stage: string;
+  validUntil: string;
   restrictions: string[];
-  expires: string;
-  severity: 'high' | 'medium';
+}
+
+interface TripCompliance {
+  id: string;
+  name: string;
+  location: string;
+  dates: string;
+  status: 'Needs Review' | 'Compliant';
+  issues: string[];
+  lastChecked: string;
 }
 
 interface HuntingSeason {
-  species: string;
-  season: string;
+  id: string;
+  animal: string;
+  dates: string;
   permitRequired: boolean;
-  status: 'active' | 'upcoming';
+  status: 'Active' | 'Upcoming';
 }
 
 @Component({
@@ -66,13 +65,7 @@ interface HuntingSeason {
     CommonModule,
     RouterModule,
     LucideAngularModule,
-    ButtonComponent,
-    CardComponent,
-    CardHeaderComponent,
-    CardTitleComponent,
-    CardContentComponent,
-    CardDescriptionComponent,
-    BadgeComponent
+    LucideAngularModule
   ],
   templateUrl: './environmental-compliance.component.html',
   styles: []
@@ -86,8 +79,9 @@ export class EnvironmentalComplianceComponent {
   readonly FileTextIcon = FileText;
   readonly InfoIcon = Info;
   readonly ArrowRightIcon = ArrowRight;
-  readonly CheckCircleIcon = CheckCircle;
+  readonly CheckCircleIcon = CheckCircle2;
   readonly AlertTriangleIcon = AlertTriangle;
+  readonly AlertCircleIcon = AlertCircle;
   readonly XCircleIcon = XCircle;
   readonly CalendarIcon = Calendar;
   readonly BanIcon = Ban;
@@ -95,198 +89,182 @@ export class EnvironmentalComplianceComponent {
   readonly FishIcon = Fish;
   readonly TreePineIcon = TreePine;
   readonly ChevronRightIcon = ChevronRight;
+  readonly TreesIcon = Trees;
 
   // Mock Data
   environmentalZones: EnvironmentalZone[] = [
     {
-      id: 'zone-1',
+      id: '1',
       name: 'Rocky Mountain Wilderness Area',
-      type: 'wilderness',
+      status: 'Open',
+      permitRequired: true,
       restrictions: [
         'Group size limit: 12 people maximum',
         'No motorized vehicles or equipment',
         'Camping 200 feet from water sources',
-        'Pack out all waste (Leave No Trace)',
-      ],
-      permitRequired: true,
-      status: 'open',
+        'Pack out all waste (Leave No Trace)'
+      ]
     },
     {
-      id: 'zone-2',
+      id: '2',
       name: 'Yosemite Valley - Bear Protection Zone',
-      type: 'wildlife-protection',
+      status: 'Open',
+      permitRequired: false,
       restrictions: [
         'Bear canisters mandatory for all food storage',
         'No food storage in vehicles',
         'Report all bear sightings to rangers',
-        'Minimum 100-yard distance from bears',
-      ],
-      permitRequired: false,
-      status: 'open',
+        'Minimum 100-yard distance from bears'
+      ]
     },
     {
-      id: 'zone-3',
+      id: '3',
       name: 'Grand Teton High Country',
-      type: 'seasonal-closure',
+      status: 'Closed',
+      permitRequired: true,
       restrictions: [
         'Closed for winter wildlife migration (Dec 1 - April 15)',
         'No camping above treeline during closure',
-        'Permit required during open season',
-      ],
-      permitRequired: true,
-      status: 'closed',
-    },
+        'Permit required during open season'
+      ]
+    }
   ];
 
   fireBans: FireBan[] = [
     {
-      id: 'ban-1',
+      id: '1',
       location: 'Rocky Mountain NP - East Side',
-      level: 'Stage 2',
+      stage: 'Stage 2 Fire Ban',
+      validUntil: 'March 15, 2026',
       restrictions: [
         'All open fires prohibited',
         'Camp stoves with shut-off valve permitted',
-        'Smoking only in enclosed vehicles',
-      ],
-      expires: 'March 15, 2026',
-      severity: 'high',
+        'Smoking only in enclosed vehicles'
+      ]
     },
     {
-      id: 'ban-2',
+      id: '2',
       location: 'Colorado Front Range - Multiple Counties',
-      level: 'Stage 1',
+      stage: 'Stage 1 Fire Ban',
+      validUntil: 'April 1, 2026',
       restrictions: [
         'Campfires in designated rings only',
         'No fires on high wind days',
-        'Fire must be attended at all times',
-      ],
-      expires: 'April 1, 2026',
-      severity: 'medium',
-    },
-  ];
-
-  huntingSeasons: HuntingSeason[] = [
-    {
-      species: 'Elk',
-      season: 'August 15 - November 30',
-      permitRequired: true,
-      status: 'active',
-    },
-    {
-      species: 'Deer (Mule)',
-      season: 'October 1 - November 15',
-      permitRequired: true,
-      status: 'upcoming',
-    },
-    {
-      species: 'Turkey',
-      season: 'April 15 - May 31',
-      permitRequired: true,
-      status: 'upcoming',
-    },
+        'Fire must be attended at all times'
+      ]
+    }
   ];
 
   tripCompliance: TripCompliance[] = [
     {
-      tripId: 'trip-1',
-      tripName: 'Rocky Mountain Spring Adventure',
-      destination: 'Rocky Mountain National Park, CO',
+      id: '1',
+      name: 'Rocky Mountain Spring Adventure',
+      location: 'Rocky Mountain National Park, CO',
       dates: 'March 10-14, 2026',
-      overallStatus: 'needs-review',
+      status: 'Needs Review',
       issues: [
         'Stage 2 fire ban in effect - review restrictions',
-        'Wilderness permit required - not yet obtained',
+        'Wilderness permit required - not yet obtained'
       ],
-      lastChecked: '2 hours ago',
+      lastChecked: '2 hours ago'
     },
     {
-      tripId: 'trip-2',
-      tripName: 'Yosemite Family Camping',
-      destination: 'Yosemite National Park, CA',
+      id: '2',
+      name: 'Yosemite Family Camping',
+      location: 'Yosemite National Park, CA',
       dates: 'April 5-10, 2026',
-      overallStatus: 'compliant',
+      status: 'Compliant',
       issues: [],
-      lastChecked: '1 day ago',
-    },
+      lastChecked: '1 day ago'
+    }
   ];
+
+  huntingSeasons: HuntingSeason[] = [
+    {
+      id: '1',
+      animal: 'Elk',
+      dates: 'August 15 - November 30',
+      permitRequired: true,
+      status: 'Active'
+    },
+    {
+      id: '2',
+      animal: 'Deer (Mule)',
+      dates: 'October 1 - November 15',
+      permitRequired: true,
+      status: 'Active'
+    },
+    {
+      id: '3',
+      animal: 'Turkey',
+      dates: 'April 15 - May 31',
+      permitRequired: true,
+      status: 'Upcoming'
+    }
+  ];
+
+  safetyAlert = {
+    message: "Looking for safety alerts? Real-time weather warnings, wildlife dangers, and emergency check-in are on the",
+    linkText: "Safety page",
+    linkUrl: "/safety"
+  };
 
   constructor(private router: Router) { }
 
-  getZoneIcon(type: EnvironmentalZone['type']): any {
-    switch (type) {
-      case 'wilderness':
-        return this.MountainIcon;
-      case 'wildlife-protection':
-        return this.BinocularsIcon;
-      case 'restricted':
-        return this.BanIcon;
-      case 'seasonal-closure':
-        return this.CalendarIcon;
-      default:
-        return this.MapPinIcon;
-    }
+  getZoneIcon(name: string): any {
+    if (name.includes('Wilderness')) return this.MountainIcon;
+    if (name.includes('Bear')) return this.BinocularsIcon;
+    return this.MapPinIcon;
   }
 
   getZoneStatusConfig(status: EnvironmentalZone['status']): { label: string; color: string; icon: any } {
     switch (status) {
-      case 'open':
+      case 'Open':
         return {
           label: 'Open',
-          color: 'bg-green-50 text-green-700 border-green-200',
+          color: 'bg-emerald-50 text-emerald-700 border-emerald-100',
           icon: this.CheckCircleIcon,
         };
-      case 'restricted':
-        return {
-          label: 'Restricted',
-          color: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-          icon: this.AlertTriangleIcon,
-        };
-      case 'closed':
+      case 'Closed':
         return {
           label: 'Closed',
-          color: 'bg-red-50 text-red-700 border-red-200',
+          color: 'bg-red-50 text-red-700 border-red-100',
           icon: this.XCircleIcon,
         };
       default:
         return {
           label: 'Unknown',
-          color: 'bg-gray-50 text-gray-700 border-gray-200',
+          color: 'bg-stone-50 text-stone-700 border-stone-200',
           icon: this.InfoIcon,
         };
     }
   }
 
-  getComplianceConfig(status: TripCompliance['overallStatus']): { label: string; color: string; icon: any } {
+  getComplianceConfig(status: TripCompliance['status']): { label: string; color: string; icon: any } {
     switch (status) {
-      case 'compliant':
+      case 'Compliant':
         return {
           icon: this.CheckCircleIcon,
-          color: 'bg-green-50 text-green-700 border-green-200',
+          color: 'bg-emerald-50 text-emerald-700 border-emerald-100',
           label: 'Compliant',
         };
-      case 'needs-review':
+      case 'Needs Review':
         return {
           icon: this.AlertTriangleIcon,
-          color: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+          color: 'bg-yellow-50 text-yellow-700 border-yellow-100',
           label: 'Needs Review',
-        };
-      case 'restricted':
-        return {
-          icon: this.XCircleIcon,
-          color: 'bg-red-50 text-red-700 border-red-200',
-          label: 'Restricted',
         };
       default:
         return {
           label: 'Unknown',
-          color: 'bg-gray-50 text-gray-700 border-gray-200',
+          color: 'bg-stone-50 text-stone-700 border-stone-200',
           icon: this.InfoIcon,
         };
     }
   }
 
   hasHighSeverityBan(): boolean {
-    return this.fireBans.some(b => b.severity === 'high');
+    return this.fireBans.some(b => b.stage.includes('Stage 2'));
   }
 
   navigate(url: string): void {

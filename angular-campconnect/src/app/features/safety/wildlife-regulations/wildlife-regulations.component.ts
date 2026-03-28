@@ -1,9 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { LucideAngularModule, ChevronLeft, Binoculars, MapPin, Shield, Calendar, AlertTriangle, Info, FileText, CheckCircle, Ban, XCircle } from 'lucide-angular';
-import { CardComponent, CardHeaderComponent, CardTitleComponent, CardContentComponent, CardDescriptionComponent } from '../../../shared/components/card.component';
-import { BadgeComponent } from '../../../shared/components/badge.component';
+import { LucideAngularModule, ChevronLeft, ChevronRight, Binoculars, MapPin, Shield, Calendar, AlertTriangle, Info, FileText, CheckCircle, Ban, XCircle } from 'lucide-angular';
 
 interface WildlifeSpecies {
   id: string;
@@ -41,12 +39,7 @@ interface WildlifeSpecies {
   imports: [
     CommonModule,
     LucideAngularModule,
-    CardComponent,
-    CardHeaderComponent,
-    CardTitleComponent,
-    CardContentComponent,
-    CardDescriptionComponent,
-    BadgeComponent
+    LucideAngularModule
   ],
   templateUrl: './wildlife-regulations.component.html',
   styles: []
@@ -64,6 +57,7 @@ export class WildlifeRegulationsComponent {
   readonly CheckCircleIcon = CheckCircle;
   readonly XCircleIcon = XCircle;
   readonly BanIcon = Ban;
+  readonly ChevronRightIcon = ChevronRight;
 
   species: WildlifeSpecies[] = [
     {
@@ -232,7 +226,6 @@ export class WildlifeRegulationsComponent {
     },
   ];
 
-  selectedSpecies: WildlifeSpecies | null = null;
   filterCategory: string = 'all';
 
   statusColors: { [key: string]: string } = {
@@ -245,19 +238,30 @@ export class WildlifeRegulationsComponent {
 
   constructor(private router: Router) { }
 
+  selectedFilter: string = 'All Species';
+  selectedSpeciesId: string | null = null;
+
   get filteredSpecies(): WildlifeSpecies[] {
-    return this.filterCategory === 'all'
-      ? this.species
-      : this.species.filter((s) => s.category === this.filterCategory);
+    if (this.selectedFilter === 'All Species') return this.species;
+    return this.species.filter(s => {
+      if (this.selectedFilter === 'Protected') return s.category === 'protected' || s.conservationStatus === 'protected';
+      if (this.selectedFilter === 'Big Game') return s.category === 'big-game';
+      if (this.selectedFilter === 'Small Game') return s.category === 'small-game';
+      return true;
+    });
   }
 
-  setFilterCategory(category: string): void {
-    this.filterCategory = category;
-    this.selectedSpecies = null; // Reset selection on filter change
+  setSelectedFilter(filter: string): void {
+    this.selectedFilter = filter;
+    this.selectedSpeciesId = null;
   }
 
-  selectSpecies(species: WildlifeSpecies): void {
-    this.selectedSpecies = species;
+  setSelectedSpecies(id: string): void {
+    this.selectedSpeciesId = id;
+  }
+
+  get selectedSpecies(): WildlifeSpecies | undefined {
+    return this.species.find(s => s.id === this.selectedSpeciesId);
   }
 
   navigate(url: string): void {

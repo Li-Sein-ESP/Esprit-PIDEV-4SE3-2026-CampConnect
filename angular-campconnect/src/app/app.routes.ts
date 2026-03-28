@@ -4,6 +4,7 @@ import { authGuard } from './core/guards/auth.guard';
 import { RoleDashboardComponent } from './features/dashboard/role-dashboard.component';
 
 export const routes: Routes = [
+    // Standalone auth routes (outside MainLayoutComponent)
     {
         path: 'login',
         loadComponent: () => import('./features/auth/login.component').then(m => m.LoginComponent)
@@ -12,6 +13,7 @@ export const routes: Routes = [
         path: 'signup',
         loadComponent: () => import('./features/auth/login.component').then(m => m.LoginComponent)
     },
+    // Equipment Provider Portal
     {
         path: 'provider',
         loadComponent: () => import('./features/marketplace/provider-layout/provider-layout.component').then(m => m.ProviderLayoutComponent),
@@ -53,6 +55,7 @@ export const routes: Routes = [
             }
         ]
     },
+    // Delivery Provider Portal
     {
         path: 'delivery',
         loadComponent: () => import('./features/delivery/delivery-layout/delivery-layout.component').then(m => m.DeliveryLayoutComponent),
@@ -90,10 +93,12 @@ export const routes: Routes = [
             }
         ]
     },
+    // Landing Page
     {
         path: '',
         loadComponent: () => import('./features/landing/landing.component').then(m => m.LandingComponent)
     },
+    // Admin Portal
     {
         path: 'admin',
         loadComponent: () => import('./features/admin/admin-layout/admin-layout.component').then(m => m.AdminLayoutComponent),
@@ -115,10 +120,12 @@ export const routes: Routes = [
             }
         ]
     },
+    // Main Layout Routes
     {
         path: '',
         component: MainLayoutComponent,
         children: [
+            // Marketplace
             {
                 path: 'marketplace',
                 children: [
@@ -157,6 +164,7 @@ export const routes: Routes = [
                 canActivate: [authGuard],
                 data: { roles: ['ROLE_ORGANIZER'] }
             },
+            // Profile
             {
                 path: 'profile/edit',
                 loadComponent: () => import('./features/auth/profile/camper-edit-profile.component').then(m => m.CamperEditProfileComponent),
@@ -167,9 +175,17 @@ export const routes: Routes = [
                 path: 'profile',
                 loadComponent: () => import('./features/auth/profile/camper-profile.component').then(m => m.CamperProfileComponent),
                 canActivate: [authGuard],
-                data: { roles: ['ROLE_CAMPER', 'ROLE_SITE_OWNER', 'ROLE_EQUIPMENT_PROVIDER', 'ROLE_ORGANIZER', 'ROLE_DELIVERY_PROVIDER', 'ROLE_ADMIN'] } // Accessible to all logged-in users
+                data: { roles: ['ROLE_CAMPER', 'ROLE_SITE_OWNER', 'ROLE_EQUIPMENT_PROVIDER', 'ROLE_ORGANIZER', 'ROLE_DELIVERY_PROVIDER', 'ROLE_ADMIN'] }
             },
-            // Existing routes
+            {
+                path: 'profile/orders',
+                loadComponent: () => import('./features/marketplace/camper-orders/camper-orders.component').then(m => m.CamperOrdersComponent)
+            },
+            {
+                path: 'profile/orders/:orderId',
+                loadComponent: () => import('./features/marketplace/camper-order-details/camper-order-details.component').then(m => m.CamperOrderDetailsComponent)
+            },
+            // Trips
             {
                 path: 'plan-trip',
                 loadComponent: () => import('./features/trips/plan-trip.component').then(m => m.PlanTripComponent)
@@ -183,6 +199,7 @@ export const routes: Routes = [
                 path: 'trips/:id',
                 loadComponent: () => import('./features/trips/trip-detail/trip-detail.component').then(m => m.TripDetailComponent)
             },
+            // Campsites
             {
                 path: 'campsites',
                 loadComponent: () => import('./features/campsites/campsites.component').then(m => m.CampsitesComponent)
@@ -191,6 +208,7 @@ export const routes: Routes = [
                 path: 'campsites/:id',
                 loadComponent: () => import('./features/campsites/campsite-detail/campsite-detail.component').then(m => m.CampsiteDetailComponent)
             },
+            // Gear
             {
                 path: 'gear',
                 loadComponent: () => import('./features/gear/gear.component').then(m => m.GearComponent)
@@ -225,6 +243,7 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/delivery/deliveries/deliveries.component').then(m => m.DeliveriesComponent),
                 canActivate: [authGuard]
             },
+            // Community
             {
                 path: 'community',
                 loadComponent: () => import('./features/community/community.component').then(m => m.CommunityComponent)
@@ -280,9 +299,14 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/community/post-details/post-details.component').then(m => m.PostDetailsComponent)
             },
             {
+                path: 'community/moderation',
+                loadComponent: () => import('./features/community/moderation-dashboard/moderation-dashboard.component').then(m => m.ModerationDashboardComponent)
+            },
+            {
                 path: 'community/:id',
                 loadComponent: () => import('./features/community/post-detail/post-detail.component').then(m => m.PostDetailComponent)
             },
+            // Academy
             {
                 path: 'academy',
                 loadComponent: () => import('./features/academy/academy.component').then(m => m.AcademyComponent)
@@ -292,25 +316,63 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/academy/course-detail/course-detail.component').then(m => m.CourseDetailComponent)
             },
             {
+                path: 'academy/video/:videoId',
+                loadComponent: () => import('./features/academy/knowledge-video/knowledge-video.component').then(m => m.KnowledgeVideoComponent)
+            },
+            {
+                path: 'academy/expert/:expertId',
+                loadComponent: () => import('./features/academy/expert-profile/expert-profile.component').then(m => m.ExpertProfileComponent)
+            },
+            {
+                path: 'academy/certifications',
+                loadComponent: () => import('./features/academy/certification-programs/certification-programs.component').then(m => m.CertificationProgramsComponent)
+            },
+            {
+                path: 'academy/my-progress',
+                loadComponent: () => import('./features/academy/certification-progress/certification-progress.component').then(m => m.CertificationProgressComponent)
+            },
+            {
+                path: 'academy/my-badges',
+                loadComponent: () => import('./features/academy/my-badges/my-badges.component').then(m => m.MyBadgesComponent)
+            },
+            // Safety
+            {
                 path: 'safety',
                 loadComponent: () => import('./features/safety/safety.component').then(m => m.SafetyComponent)
             },
             {
-                path: 'delivery/track/:orderId',
-                loadComponent: () => import('./features/delivery/delivery-tracking/delivery-tracking.component').then(m => m.DeliveryTrackingComponent)
+                path: 'safety/alerts',
+                loadComponent: () => import('./features/safety/safety-alerts/safety-alerts.component').then(m => m.SafetyAlertsComponent)
             },
             {
-                path: 'profile/orders',
-                loadComponent: () => import('./features/marketplace/camper-orders/camper-orders.component').then(m => m.CamperOrdersComponent)
+                path: 'safety/active-alerts',
+                loadComponent: () => import('./features/safety/active-alerts/active-alerts.component').then(m => m.ActiveAlertsComponent)
             },
             {
-                path: 'profile/orders/:orderId',
-                loadComponent: () => import('./features/marketplace/camper-order-details/camper-order-details.component').then(m => m.CamperOrderDetailsComponent)
+                path: 'safety/checkin',
+                loadComponent: () => import('./features/safety/trip-checkin/trip-checkin.component').then(m => m.TripCheckinComponent)
             },
             {
-                path: 'delivery-provider/login',
-                loadComponent: () => import('./features/auth/login.component').then(m => m.LoginComponent)
+                path: 'safety/compliance/:tripId',
+                loadComponent: () => import('./features/safety/trip-compliance-report/trip-compliance-report.component').then(m => m.TripComplianceReportComponent)
             },
+            {
+                path: 'safety/compliance-detail',
+                loadComponent: () => import('./features/safety/trip-compliance-detail/trip-compliance-detail.component').then(m => m.TripComplianceDetailComponent)
+            },
+            {
+                path: 'safety/wildlife',
+                loadComponent: () => import('./features/safety/wildlife-regulations/wildlife-regulations.component').then(m => m.WildlifeRegulationsComponent)
+            },
+            {
+                path: 'safety/zones',
+                loadComponent: () => import('./features/safety/environmental-zones/environmental-zones.component').then(m => m.EnvironmentalZonesComponent)
+            },
+            {
+                path: 'environmental',
+                loadComponent: () => import('./features/safety/environmental-compliance/environmental-compliance.component').then(m => m.EnvironmentalComplianceComponent)
+            },
+            // Dashboard
             {
                 path: 'dashboard',
                 loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
@@ -330,17 +392,6 @@ export const routes: Routes = [
                 path: 'discover',
                 loadComponent: () => import('./features/bookings/availability-search/availability-search.component').then(m => m.AvailabilitySearchComponent)
             },
-            // - [x] Researching the cause of the 401 error <!-- id: 0 -->
-            //     - [x] Locate reservation components and services <!-- id: 1 -->
-            //     - [x] Inspect authentication/interceptor logic <!-- id: 2 -->
-            //     - [x] Check backend security configuration for the reservation endpoint <!-- id: 3 -->
-            // - [x] Implementing the fix for token expiration <!-- id: 4 -->
-            //     - [x] Update `AuthService` to validate token expiration <!-- id: 6 -->
-            //     - [x] Update `AuthInterceptor` to handle 401 errors <!-- id: 7 -->
-            // - [ ] Refining the "My Reservations" interface <!-- id: 8 -->
-            //     - [ ] Remove ID display from the template <!-- id: 9 -->
-            //     - [ ] Ensure only the current user's reservations are shown <!-- id: 10 -->
-            // - [x] Verifying the fix <!-- id: 5 -->
             {
                 path: 'booking/reserve/:siteId',
                 loadComponent: () => import('./features/bookings/reservation-create/reservation-create.component').then(m => m.ReservationCreateComponent),
@@ -388,6 +439,30 @@ export const routes: Routes = [
                     }
                 ]
             },
+            {
+                path: 'companions/preferences',
+                loadComponent: () => import('./features/companions/matching-preferences/matching-preferences.component').then(m => m.MatchingPreferencesComponent)
+            },
+            {
+                path: 'companions/matches',
+                loadComponent: () => import('./features/companions/match-suggestions/match-suggestions.component').then(m => m.MatchSuggestionsComponent)
+            },
+            {
+                path: 'companions/match/:matchId',
+                loadComponent: () => import('./features/companions/match-detail/match-detail.component').then(m => m.MatchDetailComponent)
+            },
+            {
+                path: 'companions/create-group',
+                loadComponent: () => import('./features/companions/create-group-trip/create-group-trip.component').then(m => m.CreateGroupTripComponent)
+            },
+            {
+                path: 'companions/group/:groupId',
+                loadComponent: () => import('./features/companions/group-management/group-management.component').then(m => m.GroupManagementComponent)
+            },
+            {
+                path: 'companions/groups',
+                loadComponent: () => import('./features/companions/my-groups/my-groups.component').then(m => m.MyGroupsComponent)
+            },
             // Groups Management
             {
                 path: 'groups/:id',
@@ -410,12 +485,10 @@ export const routes: Routes = [
                 path: 'trip-intents/edit/:id',
                 loadComponent: () => import('./features/trip-intents/trip-intent-edit/trip-intent-edit').then(m => m.TripIntentEditComponent)
             },
-
             {
                 path: 'my-trip-intents',
                 loadComponent: () => import('./features/trip-intents/my-trip-intents/my-trip-intents.component').then(m => m.MyTripIntentsComponent)
             },
-
             {
                 path: 'trip-intents/:id',
                 loadComponent: () => import('./features/trip-intents/trip-intent-detail/trip-intent-detail.component').then(m => m.TripIntentDetailComponent)
@@ -439,11 +512,84 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/trips/trip-packing/trip-packing.component').then(m => m.TripPackingComponent),
                 canActivate: [authGuard]
             },
-            // END Admin Block
             {
-                path: '**',
-                redirectTo: ''
+                path: 'plan-trip/:tripId/budget',
+                loadComponent: () => import('./features/trips/trip-budget/trip-budget.component').then(m => m.TripBudgetComponent)
+            },
+            {
+                path: 'plan-trip/:tripId/nearby',
+                loadComponent: () => import('./features/trips/trip-nearby/trip-nearby.component').then(m => m.TripNearbyComponent)
+            },
+            {
+                path: 'packing-lists',
+                loadComponent: () => import('./features/trips/packing-lists/packing-lists.component').then(m => m.PackingListsComponent)
+            },
+            {
+                path: 'budget-estimation',
+                loadComponent: () => import('./features/trips/budget-estimation/budget-estimation.component').then(m => m.BudgetEstimationComponent)
+            },
+            {
+                path: 'recommended-places',
+                loadComponent: () => import('./features/trips/recommended-places/recommended-places.component').then(m => m.RecommendedPlacesComponent)
+            },
+            // Gear Extended (from Nawres)
+            {
+                path: 'gear/cart',
+                loadComponent: () => import('./features/gear/gear-cart/gear-cart.component').then(m => m.GearCartComponent)
+            },
+            {
+                path: 'gear/kits',
+                loadComponent: () => import('./features/gear/gear-kits/gear-kits.component').then(m => m.GearKitsComponent)
+            },
+
+            {
+                path: 'gear/delivery',
+                loadComponent: () => import('./features/gear/delivery-logistics/delivery-logistics.component').then(m => m.DeliveryLogisticsComponent)
+            },
+            {
+                path: 'gear/delivery/:deliveryId',
+                loadComponent: () => import('./features/gear/delivery-tracking/delivery-tracking.component').then(m => m.DeliveryTrackingComponent)
+            },
+            {
+                path: 'gear/provider',
+                loadComponent: () => import('./features/gear/provider-deliveries/provider-deliveries.component').then(m => m.ProviderDeliveriesComponent)
+            },
+            // Transportation (from Nawres)
+            {
+                path: 'transportation',
+                loadComponent: () => import('./features/transportation/transportation-overview/transportation-overview.component').then(m => m.TransportationOverviewComponent)
+            },
+            {
+                path: 'transportation/options',
+                loadComponent: () => import('./features/transportation/transportation-options/transportation-options.component').then(m => m.TransportationOptionsComponent)
+            },
+            {
+                path: 'transportation/route/:optionId',
+                loadComponent: () => import('./features/transportation/route-breakdown/route-breakdown.component').then(m => m.RouteBreakdownComponent)
+            },
+            {
+                path: 'transportation/confirm',
+                loadComponent: () => import('./features/transportation/transport-confirmation/transport-confirmation.component').then(m => m.TransportConfirmationComponent)
+            },
+            // Events (from Nawres)
+            {
+                path: 'events',
+                loadComponent: () => import('./features/events/events-home/events-home.component').then(m => m.EventsHomeComponent)
+            },
+            {
+                path: 'events/:eventId',
+                loadComponent: () => import('./features/events/event-details/event-details.component').then(m => m.EventDetailsComponent)
+            },
+            // Delivery Provider Login
+            {
+                path: 'delivery-provider/login',
+                loadComponent: () => import('./features/auth/login.component').then(m => m.LoginComponent)
             }
         ]
+    },
+    // Wildcard - redirect to landing
+    {
+        path: '**',
+        redirectTo: ''
     }
 ];

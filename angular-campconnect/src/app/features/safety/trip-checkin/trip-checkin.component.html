@@ -1,0 +1,262 @@
+<div class="min-h-screen bg-[#FDFCF8] font-sans">
+    <!-- Header -->
+    <header class="bg-[#C8102E] text-white p-6 md:p-10">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="bg-white/20 p-2 rounded-full">
+                    <lucide-icon [img]="PhoneIcon" size="24" class="text-white"></lucide-icon>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold">Emergency Contacts &amp; Check-In</h1>
+            </div>
+            <p class="text-white/80 max-w-2xl text-lg">
+                Manage emergency contacts and stay connected with check-in notifications during your trips.
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-6 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Left Column: Check-In + Emergency Contacts -->
+        <div class="lg:col-span-2 space-y-8">
+
+            <!-- Check-In Status -->
+            <section>
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-3xl font-bold text-[#1B362C]">Check-In Status</h2>
+                    <span
+                        class="bg-[#2B57FF] text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">
+                        <lucide-icon [img]="BellIcon" size="12" class="text-white"></lucide-icon>
+                        1 Pending
+                    </span>
+                </div>
+
+                <div class="space-y-6">
+                    <div *ngFor="let trip of trips" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-[#1B362C]">{{ trip.name }}</h3>
+                                <div class="flex flex-wrap gap-4 mt-1 text-gray-500 text-sm">
+                                    <span class="flex items-center gap-1">
+                                        <lucide-icon [img]="MapPinIcon" size="14" class="text-gray-400"></lucide-icon>
+                                        {{ trip.location }}
+                                    </span>
+                                    <span class="flex items-center gap-1">
+                                        <lucide-icon [img]="ClockIcon" size="14" class="text-gray-400"></lucide-icon>
+                                        {{ trip.time }}
+                                    </span>
+                                </div>
+                            </div>
+                            <span *ngIf="trip.status === 'checked-in'"
+                                class="bg-[#E7F7F2] text-[#0A8F6A] text-xs font-bold px-3 py-1.5 rounded-full border border-[#B2E2D3] flex items-center gap-1.5">
+                                <lucide-icon [img]="CheckCircle2Icon" size="14" class="text-[#0A8F6A]"></lucide-icon>
+                                Checked In
+                            </span>
+                            <span *ngIf="trip.status === 'pending'"
+                                class="bg-[#EEF2FF] text-[#2B57FF] text-xs font-bold px-3 py-1.5 rounded-full border border-[#D1DBFF] flex items-center gap-1.5">
+                                <lucide-icon [img]="ClockIcon" size="14" class="text-[#2B57FF]"></lucide-icon>
+                                Pending
+                            </span>
+                        </div>
+
+                        <!-- Checked-in state -->
+                        <div *ngIf="trip.status === 'checked-in'"
+                            class="bg-[#F2FDF9] border border-[#B2E2D3] rounded-xl p-4 flex items-center gap-3">
+                            <lucide-icon [img]="CheckCircle2Icon" size="20" class="text-[#0A8F6A]"></lucide-icon>
+                            <div>
+                                <p class="font-semibold text-[#1B362C]">Checked In Successfully</p>
+                                <p class="text-xs text-gray-500">Completed at {{ trip.lastCheckedIn }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Pending state -->
+                        <div *ngIf="trip.status === 'pending'" class="space-y-4">
+                            <div class="bg-[#EFF6FF] border border-[#BFDBFE] rounded-xl p-4 flex items-start gap-3">
+                                <lucide-icon [img]="InfoIcon" size="20" class="text-[#2B57FF] mt-0.5"></lucide-icon>
+                                <div>
+                                    <p class="font-semibold text-[#1B362C]">Check-In Reminder</p>
+                                    <p class="text-xs text-gray-600 leading-relaxed">
+                                        Please check in at the scheduled time to confirm your safety. Your emergency
+                                        contacts will be notified if you miss your check-in.
+                                    </p>
+                                </div>
+                            </div>
+                            <button (click)="checkInNow(trip.id)"
+                                class="w-full bg-[#1B362C] hover:bg-[#142821] text-white font-bold py-3.5 rounded-lg flex items-center justify-center gap-2 transition-colors">
+                                <lucide-icon [img]="CheckCircle2Icon" size="20" class="text-white"></lucide-icon>
+                                Check In Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Emergency Contacts -->
+            <section class="pt-4">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-3xl font-bold text-[#1B362C]">Emergency Contacts</h2>
+                    <button (click)="openAddContactModal()"
+                        class="bg-[#1B362C] hover:bg-[#142821] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-bold text-sm transition-colors">
+                        <lucide-icon [img]="UserPlusIcon" size="16" class="text-white"></lucide-icon>
+                        Add Contact
+                    </button>
+                </div>
+
+                <div class="space-y-4">
+                    <div *ngFor="let contact of contacts"
+                        class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-14 h-14 bg-[#F0F7FF] rounded-full flex items-center justify-center">
+                                    <lucide-icon [img]="UserIcon" size="24" class="text-[#2B57FF]"></lucide-icon>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="text-xl font-bold text-[#1B362C]">{{ contact.name }}</h3>
+                                        <span *ngIf="contact.isPrimary"
+                                            class="bg-[#2B57FF] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                                            Primary
+                                        </span>
+                                    </div>
+                                    <p class="text-gray-500">{{ contact.relationship }}</p>
+                                </div>
+                            </div>
+                            <button class="p-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                <lucide-icon [img]="Edit2Icon" size="20" class="text-gray-400"></lucide-icon>
+                            </button>
+                        </div>
+                        <div class="mt-6 flex flex-wrap gap-x-12 gap-y-3 text-sm text-gray-600">
+                            <div class="flex items-center gap-2">
+                                <lucide-icon [img]="PhoneIcon" size="16" class="text-gray-400"></lucide-icon>
+                                {{ contact.phone }}
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <lucide-icon [img]="MailIcon" size="16" class="text-gray-400"></lucide-icon>
+                                {{ contact.email }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="space-y-6">
+
+            <!-- Emergency Services -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border-2 border-red-50">
+                <div class="flex items-center gap-2 mb-6">
+                    <lucide-icon [img]="PhoneIcon" size="20" class="text-[#1B362C]"></lucide-icon>
+                    <h3 class="font-bold text-[#1B362C] uppercase tracking-wide text-sm">Emergency Services</h3>
+                </div>
+                <div class="space-y-6">
+                    <div>
+                        <p class="text-red-500 text-[10px] font-bold uppercase mb-1">All Emergencies</p>
+                        <p class="text-3xl font-bold text-[#1B362C]">911</p>
+                    </div>
+                    <div>
+                        <p class="text-red-500 text-[10px] font-bold uppercase mb-1">National Park Service</p>
+                        <p class="text-xl font-bold text-[#1B362C]">(970) 586-1206</p>
+                    </div>
+                    <div>
+                        <p class="text-red-500 text-[10px] font-bold uppercase mb-1">Search &amp; Rescue</p>
+                        <p class="text-xl font-bold text-[#1B362C]">(970) 586-1399</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- How Check-In Works -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-blue-50">
+                <h3 class="font-bold text-[#1B362C] mb-4">How Check-In Works</h3>
+                <div class="space-y-4">
+                    <div *ngFor="let step of ['Set check-in times when creating or editing trips', 'Receive reminders before scheduled check-ins', 'Emergency contacts are notified if you miss a check-in']; let i = index"
+                        class="flex gap-3">
+                        <div
+                            class="flex-shrink-0 w-5 h-5 bg-[#2B57FF] text-white rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5">
+                            {{ i + 1 }}
+                        </div>
+                        <p class="text-xs text-gray-600 leading-relaxed">{{ step }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <h2 class="text-2xl font-bold text-[#1B362C] mb-4">Notification Settings</h2>
+                <div class="space-y-4">
+                    <div *ngFor="let setting of notificationSettings" class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600 font-medium">{{ setting.label }}</span>
+                        <div
+                            [class]="setting.checked ? 'w-5 h-5 rounded flex items-center justify-center border bg-[#C8102E] border-[#C8102E]' : 'w-5 h-5 rounded flex items-center justify-center border bg-white border-gray-300'">
+                            <lucide-icon *ngIf="setting.checked" [img]="CheckCircle2Icon" size="12"
+                                class="text-white"></lucide-icon>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<!-- Add Emergency Contact Modal -->
+<div *ngIf="showAddContactModal"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+    (click)="closeAddContactModal()">
+    <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl" (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-100">
+            <h2 class="text-xl font-bold text-[#1B362C]">Add Emergency Contact</h2>
+            <button (click)="closeAddContactModal()"
+                class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+                <lucide-icon [img]="XIcon" size="20"></lucide-icon>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6">
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <!-- Name -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Name <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" [(ngModel)]="newContact.name" placeholder=""
+                        class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1B362C] focus:ring-2 focus:ring-[#1B362C]/20 transition-all" />
+                </div>
+                <!-- Relationship -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Relationship <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" [(ngModel)]="newContact.relationship" placeholder="e.g., Spouse, Parent, Friend"
+                        class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1B362C] focus:ring-2 focus:ring-[#1B362C]/20 transition-all" />
+                </div>
+                <!-- Phone -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Phone <span
+                            class="text-red-500">*</span></label>
+                    <input type="tel" [(ngModel)]="newContact.phone" placeholder="(555) 123-4567"
+                        class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1B362C] focus:ring-2 focus:ring-[#1B362C]/20 transition-all" />
+                </div>
+                <!-- Email -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Email <span
+                            class="text-red-500">*</span></label>
+                    <input type="email" [(ngModel)]="newContact.email" placeholder="contact@email.com"
+                        class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#1B362C] focus:ring-2 focus:ring-[#1B362C]/20 transition-all" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex gap-3 px-6 pb-6">
+            <button (click)="submitNewContact()"
+                class="flex-1 py-3 bg-[#1B362C] text-white rounded-xl text-sm font-bold hover:bg-[#142821] transition-colors">
+                Add Contact
+            </button>
+            <button (click)="closeAddContactModal()"
+                class="px-6 py-3 border border-gray-200 text-gray-700 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>

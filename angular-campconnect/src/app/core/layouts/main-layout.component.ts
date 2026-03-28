@@ -41,7 +41,7 @@ import { filter } from 'rxjs/operators';
                 <li><a routerLink="/campsites" class="hover:text-white transition-colors">Campsites</a></li>
                 <li><a routerLink="/academy" class="hover:text-white transition-colors">Academy</a></li>
                 <li><a routerLink="/events" class="hover:text-white transition-colors">Events</a></li>
-                <li><a routerLink="/safety" class="hover:text-white transition-colors">Safety</a></li>
+                <li><a routerLink="/safety/alerts" class="hover:text-white transition-colors">Safety</a></li>
               </ul>
             </div>
 
