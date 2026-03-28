@@ -121,7 +121,9 @@ export class NavigationComponent implements OnInit {
           { label: 'Campsites', link: '/campsites' },
           { label: 'Academy', link: '/academy' },
           { label: 'Events', link: '/events' },
-          { label: 'Safety', link: '/safety' }
+          { label: 'Safety Alerts', link: '/safety' },
+          { label: 'Safety Map', link: '/safety/map' },
+          { label: 'Report Incident', link: '/safety/report-incident' }
         ]
       },
       {
@@ -144,9 +146,12 @@ export class NavigationComponent implements OnInit {
       {
         label: 'Community',
         children: [
-          { label: 'Forums', link: '/community' },
+          { label: 'Feed', link: '/community/feed' },
+          { label: 'Forums', link: '/community/forums' },
+          { label: 'Events', link: '/community/events' },
+          { label: 'Messaging', link: '/community/messaging' },
           { label: 'Trip Stories', link: '/community/stories' },
-          { label: 'Help Center', link: '/community/help' }
+          { label: 'Leaderboard', link: '/community/leaderboard' }
         ]
       }
     ];
