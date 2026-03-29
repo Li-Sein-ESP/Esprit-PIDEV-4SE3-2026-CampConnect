@@ -4,6 +4,7 @@ import com.campconnect.dto.ChangePasswordRequest;
 import com.campconnect.dto.MessageResponse;
 import com.campconnect.dto.UpdateProfileRequest;
 import com.campconnect.dto.UserProfileResponse;
+import com.campconnect.dto.UserStatsResponse;
 import com.campconnect.service.UserService;
 import com.campconnect.service.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,5 +47,12 @@ public class UserController {
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         userService.changePassword(userDetails.getId(), request);
         return ResponseEntity.ok(new MessageResponse("Password updated successfully"));
+    }
+
+    @GetMapping("/me/stats")
+    @Operation(summary = "Get current user statistics")
+    public ResponseEntity<UserStatsResponse> getMyStats(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(userService.getUserStats(userDetails.getId()));
     }
 }

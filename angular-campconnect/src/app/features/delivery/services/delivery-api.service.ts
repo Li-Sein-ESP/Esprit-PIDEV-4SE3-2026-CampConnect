@@ -75,6 +75,42 @@ export interface EarningsResponse {
     dailyBreakdown: DailyEarning[];
 }
 
+export interface DriverProfileStatsResponse {
+    totalDeliveries: number;
+    activeJobs: number;
+    totalEarnings: number;
+    rating: number;
+    completionRate: number;
+    onTimeRate: number;
+    deliveredCount: number;
+    cancelledCount: number;
+    failedCount: number;
+}
+
+export interface VehicleEarning {
+    vehicleId: string;
+    vehicleName: string;
+    deliveryCount: number;
+    earnings: number;
+}
+
+export interface VehicleEarningsBreakdownResponse {
+    vehicleEarnings: VehicleEarning[];
+}
+
+export interface Payment {
+    id: string;
+    deliveryId: string;
+    customerName: string;
+    amount: number;
+    paymentDate: string;
+    status: string;
+}
+
+export interface RecentPaymentsResponse {
+    payments: Payment[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class DeliveryApiService {
     private readonly base = `${environment.apiUrl}/deliveries`;
@@ -138,5 +174,26 @@ export class DeliveryApiService {
      */
     getEarnings(): Observable<EarningsResponse> {
         return this.http.get<EarningsResponse>(`${this.base}/earnings`);
+    }
+
+    /**
+     * GET /api/deliveries/profile-stats  (DELIVERY_PROVIDER)
+     */
+    getProfileStats(): Observable<DriverProfileStatsResponse> {
+        return this.http.get<DriverProfileStatsResponse>(`${this.base}/profile-stats`);
+    }
+
+    /**
+     * GET /api/deliveries/earnings/breakdown  (DELIVERY_PROVIDER)
+     */
+    getEarningsBreakdown(): Observable<VehicleEarningsBreakdownResponse> {
+        return this.http.get<VehicleEarningsBreakdownResponse>(`${this.base}/earnings/breakdown`);
+    }
+
+    /**
+     * GET /api/deliveries/earnings/payments  (DELIVERY_PROVIDER)
+     */
+    getRecentPayments(): Observable<RecentPaymentsResponse> {
+        return this.http.get<RecentPaymentsResponse>(`${this.base}/earnings/payments`);
     }
 }

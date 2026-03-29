@@ -3,8 +3,11 @@ package com.campconnect.delivery.controller;
 import com.campconnect.common.PagedResponse;
 import com.campconnect.delivery.dto.DeliveryRequest;
 import com.campconnect.delivery.dto.DeliveryResponse;
+import com.campconnect.delivery.dto.DriverProfileStatsResponse;
 import com.campconnect.delivery.dto.EarningsResponse;
+import com.campconnect.delivery.dto.RecentPaymentsResponse;
 import com.campconnect.delivery.dto.RouteDto;
+import com.campconnect.delivery.dto.VehicleEarningsBreakdownResponse;
 import com.campconnect.delivery.model.DeliveryPriority;
 import com.campconnect.delivery.model.DeliveryStatus;
 import com.campconnect.delivery.service.DeliveryService;
@@ -80,6 +83,30 @@ public class DeliveryController {
     public ResponseEntity<EarningsResponse> getEarnings(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(deliveryService.calculateEarnings(userDetails.getId()));
+    }
+
+    @GetMapping("/profile-stats")
+    @PreAuthorize("hasRole('DELIVERY_PROVIDER')")
+    @Operation(summary = "Get driver profile statistics")
+    public ResponseEntity<DriverProfileStatsResponse> getProfileStats(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(deliveryService.getDriverProfileStats(userDetails.getId()));
+    }
+
+    @GetMapping("/earnings/breakdown")
+    @PreAuthorize("hasRole('DELIVERY_PROVIDER') or hasRole('ADMIN')")
+    @Operation(summary = "Get vehicle earnings breakdown")
+    public ResponseEntity<VehicleEarningsBreakdownResponse> getEarningsBreakdown(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(deliveryService.getVehicleEarningsBreakdown(userDetails.getId()));
+    }
+
+    @GetMapping("/earnings/payments")
+    @PreAuthorize("hasRole('DELIVERY_PROVIDER') or hasRole('ADMIN')")
+    @Operation(summary = "Get recent payment history")
+    public ResponseEntity<RecentPaymentsResponse> getRecentPayments(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(deliveryService.getRecentPayments(userDetails.getId()));
     }
 
     @GetMapping("/{id}")

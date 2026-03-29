@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { CardComponent, CardHeaderComponent, CardTitleComponent, CardContentComponent } from '../../shared/components/card.component';
@@ -6,6 +6,7 @@ import { BadgeComponent } from '../../shared/components/badge.component';
 import { LucideAngularModule, Calendar, MapPin, Package, Users, Bell } from 'lucide-angular';
 import { GroupInviteService } from '../groups/services/group-invite.service';
 import { AuthService } from '../../core/services/auth.service';
+import { UserApiService } from '../auth/services/user-api.service';
 import { switchMap, of } from 'rxjs';
 
 @Component({
@@ -41,7 +42,7 @@ import { switchMap, of } from 'rxjs';
               <lucide-icon [img]="CalendarIcon" [size]="24" class="text-[var(--color-primary-600)]"></lucide-icon>
             </div>
             <div>
-              <div class="text-2xl font-bold text-[var(--color-text-heading)]">5</div>
+              <div class="text-2xl font-bold text-[var(--color-text-heading)]">{{ upcomingTrips }}</div>
               <div class="text-sm text-[var(--color-text-secondary)]">Upcoming Trips</div>
             </div>
           </div>
@@ -53,7 +54,7 @@ import { switchMap, of } from 'rxjs';
               <lucide-icon [img]="MapPinIcon" [size]="24" class="text-[var(--color-success-600)]"></lucide-icon>
             </div>
             <div>
-              <div class="text-2xl font-bold text-[var(--color-text-heading)]">12</div>
+              <div class="text-2xl font-bold text-[var(--color-text-heading)]">{{ savedCampsites }}</div>
               <div class="text-sm text-[var(--color-text-secondary)]">Saved Campsites</div>
             </div>
           </div>
@@ -65,7 +66,7 @@ import { switchMap, of } from 'rxjs';
               <lucide-icon [img]="PackageIcon" [size]="24" class="text-[var(--color-accent-600)]"></lucide-icon>
             </div>
             <div>
-              <div class="text-2xl font-bold text-[var(--color-text-heading)]">3</div>
+              <div class="text-2xl font-bold text-[var(--color-text-heading)]">{{ gearRentals }}</div>
               <div class="text-sm text-[var(--color-text-secondary)]">Gear Rentals</div>
             </div>
           </div>
@@ -77,7 +78,7 @@ import { switchMap, of } from 'rxjs';
               <lucide-icon [img]="UsersIcon" [size]="24" class="text-[var(--color-info-600)]"></lucide-icon>
             </div>
             <div>
-              <div class="text-2xl font-bold text-[var(--color-text-heading)]">8</div>
+              <div class="text-2xl font-bold text-[var(--color-text-heading)]">{{ tripCompanions }}</div>
               <div class="text-sm text-[var(--color-text-secondary)]">Trip Companions</div>
             </div>
           </div>
@@ -154,12 +155,18 @@ import { switchMap, of } from 'rxjs';
   `,
     styles: []
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
     CalendarIcon = Calendar;
     MapPinIcon = MapPin;
     PackageIcon = Package;
     UsersIcon = Users;
     BellIcon = Bell;
+
+    // Dashboard stats
+    upcomingTrips = 0;
+    savedCampsites = 0;
+    gearRentals = 0;
+    tripCompanions = 0;
 
     pendingCount$ = this.authService.getCurrentUser().pipe(
         switchMap(user => user ? this.inviteService.getPendingInvitesCount(user.id) : of(0))
@@ -167,6 +174,26 @@ export class DashboardComponent {
 
     constructor(
         private inviteService: GroupInviteService,
-        private authService: AuthService
+        private authService: AuthService,
+        private userApi: UserApiService
     ) {}
+
+    ngOnInit(): void {
+        this.loadDashboardStats();
+    }
+
+    loadDashboardStats(): void {
+        this.userApi.getUserStats().subscribe({
+            next: (stats) => {
+                this.upcomingTrips = stats.activeReservations || 0;
+                this.gearRentals = stats.activeRentals || 0;
+                // savedCampsites and tripCompanions not yet in API - keep at 0 for now
+                // TODO: Add favorites endpoint and friends/companions endpoint
+            },
+            error: (err) => {
+                console.error('Failed to load dashboard stats:', err);
+                // Stats remain at 0
+            }
+        });
+    }
 }

@@ -179,11 +179,13 @@ export const routes: Routes = [
             },
             {
                 path: 'profile/orders',
-                loadComponent: () => import('./features/marketplace/camper-orders/camper-orders.component').then(m => m.CamperOrdersComponent)
+                loadComponent: () => import('./features/marketplace/camper-orders/camper-orders.component').then(m => m.CamperOrdersComponent),
+                canActivate: [authGuard]
             },
             {
                 path: 'profile/orders/:orderId',
-                loadComponent: () => import('./features/marketplace/camper-order-details/camper-order-details.component').then(m => m.CamperOrderDetailsComponent)
+                loadComponent: () => import('./features/marketplace/camper-order-details/camper-order-details.component').then(m => m.CamperOrderDetailsComponent),
+                canActivate: [authGuard]
             },
             // Trips
             {
@@ -375,8 +377,8 @@ export const routes: Routes = [
             // Dashboard
             {
                 path: 'dashboard',
-                loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
-                canActivate: [authGuard]
+                redirectTo: 'profile',
+                pathMatch: 'full'
             },
             // Booking Flow
             {

@@ -180,6 +180,39 @@
 
         <!-- ── OVERVIEW TAB ── -->
         <div *ngIf="activeTab === 'overview'" class="cc-tab-panel cc-tab-panel--active" role="tabpanel">
+            <section class="cc-quick-actions" aria-label="Quick actions">
+                <h2 class="cc-section-title"><span class="cc-section-title__dot"></span> Quick Actions</h2>
+                <div class="cc-quick-actions__grid">
+                    <a routerLink="/plan-trip" class="cc-quick-action-card">
+                        <div class="cc-quick-action-card__emoji">🗺️</div>
+                        <div class="cc-quick-action-card__label">Plan Trip</div>
+                    </a>
+                    <a routerLink="/campsites" class="cc-quick-action-card">
+                        <div class="cc-quick-action-card__emoji">⛺</div>
+                        <div class="cc-quick-action-card__label">Find Sites</div>
+                    </a>
+                    <a routerLink="/gear" class="cc-quick-action-card">
+                        <div class="cc-quick-action-card__emoji">🎒</div>
+                        <div class="cc-quick-action-card__label">Rent Gear</div>
+                    </a>
+                    <a routerLink="/community" class="cc-quick-action-card">
+                        <div class="cc-quick-action-card__emoji">👥</div>
+                        <div class="cc-quick-action-card__label">Community</div>
+                    </a>
+                    <a routerLink="/invites" class="cc-quick-action-card cc-quick-action-card--invite">
+                        <div class="cc-quick-action-card__emoji">📩</div>
+                        <div class="cc-quick-action-card__label">Invitations</div>
+                        <span *ngIf="((pendingCount$ | async) || 0) > 0" class="cc-quick-action-card__count">
+                            {{ pendingCount$ | async }}
+                        </span>
+                    </a>
+                    <a routerLink="/profile/orders" class="cc-quick-action-card">
+                        <div class="cc-quick-action-card__emoji">🧾</div>
+                        <div class="cc-quick-action-card__label">My Orders</div>
+                    </a>
+                </div>
+            </section>
+
             <!-- Recent Trip Activity -->
             <h2 class="cc-section-title"><span class="cc-section-title__dot"></span> Recent Trip Activity</h2>
             <div class="cc-trip-grid">

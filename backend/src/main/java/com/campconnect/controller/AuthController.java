@@ -95,9 +95,9 @@ public class AuthController {
 		Set<Role> roles = new HashSet<>();
 
 		if (strRoles == null || strRoles.isEmpty()) {
-			Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+			Role camperRole = roleRepository.findByName(ERole.ROLE_CAMPER)
 					.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-			roles.add(userRole);
+			roles.add(camperRole);
 		} else {
 			if (strRoles.size() > 1) {
 				throw new RuntimeException("Error: You can only select one role explicitly.");

@@ -1,9 +1,11 @@
 import { Component, HostListener, OnInit, AfterViewInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, switchMap, of } from 'rxjs';
 import { UserApiService } from '../services/user-api.service';
 import { UserProfileResponse } from '../models/user.model';
+import { GroupInviteService } from '../../groups/services/group-invite.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
     selector: 'app-camper-profile',
@@ -73,9 +75,15 @@ export class CamperProfileComponent implements OnInit, AfterViewInit, OnDestroy 
     gearRentedAnimated: number = 0;
     animated: boolean = false;
 
+    pendingCount$ = this.authService.getCurrentUser().pipe(
+        switchMap(user => user ? this.inviteService.getPendingInvitesCount(user.id) : of(0))
+    );
+
     constructor(
         private userApi: UserApiService,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private inviteService: GroupInviteService,
+        private authService: AuthService
     ) { }
 
     ngOnInit(): void {
@@ -96,6 +104,25 @@ export class CamperProfileComponent implements OnInit, AfterViewInit, OnDestroy 
                     this.error = 'Failed to load profile.';
                     this.loading = false;
                     this.cdr.markForCheck();
+                }
+            });
+        
+        // Load user stats
+        this.userApi.getUserStats()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (stats) => {
+                    this.user.stats = {
+                        tripsCompleted: stats.tripsCompleted,
+                        campsitesVisited: stats.campsitesVisited,
+                        reviewsGiven: stats.reviewsGiven,
+                        gearRented: stats.gearRented
+                    };
+                    this.cdr.markForCheck();
+                },
+                error: (err) => {
+                    console.error('Failed to load user stats:', err);
+                    // Keep the mock stats if API fails
                 }
             });
     }

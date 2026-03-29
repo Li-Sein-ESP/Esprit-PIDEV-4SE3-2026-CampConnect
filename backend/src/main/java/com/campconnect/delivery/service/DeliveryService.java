@@ -46,10 +46,14 @@ public class DeliveryService {
 
     // Valid delivery state transitions
     private static final Map<DeliveryStatus, Set<DeliveryStatus>> VALID_TRANSITIONS = Map.of(
-            DeliveryStatus.CREATED, EnumSet.of(DeliveryStatus.DISPATCHED, DeliveryStatus.CANCELLED),
-            DeliveryStatus.DISPATCHED, EnumSet.of(DeliveryStatus.IN_TRANSIT, DeliveryStatus.CANCELLED),
-            DeliveryStatus.IN_TRANSIT, EnumSet.of(DeliveryStatus.DELIVERED, DeliveryStatus.CANCELLED),
+            DeliveryStatus.CREATED, EnumSet.of(DeliveryStatus.PENDING, DeliveryStatus.ASSIGNED, DeliveryStatus.CANCELLED),
+            DeliveryStatus.PENDING, EnumSet.of(DeliveryStatus.ASSIGNED, DeliveryStatus.CANCELLED),
+            DeliveryStatus.ASSIGNED, EnumSet.of(DeliveryStatus.DISPATCHED, DeliveryStatus.PICKED_UP, DeliveryStatus.CANCELLED),
+            DeliveryStatus.DISPATCHED, EnumSet.of(DeliveryStatus.PICKED_UP, DeliveryStatus.IN_TRANSIT, DeliveryStatus.CANCELLED),
+            DeliveryStatus.PICKED_UP, EnumSet.of(DeliveryStatus.IN_TRANSIT, DeliveryStatus.CANCELLED),
+            DeliveryStatus.IN_TRANSIT, EnumSet.of(DeliveryStatus.DELIVERED, DeliveryStatus.FAILED, DeliveryStatus.CANCELLED),
             DeliveryStatus.DELIVERED, EnumSet.noneOf(DeliveryStatus.class),
+            DeliveryStatus.FAILED, EnumSet.of(DeliveryStatus.PENDING, DeliveryStatus.CANCELLED),
             DeliveryStatus.CANCELLED, EnumSet.noneOf(DeliveryStatus.class));
 
     // ---------- READ ----------
@@ -116,7 +120,13 @@ public class DeliveryService {
             if (deliveryRepository.existsByRentalIdAndStatusAndDeletedFalse(request.getRentalId(),
                     DeliveryStatus.CREATED)
                     || deliveryRepository.existsByRentalIdAndStatusAndDeletedFalse(request.getRentalId(),
+                            DeliveryStatus.PENDING)
+                    || deliveryRepository.existsByRentalIdAndStatusAndDeletedFalse(request.getRentalId(),
+                            DeliveryStatus.ASSIGNED)
+                    || deliveryRepository.existsByRentalIdAndStatusAndDeletedFalse(request.getRentalId(),
                             DeliveryStatus.DISPATCHED)
+                    || deliveryRepository.existsByRentalIdAndStatusAndDeletedFalse(request.getRentalId(),
+                            DeliveryStatus.PICKED_UP)
                     || deliveryRepository.existsByRentalIdAndStatusAndDeletedFalse(request.getRentalId(),
                             DeliveryStatus.IN_TRANSIT)) {
                 throw new ConflictException("An active delivery already exists for this rental");
@@ -220,8 +230,11 @@ public class DeliveryService {
                 .filter(d -> !d.isDeleted())
                 .orElseThrow(() -> new ResourceNotFoundException("Delivery", "id", id));
 
-        if (delivery.getStatus() == DeliveryStatus.IN_TRANSIT || delivery.getStatus() == DeliveryStatus.DISPATCHED) {
-            throw new ConflictException("Cannot delete a delivery that is currently in transit or dispatched");
+        if (delivery.getStatus() == DeliveryStatus.IN_TRANSIT 
+                || delivery.getStatus() == DeliveryStatus.DISPATCHED
+                || delivery.getStatus() == DeliveryStatus.PICKED_UP
+                || delivery.getStatus() == DeliveryStatus.ASSIGNED) {
+            throw new ConflictException("Cannot delete a delivery that is currently active");
         }
         delivery.setDeleted(true);
         deliveryRepository.save(delivery);
@@ -274,5 +287,110 @@ public class DeliveryService {
 
         resp.setDailyBreakdown(breakdown);
         return resp;
+    }
+
+    public com.campconnect.delivery.dto.DriverProfileStatsResponse getDriverProfileStats(String driverId) {
+        // Use optimized count queries instead of fetching all entities
+        long totalDeliveries = deliveryRepository.countByDriverIdAndDeletedFalse(driverId);
+        
+        // Active statuses
+        java.util.Set<DeliveryStatus> activeStatuses = java.util.Set.of(
+                DeliveryStatus.CREATED, 
+                DeliveryStatus.PENDING,
+                DeliveryStatus.ASSIGNED,
+                DeliveryStatus.DISPATCHED,
+                DeliveryStatus.PICKED_UP,
+                DeliveryStatus.IN_TRANSIT
+        );
+        long activeJobs = deliveryRepository.countByDriverIdAndStatusInAndDeletedFalse(driverId, activeStatuses);
+        
+        long deliveredCount = deliveryRepository.countByDriverIdAndStatusAndDeletedFalse(driverId, DeliveryStatus.DELIVERED);
+        long cancelledCount = deliveryRepository.countByDriverIdAndStatusAndDeletedFalse(driverId, DeliveryStatus.CANCELLED);
+        long failedCount = deliveryRepository.countByDriverIdAndStatusAndDeletedFalse(driverId, DeliveryStatus.FAILED);
+        
+        BigDecimal totalEarnings = FLAT_RATE.multiply(BigDecimal.valueOf(deliveredCount));
+        
+        // Calculate completion rate (delivered / (delivered + cancelled + failed))
+        long completedOrFailed = deliveredCount + cancelledCount + failedCount;
+        double completionRate = completedOrFailed > 0 
+                ? (double) deliveredCount / completedOrFailed * 100.0 
+                : 0.0;
+        
+        // Calculate on-time rate (assuming all delivered are on-time for now; would need scheduledDate vs deliveredDate comparison)
+        double onTimeRate = deliveredCount > 0 ? 95.0 : 0.0; // Mock value for now
+        
+        // Rating would come from a review system (not implemented yet)
+        double rating = 4.5; // Mock value for now
+        
+        return com.campconnect.delivery.dto.DriverProfileStatsResponse.builder()
+                .totalDeliveries(totalDeliveries)
+                .activeJobs(activeJobs)
+                .totalEarnings(totalEarnings)
+                .rating(rating)
+                .completionRate(completionRate)
+                .onTimeRate(onTimeRate)
+                .deliveredCount(deliveredCount)
+                .cancelledCount(cancelledCount)
+                .failedCount(failedCount)
+                .build();
+    }
+
+    public com.campconnect.delivery.dto.VehicleEarningsBreakdownResponse getVehicleEarningsBreakdown(String driverId) {
+        List<Delivery> completed = deliveryRepository
+                .findByDriverIdAndStatusAndDeletedFalse(driverId, DeliveryStatus.DELIVERED);
+
+        // Since Delivery model doesn't have vehicleId, we'll return aggregate stats
+        // In a future iteration, we could add vehicleId to Delivery model
+        long totalCount = completed.size();
+        BigDecimal totalEarnings = FLAT_RATE.multiply(BigDecimal.valueOf(totalCount));
+
+        List<com.campconnect.delivery.dto.VehicleEarningsBreakdownResponse.VehicleEarning> vehicleEarnings = 
+                List.of(
+                    com.campconnect.delivery.dto.VehicleEarningsBreakdownResponse.VehicleEarning.builder()
+                            .vehicleId("all")
+                            .vehicleName("All Vehicles")
+                            .deliveryCount(totalCount)
+                            .earnings(totalEarnings)
+                            .build()
+                );
+
+        return com.campconnect.delivery.dto.VehicleEarningsBreakdownResponse.builder()
+                .vehicleEarnings(vehicleEarnings)
+                .build();
+    }
+
+    public com.campconnect.delivery.dto.RecentPaymentsResponse getRecentPayments(String driverId) {
+        List<Delivery> completed = deliveryRepository
+                .findByDriverIdAndStatusAndDeletedFalse(driverId, DeliveryStatus.DELIVERED);
+
+        List<com.campconnect.delivery.dto.RecentPaymentsResponse.Payment> payments = 
+                completed.stream()
+                .filter(d -> d.getDeliveredDate() != null)
+                .sorted((a, b) -> b.getDeliveredDate().compareTo(a.getDeliveredDate()))
+                .limit(10) // Get last 10 payments
+                .map(delivery -> {
+                    // Get customer name from rental or purchase
+                    String customerName = "Customer"; // Default
+                    if (delivery.getRentalId() != null) {
+                        rentalRepository.findById(delivery.getRentalId())
+                                .ifPresent(rental -> {
+                                    // Would need to look up user by renterId
+                                });
+                    }
+                    
+                    return com.campconnect.delivery.dto.RecentPaymentsResponse.Payment.builder()
+                            .id(delivery.getId())
+                            .deliveryId(delivery.getId())
+                            .customerName(customerName)
+                            .amount(FLAT_RATE)
+                            .paymentDate(delivery.getDeliveredDate())
+                            .status("COMPLETED")
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return com.campconnect.delivery.dto.RecentPaymentsResponse.builder()
+                .payments(payments)
+                .build();
     }
 }

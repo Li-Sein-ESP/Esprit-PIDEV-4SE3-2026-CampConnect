@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Collection;
 
 @Repository
 public interface DeliveryRepository extends MongoRepository<Delivery, String> {
@@ -28,4 +29,13 @@ public interface DeliveryRepository extends MongoRepository<Delivery, String> {
     boolean existsByRentalIdAndStatusAndDeletedFalse(String rentalId, DeliveryStatus status);
 
     java.util.List<Delivery> findByDriverIdAndStatusAndDeletedFalse(String driverId, DeliveryStatus status);
+
+    java.util.List<Delivery> findByDriverIdAndDeletedFalse(String driverId);
+    
+    // Optimized count queries for driver stats
+    long countByDriverIdAndDeletedFalse(String driverId);
+    
+    long countByDriverIdAndStatusAndDeletedFalse(String driverId, DeliveryStatus status);
+    
+    long countByDriverIdAndStatusInAndDeletedFalse(String driverId, Collection<DeliveryStatus> statuses);
 }

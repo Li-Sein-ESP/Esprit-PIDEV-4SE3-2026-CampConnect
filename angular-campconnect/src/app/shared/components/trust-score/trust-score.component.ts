@@ -1,20 +1,20 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 /**
  * TrustScoreComponent — displays a user's trust score as a badge/pill.
- * Stub implementation; extend with real scoring logic as needed.
  */
 @Component({
     selector: 'app-trust-score',
     standalone: true,
-    imports: [CommonModule],
+    imports: [],
     template: `
-        <span *ngIf="score != null"
-            [class]="getClass()"
-            [title]="'Trust Score: ' + score">
-            {{ score }}
-        </span>
+        @if (score != null) {
+            <span
+                [class]="getClass()"
+                [title]="'Trust Score: ' + score">
+                {{ score }}
+            </span>
+        }
     `,
     styles: [`
         .trust-high  { display:inline-flex; align-items:center; padding:2px 8px; border-radius:9999px; font-size:0.75rem; font-weight:600; background:#d1fae5; color:#065f46; }
