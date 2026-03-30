@@ -1,0 +1,178 @@
+<app-modal [isOpen]="true" (close)="close.emit()" [size]="step === 'submitting' || step === 'success' ? 'sm' : 'lg'">
+
+    <!-- Submitting State -->
+    <div *ngIf="step === 'submitting'" class="text-center py-12">
+        <lucide-icon [name]="Loader2"
+            class="w-16 h-16 text-[var(--color-primary-600)] animate-spin mx-auto mb-4"></lucide-icon>
+        <h3 class="mb-2">Submitting your review...</h3>
+        <p class="text-[var(--color-text-secondary)]">This will only take a moment</p>
+    </div>
+
+    <!-- Success State -->
+    <div *ngIf="step === 'success'" class="text-center py-12">
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <lucide-icon [name]="CheckCircle" class="w-10 h-10 text-green-600"></lucide-icon>
+        </div>
+        <h3 class="mb-2">Review Submitted!</h3>
+        <p class="text-[var(--color-text-secondary)]">
+            Thank you for sharing your experience
+        </p>
+    </div>
+
+    <!-- Form Content -->
+    <div *ngIf="step === 'rating' || step === 'details'">
+        <div class="mb-6">
+            <h2 class="mb-2">Write a Review</h2>
+            <div class="flex items-center gap-2">
+                <p class="text-[var(--color-text-secondary)]">{{ campsiteId }}</p>
+            </div>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="flex items-center gap-2 mb-8">
+            <div class="flex-1 h-1 rounded-full"
+                [class.bg-[var(--color-primary-600)]]="step === 'rating' || step === 'details'"
+                [class.bg-[var(--color-neutral-200)]]="step !== 'rating' && step !== 'details'"></div>
+            <div class="flex-1 h-1 rounded-full" [class.bg-[var(--color-primary-600)]]="step === 'details'"
+                [class.bg-[var(--color-neutral-200)]]="step !== 'details'"></div>
+        </div>
+
+        <!-- Rating Step -->
+        <div *ngIf="step === 'rating'">
+            <h3 class="mb-6 text-center">Rate your experience</h3>
+
+            <!-- Overall Rating Preview -->
+            <div *ngIf="overallRating > 0" class="text-center mb-8 p-6 bg-[var(--color-primary-50)] rounded-lg">
+                <div class="text-sm text-[var(--color-text-secondary)] mb-2">Overall Rating</div>
+                <div class="flex items-center justify-center gap-2 mb-2">
+                    <lucide-icon *ngFor="let i of range(5)" [name]="Star" class="w-8 h-8"
+                        [class.text-amber-500]="i < overallRating" [class.fill-current]="i < overallRating"
+                        [class.text-[var(--color-neutral-200)]]="i >= overallRating"></lucide-icon>
+                </div>
+                <div class="text-2xl font-bold text-[var(--color-primary-600)]">
+                    {{ overallRating }}/5
+                </div>
+            </div>
+
+            <!-- Criteria Ratings -->
+            <div class="space-y-6 mb-8">
+                <div *ngFor="let criterion of ratingCriteria">
+                    <div class="mb-2">
+                        <div class="font-medium mb-1">{{ criterion.label }}</div>
+                        <div class="text-sm text-[var(--color-text-secondary)]">
+                            {{ criterion.description }}
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button *ngFor="let i of range(5)" (click)="setRating(criterion.key, i + 1)"
+                            (mouseenter)="setHoveredRating(criterion.key, i + 1)"
+                            (mouseleave)="setHoveredRating(criterion.key, 0)"
+                            class="transition-transform hover:scale-110">
+                            <lucide-icon [name]="Star" class="w-8 h-8 transition-colors"
+                                [class.text-amber-500]="i < (getHoveredRatingValue(criterion.key) || getRatingValue(criterion.key))"
+                                [class.fill-current]="i < (getHoveredRatingValue(criterion.key) || getRatingValue(criterion.key))"
+                                [class.text-[var(--color-neutral-200)]]="i >= (getHoveredRatingValue(criterion.key) || getRatingValue(criterion.key))"
+                                [class.hover:text-amber-300]="i >= (getHoveredRatingValue(criterion.key) || getRatingValue(criterion.key))"></lucide-icon>
+                        </button>
+                        <span *ngIf="getRatingValue(criterion.key) > 0"
+                            class="ml-2 font-medium text-[var(--color-primary-600)]">
+                            {{ getRatingValue(criterion.key) }}/5
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <app-button variant="ghost" (click)="close.emit()">
+                    Cancel
+                </app-button>
+                <app-button (click)="step = 'details'" [disabled]="!canContinueToDetails">
+                    Continue
+                </app-button>
+            </div>
+        </div>
+
+        <!-- Details Step -->
+        <div *ngIf="step === 'details'">
+            <h3 class="mb-6">Share your experience</h3>
+
+            <!-- Overall Rating Display -->
+            <div class="flex items-center gap-3 mb-6 p-4 bg-[var(--color-primary-50)] rounded-lg">
+                <div class="flex items-center gap-1">
+                    <lucide-icon *ngFor="let i of range(5)" [name]="Star" class="w-5 h-5"
+                        [class.text-amber-500]="i < overallRating" [class.fill-current]="i < overallRating"
+                        [class.text-[var(--color-neutral-200)]]="i >= overallRating"></lucide-icon>
+                </div>
+                <span class="font-bold text-[var(--color-primary-600)]">{{ overallRating }}/5</span>
+                <button (click)="step = 'rating'"
+                    class="ml-auto text-sm text-[var(--color-primary-600)] hover:underline">
+                    Edit ratings
+                </button>
+            </div>
+
+            <!-- Review Title -->
+            <div class="mb-6">
+                <label class="block mb-2 font-medium text-[var(--color-text-primary)]">
+                    Review Title
+                </label>
+                <input type="text" [(ngModel)]="title" placeholder="Summarize your experience..."
+                    class="w-full px-4 py-2.5 rounded-lg bg-white border-2 border-[var(--color-border-light)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:outline-none focus:border-[var(--color-primary-500)] focus:ring-2 focus:ring-[var(--color-primary-100)] transition-all duration-200"
+                    maxlength="100" />
+                <div class="text-xs text-[var(--color-text-tertiary)] mt-1 text-right">
+                    {{ title.length }}/100
+                </div>
+            </div>
+
+            <!-- Review Content -->
+            <div class="mb-6">
+                <label class="block mb-2 font-medium text-[var(--color-text-primary)]">
+                    Your Review
+                </label>
+                <textarea [(ngModel)]="content"
+                    placeholder="Tell others about your stay... What did you love? What could be improved?" rows="6"
+                    class="w-full px-4 py-2.5 rounded-lg bg-white border-2 border-[var(--color-border-light)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:outline-none focus:border-[var(--color-primary-500)] focus:ring-2 focus:ring-[var(--color-primary-100)] transition-all duration-200"
+                    maxlength="1000"></textarea>
+                <div class="text-xs text-[var(--color-text-tertiary)] mt-1 text-right">
+                    {{ content.length }}/1000
+                </div>
+            </div>
+
+            <!-- Photo Upload -->
+            <div class="mb-8">
+                <label class="block mb-2 font-medium text-[var(--color-text-primary)]">
+                    Add Photos (Optional)
+                </label>
+                <div class="grid grid-cols-5 gap-3">
+                    <div *ngFor="let photo of photos; let i = index" class="relative aspect-square">
+                        <img [src]="photo" [alt]="'Upload ' + (i + 1)" class="w-full h-full object-cover rounded-lg" />
+                        <button (click)="removePhoto(i)"
+                            class="absolute -top-2 -right-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 transition-colors">
+                            <lucide-icon [name]="X" class="w-4 h-4"></lucide-icon>
+                        </button>
+                    </div>
+
+                    <label *ngIf="photos.length < 5"
+                        class="aspect-square border-2 border-dashed border-[var(--color-border-medium)] rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-[var(--color-primary-600)] hover:bg-[var(--color-primary-50)] transition-all">
+                        <input type="file" accept="image/*" multiple (change)="handlePhotoUpload($event)"
+                            class="hidden" />
+                        <lucide-icon [name]="ImageIcon"
+                            class="w-6 h-6 text-[var(--color-text-tertiary)] mb-1"></lucide-icon>
+                        <span class="text-xs text-[var(--color-text-tertiary)]">Add Photo</span>
+                    </label>
+                </div>
+                <p class="text-xs text-[var(--color-text-tertiary)] mt-2">
+                    Add up to 5 photos to help others
+                </p>
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <app-button variant="ghost" (click)="step = 'rating'">
+                    Back
+                </app-button>
+                <app-button (click)="handleSubmit()" [disabled]="!canSubmit">
+                    Submit Review
+                </app-button>
+            </div>
+        </div>
+    </div>
+</app-modal>

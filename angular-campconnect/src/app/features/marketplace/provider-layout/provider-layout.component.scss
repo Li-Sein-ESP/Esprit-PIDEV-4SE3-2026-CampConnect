@@ -1,0 +1,12 @@
+/* Layout styles */
+.cc-provider-layout-root {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+.cc-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}

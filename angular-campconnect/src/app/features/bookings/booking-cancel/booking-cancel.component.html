@@ -1,0 +1,61 @@
+<div class="min-h-screen bg-[var(--color-background)] py-12">
+  <div class="container max-w-2xl">
+    <h2 class="mb-8">Cancel Booking</h2>
+
+    <app-card variant="bordered" class="border-amber-300 bg-amber-50 mb-6">
+      <app-card-content class="p-6">
+        <div class="flex gap-3">
+          <lucide-icon [img]="AlertCircle" class="w-5 h-5 text-amber-600 flex-shrink-0"></lucide-icon>
+          <div>
+            <div class="font-medium text-amber-900 mb-1">Cancellation Policy</div>
+            <div class="text-sm text-amber-700">
+              Based on your booking date, you are eligible for a {{ refundPercentage }}% refund (\${{ refundAmount }})
+            </div>
+          </div>
+        </div>
+      </app-card-content>
+    </app-card>
+
+    <app-card variant="elevated" class="mb-6">
+      <app-card-header>
+        <app-card-title>Booking Details</app-card-title>
+      </app-card-header>
+      <app-card-content>
+        <div class="space-y-3">
+          <div><span class="text-[var(--color-text-secondary)]">Booking ID:</span> <span
+              class="font-medium">BK123456</span></div>
+          <div><span class="text-[var(--color-text-secondary)]">Campsite:</span> <span class="font-medium">Upper Pines
+              Campground</span></div>
+          <div><span class="text-[var(--color-text-secondary)]">Dates:</span> <span class="font-medium">July 15-18,
+              2024</span></div>
+          <div><span class="text-[var(--color-text-secondary)]">Total Paid:</span> <span
+              class="font-medium">\$373.19</span></div>
+        </div>
+      </app-card-content>
+    </app-card>
+
+    <app-card variant="elevated" class="mb-6">
+      <app-card-header>
+        <app-card-title>Reason for Cancellation</app-card-title>
+      </app-card-header>
+      <app-card-content>
+        <select [(ngModel)]="cancelReason" class="w-full px-4 py-2 rounded-lg border-2 mb-4">
+          <option value="">Select a reason...</option>
+          <option value="plans-changed">Plans changed</option>
+          <option value="weather">Weather concerns</option>
+          <option value="emergency">Emergency</option>
+          <option value="other">Other</option>
+        </select>
+        <textarea [(ngModel)]="cancelNotes" rows="4" placeholder="Additional details (optional)"
+          class="w-full px-4 py-2 rounded-lg border-2"></textarea>
+      </app-card-content>
+    </app-card>
+
+    <div class="flex gap-4">
+      <app-button variant="outline" [fullWidth]="true" (click)="goBack()">Keep Booking</app-button>
+      <app-button variant="destructive" [fullWidth]="true" (click)="confirmCancel()" [disabled]="!cancelReason">
+        Confirm Cancellation
+      </app-button>
+    </div>
+  </div>
+</div>

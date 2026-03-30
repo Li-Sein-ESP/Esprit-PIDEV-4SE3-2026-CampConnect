@@ -1,0 +1,225 @@
+<div class="elite-home-container min-h-screen bg-[#FDFCFB] text-[#0A1F1C] font-sans selection:bg-[#2d6a4f]/20 overflow-x-hidden">
+
+  <!-- OVERLAY TEXTURE (GRAIN) -->
+  <div class="fixed inset-0 pointer-events-none z-[999] opacity-[0.03] mix-blend-overlay" 
+       style="background-image: url('https://grainy-gradients.vercel.app/noise.svg')"></div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div *ngIf="toast" class="fixed top-10 right-10 z-[1000] flex items-center gap-4 px-8 py-5 bg-[#0A1F1C] text-white rounded-2xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border border-white/10 animate-in slide-in-from-right-12 duration-500">
+    <lucide-icon [img]="toast.type === 'success' ? CheckSquare : AlertCircle" class="w-5 h-5 text-emerald-400"></lucide-icon>
+    <div class="flex flex-col">
+      <span class="text-[9px] font-black uppercase tracking-widest opacity-40">System Message</span>
+      <span class="font-bold text-xs uppercase tracking-tight">{{ toast.message }}</span>
+    </div>
+  </div>
+
+  <!-- ELITE HERO (V4.0) -->
+  <header class="relative h-[90vh] w-full overflow-hidden flex items-center justify-center">
+    <!-- Cinematic Background -->
+    <div class="absolute inset-0 z-0 scale-110 animate-[hq-zoom_40s_linear_infinite_alternate]">
+      <div class="absolute inset-0 bg-black/20 z-10"></div>
+      <img src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1600" class="w-full h-full object-cover grayscale-[0.2] contrast-[1.1]">
+    </div>
+    
+    <!-- Multi-Layer Atmospheric Overlays -->
+    <div class="absolute inset-0 z-10 bg-gradient-to-b from-[#FDFCFB]/10 via-transparent to-[#FDFCFB]"></div>
+
+    <div class="relative z-20 container mx-auto px-10 max-w-7xl">
+      <div class="flex flex-col items-center text-center">
+         <div class="flex items-center gap-4 mb-8 animate-in slide-in-from-bottom-8 duration-1000">
+           <div class="w-12 h-px bg-[#2d6a4f]"></div>
+           <span class="text-[10px] font-black uppercase tracking-[0.6em] text-[#2d6a4f]">Command Center v4.0</span>
+           <div class="w-12 h-px bg-[#2d6a4f]"></div>
+         </div>
+
+         <h1 class="font-serif text-[12vw] md:text-9xl font-bold text-[#0A1F1C] leading-[0.85] tracking-tight mb-12 drop-shadow-2xl animate-in slide-in-from-bottom-12 duration-1000 delay-200">
+           Elite <br>
+           <span class="italic text-transparent bg-clip-text bg-gradient-to-r from-[#0A1F1C] to-[#2d6a4f]/70">Exploration.</span>
+         </h1>
+
+         <p class="text-xl md:text-2xl text-[#0A1F1C]/60 font-medium max-w-2xl mb-16 leading-relaxed animate-in fade-in duration-1000 delay-500">
+           Access specialized field training, high-altitude expeditions, and tactical wilderness certifications.
+         </p>
+
+         <div class="flex items-center gap-8 animate-in slide-in-from-bottom-8 duration-1000 delay-700">
+            <a href="#events-grid"
+              class="group relative px-16 py-6 bg-[#0A1F1C] text-white text-[10px] font-black uppercase tracking-[0.4em] rounded-2xl shadow-2xl hover:bg-[#2d6a4f] transition-all duration-700 overflow-hidden">
+              <div class="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-[1s] skewed-shine"></div>
+              <span class="relative z-10">Initialize Search</span>
+            </a>
+         </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SECTOR OPERATIONS (FILTERING) -->
+  <section class="container mx-auto px-10 max-w-7xl pt-24 pb-16" id="events-grid">
+    <div class="flex flex-col md:flex-row justify-between items-end gap-10 mb-20">
+      <div>
+        <div class="flex items-center gap-4 mb-4">
+          <span class="text-[9px] font-black uppercase tracking-[0.5em] text-[#2d6a4f]">IV / 01</span>
+          <h2 class="font-serif text-5xl font-bold text-[#0A1F1C] tracking-tight">Active Deployments</h2>
+        </div>
+        <p class="text-lg text-[#0A1F1C]/40 font-medium tracking-tight">Sector monitoring for upcoming mission windows.</p>
+      </div>
+
+      <div class="flex flex-wrap gap-3 justify-end max-w-lg">
+        <button *ngFor="let cat of categories" (click)="setType(cat.id)"
+          [class]="selectedType() === cat.id ? 'bg-[#0A1F1C] text-white shadow-2xl shadow-black/20 scale-105' : 'bg-white/50 text-[#0A1F1C]/40 border-white/40 border'"
+          class="px-6 py-3 rounded-xl font-black text-[8px] uppercase tracking-[0.2em] transition-all duration-500 hover:bg-[#0A1F1C] hover:text-white group relative overflow-hidden">
+          <span class="relative z-10">{{ cat.label }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ELITE MISSION GRID -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+      <div *ngFor="let event of filteredEvents(); let i = index" 
+           class="group relative h-[600px] rounded-[3rem] overflow-hidden bg-white shadow-[0_40px_100px_-20px_rgba(0,0,0,0.06)] border border-white/40 hover:translate-y-[-10px] transition-all duration-700 animate-in fade-in slide-in-from-bottom-12"
+           [style.animation-delay.ms]="i * 100">
+        
+        <!-- Background Image with tactical overlay -->
+        <div class="absolute inset-0 z-0">
+           <img [src]="event.imageUrl" [alt]="event.title" class="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-[2s]">
+           <div class="absolute inset-0 bg-gradient-to-t from-[#0A1F1C] via-[#0A1F1C]/40 to-black/20 z-10"></div>
+        </div>
+
+        <!-- Content Architecture -->
+        <div class="relative z-20 h-full p-10 flex flex-col justify-end text-white">
+          <!-- Tactical Badges -->
+          <div class="flex gap-2 mb-6">
+            <span class="px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-[8px] font-black uppercase tracking-widest leading-none">
+              {{ event.type.replace('_', ' ').replace('-', ' ') }}
+            </span>
+            <span class="px-4 py-1.5 bg-emerald-500/90 backdrop-blur-md border border-white/10 rounded-lg text-[8px] font-black uppercase tracking-widest leading-none">
+              Tier: {{ event.difficulty }}
+            </span>
+          </div>
+
+          <h3 class="font-serif text-4xl font-bold leading-[0.9] tracking-tight mb-8 group-hover:italic transition-all duration-700">
+            {{ event.title }}
+          </h3>
+
+          <!-- Logistics Summary -->
+          <div class="space-y-4 mb-10 opacity-60 group-hover:opacity-100 transition-opacity duration-700">
+             <div class="flex items-center gap-4">
+               <lucide-icon [img]="Clock" class="w-4 h-4 text-emerald-400"></lucide-icon>
+               <span class="text-[10px] font-black uppercase tracking-widest">{{ formatDate(event.startDate) }} - {{ formatTime(event.startDate) }}</span>
+             </div>
+             <div class="flex items-center gap-4">
+               <lucide-icon [img]="MapPin" class="w-4 h-4 text-emerald-400"></lucide-icon>
+               <span class="text-[10px] font-black uppercase tracking-widest">{{ event.location.name }}</span>
+             </div>
+          </div>
+
+          <!-- Capacity Tactical Bar -->
+          <div class="mb-10 p-5 bg-white/5 backdrop-blur-2xl rounded-2xl border border-white/10">
+             <div class="flex justify-between items-end mb-3">
+               <span class="text-[8px] font-black uppercase tracking-widest opacity-40">Unit Load</span>
+               <span class="text-xs font-black">{{ event.registered }} <span class="opacity-20">/</span> {{ event.capacity }}</span>
+             </div>
+             <div class="flex gap-1 h-1.5">
+               <div *ngFor="let seg of getCapacitySegments(event); let j = index" 
+                    class="flex-1 rounded-full transition-all duration-700"
+                    [class]="seg ? 'opacity-100' : 'bg-white/5'"
+                    [style.background-color]="seg ? getCapacityColor(event) : ''"></div>
+             </div>
+          </div>
+
+          <!-- Price & CTA -->
+          <div class="flex items-center justify-between">
+             <div class="flex flex-col">
+               <span class="text-[8px] font-black uppercase tracking-widest opacity-40 mb-1">Threshold</span>
+               <span class="text-2xl font-serif font-bold tracking-tighter">{{ event.price === 0 ? 'Free' : event.price + ' DT' }}</span>
+             </div>
+             
+             <a [routerLink]="['/events', event.id]"
+                class="px-10 py-5 bg-white text-[#0A1F1C] text-[9px] font-black uppercase tracking-[0.3em] rounded-xl hover:bg-emerald-500 hover:text-white transition-all duration-500 shadow-xl shadow-black/40 group/btn relative overflow-hidden active:scale-95">
+                <span class="relative z-10">Access Intel</span>
+             </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State Tactical -->
+    <div *ngIf="filteredEvents().length === 0" class="py-40 text-center relative">
+       <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-center opacity-[0.02] pointer-events-none">
+          <lucide-icon [img]="Ban" class="w-80 h-80"></lucide-icon>
+       </div>
+       <div class="relative z-10">
+         <h3 class="font-serif text-6xl font-black text-[#0A1F1C]/20 italic mb-4">No Intel Detected.</h3>
+         <p class="text-[10px] font-black uppercase tracking-[0.5em] text-[#0A1F1C]/30">Sector clearance confirmed. Adjust filters.</p>
+       </div>
+    </div>
+  </section>
+
+  <!-- ELITE MISSION CONTROL CTA -->
+  <section class="container mx-auto px-10 max-w-7xl pt-24 pb-40">
+     <div class="bg-[#0A1F1C] rounded-[4rem] p-20 md:p-32 text-center relative overflow-hidden group shadow-[0_100px_150px_-50px_rgba(0,0,0,0.5)]">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(45,106,79,0.3),_transparent_70%)] opacity-50 group-hover:scale-125 transition-transform duration-[5s]"></div>
+        <div class="absolute inset-0 opacity-[0.03] pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-20 bg-[length:100%_2px,3px_100%] animate-[scanline_10s_linear_infinite]"></div>
+
+        <div class="relative z-30">
+           <div class="flex items-center justify-center gap-6 mb-12">
+             <div class="w-20 h-px bg-white/10"></div>
+             <span class="text-[10px] font-black uppercase tracking-[0.6em] text-emerald-400">Collaborative Sector</span>
+             <div class="w-20 h-px bg-white/10"></div>
+           </div>
+
+           <h2 class="font-serif text-6xl md:text-8xl font-bold text-white mb-12 leading-[0.9] tracking-tight">
+             Establish Your <br>
+             <span class="italic text-transparent bg-clip-text bg-gradient-to-r from-white to-emerald-400/50">Command Base.</span>
+           </h2>
+
+           <p class="text-white/40 font-medium max-w-xl mx-auto mb-16 text-lg tracking-tight">
+             Coordinate specialized field workshops or organize high-tier expeditions. Secure your sector in the global network.
+           </p>
+
+           <button class="px-20 py-7 bg-emerald-500 text-white text-[12px] font-black uppercase tracking-[0.4em] rounded-3xl hover:bg-[#398361] hover:shadow-[0_40px_80px_rgba(45,106,79,0.5)] transition-all duration-700 active:scale-95 group/btn-cta overflow-hidden relative">
+              <div class="absolute inset-0 bg-white/20 -translate-x-full group-hover/btn-cta:translate-x-full transition-transform duration-[1.5s] skewed-shine"></div>
+              <span class="relative z-10">Authorize Deployment</span>
+           </button>
+        </div>
+     </div>
+  </section>
+
+</div>
+
+<style>
+  @keyframes hq-zoom {
+    0% { transform: scale(1.1) translate(0, 0); }
+    100% { transform: scale(1.25) translate(-2%, -2%); }
+  }
+
+  @keyframes scanline {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100%; }
+  }
+
+  .elite-home-container {
+    scroll-behavior: smooth;
+    background-image: 
+      radial-gradient(circle at 0% 0%, rgba(10,31,28,0.02) 0%, transparent 50%),
+      radial-gradient(circle at 100% 100%, rgba(45,106,79,0.02) 0%, transparent 50%);
+  }
+
+  .skewed-shine {
+    transform: skewX(-20deg);
+  }
+
+  /* Custom Scrollbar for Elite Feel */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #FDFCFB;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #0A1F1C;
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2d6a4f;
+  }
+</style>

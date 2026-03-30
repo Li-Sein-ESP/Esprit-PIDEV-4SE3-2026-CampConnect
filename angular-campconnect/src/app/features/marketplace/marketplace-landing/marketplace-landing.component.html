@@ -1,0 +1,248 @@
+<div class="min-h-screen bg-stone-50 font-sans text-stone-900 antialiased">
+
+    <!-- Header -->
+
+
+    <main>
+        <!-- Hero -->
+        <section class="relative flex h-[90vh] min-h-[700px] items-center justify-center overflow-hidden">
+            <!-- Background Image -->
+            <div class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                style="background-image: url('https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1920&q=80')">
+            </div>
+            <!-- Gradient Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60"></div>
+
+            <!-- Content -->
+            <div class="relative z-10 mx-auto max-w-4xl px-6 text-center animate-fade-in-up">
+                <h1 class="mb-6 text-5xl font-light tracking-tight text-white md:text-7xl lg:text-8xl">
+                    <span class="block font-semibold">Adventure</span>
+                    <span class="block font-light">Awaits Outdoors</span>
+                </h1>
+                <p class="mx-auto mb-10 max-w-xl text-lg font-light leading-relaxed text-white/80 md:text-xl">
+                    Rent premium camping gear from local outdoor enthusiasts. Travel lighter, explore further.
+                </p>
+                <div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
+                    <button
+                        class="group relative overflow-hidden rounded-full bg-emerald-600 px-8 py-4 text-sm font-medium text-white transition-all hover:bg-emerald-500 hover:shadow-2xl hover:shadow-emerald-500/25">
+                        <span class="relative z-10">Start Exploring</span>
+                        <div
+                            class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full">
+                        </div>
+                    </button>
+                    <button
+                        class="group flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-8 py-4 text-sm font-medium text-white backdrop-blur-sm transition-all hover:border-white/50 hover:bg-white/20">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8 5v14l11-7z" />
+                        </svg>
+                        <span>Watch How It Works</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scroll Indicator -->
+            <div class="absolute bottom-8 left-1/2 -translate-x-1/2">
+                <div class="flex flex-col items-center gap-2 text-white/60">
+                    <span class="text-xs uppercase tracking-widest">Scroll to explore</span>
+                    <div class="h-10 w-6 rounded-full border-2 border-white/40 p-1">
+                        <div class="h-2 w-2 animate-bounce rounded-full bg-white"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories -->
+        <section class="bg-stone-50 py-24">
+            <div class="mx-auto max-w-7xl px-6">
+                <div class="mb-12 flex items-end justify-between animate-on-scroll">
+                    <div>
+                        <h2 class="mb-3 text-3xl font-semibold tracking-tight text-stone-900 md:text-4xl">
+                            Browse by Category
+                        </h2>
+                        <p class="text-stone-500">
+                            Find the perfect gear for your next adventure
+                        </p>
+                    </div>
+                    <a routerLink="/marketplace/category/all"
+                        class="hidden items-center gap-1 text-sm font-medium text-emerald-700 transition-colors hover:text-emerald-800 md:flex">
+                        View all categories
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+                    <a *ngFor="let category of categories" [routerLink]="['/marketplace/category', category.id]"
+                        class="group relative block aspect-[4/5] overflow-hidden rounded-2xl animate-on-scroll cursor-pointer">
+                        <img [src]="category.image" [alt]="category.name"
+                            class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-4">
+                            <h3 class="mb-1 text-sm font-semibold text-white">{{category.name}}</h3>
+                            <p class="text-xs text-white/70">{{category.count}} items</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Products -->
+        <section class="bg-white py-24">
+            <div class="mx-auto max-w-7xl px-6">
+                <div class="mb-12 animate-on-scroll">
+                    <h2 class="mb-3 text-3xl font-semibold tracking-tight text-stone-900 md:text-4xl">
+                        Featured Gear
+                    </h2>
+                    <p class="text-stone-500">
+                        Hand-picked essentials for your outdoor journey
+                    </p>
+                </div>
+
+                <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    <a *ngFor="let product of featuredProducts" [routerLink]="['/marketplace/product', product.id]"
+                        class="group block animate-on-scroll">
+                        <div class="relative mb-4 aspect-[4/3] overflow-hidden rounded-2xl bg-stone-100">
+                            <img [src]="product.image" [alt]="product.name"
+                                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            <div
+                                class="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium text-stone-800 backdrop-blur-sm">
+                                <svg class="h-3.5 w-3.5 text-amber-500" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                </svg>
+                                {{product.rating}}
+                            </div>
+                        </div>
+                        <h3 class="mb-1 text-base font-medium text-stone-900">{{product.name}}</h3>
+                        <p class="mb-2 text-sm text-stone-500">{{product.category}}</p>
+                        <p class="text-base font-semibold text-emerald-800">
+                            \${{product.price}}
+                            <span class="text-sm font-normal text-stone-400">/day</span>
+                        </p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Most Rented (Horizontal Scroll) -->
+        <section class="bg-stone-900 py-24">
+            <div class="mx-auto max-w-7xl px-6">
+                <div class="mb-12 flex items-end justify-between animate-on-scroll">
+                    <div>
+                        <h2 class="mb-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">
+                            Most Rented This Week
+                        </h2>
+                        <p class="text-stone-400">
+                            Popular gear that fellow adventurers are choosing
+                        </p>
+                    </div>
+                    <div class="hidden items-center gap-2 md:flex">
+                        <button (click)="scrollMostRented('left')"
+                            class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-700 text-white transition-colors hover:border-stone-500 hover:bg-stone-800">
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M15 18l-6-6 6-6" />
+                            </svg>
+                        </button>
+                        <button (click)="scrollMostRented('right')"
+                            class="flex h-10 w-10 items-center justify-center rounded-full border border-stone-700 text-white transition-colors hover:border-stone-500 hover:bg-stone-800">
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div #mostRentedContainer class="flex gap-6 overflow-x-auto pb-4 scrollbar-hide scroll-smooth">
+                    <a *ngFor="let product of mostRented" [routerLink]="['/marketplace/product', product.id]"
+                        class="min-w-[300px] flex-shrink-0 animate-on-scroll group block">
+                        <div class="relative mb-4 aspect-[4/3] overflow-hidden rounded-2xl bg-stone-800">
+                            <img [src]="product.image" [alt]="product.name"
+                                class="h-full w-full object-cover opacity-80 transition-all duration-500 group-hover:scale-105 group-hover:opacity-100">
+                            <div
+                                class="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-medium text-white">
+                                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                </svg>
+                                {{product.rating}}
+                            </div>
+                            <div
+                                class="absolute bottom-3 right-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium text-stone-800 backdrop-blur-sm">
+                                {{product.reviewCount}} reviews
+                            </div>
+                        </div>
+                        <h3 class="mb-1 text-base font-medium text-white">{{product.name}}</h3>
+                        <p class="mb-2 text-sm text-stone-400">{{product.category}}</p>
+                        <p class="text-base font-semibold text-emerald-400">
+                            \${{product.price}}
+                            <span class="text-sm font-normal text-stone-500">/day</span>
+                        </p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Camping Kits -->
+        <section class="bg-stone-50 py-24">
+            <div class="mx-auto max-w-7xl px-6">
+                <div class="mb-12 text-center animate-on-scroll">
+                    <h2 class="mb-3 text-3xl font-semibold tracking-tight text-stone-900 md:text-4xl">
+                        Complete Camping Kits
+                    </h2>
+                    <p class="mx-auto max-w-xl text-stone-500">
+                        Bundled gear at exclusive discounts. Everything you need, packaged for convenience.
+                    </p>
+                </div>
+
+                <div class="grid gap-8 lg:grid-cols-3">
+                    <a *ngFor="let kit of campingKits" [routerLink]="['/marketplace/product', kit.id]"
+                        class="group relative block overflow-hidden rounded-3xl bg-white shadow-sm transition-all hover:shadow-xl animate-on-scroll">
+                        <div class="relative aspect-[16/10] overflow-hidden">
+                            <img [src]="kit.image" [alt]="kit.name"
+                                class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent">
+                            </div>
+                            <div
+                                class="absolute left-4 top-4 rounded-full bg-amber-500 px-3 py-1.5 text-xs font-bold text-white">
+                                {{kit.discount}}
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="mb-2 text-xl font-semibold text-stone-900">{{kit.name}}</h3>
+                            <p class="mb-4 text-sm text-stone-500">{{kit.description}}</p>
+                            <div class="mb-4 rounded-xl bg-stone-50 p-3">
+                                <p class="text-xs font-medium uppercase tracking-wide text-stone-400">Includes</p>
+                                <p class="mt-1 text-sm text-stone-700">{{kit.items}}</p>
+                            </div>
+                            <div class="flex items-end justify-between">
+                                <div>
+                                    <span class="text-2xl font-bold text-emerald-800">\${{kit.price}}</span>
+                                    <span
+                                        class="ml-2 text-sm text-stone-400 line-through">\${{kit.originalPrice}}</span>
+                                </div>
+                                <span class="text-sm font-medium text-emerald-600">Save \${{kit.originalPrice -
+                                    kit.price}}</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trust Stats -->
+        <section class="bg-emerald-900 py-20">
+            <div class="mx-auto max-w-7xl px-6">
+                <div class="grid gap-8 md:grid-cols-4">
+                    <div *ngFor="let stat of trustStats" class="text-center animate-on-scroll">
+                        <div class="mb-2 text-4xl font-bold text-white md:text-5xl">{{stat.value}}</div>
+                        <div class="text-emerald-200">{{stat.label}}</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+
+</div>

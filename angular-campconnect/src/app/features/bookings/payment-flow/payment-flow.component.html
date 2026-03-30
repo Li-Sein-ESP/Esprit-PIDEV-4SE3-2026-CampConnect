@@ -1,0 +1,102 @@
+<div class="min-h-screen bg-[var(--color-background)] py-12">
+  <div class="container max-w-4xl">
+    <button (click)="goBack()" class="flex items-center gap-2 text-[var(--color-text-secondary)] mb-6">
+      <lucide-icon [img]="ChevronLeft" class="w-5 h-5"></lucide-icon>
+      Back
+    </button>
+
+    <h2 class="mb-8">Secure Payment</h2>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Security Badge -->
+        <app-card variant="bordered" class="bg-gradient-to-r from-green-50 to-blue-50">
+          <app-card-content class="py-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+                <lucide-icon [img]="Shield" class="w-5 h-5 text-white"></lucide-icon>
+              </div>
+              <div>
+                <div class="font-medium text-sm">Secure Payment</div>
+                <div class="text-xs text-[var(--color-text-secondary)]">Your information is encrypted</div>
+              </div>
+            </div>
+          </app-card-content>
+        </app-card>
+
+        <!-- Payment Method -->
+        <app-card variant="elevated">
+          <app-card-header>
+            <app-card-title>Payment Method</app-card-title>
+          </app-card-header>
+          <app-card-content>
+            <div class="space-y-3">
+              <button (click)="paymentMethod.set('card')"
+                [class]="paymentMethod() === 'card' ? 'w-full p-4 rounded-lg border-2 border-[var(--color-primary-600)] bg-[var(--color-primary-50)]' : 'w-full p-4 rounded-lg border-2'">
+                <div class="flex items-center gap-3">
+                  <lucide-icon [img]="CreditCard" class="w-6 h-6"></lucide-icon>
+                  <span>Credit or Debit Card</span>
+                </div>
+              </button>
+              <button (click)="paymentMethod.set('wallet')"
+                [class]="paymentMethod() === 'wallet' ? 'w-full p-4 rounded-lg border-2 border-[var(--color-primary-600)] bg-[var(--color-primary-50)]' : 'w-full p-4 rounded-lg border-2'">
+                <div class="flex items-center gap-3">
+                  <lucide-icon [img]="Wallet" class="w-6 h-6"></lucide-icon>
+                  <span>Digital Wallet</span>
+                </div>
+              </button>
+            </div>
+          </app-card-content>
+        </app-card>
+
+        <!-- Card Details -->
+        @if (paymentMethod() === 'card') {
+        <app-card variant="elevated">
+          <app-card-header>
+            <app-card-title>Card Details</app-card-title>
+          </app-card-header>
+          <app-card-content>
+            <div class="space-y-4">
+              <input [(ngModel)]="cardNumber" placeholder="Card Number" class="w-full px-4 py-2 rounded-lg border-2" />
+              <input [(ngModel)]="cardName" placeholder="Cardholder Name"
+                class="w-full px-4 py-2 rounded-lg border-2" />
+              <div class="grid grid-cols-2 gap-4">
+                <input [(ngModel)]="cardExpiry" placeholder="MM/YY" class="px-4 py-2 rounded-lg border-2" />
+                <input [(ngModel)]="cardCvv" placeholder="CVV" type="password" class="px-4 py-2 rounded-lg border-2" />
+              </div>
+            </div>
+          </app-card-content>
+        </app-card>
+        }
+      </div>
+
+      <!-- Order Summary -->
+      <div>
+        <app-card variant="elevated" class="sticky top-24">
+          <app-card-header>
+            <app-card-title>Order Summary</app-card-title>
+          </app-card-header>
+          <app-card-content>
+            <div class="space-y-2 mb-6">
+              <div class="flex justify-between"><span>Subtotal</span><span>\$340</span></div>
+              <div class="flex justify-between"><span>Tax</span><span>\$27.20</span></div>
+              <div class="flex justify-between"><span>Service Fee</span><span>\$5.99</span></div>
+              <div class="flex justify-between pt-3 border-t-2"><span class="font-bold">Total</span><span
+                  class="text-xl font-bold text-[var(--color-primary-600)]">\$373.19</span></div>
+            </div>
+            <app-button size="lg" [fullWidth]="true" (click)="processPayment()"
+              [disabled]="!paymentMethod() || isProcessing()">
+              @if (isProcessing()) {
+              <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+              Processing...
+              } @else {
+              <lucide-icon [img]="Lock" class="w-5 h-5 mr-2"></lucide-icon>
+              Pay \$373.19
+              }
+            </app-button>
+          </app-card-content>
+        </app-card>
+      </div>
+    </div>
+  </div>
+</div>

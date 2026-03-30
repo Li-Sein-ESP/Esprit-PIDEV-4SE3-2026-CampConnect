@@ -1,0 +1,258 @@
+<!-- Back Link (v8 Style) -->
+<div class="bg-white border-b border-gray-100">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="py-3">
+      <button (click)="navigate('/environmental')"
+        class="flex items-center space-x-2 text-sm text-gray-500 hover:text-gray-800 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        <span>Back to Safety Overview</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Hero Section (v8 Style - Matched to Screenshot) -->
+<div class="bg-[#065F46] text-white py-14">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center space-x-5 mb-4">
+      <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 2l-8 16h16l-8-16zm0 4l4 10H8l4-10z" />
+      </svg>
+      <h1 class="text-4xl font-extrabold font-primary tracking-tight">Environmental Protection Zones</h1>
+    </div>
+    <p class="text-green-50/80 max-w-2xl text-lg leading-relaxed font-medium">
+      Understand environmental regulations, protected species, and seasonal restrictions for your destination.
+    </p>
+  </div>
+</div>
+
+<!-- Main Content Layout -->
+<div class="min-h-screen bg-stone-50/20">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+      <!-- Sidebar: Zone Selection -->
+      <aside class="lg:col-span-1">
+        <h2 class="text-2xl font-bold text-gray-900 mb-8 font-primary">Select a Zone</h2>
+        <div class="space-y-5">
+          <div *ngFor="let zone of zones" (click)="selectZone(zone)"
+            class="bg-white rounded-2xl border p-6 cursor-pointer transition-all duration-300"
+            [ngClass]="selectedZone?.id === zone.id ? 'border-green-600 ring-4 ring-green-600/5 shadow-xl -translate-y-1' : 'border-gray-100 shadow-sm hover:border-green-200 hover:shadow-md'">
+            <div class="flex items-start space-x-5">
+              <div class="w-14 h-14 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm"
+                [ngClass]="zone.iconColor">
+                <svg *ngIf="zone.icon === 'mountain'" class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M14 6l-3.5 5-2.5-3-6 9h19l-6.5-11z" />
+                </svg>
+                <svg *ngIf="zone.icon === 'shield'" class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
+                </svg>
+                <svg *ngIf="zone.icon !== 'mountain' && zone.icon !== 'shield'" class="w-8 h-8" fill="currentColor"
+                  viewBox="0 0 24 24">
+                  <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" />
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="font-bold text-gray-900 text-lg mb-1 leading-tight">{{zone.name}}</h3>
+                <p class="text-[13px] text-gray-500 mb-4 font-medium">{{zone.location}}</p>
+                <span class="inline-flex px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-md"
+                  [ngClass]="zone.protectionLevel === 'High' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'">
+                  {{zone.protectionLevel}} Protection
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Display Area -->
+      <div class="lg:col-span-2">
+        <div *ngIf="selectedZone; else noSelection"
+          class="space-y-8 animate-in slide-in-from-bottom-6 fade-in duration-500">
+
+          <!-- Wilderness Area Header Card -->
+          <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h2 class="text-3xl font-bold text-gray-900">{{selectedZone.name}}</h2>
+                <p class="flex items-center text-gray-600 mt-2">
+                  <lucide-icon [img]="MapPinIcon" class="h-5 w-5 mr-2 text-green-600"></lucide-icon>
+                  {{selectedZone.location}}
+                </p>
+              </div>
+              <span class="text-white text-sm font-semibold px-4 py-1.5 rounded-full shadow-sm"
+                [ngClass]="selectedZone.protectionLevel === 'High' ? 'bg-red-600' : 'bg-amber-500'">
+                {{selectedZone.protectionLevel}} Protection
+              </span>
+            </div>
+          </div>
+
+          <!-- Protected Species Card -->
+          <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-2xl font-bold mb-2 text-gray-900">Protected Species</h2>
+            <p class="text-gray-600 mb-6 font-medium">
+              Special protections apply to these species in this zone
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div *ngFor="let s of selectedZone.protectedSpecies"
+                class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 hover:bg-stone-50 transition-colors">
+                <div class="flex items-center">
+                  <div class="mr-4 p-2.5 bg-white rounded-lg shadow-sm" [ngClass]="s.iconColor">
+                    <lucide-icon [img]="s.icon" class="h-6 w-6"></lucide-icon>
+                  </div>
+                  <div>
+                    <p class="font-bold text-gray-900">{{s.name}}</p>
+                    <p class="text-sm text-gray-500 font-medium">{{s.type}}</p>
+                  </div>
+                </div>
+                <span
+                  class="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border border-transparent shadow-sm"
+                  [ngClass]="getStatusColor(s.status)">
+                  {{s.status}}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seasonal Restrictions Card -->
+          <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-2xl font-bold mb-2 text-gray-900">Seasonal Restrictions</h2>
+            <p class="text-gray-600 mb-6 font-medium">
+              Time-based regulations and closures
+            </p>
+            <div class="space-y-6">
+              <div *ngFor="let res of selectedZone.seasonalRestrictions"
+                class="pb-6 last:pb-0 border-b last:border-0 border-gray-50">
+                <h3 class="text-lg font-bold flex items-center mb-4 text-emerald-900">
+                  <lucide-icon [img]="CalendarIcon" class="h-5 w-5 mr-2 text-emerald-600"></lucide-icon>
+                  {{res.date}}
+                </h3>
+                <p class="text-sm font-bold text-gray-700 mb-3 px-7">{{res.title}}</p>
+                <ul class="space-y-3 pl-7">
+                  <li *ngFor="let item of res.restrictions"
+                    class="flex items-start text-sm text-gray-600 leading-relaxed">
+                    <lucide-icon [img]="AlertTriangleIcon"
+                      class="h-4 w-4 text-amber-500 mr-2 mt-0.5 flex-shrink-0"></lucide-icon>
+                    <span>{{item}}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Permit Requirements Card -->
+          <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-2xl font-bold mb-6 text-gray-900">Permit Requirements</h2>
+            <div class="bg-blue-50 border border-blue-100 rounded-xl p-5 mb-8 flex items-center shadow-sm">
+              <div class="mr-5 p-3 bg-white rounded-xl shadow-sm">
+                <lucide-icon [img]="LockIcon" class="h-8 w-8 text-blue-500"></lucide-icon>
+              </div>
+              <div>
+                <p class="font-black text-blue-900 text-lg uppercase tracking-tight">Permit Required</p>
+                <div class="flex flex-wrap gap-x-6 mt-1">
+                  <p class="text-sm text-blue-700/80 font-bold">
+                    Type: <span class="text-blue-900">{{selectedZone.permitRequirements.type}}</span>
+                  </p>
+                  <p class="text-sm text-blue-700/80 font-bold">
+                    Cost: <span class="text-blue-900">{{selectedZone.permitRequirements.cost}}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-black text-gray-900 mb-4 uppercase tracking-widest flex items-center gap-2">
+                <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                Permit Limitations
+              </h3>
+              <ul class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <li *ngFor="let limit of selectedZone.permitRequirements.limitations"
+                  class="flex items-center text-sm text-gray-700 font-medium p-3 bg-stone-50 rounded-lg">
+                  <lucide-icon [img]="InfoIcon" class="h-4 w-4 text-blue-500 mr-3 flex-shrink-0"></lucide-icon>
+                  {{limit}}
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Activity Regulations Card -->
+          <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-2xl font-bold mb-2 text-gray-900">Activity Regulations</h2>
+            <p class="text-gray-600 mb-8 font-medium">
+              What you can and cannot do in this zone
+            </p>
+
+            <div class="space-y-10">
+              <!-- Allowed -->
+              <div>
+                <h3 class="text-sm font-black flex items-center text-emerald-900 uppercase tracking-widest mb-4">
+                  <lucide-icon [img]="CheckCheckIcon" class="h-5 w-5 mr-2 text-emerald-600"></lucide-icon>
+                  Allowed Activities
+                </h3>
+                <ul class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <li *ngFor="let act of selectedZone.activityRegulations.allowed"
+                    class="flex items-center p-3 text-sm text-gray-700 font-medium bg-emerald-50/30 border border-emerald-50 rounded-lg">
+                    <lucide-icon [img]="CheckIcon" class="h-4 w-4 text-emerald-500 mr-3"></lucide-icon>
+                    {{act}}
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Restricted -->
+              <div>
+                <h3 class="text-sm font-black flex items-center text-amber-900 uppercase tracking-widest mb-4">
+                  <lucide-icon [img]="AlertTriangleIcon" class="h-5 w-5 mr-2 text-amber-600"></lucide-icon>
+                  Restricted Activities
+                </h3>
+                <ul class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <li *ngFor="let act of selectedZone.activityRegulations.restricted"
+                    class="flex items-center p-3 text-sm text-gray-700 font-medium bg-amber-50/30 border border-amber-50 rounded-lg">
+                    <lucide-icon [img]="AlertTriangleIcon" class="h-4 w-4 text-amber-500 mr-3"></lucide-icon>
+                    {{act}}
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Prohibited -->
+              <div>
+                <h3 class="text-sm font-black flex items-center text-red-900 uppercase tracking-widest mb-4">
+                  <lucide-icon [img]="BanIcon" class="h-5 w-5 mr-2 text-red-600"></lucide-icon>
+                  Prohibited Activities
+                </h3>
+                <ul class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <li *ngFor="let act of selectedZone.activityRegulations.prohibited"
+                    class="flex items-center p-3 text-sm text-gray-700 font-medium bg-red-50/30 border border-red-50 rounded-lg">
+                    <lucide-icon [img]="BanIcon" class="h-4 w-4 text-red-500 mr-3"></lucide-icon>
+                    {{act}}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Selection Placeholder -->
+        <ng-template #noSelection>
+          <div
+            class="bg-white rounded-[2.5rem] border border-gray-100 p-20 flex flex-col items-center justify-center text-center h-[600px] shadow-sm animate-in zoom-in-95 duration-700">
+            <div class="w-24 h-24 bg-stone-50 rounded-full flex items-center justify-center mb-10 shadow-inner">
+              <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <h3 class="text-4xl font-extrabold text-gray-900 mb-5 font-primary tracking-tight">Select a Zone</h3>
+            <p class="text-gray-500 max-w-sm text-lg leading-relaxed font-medium">
+              Choose an environmental zone from the list to view detailed regulations and protected species information.
+            </p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </main>
+</div>

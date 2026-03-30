@@ -1,0 +1,335 @@
+<div class="bg-stone-50 min-h-screen pb-20">
+  <!-- Hero Header -->
+  <div class="bg-emerald-900 text-white py-12 px-6">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center">
+          <lucide-icon [img]="LeafIcon" class="w-8 h-8 text-white"></lucide-icon>
+        </div>
+        <h1 class="text-3xl font-bold">Environmental Compliance & Regulations</h1>
+      </div>
+      <p class="text-emerald-100 max-w-3xl text-lg">
+        Regulations, restrictions, and permit requirements to protect nature and ensure legal outdoor recreation.
+      </p>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-6 -mt-8">
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div routerLink="/safety/zones"
+        class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm flex flex-col justify-between h-32 cursor-pointer hover:border-emerald-600 hover:bg-emerald-50/10 transition-all group">
+        <div
+          class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-3 group-hover:bg-blue-100 transition-colors">
+          <lucide-icon [img]="MapPinIcon" class="w-5 h-5 text-blue-600 font-bold"></lucide-icon>
+        </div>
+        <div>
+          <h3 class="font-semibold text-stone-800 text-sm group-hover:text-emerald-700 transition-colors">Environmental
+            Zones</h3>
+          <p class="text-stone-500 text-xs">{{ environmentalZones.length }} zones with rules</p>
+        </div>
+      </div>
+      <div routerLink="/safety/zones"
+        class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm flex flex-col justify-between h-32 cursor-pointer hover:border-emerald-600 hover:bg-emerald-50/10 transition-all group">
+        <div
+          class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center mb-3 group-hover:bg-orange-100 transition-colors">
+          <lucide-icon [img]="FlameIcon" class="w-5 h-5 text-orange-600"></lucide-icon>
+        </div>
+        <div>
+          <h3 class="font-semibold text-stone-800 text-sm group-hover:text-emerald-700 transition-colors">Fire
+            Restrictions</h3>
+          <p class="text-stone-500 text-xs">{{ fireBans.length }} active bans</p>
+        </div>
+      </div>
+      <div routerLink="/safety/wildlife"
+        class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm flex flex-col justify-between h-32 cursor-pointer hover:border-emerald-600 hover:bg-emerald-50/10 transition-all group">
+        <div
+          class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center mb-3 group-hover:bg-emerald-100 transition-colors">
+          <lucide-icon [img]="BinocularsIcon" class="w-5 h-5 text-emerald-600 font-bold"></lucide-icon>
+        </div>
+        <div>
+          <h3 class="font-semibold text-stone-800 text-sm group-hover:text-emerald-700 transition-colors">Wildlife &
+            Hunting</h3>
+          <p class="text-stone-500 text-xs">Regulations & seasons</p>
+        </div>
+      </div>
+      <div routerLink="/plan-trip"
+        class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm flex flex-col justify-between h-32 cursor-pointer hover:border-emerald-600 hover:bg-emerald-50/10 transition-all group">
+        <div
+          class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center mb-3 group-hover:bg-purple-100 transition-colors">
+          <lucide-icon [img]="FileTextIcon" class="w-5 h-5 text-purple-600"></lucide-icon>
+        </div>
+        <div>
+          <h3 class="font-semibold text-stone-800 text-sm group-hover:text-emerald-700 transition-colors">My Trip
+            Compliance</h3>
+          <p class="text-stone-500 text-xs">Check trip status</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Safety Alert -->
+    <div class="bg-white border border-orange-200 rounded-xl p-4 mb-10 flex items-start gap-3 shadow-sm">
+      <lucide-icon [img]="AlertCircleIcon" class="w-5 h-5 text-orange-600 shrink-0 mt-0.5"></lucide-icon>
+      <p class="text-stone-700 text-sm">
+        <span class="font-bold">{{ safetyAlert.message.split('?')[0] }}? </span>
+        {{ safetyAlert.message.split('?')[1] }}
+        <a [routerLink]="safetyAlert.linkUrl" class="text-orange-600 font-bold hover:underline ml-1">
+          {{ safetyAlert.linkText }}
+        </a>
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Main Column -->
+      <div class="lg:col-span-2 space-y-12">
+
+        <!-- Environmental Zones -->
+        <section>
+          <div class="flex items-end justify-between mb-6">
+            <div>
+              <h2 class="text-2xl font-bold text-stone-800">Environmental Zones</h2>
+              <p class="text-stone-500 text-sm mt-1">Protected areas with specific regulations</p>
+            </div>
+            <button routerLink="/safety/zones"
+              class="hidden sm:flex items-center gap-1 text-sm font-medium text-stone-600 hover:text-stone-900 border border-stone-300 rounded-lg px-4 py-2 hover:bg-stone-50 transition-colors">
+              View All
+              <lucide-icon [img]="ArrowRightIcon" class="w-4 h-4"></lucide-icon>
+            </button>
+          </div>
+          <div>
+            <div *ngFor="let zone of environmentalZones" routerLink="/safety/zones"
+              class="bg-white rounded-xl border border-stone-200 p-6 mb-4 shadow-sm cursor-pointer hover:border-emerald-300 hover:shadow-md transition-all">
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-4">
+                  <div class="h-12 w-12 rounded-lg flex items-center justify-center shrink-0"
+                    [ngClass]="zone.status === 'Closed' ? 'bg-red-50' : 'bg-emerald-50'">
+                    <lucide-icon [img]="getZoneIcon(zone.name)" class="w-6 h-6"
+                      [ngClass]="zone.status === 'Closed' ? 'text-red-600' : 'text-emerald-600'"></lucide-icon>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-bold text-stone-800">{{zone.name}}</h3>
+                    <div *ngIf="zone.permitRequired" class="flex items-center gap-1 mt-1">
+                      <span
+                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                        <lucide-icon [img]="FileTextIcon" class="w-3 h-3"></lucide-icon>
+                        Permit Required
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-medium border"
+                  [ngClass]="zone.status === 'Closed' ? 'bg-red-50 text-red-700 border-red-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100'">
+                  <span class="flex items-center gap-1">
+                    <lucide-icon [img]="zone.status === 'Closed' ? XCircleIcon : CheckCircleIcon"
+                      class="w-3 h-3"></lucide-icon>
+                    {{zone.status}}
+                  </span>
+                </span>
+              </div>
+
+              <div class="pl-0 sm:pl-16">
+                <h4 class="font-semibold text-stone-800 text-sm mb-2">Restrictions:</h4>
+                <ul class="space-y-1">
+                  <li *ngFor="let r of zone.restrictions" class="text-stone-600 text-sm flex items-start gap-2">
+                    <span class="mt-1.5 h-1 w-1 rounded-full bg-stone-400 shrink-0"></span>
+                    {{r}}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Fire Bans -->
+        <section>
+          <div class="flex items-end justify-between mb-6">
+            <div>
+              <h2 class="text-2xl font-bold text-stone-800">Fire Bans & Restrictions</h2>
+              <p class="text-stone-500 text-sm mt-1">Current fire restrictions by location</p>
+            </div>
+            <button routerLink="/safety/zones"
+              class="hidden sm:flex items-center gap-1 text-sm font-medium text-stone-600 hover:text-stone-900 border border-stone-300 rounded-lg px-4 py-2 hover:bg-stone-50 transition-colors">
+              View All
+              <lucide-icon [img]="ArrowRightIcon" class="w-4 h-4"></lucide-icon>
+            </button>
+          </div>
+          <div>
+            <div *ngFor="let ban of fireBans" class="bg-white rounded-xl border-l-4 p-6 mb-4 shadow-sm border-stone-200"
+              [ngClass]="ban.stage.includes('Stage 2') ? 'border-l-orange-500' : 'border-l-yellow-500'">
+              <div class="flex items-start gap-4 mb-4">
+                <div class="h-10 w-10 rounded-full flex items-center justify-center shrink-0"
+                  [ngClass]="ban.stage.includes('Stage 2') ? 'bg-orange-100' : 'bg-yellow-100'">
+                  <lucide-icon [img]="FlameIcon" class="w-5 h-5"
+                    [ngClass]="ban.stage.includes('Stage 2') ? 'text-orange-600' : 'text-yellow-600'"></lucide-icon>
+                </div>
+                <div>
+                  <h3 class="text-lg font-bold text-stone-800">{{ban.location}}</h3>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="text-xs font-bold px-2 py-0.5 rounded"
+                      [ngClass]="ban.stage.includes('Stage 2') ? 'bg-orange-100 text-orange-800' : 'bg-yellow-100 text-yellow-800'">
+                      {{ban.stage}}
+                    </span>
+                    <span class="text-stone-400 text-xs flex items-center gap-1">
+                      <lucide-icon [img]="CalendarIcon" class="w-3 h-3"></lucide-icon>
+                      Valid until {{ban.validUntil}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pl-14">
+                <ul class="space-y-2">
+                  <li *ngFor="let r of ban.restrictions" class="text-stone-600 text-sm flex items-center gap-2">
+                    <lucide-icon [img]="XCircleIcon" class="w-4 h-4 text-red-500 shrink-0"></lucide-icon>
+                    {{r}}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- My Trip Compliance -->
+        <section>
+          <div class="flex items-end justify-between mb-6">
+            <div>
+              <h2 class="text-2xl font-bold text-stone-800">My Trip Compliance</h2>
+              <p class="text-stone-500 text-sm mt-1">Environmental and legal status for upcoming trips</p>
+            </div>
+            <button routerLink="/plan-trip"
+              class="hidden sm:flex items-center gap-1 text-sm font-medium text-stone-600 hover:text-stone-900 border border-stone-300 rounded-lg px-4 py-2 hover:bg-stone-50 transition-colors">
+              View All Trips
+              <lucide-icon [img]="ArrowRightIcon" class="w-4 h-4"></lucide-icon>
+            </button>
+          </div>
+          <div>
+            <div *ngFor="let trip of tripCompliance"
+              class="bg-white rounded-xl border border-stone-200 p-6 mb-4 shadow-sm">
+              <div class="flex items-start justify-between mb-4">
+                <div>
+                  <h3 class="font-bold text-stone-800 text-lg">{{trip.name}}</h3>
+                  <div class="flex items-center gap-4 text-sm text-stone-500 mt-1">
+                    <span class="flex items-center gap-1">
+                      <lucide-icon [img]="MapPinIcon" class="w-3.5 h-3.5"></lucide-icon> {{trip.location}}
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <lucide-icon [img]="CalendarIcon" class="w-3.5 h-3.5"></lucide-icon> {{trip.dates}}
+                    </span>
+                  </div>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-medium border flex items-center gap-1"
+                  [ngClass]="trip.status === 'Compliant' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-yellow-50 text-yellow-700 border-yellow-100'">
+                  <lucide-icon [img]="trip.status === 'Compliant' ? CheckCircleIcon : AlertTriangleIcon"
+                    class="w-3 h-3"></lucide-icon>
+                  {{trip.status}}
+                </span>
+              </div>
+
+              <div class="rounded-lg p-4 border"
+                [ngClass]="trip.status === 'Compliant' ? 'bg-emerald-50/50 border-emerald-100' : 'bg-yellow-50/50 border-yellow-100'">
+                <div *ngIf="trip.status === 'Compliant'" class="flex items-center gap-2 text-emerald-800 font-medium">
+                  <lucide-icon [img]="CheckCircleIcon" class="w-5 h-5"></lucide-icon>
+                  <div>
+                    <p>All Requirements Met</p>
+                    <p class="text-xs font-normal text-emerald-600 mt-0.5">Your trip complies with all current
+                      environmental
+                      regulations.</p>
+                  </div>
+                </div>
+                <div *ngIf="trip.status !== 'Compliant'">
+                  <h4 class="font-bold text-yellow-800 mb-2 flex items-center gap-2">
+                    {{trip.issues.length}} Compliance Issues
+                  </h4>
+                  <ul class="space-y-1">
+                    <li *ngFor="let issue of trip.issues" class="text-yellow-800 text-sm flex items-start gap-2">
+                      <lucide-icon [img]="AlertTriangleIcon" class="w-4 h-4 mt-0.5 shrink-0"></lucide-icon>
+                      {{issue}}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between mt-4">
+                <span class="text-xs text-stone-400">Last checked: {{trip.lastChecked}}</span>
+                <button routerLink="/safety/compliance-detail"
+                  class="flex items-center gap-1 text-stone-600 text-sm font-medium hover:text-stone-900 border border-stone-300 px-3 py-1.5 rounded-lg hover:bg-stone-50 transition-colors">
+                  <lucide-icon [img]="FileTextIcon" class="w-3.5 h-3.5"></lucide-icon>
+                  View Details
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Sidebar Column -->
+      <div class="lg:col-span-1 space-y-6">
+
+        <!-- Hunting Seasons -->
+        <div class="bg-white rounded-xl border border-stone-200 p-6 shadow-sm">
+          <h3 class="text-xl font-bold text-stone-800 mb-1">Hunting Seasons</h3>
+          <p class="text-stone-500 text-sm mb-4">Current and upcoming seasons</p>
+
+          <div class="space-y-4">
+            <div *ngFor="let season of huntingSeasons" class="bg-stone-50 rounded-lg p-3">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2 font-semibold text-stone-800 text-sm">
+                  <lucide-icon [img]="BinocularsIcon" class="w-4 h-4 text-stone-500"></lucide-icon>
+                  {{season.animal}}
+                </div>
+                <span *ngIf="season.status === 'Active'"
+                  class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">Active</span>
+              </div>
+              <div class="text-xs text-stone-500 mb-1 flex items-center gap-1">
+                <lucide-icon [img]="CalendarIcon" class="w-3 h-3"></lucide-icon>
+                {{season.dates}}
+              </div>
+              <div *ngIf="season.permitRequired" class="text-xs text-blue-600 font-medium flex items-center gap-1">
+                <lucide-icon [img]="FileTextIcon" class="w-3 h-3"></lucide-icon>
+                Permit required
+              </div>
+            </div>
+          </div>
+
+          <button
+            class="w-full mt-4 flex items-center justify-center gap-2 border border-stone-300 rounded-lg py-2 text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors">
+            View All Regulations
+            <lucide-icon [img]="ArrowRightIcon" class="w-4 h-4"></lucide-icon>
+          </button>
+        </div>
+
+        <!-- Leave No Trace -->
+        <div class="bg-white rounded-xl border border-stone-200 p-6 shadow-sm">
+          <h3 class="font-bold text-stone-800 mb-4 flex items-center gap-2">
+            <lucide-icon [img]="TreesIcon" class="w-5 h-5 text-emerald-700"></lucide-icon>
+            Leave No Trace
+          </h3>
+          <ul class="space-y-3">
+            <li
+              *ngFor="let item of ['Plan ahead and prepare', 'Travel on durable surfaces', 'Dispose of waste properly', 'Minimize campfire impact', 'Respect wildlife', 'Be considerate of others']"
+              class="flex items-start gap-2 text-sm text-emerald-800">
+              <lucide-icon [img]="CheckCircleIcon" class="w-4 h-4 mt-0.5 text-emerald-600 shrink-0"></lucide-icon>
+              {{item}}
+            </li>
+          </ul>
+        </div>
+
+        <!-- Compliance Resources -->
+        <div class="bg-white rounded-xl border border-stone-200 p-6 shadow-sm">
+          <h3 class="font-bold text-stone-800 mb-4">Compliance Resources</h3>
+          <ul class="space-y-4">
+            <li
+              *ngFor="let item of ['Wilderness Permit Information', 'Fire Restriction Map', 'Wildlife Protection Guidelines', 'Safety Alerts & Emergency Info']; let idx = index">
+              <a href="#" class="text-sm flex items-center gap-2 hover:underline"
+                [ngClass]="idx === 3 ? 'text-blue-600' : 'text-stone-600'">
+                <span class="text-stone-300">—</span> {{item}}
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>

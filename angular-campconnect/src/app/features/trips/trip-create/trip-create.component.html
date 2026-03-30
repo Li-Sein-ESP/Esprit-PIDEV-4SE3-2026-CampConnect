@@ -1,0 +1,129 @@
+<div class="min-h-screen bg-[var(--color-background)] py-12">
+  <div class="container max-w-2xl">
+    <h2 class="mb-8 font-bold text-3xl text-[var(--color-text-primary)]">Create New Trip</h2>
+
+    <app-card variant="elevated">
+      <app-card-content class="p-8">
+        <!-- Error Message (General) -->
+        <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3 text-red-700 animate-in fade-in duration-200">
+          <lucide-icon [img]="AlertCircle" class="w-5 h-5 flex-shrink-0 mt-0.5"></lucide-icon>
+          <div class="text-sm font-medium">{{ errorMessage }}</div>
+        </div>
+
+        <form *ngIf="tripForm" [formGroup]="tripForm" (ngSubmit)="createTrip()" class="space-y-6">
+          <!-- Trip Name -->
+          <div>
+            <label class="block text-sm font-medium mb-2 text-[var(--color-text-secondary)]">Trip Name</label>
+            <input formControlName="name" placeholder="e.g., Yosemite Summer Adventure"
+              [class.border-red-500]="f['name'].invalid && (f['name'].dirty || f['name'].touched)"
+              class="w-full px-4 py-2 rounded-lg border-2 border-[var(--color-border-light)] focus:border-[var(--color-primary-600)] outline-none transition-all" />
+            <div *ngIf="f['name'].invalid && (f['name'].dirty || f['name'].touched)" class="mt-1 text-xs text-red-500 font-medium">
+              <span *ngIf="f['name'].errors?.['required']">Trip name is required.</span>
+              <span *ngIf="f['name'].errors?.['minlength']">Name must be at least 3 characters.</span>
+            </div>
+          </div>
+
+          <!-- Destination -->
+          <div>
+            <label class="block text-sm font-medium mb-2 text-[var(--color-text-secondary)]">Destination</label>
+            <div class="relative">
+              <lucide-icon [img]="MapPin"
+                class="absolute left-3 top-3 w-5 h-5 text-[var(--color-text-tertiary)]"></lucide-icon>
+              <input formControlName="destination" placeholder="Where are you going?"
+                [class.border-red-500]="f['destination'].invalid && (f['destination'].dirty || f['destination'].touched)"
+                class="w-full pl-10 pr-4 py-2 rounded-lg border-2 border-[var(--color-border-light)] focus:border-[var(--color-primary-600)] outline-none transition-all" />
+            </div>
+            <div *ngIf="f['destination'].invalid && (f['destination'].dirty || f['destination'].touched)" class="mt-1 text-xs text-red-500 font-medium">
+              Destination is required.
+            </div>
+          </div>
+
+          <!-- Dates -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-2 text-[var(--color-text-secondary)]">Start Date</label>
+              <input type="date" formControlName="startDate" [min]="today"
+                [class.border-red-500]="f['startDate'].invalid && (f['startDate'].dirty || f['startDate'].touched)"
+                class="w-full px-4 py-2 rounded-lg border-2 border-[var(--color-border-light)] outline-none transition-all" />
+              <div *ngIf="f['startDate'].invalid && (f['startDate'].dirty || f['startDate'].touched)" class="mt-1 text-xs text-red-500 font-medium">
+                Start date is required.
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2 text-[var(--color-text-secondary)]">End Date</label>
+              <input type="date" formControlName="endDate" [min]="f['startDate'].value || today"
+                [class.border-red-500]="f['endDate'].invalid && (f['endDate'].dirty || f['endDate'].touched)"
+                class="w-full px-4 py-2 rounded-lg border-2 border-[var(--color-border-light)] outline-none transition-all" />
+              <div *ngIf="f['endDate'].invalid && (f['endDate'].dirty || f['endDate'].touched)" class="mt-1 text-xs text-red-500 font-medium">
+                End date is required.
+              </div>
+            </div>
+          </div>
+          <!-- Date Range Error -->
+          <div *ngIf="tripForm.errors?.['dateRangeInvalid'] && (f['startDate'].dirty || f['startDate'].touched || f['endDate'].dirty || f['endDate'].touched)" 
+               class="p-2 bg-red-50 text-red-600 rounded text-xs font-medium border border-red-100">
+            End date cannot be before start date.
+          </div>
+          <div *ngIf="tripForm.errors?.['pastDateInvalid'] && (f['startDate'].dirty || f['startDate'].touched)" 
+               class="p-2 bg-red-50 text-red-600 rounded text-xs font-medium border border-red-100 mt-2">
+            Start date cannot be in the past.
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Difficulty -->
+            <div>
+              <label class="block text-sm font-medium mb-2 text-[var(--color-text-secondary)]">Difficulty</label>
+              <select formControlName="difficulty"
+                class="w-full px-4 py-2 rounded-lg border-2 border-[var(--color-border-light)] focus:border-[var(--color-primary-600)] bg-white outline-none transition-all">
+                <option value="BEGINNER">Beginner</option>
+                <option value="EASY">Easy</option>
+                <option value="MODERATE">Moderate</option>
+                <option value="HARD">Hard</option>
+                <option value="EXPERT">Expert</option>
+              </select>
+            </div>
+            <!-- Budget -->
+            <div>
+              <label class="block text-sm font-medium mb-2 text-[var(--color-text-secondary)]">Budget ($)</label>
+              <input type="number" formControlName="budget" min="0" step="1"
+                [class.border-red-500]="f['budget'].invalid && (f['budget'].dirty || f['budget'].touched)"
+                class="w-full px-4 py-2 rounded-lg border-2 border-[var(--color-border-light)] outline-none transition-all" />
+              <div *ngIf="f['budget'].invalid && (f['budget'].dirty || f['budget'].touched)" class="mt-1 text-xs text-red-500 font-medium">
+                <span *ngIf="f['budget'].errors?.['required']">Budget is required.</span>
+                <span *ngIf="f['budget'].errors?.['min']">Budget cannot be negative.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Number of Participants -->
+          <div>
+            <label class="block text-sm font-medium mb-2 text-[var(--color-text-secondary)]">Number of Participants</label>
+            <input type="number" formControlName="participants" min="1" step="1"
+              [class.border-red-500]="f['participants'].invalid && (f['participants'].dirty || f['participants'].touched)"
+              class="w-full px-4 py-2 rounded-lg border-2 border-[var(--color-border-light)] outline-none transition-all" />
+            <div *ngIf="f['participants'].invalid && (f['participants'].dirty || f['participants'].touched)" class="mt-1 text-xs text-red-500 font-medium">
+              <span *ngIf="f['participants'].errors?.['required']">Requirement info missing.</span>
+              <span *ngIf="f['participants'].errors?.['min']">At least 1 participant required.</span>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div>
+            <label class="block text-sm font-medium mb-2 text-[var(--color-text-secondary)]">Description</label>
+            <textarea formControlName="description" rows="4" placeholder="Tell us about your trip..."
+              class="w-full px-4 py-2 rounded-lg border-2 border-[var(--color-border-light)] focus:border-[var(--color-primary-600)] outline-none transition-all"></textarea>
+          </div>
+
+          <app-button type="submit" size="lg" [fullWidth]="true" [disabled]="isSubmitting">
+            <lucide-icon *ngIf="!isSubmitting" [img]="Plus" class="w-5 h-5 mr-2"></lucide-icon>
+            <span *ngIf="isSubmitting" class="flex items-center gap-2">
+              <span class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+              Creating...
+            </span>
+            <span *ngIf="!isSubmitting">Create Trip</span>
+          </app-button>
+        </form>
+      </app-card-content>
+    </app-card>
+  </div>
+</div>

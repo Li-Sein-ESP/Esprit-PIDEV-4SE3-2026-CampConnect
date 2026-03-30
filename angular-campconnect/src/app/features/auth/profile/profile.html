@@ -1,0 +1,149 @@
+<div
+  class="min-h-screen bg-stone-900 text-stone-50 p-8 flex justify-center items-start"
+>
+  <div class="w-full max-w-2xl mt-12">
+    <!-- Header Profile Banner -->
+    <div
+      class="bg-gradient-to-br from-emerald-900/40 to-stone-800 border border-stone-700 rounded-3xl p-8 shadow-2xl relative overflow-hidden"
+    >
+      <!-- decorative blur -->
+      <div
+        class="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-[80px]"
+      ></div>
+
+      <div class="relative z-10 flex items-center gap-6">
+        <!-- Avatar placeholder -->
+        <div
+          class="w-24 h-24 rounded-2xl bg-stone-800 border-2 border-emerald-500/30 flex items-center justify-center shadow-inner"
+        >
+          <span class="text-4xl">🏕️</span>
+        </div>
+
+        <div>
+          <h1 class="text-3xl font-serif font-bold text-white mb-1">
+            {{ user?.username || 'Explorer' }}
+          </h1>
+          <p class="text-stone-400 font-medium mb-3">{{ user?.email }}</p>
+
+          <div class="flex gap-2 flex-wrap">
+            <span
+              *ngFor="let role of roles"
+              class="px-3 py-1 bg-emerald-900/50 text-emerald-300 rounded-full text-xs font-bold uppercase tracking-wider border border-emerald-700/50"
+            >
+              {{ role.replace('ROLE_', '').replace('_', ' ') }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User's Trips -->
+    <div class="mt-8 bg-stone-800/50 border border-stone-700 rounded-2xl p-8">
+      <h2
+        class="text-xl font-bold font-serif text-white mb-6 flex items-center gap-3"
+      >
+        <span
+          class="w-8 h-8 rounded-lg bg-amber-900/40 text-amber-500 flex items-center justify-center"
+          >🗺️</span
+        >
+        My Trips
+      </h2>
+
+      <div
+        *ngIf="trips && trips.length > 0"
+        class="grid grid-cols-1 md:grid-cols-2 gap-6"
+      >
+        <div
+          *ngFor="let trip of trips"
+          class="bg-stone-900/50 rounded-xl overflow-hidden border border-stone-700/50"
+        >
+          <div class="p-4">
+            <h3 class="text-lg font-semibold text-stone-100">
+              {{ trip.title || trip.name }}
+            </h3>
+            <p class="text-stone-400 text-sm">
+              {{ trip.startDate | date:'mediumDate' }} - {{ trip.endDate |
+              date:'mediumDate' }}
+            </p>
+            <div class="mt-3 flex gap-2">
+              <a
+                [routerLink]="['/trips', trip.id]"
+                class="px-3 py-2 bg-emerald-700 text-white rounded-md text-sm"
+                >View</a
+              >
+              <a
+                [routerLink]="['/plan-trip']"
+                [queryParams]="{ tripId: trip.id }"
+                class="px-3 py-2 border border-stone-600 rounded-md text-sm"
+                >Edit</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        *ngIf="!trips || trips.length === 0"
+        class="text-stone-400 py-8 text-center bg-stone-900/50 rounded-xl border border-stone-700/50 border-dashed"
+      >
+        <p>You haven't planned any trips yet.</p>
+        <a
+          [routerLink]="['/plan-trip']"
+          class="inline-block mt-4 px-6 py-2 bg-emerald-600 text-white rounded-md"
+          >Plan your first trip</a
+        >
+      </div>
+    </div>
+
+    <div
+      class="mt-8 bg-stone-800/50 border border-stone-700 rounded-2xl p-8"
+      *ngIf="profileDetails && (($any(profileDetails) | keyvalue)?.length || 0) > 0"
+    >
+      <h2
+        class="text-xl font-bold font-serif text-white mb-6 flex items-center gap-3"
+      >
+        <span
+          class="w-8 h-8 rounded-lg bg-amber-900/40 text-amber-500 flex items-center justify-center"
+          >📋</span
+        >
+        Role Specific Details
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div
+          *ngFor="let item of profileDetails | keyvalue"
+          class="bg-stone-900/50 rounded-xl p-4 border border-stone-700/50"
+        >
+          <p
+            class="text-xs text-stone-500 font-bold uppercase tracking-wider mb-1"
+          >
+            {{ formatKey($any(item).key) }}
+          </p>
+          <p class="text-stone-200 font-medium text-lg">
+            {{ item.value || 'Not provided' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="mt-8 bg-stone-800/50 border border-stone-700 rounded-2xl p-8"
+      *ngIf="!profileDetails || (($any(profileDetails) | keyvalue)?.length || 0) === 0"
+    >
+      <h2
+        class="text-xl font-bold font-serif text-white mb-6 flex items-center gap-3"
+      >
+        <span
+          class="w-8 h-8 rounded-lg bg-amber-900/40 text-amber-500 flex items-center justify-center"
+          >📋</span
+        >
+        Role Details
+      </h2>
+      <div
+        class="text-stone-400 py-8 text-center bg-stone-900/50 rounded-xl border border-stone-700/50 border-dashed"
+      >
+        <p>No specific details were provided during your sign up.</p>
+      </div>
+    </div>
+  </div>
+</div>

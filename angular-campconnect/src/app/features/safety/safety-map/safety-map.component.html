@@ -1,0 +1,122 @@
+<section class="safety-map">
+
+    <!-- Page Header -->
+    <header class="safety-map__header">
+        <div class="safety-map__header-inner">
+            <div class="safety-map__header-content">
+                <h1 class="safety-map__title">Safety Map</h1>
+                <p class="safety-map__subtitle">Visualize real-time risks in camping areas</p>
+            </div>
+            <div class="safety-map__header-status">
+                <span class="safety-map__status-dot" aria-hidden="true"></span>
+                <span class="safety-map__status-text">Live Data</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Body: Map + Side Panel -->
+    <main class="safety-map__body">
+
+        <!-- Leaflet Map -->
+        <div class="safety-map__map-wrapper">
+            <div id="safety-map-container" class="safety-map__map-surface" style="width:100%;height:600px;"></div>
+
+
+            <!-- Risk Legend -->
+            <aside class="safety-map__legend" aria-label="Risk level legend">
+                <p class="safety-map__legend-title">Risk Level</p>
+                <ul class="safety-map__legend-items">
+                    <li class="safety-map__legend-item">
+                        <span class="safety-map__legend-color safety-map__legend-color--low"></span>
+                        <span class="safety-map__legend-label">Low (Info)</span>
+                    </li>
+                    <li class="safety-map__legend-item">
+                        <span class="safety-map__legend-color safety-map__legend-color--medium"></span>
+                        <span class="safety-map__legend-label">Medium (Warning)</span>
+                    </li>
+                    <li class="safety-map__legend-item">
+                        <span class="safety-map__legend-color safety-map__legend-color--high"></span>
+                        <span class="safety-map__legend-label">High (Danger)</span>
+                    </li>
+                    <li class="safety-map__legend-item">
+                        <span class="safety-map__legend-color safety-map__legend-color--critical"></span>
+                        <span class="safety-map__legend-label">Critical</span>
+                    </li>
+                </ul>
+            </aside>
+        </div>
+
+        <!-- Alerts Side Panel -->
+        <aside class="safety-map__alerts-panel">
+
+            <div class="safety-map__alerts-header">
+                <h2 class="safety-map__alerts-title">Active Alerts</h2>
+                <span class="safety-map__alerts-count">{{ filteredAlerts.length }} alert{{ filteredAlerts.length !== 1 ?
+                    's' : '' }}</span>
+            </div>
+
+            <!-- Filter Chips -->
+            <div class="safety-map__alerts-filters" role="group" aria-label="Filter by type">
+                <button *ngFor="let f of filterTypes" class="safety-map__filter-chip"
+                    [class.safety-map__filter-chip--active]="activeFilter === f.key" (click)="applyFilter(f.key)"
+                    [attr.aria-pressed]="activeFilter === f.key">
+                    {{ f.label }}
+                </button>
+            </div>
+
+            <!-- Alert Cards -->
+            <div class="safety-map__alerts-list" role="list">
+
+                <article *ngFor="let alert of filteredAlerts" [id]="'alert-card-' + alert.id"
+                    class="safety-map__alert-card"
+                    [class.safety-map__alert-card--critical]="alert.severity === 'critical'"
+                    [class.safety-map__alert-card--high]="alert.severity === 'danger'"
+                    [class.safety-map__alert-card--medium]="alert.severity === 'warning'"
+                    [class.safety-map__alert-card--low]="alert.severity === 'info'"
+                    [class.safety-map__alert-card--selected]="selectedAlert?.id === alert.id" role="listitem">
+                    <div class="safety-map__alert-top">
+                        <span class="safety-map__alert-badge"
+                            [class.safety-map__alert-badge--critical]="alert.severity === 'critical'"
+                            [class.safety-map__alert-badge--high]="alert.severity === 'danger'"
+                            [class.safety-map__alert-badge--medium]="alert.severity === 'warning'"
+                            [class.safety-map__alert-badge--low]="alert.severity === 'info'">
+                            {{ getRiskLabel(alert.severity) }}
+                        </span>
+                        <time class="safety-map__alert-time">{{ formatTime(alert.updatedAt) }}</time>
+                    </div>
+
+                    <div class="safety-map__alert-content">
+                        <h3 class="safety-map__alert-title">{{ alert.title }}</h3>
+                        <div class="safety-map__alert-meta">
+                            <span class="safety-map__alert-region">
+                                <span class="safety-map__alert-region-icon">📍</span>
+                                {{ alert.location.region }}
+                            </span>
+                            <span class="safety-map__alert-type">
+                                <span class="safety-map__alert-type-icon">{{ getTypeIcon(alert.type) }}</span>
+                                {{ alert.type | titlecase }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="safety-map__alert-actions">
+                        <button class="safety-map__focus-btn" (click)="focusOnMap(alert)"
+                            [disabled]="!alert.location.coordinates"
+                            [title]="alert.location.coordinates ? 'Center map on this alert' : 'No coordinates available'">
+                            <span class="safety-map__focus-icon">◎</span>
+                            Focus on Map
+                        </button>
+                    </div>
+                </article>
+
+                <!-- Empty state -->
+                <div *ngIf="filteredAlerts.length === 0" class="safety-map__empty">
+                    <p>No alerts match this filter.</p>
+                </div>
+
+            </div>
+        </aside>
+
+    </main>
+
+</section>

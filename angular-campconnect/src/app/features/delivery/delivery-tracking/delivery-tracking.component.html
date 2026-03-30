@@ -1,0 +1,352 @@
+<div class="cc-tracking">
+
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 1. TOP STATUS SECTION                       -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="cc-tracking__status-section">
+        <div class="cc-tracking__status-inner">
+            <div class="cc-tracking__status-label">
+                <span class="cc-tracking__pulse-dot"></span>
+                <span class="cc-tracking__status-badge">Live Tracking</span>
+            </div>
+            <h1 class="cc-tracking__status-title">
+                {{ delivery.status === 'DELIVERED' ? 'Your gear has arrived' : 'Your gear is on the way' }}
+            </h1>
+            <p class="cc-tracking__status-subtitle" *ngIf="delivery.status !== 'DELIVERED'">Arriving in approximately
+            </p>
+            <p class="cc-tracking__status-subtitle" *ngIf="delivery.status === 'DELIVERED'">Successfully delivered</p>
+            <div class="cc-tracking__eta">
+                <div class="cc-tracking__eta-block">
+                    <span class="cc-tracking__eta-number">{{ etaHours }}</span>
+                    <span class="cc-tracking__eta-unit">hrs</span>
+                </div>
+                <span class="cc-tracking__eta-sep">:</span>
+                <div class="cc-tracking__eta-block">
+                    <span class="cc-tracking__eta-number">{{ padZero(etaMinutes) }}</span>
+                    <span class="cc-tracking__eta-unit">min</span>
+                </div>
+                <span class="cc-tracking__eta-sep">:</span>
+                <div class="cc-tracking__eta-block">
+                    <span class="cc-tracking__eta-number cc-tracking__eta-seconds">{{ padZero(etaSeconds) }}</span>
+                    <span class="cc-tracking__eta-unit">sec</span>
+                </div>
+            </div>
+            <p class="cc-tracking__status-eta-time" *ngIf="delivery.status !== 'DELIVERED'">
+                Estimated arrival — <strong>{{ delivery.estimatedArrival }}</strong>
+            </p>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 2. LIVE PROGRESS TIMELINE                   -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="cc-tracking__progress-section">
+        <div class="cc-tracking__progress-inner">
+            <div class="cc-tracking__timeline">
+                <div class="cc-tracking__timeline-track">
+                    <div class="cc-tracking__timeline-fill" [style.width]="progressWidth"></div>
+                </div>
+                <div class="cc-tracking__timeline-steps">
+
+                    <ng-container *ngFor="let step of delivery.timeline; let i = index">
+                        <!-- Determine step classes -->
+                        <div class="cc-tracking__step" [ngClass]="{
+                     'cc-tracking__step--completed': step.completed,
+                     'cc-tracking__step--active': !step.completed && (i === 0 || delivery.timeline[i-1].completed),
+                     'cc-tracking__step--pending': !step.completed && (i > 0 && !delivery.timeline[i-1].completed)
+                   }">
+                            <div class="cc-tracking__step-dot">
+                                <svg *ngIf="step.completed" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                                <div *ngIf="!step.completed && (i === 0 || delivery.timeline[i-1].completed)"
+                                    class="cc-tracking__step-dot-pulse"></div>
+                            </div>
+                            <span class="cc-tracking__step-label">{{ step.label }}</span>
+                            <span class="cc-tracking__step-time">{{ step.time }}</span>
+                        </div>
+                    </ng-container>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 3. MAP SECTION                              -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="cc-tracking__map-section">
+        <div class="cc-tracking__map-inner">
+            <div class="cc-tracking__map-header">
+                <h2 class="cc-tracking__section-title">Live Location</h2>
+                <button class="cc-tracking__map-toggle" (click)="toggleMap()">
+                    <svg class="cc-tracking__map-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    <span>{{ isMapHidden ? 'Show Map' : 'Hide Map' }}</span>
+                </button>
+            </div>
+            <div class="cc-tracking__map-container" [class.cc-tracking__map-container--hidden]="isMapHidden">
+                <div class="cc-tracking__map-canvas">
+                    <svg class="cc-tracking__map-svg" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice">
+                        <!-- Background grid -->
+                        <defs>
+                            <pattern id="ccGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+                                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#e8e5e0" stroke-width="0.5" />
+                            </pattern>
+                            <filter id="ccGlow">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                            <linearGradient id="routeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#2d6a4f;stop-opacity:0.3" />
+                                <stop offset="75%" style="stop-color:#2d6a4f;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#40916c;stop-opacity:0.4" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="800" height="400" fill="#f7f5f2" />
+                        <rect width="800" height="400" fill="url(#ccGrid)" />
+
+                        <!-- Mock roads -->
+                        <path d="M 0 200 L 200 200 L 280 150 L 400 150 L 500 200 L 600 180 L 800 180" fill="none"
+                            stroke="#d4cfc7" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M 400 0 L 400 150 L 400 400" fill="none" stroke="#d4cfc7" stroke-width="14"
+                            stroke-linecap="round" />
+                        <path d="M 200 0 L 200 200 L 200 400" fill="none" stroke="#d4cfc7" stroke-width="14"
+                            stroke-linecap="round" />
+                        <path d="M 0 320 L 300 320 L 500 280 L 800 300" fill="none" stroke="#d4cfc7" stroke-width="12"
+                            stroke-linecap="round" stroke-linejoin="round" />
+
+                        <!-- Route line (completed) -->
+                        <path
+                            d="M 140 300 C 180 300 200 260 240 240 C 280 220 300 200 340 180 C 380 160 420 155 460 160 C 500 165 520 180 560 180"
+                            fill="none" stroke="url(#routeGrad)" stroke-width="4" stroke-linecap="round"
+                            stroke-dasharray="0" filter="url(#ccGlow)" />
+
+                        <!-- Route line (remaining - dashed) -->
+                        <path d="M 560 180 C 600 180 620 170 660 160 C 700 150 720 140 700 120" fill="none"
+                            stroke="#2d6a4f" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 8"
+                            opacity="0.4" />
+
+                        <!-- Pickup marker -->
+                        <g transform="translate(140, 300)">
+                            <circle cx="0" cy="0" r="18" fill="#2d6a4f" opacity="0.1" />
+                            <circle cx="0" cy="0" r="10" fill="#2d6a4f" opacity="0.2" />
+                            <circle cx="0" cy="0" r="5" fill="#2d6a4f" />
+                            <text x="14" y="-12" font-family="Inter, sans-serif" font-size="11" font-weight="600"
+                                fill="#2d6a4f">Warehouse</text>
+                        </g>
+
+                        <!-- Delivery marker -->
+                        <g transform="translate(700, 120)">
+                            <circle cx="0" cy="0" r="18" fill="#b85c38" opacity="0.15" />
+                            <circle cx="0" cy="0" r="10" fill="#b85c38" opacity="0.25" />
+                            <circle cx="0" cy="0" r="5" fill="white" stroke="#b85c38" stroke-width="2.5" />
+                            <text x="-60" y="-18" font-family="Inter, sans-serif" font-size="11" font-weight="600"
+                                fill="#b85c38">Your Location</text>
+                        </g>
+
+                        <!-- Vehicle icon (moving) -->
+                        <g class="cc-tracking__vehicle-marker" transform="translate(560, 180)">
+                            <circle cx="0" cy="0" r="22" fill="#2d6a4f" opacity="0.12">
+                                <animate attributeName="r" values="22;28;22" dur="2s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.12;0.04;0.12" dur="2s"
+                                    repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="0" cy="0" r="16" fill="#2d6a4f" />
+                            <svg x="-9" y="-9" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="1" y="3" width="15" height="13" rx="2" ry="2" />
+                                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                                <circle cx="5.5" cy="18.5" r="2.5" />
+                                <circle cx="18.5" cy="18.5" r="2.5" />
+                            </svg>
+                        </g>
+                    </svg>
+
+                    <!-- Map overlay info -->
+                    <div class="cc-tracking__map-overlay">
+                        <div class="cc-tracking__map-overlay-pill">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                            <span>23 min away · {{ delivery.distance }} km remaining</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 4. DELIVERY INFO CARD                       -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="cc-tracking__delivery-section">
+        <div class="cc-tracking__delivery-inner">
+            <h2 class="cc-tracking__section-title">Delivery Details</h2>
+            <div class="cc-tracking__delivery-card">
+                <div class="cc-tracking__delivery-card-main">
+                    <div class="cc-tracking__driver-info">
+                        <div class="cc-tracking__driver-avatar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                        </div>
+                        <div class="cc-tracking__driver-details">
+                            <h3 class="cc-tracking__driver-name">{{ delivery.provider.name }}</h3>
+                            <div class="cc-tracking__driver-rating">
+                                <div class="cc-tracking__stars">
+                                    <svg viewBox="0 0 24 24" fill="#f0a500" stroke="none">
+                                        <polygon
+                                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                    </svg>
+                                    <svg viewBox="0 0 24 24" fill="#f0a500" stroke="none">
+                                        <polygon
+                                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                    </svg>
+                                    <svg viewBox="0 0 24 24" fill="#f0a500" stroke="none">
+                                        <polygon
+                                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                    </svg>
+                                    <svg viewBox="0 0 24 24" fill="#f0a500" stroke="none">
+                                        <polygon
+                                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                    </svg>
+                                    <svg viewBox="0 0 24 24" fill="#e0ddd6" stroke="none">
+                                        <polygon
+                                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                    </svg>
+                                </div>
+                                <span class="cc-tracking__rating-number">{{ delivery.provider.rating }}</span>
+                                <span class="cc-tracking__rating-count">(312 deliveries)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cc-tracking__delivery-meta">
+                        <div class="cc-tracking__meta-item">
+                            <span class="cc-tracking__meta-label">Vehicle</span>
+                            <span class="cc-tracking__vehicle-badge cc-tracking__vehicle-badge--van">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="1" y="3" width="15" height="13" rx="2" ry="2" />
+                                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                                    <circle cx="5.5" cy="18.5" r="2.5" />
+                                    <circle cx="18.5" cy="18.5" r="2.5" />
+                                </svg>
+                                {{ delivery.vehicleType }}
+                            </span>
+                        </div>
+                        <div class="cc-tracking__meta-item">
+                            <span class="cc-tracking__meta-label">Distance</span>
+                            <span class="cc-tracking__meta-value">{{ delivery.distance }} km</span>
+                        </div>
+                        <div class="cc-tracking__meta-item">
+                            <span class="cc-tracking__meta-label">Package</span>
+                            <span class="cc-tracking__meta-value">{{ delivery.weight }} kg</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="cc-tracking__delivery-card-actions">
+                    <button class="cc-tracking__contact-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+                        </svg>
+                        Call Driver
+                    </button>
+                    <button class="cc-tracking__message-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                        </svg>
+                        Message
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 5. ORDER SUMMARY                            -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="cc-tracking__order-section">
+        <div class="cc-tracking__order-inner">
+            <h2 class="cc-tracking__section-title">Rented Items</h2>
+            <div class="cc-tracking__order-list">
+
+                <article class="cc-tracking__order-item" *ngFor="let item of delivery.items">
+                    <div class="cc-tracking__item-image">
+                        <svg viewBox="0 0 80 80" fill="none" *ngIf="item.category === 'tent'">
+                            <rect width="80" height="80" rx="12" fill="#eef2ed" />
+                            <g transform="translate(20,18)">
+                                <polygon points="20,4 38,38 2,38" fill="none" stroke="#2d6a4f" stroke-width="2.5"
+                                    stroke-linejoin="round" />
+                                <line x1="20" y1="38" x2="20" y2="28" stroke="#2d6a4f" stroke-width="2" />
+                                <rect x="16" y="38" width="8" height="4" rx="1" fill="#2d6a4f" opacity="0.3" />
+                            </g>
+                        </svg>
+                        <svg viewBox="0 0 80 80" fill="none" *ngIf="item.category === 'bag'">
+                            <rect width="80" height="80" rx="12" fill="#eef2ed" />
+                            <g transform="translate(22,22)">
+                                <rect x="2" y="8" width="32" height="20" rx="4" fill="none" stroke="#2d6a4f"
+                                    stroke-width="2.5" />
+                                <path d="M8 8 V4 Q8 2 10 2 H26 Q28 2 28 4 V8" fill="none" stroke="#2d6a4f"
+                                    stroke-width="2" />
+                                <line x1="18" y1="14" x2="18" y2="22" stroke="#2d6a4f" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </g>
+                        </svg>
+                        <svg viewBox="0 0 80 80" fill="none" *ngIf="item.category === 'pack'">
+                            <rect width="80" height="80" rx="12" fill="#eef2ed" />
+                            <g transform="translate(24,18)">
+                                <rect x="4" y="10" width="24" height="26" rx="3" fill="none" stroke="#2d6a4f"
+                                    stroke-width="2.5" />
+                                <path d="M10 10 V6 Q10 2 16 2 Q22 2 22 6 V10" fill="none" stroke="#2d6a4f"
+                                    stroke-width="2.5" />
+                                <line x1="10" y1="20" x2="22" y2="20" stroke="#2d6a4f" stroke-width="1.5"
+                                    stroke-linecap="round" />
+                                <line x1="10" y1="26" x2="18" y2="26" stroke="#2d6a4f" stroke-width="1.5"
+                                    stroke-linecap="round" />
+                            </g>
+                        </svg>
+                        <svg viewBox="0 0 80 80" fill="none" *ngIf="item.category === 'stove'">
+                            <rect width="80" height="80" rx="12" fill="#eef2ed" />
+                            <g transform="translate(22,20)">
+                                <circle cx="18" cy="18" r="14" fill="none" stroke="#2d6a4f" stroke-width="2.5" />
+                                <circle cx="18" cy="18" r="3" fill="#2d6a4f" />
+                                <line x1="18" y1="8" x2="18" y2="4" stroke="#2d6a4f" stroke-width="2"
+                                    stroke-linecap="round" />
+                                <line x1="18" y1="32" x2="18" y2="36" stroke="#2d6a4f" stroke-width="2"
+                                    stroke-linecap="round" />
+                                <line x1="8" y1="18" x2="4" y2="18" stroke="#2d6a4f" stroke-width="2"
+                                    stroke-linecap="round" />
+                                <line x1="28" y1="18" x2="32" y2="18" stroke="#2d6a4f" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="cc-tracking__item-info">
+                        <h4 class="cc-tracking__item-name">{{ item.name }}</h4>
+                        <p class="cc-tracking__item-detail">{{ item.detail }}</p>
+                    </div>
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+
+
+</div>

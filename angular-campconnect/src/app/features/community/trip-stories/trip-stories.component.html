@@ -1,0 +1,288 @@
+<div class="min-h-screen bg-[var(--color-background)]">
+  <!-- Header -->
+  <section class="bg-gradient-to-br from-[var(--color-primary-700)] to-[var(--color-primary-900)] text-white py-16">
+    <div class="container">
+      <div class="max-w-4xl">
+        <div class="flex items-center gap-3 mb-4">
+          <lucide-icon [img]="FileTextIcon" [size]="32" class="text-[var(--color-accent-400)]"></lucide-icon>
+          <span class="text-[var(--color-accent-400)] font-medium">Community</span>
+        </div>
+        <h1 class="text-5xl font-bold mb-4 text-white">Trip Stories & Adventures</h1>
+        <p class="text-xl text-[var(--color-neutral-200)] mb-8 leading-relaxed">
+          Real experiences from real campers. Get inspired, learn from others, and share your own outdoor adventures.
+        </p>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-3 gap-6 max-w-xl">
+          <div class="text-center">
+            <div class="text-3xl font-bold text-[var(--color-accent-400)] mb-1">
+              {{ tripStories.length }}
+            </div>
+            <div class="text-sm text-[var(--color-neutral-300)]">Stories</div>
+          </div>
+          <div class="text-center">
+            <div class="text-3xl font-bold text-[var(--color-accent-400)] mb-1">
+              {{ getTotalViews() }}
+            </div>
+            <div class="text-sm text-[var(--color-neutral-300)]">Total Views</div>
+          </div>
+          <div class="text-center">
+            <div class="text-3xl font-bold text-[var(--color-accent-400)] mb-1">
+              {{ getTotalComments() }}
+            </div>
+            <div class="text-sm text-[var(--color-neutral-300)]">Comments</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Search & Filters -->
+  <section class="border-b border-[var(--color-border-light)] bg-white sticky top-0 z-30 shadow-sm">
+    <div class="container py-6">
+      <div class="flex flex-col md:flex-row gap-4 mb-4">
+        <div class="flex-1 relative">
+          <lucide-icon [img]="SearchIcon" [size]="20"
+            class="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]"></lucide-icon>
+          <input type="text" placeholder="Search stories, locations, or tags..." [(ngModel)]="searchQuery"
+            class="w-full pl-10 px-4 py-2 border border-[var(--color-border-medium)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-500)]" />
+        </div>
+
+        <app-button variant="primary" (click)="navigateToCreate()" customClass="flex items-center gap-2">
+          <lucide-icon [img]="PlusIcon" [size]="16"></lucide-icon>
+          Share Your Story
+        </app-button>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="flex gap-2 overflow-x-auto pb-2">
+        <button *ngFor="let filter of filterOptions" (click)="selectedFilter = filter"
+          class="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors"
+          [class.bg-[var(--color-primary-600)]]="selectedFilter === filter"
+          [class.text-white]="selectedFilter === filter"
+          [class.bg-[var(--color-neutral-100)]]="selectedFilter !== filter"
+          [class.text-[var(--color-text-secondary)]]="selectedFilter !== filter"
+          [class.hover:bg-[var(--color-neutral-200)]]="selectedFilter !== filter">
+          {{ filter }}
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Stories -->
+  <section *ngIf="featuredStories.length > 0 && selectedFilter === 'Latest' && searchQuery === ''"
+    class="py-12 bg-[var(--color-primary-50)]">
+    <div class="container">
+      <div class="flex items-center gap-2 mb-6">
+        <lucide-icon [img]="AwardIcon" [size]="24" class="text-[var(--color-accent-600)]"></lucide-icon>
+        <h2 class="text-3xl font-bold text-[var(--color-text-heading)]">Featured Stories</h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <app-card *ngFor="let story of featuredStories.slice(0, 2)" variant="interactive"
+          (click)="navigateToStory(story.id)"
+          customClass="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full" padding="none">
+          <div class="relative h-64 overflow-hidden">
+            <img [src]="story.coverImage" [alt]="story.title" class="w-full h-full object-cover" />
+            <div class="absolute top-4 right-4 flex gap-2">
+              <button (click)="$event.stopPropagation(); toggleSaved(story.id)"
+                class="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition-colors">
+                <lucide-icon [img]="BookmarkIcon" [size]="20"
+                  [class.fill-[var(--color-primary-600)]]="isSaved(story.id)"
+                  [class.text-[var(--color-primary-600)]]="isSaved(story.id)"
+                  [class.text-[var(--color-text-secondary)]]="!isSaved(story.id)"></lucide-icon>
+              </button>
+            </div>
+            <div class="absolute top-4 left-4">
+              <app-badge variant="default" customClass="bg-[var(--color-accent-500)] text-white">
+                Featured
+              </app-badge>
+            </div>
+          </div>
+
+          <app-card-content customClass="p-6">
+            <div class="flex items-center gap-3 mb-3">
+              <div
+                class="w-10 h-10 rounded-full bg-[var(--color-primary-600)] flex items-center justify-center text-white font-bold">
+                {{ story.author.avatar }}
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-medium text-[var(--color-text-primary)]">{{ story.author.name }}</span>
+                  <lucide-icon *ngIf="story.author.verified" [img]="AwardIcon" [size]="16"
+                    class="text-[var(--color-success-600)]"></lucide-icon>
+                </div>
+                <p class="text-sm text-[var(--color-text-secondary)]">
+                  {{ story.author.trips }} trips shared
+                </p>
+              </div>
+              <span class="text-sm text-[var(--color-text-secondary)]">
+                {{ story.publishedAt }}
+              </span>
+            </div>
+
+            <h3 class="text-2xl font-bold mb-3 text-[var(--color-text-heading)]">{{ story.title }}</h3>
+            <p class="text-[var(--color-text-secondary)] mb-4 line-clamp-2">
+              {{ story.excerpt }}
+            </p>
+
+            <div class="flex items-center gap-4 mb-4 text-sm text-[var(--color-text-secondary)]">
+              <div class="flex items-center gap-1">
+                <lucide-icon [img]="MapPinIcon" [size]="16"></lucide-icon>
+                {{ story.location }}
+              </div>
+              <div class="flex items-center gap-1">
+                <lucide-icon [img]="CalendarIcon" [size]="16"></lucide-icon>
+                {{ story.duration }}
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mb-4">
+              <app-badge *ngFor="let tag of story.tags.slice(0, 3)" variant="outline" customClass="text-xs">
+                {{ tag }}
+              </app-badge>
+            </div>
+
+            <div
+              class="flex items-center gap-6 pt-4 border-t border-[var(--color-border-light)] text-sm text-[var(--color-text-secondary)]">
+              <div class="flex items-center gap-1">
+                <lucide-icon [img]="EyeIcon" [size]="16"></lucide-icon>
+                {{ story.views | number }}
+              </div>
+              <div class="flex items-center gap-1">
+                <lucide-icon [img]="HeartIcon" [size]="16"></lucide-icon>
+                {{ story.likes }}
+              </div>
+              <div class="flex items-center gap-1">
+                <lucide-icon [img]="MessageCircleIcon" [size]="16"></lucide-icon>
+                {{ story.comments }}
+              </div>
+            </div>
+          </app-card-content>
+        </app-card>
+      </div>
+    </div>
+  </section>
+
+  <!-- All Stories Grid -->
+  <section class="py-12">
+    <div class="container">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-3xl font-bold text-[var(--color-text-heading)]">
+          {{ searchQuery ? 'Search Results' : selectedFilter === 'Latest' ? 'Latest Stories' : selectedFilter + '
+          Stories' }}
+        </h2>
+        <span class="text-[var(--color-text-secondary)]">
+          {{ sortedStories.length }} {{ sortedStories.length === 1 ? 'story' : 'stories' }}
+        </span>
+      </div>
+
+      <div *ngIf="sortedStories.length === 0"
+        class="text-center py-16 bg-white rounded-lg border border-[var(--color-border-light)]">
+        <lucide-icon [img]="FileTextIcon" [size]="64"
+          class="mx-auto mb-4 text-[var(--color-text-tertiary)]"></lucide-icon>
+        <h3 class="text-2xl font-semibold mb-2 text-[var(--color-text-heading)]">No stories found</h3>
+        <p class="text-[var(--color-text-secondary)] mb-6">
+          Try adjusting your search or be the first to share!
+        </p>
+        <app-button variant="primary" (click)="navigateToCreate()">
+          <div class="flex items-center gap-2">
+            <lucide-icon [img]="PlusIcon" [size]="16"></lucide-icon>
+            Share Your Story
+          </div>
+        </app-button>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <app-card *ngFor="let story of sortedStories" variant="interactive" (click)="navigateToStory(story.id)"
+          customClass="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full" padding="none">
+          <div class="relative h-48 overflow-hidden">
+            <img [src]="story.coverImage" [alt]="story.title" class="w-full h-full object-cover" />
+            <button (click)="$event.stopPropagation(); toggleSaved(story.id)"
+              class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition-colors">
+              <lucide-icon [img]="BookmarkIcon" [size]="16" [class.fill-[var(--color-primary-600)]]="isSaved(story.id)"
+                [class.text-[var(--color-primary-600)]]="isSaved(story.id)"
+                [class.text-[var(--color-text-secondary)]]="!isSaved(story.id)"></lucide-icon>
+            </button>
+          </div>
+
+          <app-card-content customClass="p-5">
+            <div class="flex items-center gap-2 mb-3">
+              <div
+                class="w-8 h-8 rounded-full bg-[var(--color-primary-600)] flex items-center justify-center text-white text-sm font-bold">
+                {{ story.author.avatar }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1">
+                  <span class="text-sm font-medium truncate text-[var(--color-text-primary)]">
+                    {{ story.author.name }}
+                  </span>
+                  <lucide-icon *ngIf="story.author.verified" [img]="AwardIcon" [size]="12"
+                    class="text-[var(--color-success-600)] flex-shrink-0"></lucide-icon>
+                </div>
+              </div>
+              <span class="text-xs text-[var(--color-text-secondary)] flex-shrink-0">
+                {{ story.publishedAt }}
+              </span>
+            </div>
+
+            <h3 class="text-xl font-bold mb-2 line-clamp-2 text-[var(--color-text-heading)]">{{ story.title }}</h3>
+            <p class="text-sm text-[var(--color-text-secondary)] mb-3 line-clamp-2">
+              {{ story.excerpt }}
+            </p>
+
+            <div class="flex items-center gap-3 mb-3 text-xs text-[var(--color-text-secondary)]">
+              <div class="flex items-center gap-1">
+                <lucide-icon [img]="MapPinIcon" [size]="12"></lucide-icon>
+                <span class="truncate">{{ story.location.split(',')[0] }}</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <lucide-icon [img]="CalendarIcon" [size]="12"></lucide-icon>
+                {{ story.duration }}
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-1 mb-3">
+              <app-badge *ngFor="let tag of story.tags.slice(0, 2)" variant="outline" customClass="text-xs">
+                {{ tag }}
+              </app-badge>
+            </div>
+
+            <div
+              class="flex items-center gap-4 pt-3 border-t border-[var(--color-border-light)] text-xs text-[var(--color-text-secondary)]">
+              <div class="flex items-center gap-1">
+                <lucide-icon [img]="EyeIcon" [size]="12"></lucide-icon>
+                {{ story.views | number }}
+              </div>
+              <div class="flex items-center gap-1">
+                <lucide-icon [img]="HeartIcon" [size]="12"></lucide-icon>
+                {{ story.likes }}
+              </div>
+              <div class="flex items-center gap-1">
+                <lucide-icon [img]="MessageCircleIcon" [size]="12"></lucide-icon>
+                {{ story.comments }}
+              </div>
+            </div>
+          </app-card-content>
+        </app-card>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="bg-[var(--color-surface)] border-t border-[var(--color-border-light)] py-12">
+    <div class="container text-center">
+      <h2 class="text-3xl font-bold mb-4 text-[var(--color-text-heading)]">Have a Story to Share?</h2>
+      <p class="text-lg text-[var(--color-text-secondary)] mb-6 max-w-2xl mx-auto">
+        Inspire others with your camping adventures, lessons learned, and outdoor experiences
+      </p>
+      <app-button variant="primary" size="lg" (click)="navigateToCreate()">
+        <div class="flex items-center gap-2">
+          <lucide-icon [img]="CameraIcon" [size]="20"></lucide-icon>
+          Share Your Trip Story
+          <lucide-icon [img]="ChevronRightIcon" [size]="20"></lucide-icon>
+        </div>
+      </app-button>
+    </div>
+  </section>
+</div>

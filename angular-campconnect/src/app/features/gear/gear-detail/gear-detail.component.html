@@ -1,0 +1,314 @@
+﻿<div class="min-h-screen bg-[var(--color-background)] pb-12">
+    <!-- Header -->
+    <div class="border-b border-[var(--color-border-light)] bg-white">
+        <div class="container py-4">
+            <button (click)="navigate('/gear')"
+                class="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
+                <lucide-icon [name]="ChevronLeft" class="w-5 h-5"></lucide-icon>
+                Back to Gear
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="container py-16 flex justify-center">
+        <div class="text-center text-[var(--color-text-secondary)]">
+            <div
+                class="w-10 h-10 border-4 border-[var(--color-primary-600)] border-t-transparent rounded-full animate-spin mx-auto mb-4">
+            </div>
+            <p>Loading gear details...</p>
+        </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!loading && error" class="container py-16 text-center">
+        <p class="text-red-500 mb-4">{{ error }}</p>
+        <button (click)="gearId && loadGear(gearId)"
+            class="px-4 py-2 bg-[var(--color-primary-600)] text-white rounded-lg">
+            Try Again
+        </button>
+    </div>
+
+    <!-- Content -->
+    <div class="container py-8" *ngIf="!loading && !error && gear">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- Left Column - Images -->
+            <div>
+                <div class="relative aspect-square bg-[var(--color-neutral-100)] rounded-lg overflow-hidden mb-4 group">
+                    <img [src]="currentImage" [alt]="gear.name" class="w-full h-full object-cover" />
+                    <ng-container *ngIf="gear.images.length > 1">
+                        <button (click)="prevImage()"
+                            class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                            <lucide-icon [name]="ChevronLeft" class="w-5 h-5"></lucide-icon>
+                        </button>
+                        <button (click)="nextImage()"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                            <lucide-icon [name]="ChevronRight" class="w-5 h-5"></lucide-icon>
+                        </button>
+                    </ng-container>
+                </div>
+                <div class="grid grid-cols-4 gap-2">
+                    <button *ngFor="let img of gear.images; let i = index" (click)="currentImageIndex = i"
+                        class="aspect-square rounded-lg overflow-hidden border-2 transition-all"
+                        [class.border-blue-500]="currentImageIndex === i"
+                        [class.border-transparent]="currentImageIndex !== i">
+                        <img [src]="img.imageUrl" [alt]="gear.name + ' ' + (i + 1)"
+                            class="w-full h-full object-cover" />
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Column - Details -->
+            <div>
+                <div class="mb-6">
+                    <app-badge variant="primary" customClass="mb-3">{{ gear.category }}</app-badge>
+                    <h1 class="mb-2">{{ gear.name }}</h1>
+                    <p class="text-[var(--color-text-secondary)] mb-1">
+                        Listed by <strong>{{ gear.ownerName }}</strong>
+                    </p>
+                    <p class="text-sm text-[var(--color-text-secondary)] mb-4">
+                        Condition: <strong>{{ gear.condition }}</strong> &mdash;
+                        Stock: <strong>{{ gear.quantity }}</strong>
+                    </p>
+
+                    <div class="flex gap-2 mb-6">
+                        <app-button variant="ghost" size="sm">
+                            <lucide-icon [name]="Share2" class="w-5 h-5"></lucide-icon>
+                        </app-button>
+                        <app-button variant="ghost" size="sm">
+                            <lucide-icon [name]="Heart" class="w-5 h-5"></lucide-icon>
+                        </app-button>
+                    </div>
+
+                    <!-- ══════════ ACTION PANEL ══════════ -->
+                    <div
+                        class="mb-6 p-6 bg-[var(--color-primary-50)] rounded-xl border border-[var(--color-primary-200)]">
+
+                        <!-- Tab selector (only show both tabs if BOTH) -->
+                        <div class="flex gap-2 mb-5" *ngIf="canRent && canBuy">
+                            <button (click)="selectedAction = 'rent'; successMessage = null; actionError = null"
+                                class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-semibold text-sm transition-all"
+                                [class.bg-[var(--color-primary-600)]]="selectedAction === 'rent'"
+                                [class.text-white]="selectedAction === 'rent'"
+                                [class.bg-white]="selectedAction !== 'rent'"
+                                [class.text-[var(--color-text-secondary)]]="selectedAction !== 'rent'"
+                                [class.border]="selectedAction !== 'rent'"
+                                [class.border-[var(--color-border-light)]]="selectedAction !== 'rent'">
+                                <lucide-icon [name]="Calendar" class="w-4 h-4"></lucide-icon>
+                                Rent
+                            </button>
+                            <button (click)="selectedAction = 'buy'; successMessage = null; actionError = null"
+                                class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-semibold text-sm transition-all"
+                                [class.bg-[var(--color-primary-600)]]="selectedAction === 'buy'"
+                                [class.text-white]="selectedAction === 'buy'"
+                                [class.bg-white]="selectedAction !== 'buy'"
+                                [class.text-[var(--color-text-secondary)]]="selectedAction !== 'buy'"
+                                [class.border]="selectedAction !== 'buy'"
+                                [class.border-[var(--color-border-light)]]="selectedAction !== 'buy'">
+                                <lucide-icon [name]="ShoppingBag" class="w-4 h-4"></lucide-icon>
+                                Buy
+                            </button>
+                        </div>
+
+                        <!-- ── RENT tab ─────────────────────────────────── -->
+                        <ng-container *ngIf="selectedAction === 'rent' && canRent">
+                            <div class="flex items-baseline gap-2 mb-4">
+                                <span class="text-3xl font-bold text-[var(--color-primary-600)]">
+                                    {{ effectiveDailyPrice | currency:'USD' }}
+                                </span>
+                                <span class="text-[var(--color-text-secondary)]">/day</span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-semibold mb-2">Number of Days *</label>
+                                <div class="flex items-center gap-3">
+                                    <button type="button" (click)="rentalDays = rentalDays > 1 ? rentalDays - 1 : 1"
+                                        class="w-10 h-10 rounded-full bg-white border border-[var(--color-border-light)] text-xl font-bold flex items-center justify-center hover:bg-[var(--color-primary-100)] transition-colors">
+                                        −
+                                    </button>
+                                    <input type="number" [(ngModel)]="rentalDays" min="1" max="60"
+                                        class="w-20 text-center px-2 py-2 rounded-lg bg-white border-2 border-[var(--color-border-light)] focus:outline-none focus:border-[var(--color-primary-500)] font-semibold text-lg">
+                                    <button type="button" (click)="rentalDays = rentalDays < 60 ? rentalDays + 1 : 60"
+                                        class="w-10 h-10 rounded-full bg-white border border-[var(--color-border-light)] text-xl font-bold flex items-center justify-center hover:bg-[var(--color-primary-100)] transition-colors">
+                                        +
+                                    </button>
+                                    <span class="text-sm text-[var(--color-text-secondary)]">day(s)</span>
+                                </div>
+                                <p class="text-xs text-[var(--color-text-tertiary)] mt-1">Max 60 days per booking</p>
+                            </div>
+
+                            <div
+                                class="flex items-center justify-between pt-4 border-t border-[var(--color-primary-200)]">
+                                <span class="font-medium">Rental Total</span>
+                                <span class="text-2xl font-bold text-[var(--color-primary-600)]">
+                                    {{ rentalTotal | currency:'USD' }}
+                                </span>
+                            </div>
+                        </ng-container>
+
+                        <!-- ── BUY tab ──────────────────────────────────── -->
+                        <ng-container *ngIf="selectedAction === 'buy' && canBuy">
+                            <div class="flex items-baseline gap-2 mb-4">
+                                <span class="text-3xl font-bold text-[var(--color-primary-600)]">
+                                    {{ effectiveSalePrice | currency:'USD' }}
+                                </span>
+                                <span class="text-[var(--color-text-secondary)]">sale price</span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-semibold mb-2">Quantity</label>
+                                <div class="flex items-center gap-3">
+                                    <button type="button" (click)="purchaseQty = purchaseQty > 1 ? purchaseQty - 1 : 1"
+                                        class="w-10 h-10 rounded-full bg-white border border-[var(--color-border-light)] text-xl font-bold flex items-center justify-center hover:bg-[var(--color-primary-100)] transition-colors">
+                                        −
+                                    </button>
+                                    <input type="number" [(ngModel)]="purchaseQty" min="1" [max]="gear.quantity"
+                                        class="w-20 text-center px-2 py-2 rounded-lg bg-white border-2 border-[var(--color-border-light)] focus:outline-none focus:border-[var(--color-primary-500)] font-semibold text-lg">
+                                    <button type="button"
+                                        (click)="purchaseQty = purchaseQty < gear.quantity ? purchaseQty + 1 : purchaseQty"
+                                        class="w-10 h-10 rounded-full bg-white border border-[var(--color-border-light)] text-xl font-bold flex items-center justify-center hover:bg-[var(--color-primary-100)] transition-colors">
+                                        +
+                                    </button>
+                                    <span class="text-sm text-[var(--color-text-secondary)]">
+                                        ({{ gear.quantity }} in stock)
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div
+                                class="flex items-center justify-between pt-4 border-t border-[var(--color-primary-200)]">
+                                <span class="font-medium">Purchase Total</span>
+                                <span class="text-2xl font-bold text-[var(--color-primary-600)]">
+                                    {{ purchaseTotal | currency:'USD' }}
+                                </span>
+                            </div>
+                        </ng-container>
+
+                        <!-- Success feedback -->
+                        <div *ngIf="successMessage"
+                            class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+                            ✅ {{ successMessage }}
+                        </div>
+
+                        <!-- Error feedback -->
+                        <div *ngIf="actionError"
+                            class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                            ⚠️ {{ actionError }}
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="space-y-3 mb-6">
+                        <!-- Reserve (Rent) -->
+                        <app-button *ngIf="selectedAction === 'rent' && canRent" size="lg" [fullWidth]="true"
+                            [disabled]="!isAvailable || actionLoading" (click)="onRent()">
+                            <lucide-icon [name]="Calendar" class="w-5 h-5"></lucide-icon>
+                            {{ actionLoading ? 'Processing...' : (isAvailable ? 'Reserve Now' : 'Currently Unavailable')
+                            }}
+                        </app-button>
+
+                        <!-- Buy Now -->
+                        <app-button *ngIf="selectedAction === 'buy' && canBuy" size="lg" [fullWidth]="true"
+                            [disabled]="!isAvailable || actionLoading" (click)="onBuy()">
+                            <lucide-icon [name]="ShoppingBag" class="w-5 h-5"></lucide-icon>
+                            {{ actionLoading ? 'Processing...' : (isAvailable ? 'Buy Now' : 'Out of Stock') }}
+                        </app-button>
+
+                        <app-button variant="outline" size="lg" [fullWidth]="true">
+                            Contact Owner
+                        </app-button>
+                    </div>
+
+                    <!-- Benefits -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex items-center gap-2 text-sm">
+                            <lucide-icon [name]="Shield" class="w-5 h-5 text-[var(--color-primary-600)]"></lucide-icon>
+                            <span>Damage Protection</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <lucide-icon [name]="Truck" class="w-5 h-5 text-[var(--color-primary-600)]"></lucide-icon>
+                            <span>Free Delivery</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <lucide-icon [name]="RotateCcw"
+                                class="w-5 h-5 text-[var(--color-primary-600)]"></lucide-icon>
+                            <span>Easy Returns</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <lucide-icon [name]="CheckCircle" class="w-5 h-5 text-green-600"></lucide-icon>
+                            <span>Quality Guaranteed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Description & Details -->
+        <div class="mt-12">
+            <app-card variant="elevated">
+                <app-card-header>
+                    <app-card-title>Description</app-card-title>
+                </app-card-header>
+                <app-card-content>
+                    <p class="text-[var(--color-text-secondary)] leading-relaxed">
+                        {{ gear.description }}
+                    </p>
+                </app-card-content>
+            </app-card>
+
+            <app-card variant="elevated" customClass="mt-6">
+                <app-card-header>
+                    <app-card-title>Details</app-card-title>
+                </app-card-header>
+                <app-card-content>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex items-center justify-between py-3 border-b border-[var(--color-border-light)]">
+                            <span class="text-sm text-[var(--color-text-tertiary)]">Category</span>
+                            <span class="font-medium">{{ gear.category }}</span>
+                        </div>
+                        <div class="flex items-center justify-between py-3 border-b border-[var(--color-border-light)]">
+                            <span class="text-sm text-[var(--color-text-tertiary)]">Condition</span>
+                            <span class="font-medium">{{ gear.condition }}</span>
+                        </div>
+                        <div class="flex items-center justify-between py-3 border-b border-[var(--color-border-light)]">
+                            <span class="text-sm text-[var(--color-text-tertiary)]">Listing Type</span>
+                            <span class="font-medium">
+                                <span *ngIf="gear.listingType === 'FOR_RENT'" class="text-blue-600">🏕️ For Rent</span>
+                                <span *ngIf="gear.listingType === 'FOR_SALE'" class="text-green-600">🏷️ For Sale</span>
+                                <span *ngIf="gear.listingType === 'BOTH'" class="text-purple-600">🔄 Rent &amp;
+                                    Sale</span>
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between py-3 border-b border-[var(--color-border-light)]">
+                            <span class="text-sm text-[var(--color-text-tertiary)]">Status</span>
+                            <span class="font-medium">{{ gear.status }}</span>
+                        </div>
+                        <div class="flex items-center justify-between py-3 border-b border-[var(--color-border-light)]">
+                            <span class="text-sm text-[var(--color-text-tertiary)]">Available Units</span>
+                            <span class="font-medium">{{ gear.quantity }}</span>
+                        </div>
+                        <div class="flex items-center justify-between py-3 border-b border-[var(--color-border-light)]">
+                            <span class="text-sm text-[var(--color-text-tertiary)]">Listed by</span>
+                            <span class="font-medium">{{ gear.ownerName }}</span>
+                        </div>
+                        <div *ngIf="canRent"
+                            class="flex items-center justify-between py-3 border-b border-[var(--color-border-light)]">
+                            <span class="text-sm text-[var(--color-text-tertiary)]">Daily Rental Price</span>
+                            <span class="font-medium text-blue-600">{{ effectiveDailyPrice | currency:'USD'
+                                }}/day</span>
+                        </div>
+                        <div *ngIf="canBuy"
+                            class="flex items-center justify-between py-3 border-b border-[var(--color-border-light)]">
+                            <span class="text-sm text-[var(--color-text-tertiary)]">Sale Price</span>
+                            <span class="font-medium text-green-600">{{ effectiveSalePrice | currency:'USD' }}</span>
+                        </div>
+                        <div class="flex items-center justify-between py-3 border-b border-[var(--color-border-light)]">
+                            <span class="text-sm text-[var(--color-text-tertiary)]">Listed on</span>
+                            <span class="font-medium">{{ gear.createdAt | date:'mediumDate' }}</span>
+                        </div>
+                    </div>
+                </app-card-content>
+            </app-card>
+        </div>
+    </div>
+</div>
