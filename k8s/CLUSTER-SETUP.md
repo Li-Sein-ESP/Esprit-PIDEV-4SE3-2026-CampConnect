@@ -66,11 +66,107 @@ All machines: **Windows + WSL2**
 
 | Step | Who | Command |
 |------|-----|---------|
+| 0 | ALL | Configure WSL2 networking (see Phase 0 below) |
 | 1 | ALL | `./prerequisites.sh` |
 | 2 | MASTER only | `./master-setup.sh` |
 | 3 | WORKERS only | `./worker-setup.sh '<join-command>'` |
 | 4 | MASTER only | `./deploy-app.sh` |
 | 5 | MASTER only | `./deploy-monitoring.sh` (optional) |
+
+---
+
+## PHASE 0: Network Configuration (BEFORE Everything Else)
+
+> **CRITICAL:** Complete this phase on ALL machines before proceeding!
+
+### Why This Matters
+
+By default, WSL2 uses NAT networking, which means:
+- Your WSL2 instance has an internal IP (like `172.x.x.x`)
+- **Other machines CANNOT reach your WSL2 directly**
+- Kubernetes nodes won't be able to communicate
+
+We need to fix this FIRST, or the cluster setup will fail.
+
+### Option A: Mirrored Mode (Recommended for Windows 11)
+
+This is the easiest solution. It makes WSL2 share your Windows IP address.
+
+**Step 1:** Create/edit the file `C:\Users\<YourName>\.wslconfig`
+
+**Step 2:** Add these lines:
+```ini
+[wsl2]
+networkingMode=mirrored
+```
+
+**Step 3:** Restart WSL2:
+```powershell
+wsl --shutdown
+```
+
+**Step 4:** Verify (in WSL2):
+```bash
+hostname -I
+```
+This should now show your Windows IP (like `192.168.1.50`), not an internal IP.
+
+### Option B: Port Forwarding (Alternative)
+
+If mirrored mode doesn't work, use our automated script:
+
+**Step 1:** Open PowerShell as Administrator
+
+**Step 2:** Navigate to the project:
+```powershell
+cd C:\Users\YourName\Desktop\PI\ConnectCamp\k8s\scripts
+```
+
+**Step 3:** Run the setup script:
+```powershell
+.\setup-port-forwarding.ps1
+```
+
+**Step 4:** Select your role (Master=1, Worker=2)
+
+### Firewall Configuration
+
+Even with networking configured, Windows Firewall must allow Kubernetes traffic.
+
+**Run in PowerShell as Administrator:**
+```powershell
+# Allow Kubernetes API (Master only)
+New-NetFirewallRule -DisplayName "Kubernetes API Server" -Direction Inbound -Protocol TCP -LocalPort 6443 -Action Allow
+
+# Allow Kubelet (All nodes)
+New-NetFirewallRule -DisplayName "Kubernetes Kubelet" -Direction Inbound -Protocol TCP -LocalPort 10250 -Action Allow
+
+# Allow NodePort Services (All nodes)
+New-NetFirewallRule -DisplayName "Kubernetes NodePort Services" -Direction Inbound -Protocol TCP -LocalPort 30000-32767 -Action Allow
+```
+
+### Verify Connectivity
+
+Before proceeding, test that machines can reach each other:
+
+**Step 1:** Find your Windows IP:
+```powershell
+ipconfig
+```
+
+**Step 2:** Share IPs with team and test ping:
+```powershell
+ping <teammate-ip>
+```
+
+### Phase 0 Checklist
+
+- [ ] WSL2 networking configured (mirrored mode OR port forwarding)
+- [ ] Windows Firewall rules created
+- [ ] Can ping all team members' machines
+- [ ] All team members know their Windows IP addresses
+
+**For detailed instructions, see: [WSL2-NETWORKING.md](./WSL2-NETWORKING.md)**
 
 ---
 
