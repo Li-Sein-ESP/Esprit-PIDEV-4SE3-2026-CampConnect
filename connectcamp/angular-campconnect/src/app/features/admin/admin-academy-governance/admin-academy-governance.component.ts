@@ -245,9 +245,33 @@ export class AdminAcademyGovernanceComponent implements OnInit {
     }
   }
 
+  validateCertForm(): boolean {
+    this.formErrors = {};
+
+    if (!this.certForm.name || this.certForm.name.trim().length < 3) {
+      this.formErrors['name'] = 'Le nom de la certification est requis (min. 3 caractères)';
+    }
+
+    if (!this.certForm.issuer || this.certForm.issuer.trim() === '') {
+      this.formErrors['issuer'] = 'L\'émetteur (issuer) est requis';
+    }
+
+    if (!this.certForm.validityPeriod || this.certForm.validityPeriod <= 0) {
+      this.formErrors['validityPeriod'] = 'La période de validité doit être positive';
+    }
+
+    return Object.keys(this.formErrors).length === 0;
+  }
+
   saveCertification() {
     this.successMessage.set(null);
     this.errorMessage.set('');
+    this.formErrors = {};
+
+    if (!this.validateCertForm()) {
+      this.errorMessage.set('Veuillez corriger les erreurs dans le formulaire.');
+      return;
+    }
     
     // Show confirmation before saving
     this.actionTarget = 'cert';

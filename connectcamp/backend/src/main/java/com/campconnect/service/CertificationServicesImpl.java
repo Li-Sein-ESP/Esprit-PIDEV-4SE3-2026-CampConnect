@@ -91,6 +91,14 @@ public class CertificationServicesImpl implements ICertificationServices {
         return convertToUserDTO(userCertificationRepository.save(userCert));
     }
 
+    @Override
+    public CertificationDTO getCertificationByCourseId(String courseId) {
+        List<Certification> certs = certificationRepository.findByRequiredCoursesId(courseId);
+        if (certs.isEmpty()) return null;
+        // Return the first one found that's associated with this course
+        return convertToDTO(certs.get(0));
+    }
+
     private CertificationDTO convertToDTO(Certification cert) {
         CertificationDTO dto = new CertificationDTO();
         dto.setId(cert.getId());

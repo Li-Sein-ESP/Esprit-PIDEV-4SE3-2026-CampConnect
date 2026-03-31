@@ -44,7 +44,9 @@ class AcademyControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(academyController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(academyController)
+                .setControllerAdvice(new com.campconnect.exception.GlobalExceptionHandler())
+                .build();
         objectMapper = new ObjectMapper();
     }
 
@@ -60,6 +62,35 @@ class AcademyControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(2))
                 .andExpect(jsonPath("$[0].title").value("Wilderness Survival"));
+    }
+
+    @Test
+    void createCourse_WhenValid_ShouldReturn200() throws Exception {
+        CourseDTO newCourse = new CourseDTO();
+        newCourse.setTitle("Valid Title");
+        newCourse.setDescription("Valid Desc");
+        newCourse.setCategoryName("Survival");
+        newCourse.setDifficulty(com.campconnect.enums.DifficultyLevel.BEGINNER);
+        newCourse.setDuration(120);
+        newCourse.setPrice(10.0);
+        newCourse.setPassingScore(80);
+
+        when(courseService.createCourse(any(CourseDTO.class))).thenReturn(newCourse);
+
+        mockMvc.perform(post("/api/academy/courses")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(newCourse)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void createCourse_WhenInvalid_ShouldReturn400() throws Exception {
+        CourseDTO invalidCourse = new CourseDTO(); // Missing fields triggers @Valid
+
+        mockMvc.perform(post("/api/academy/courses")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidCourse)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

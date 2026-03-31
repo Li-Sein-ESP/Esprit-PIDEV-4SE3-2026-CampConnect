@@ -37,7 +37,9 @@ class EventsControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(eventsController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(eventsController)
+                .setControllerAdvice(new com.campconnect.exception.GlobalExceptionHandler())
+                .build();
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
     }
@@ -98,6 +100,8 @@ class EventsControllerTest {
         EventDTO updated = new EventDTO();
         updated.setId("1"); updated.setTitle("Updated Hike");
         updated.setCategoryName("Adventure");
+        updated.setType(com.campconnect.enums.EventType.HIKE);
+        updated.setCapacity(10);
 
         when(eventService.updateEvent(eq("1"), any(EventDTO.class))).thenReturn(updated);
 
@@ -111,7 +115,10 @@ class EventsControllerTest {
     @Test
     void updateEvent_WhenNotFound_ShouldReturn404() throws Exception {
         EventDTO dto = new EventDTO();
+        dto.setTitle("Title");
         dto.setCategoryName("Adventure");
+        dto.setType(com.campconnect.enums.EventType.HIKE);
+        dto.setCapacity(10);
 
         when(eventService.updateEvent(eq("999"), any(EventDTO.class))).thenReturn(null);
 
@@ -119,6 +126,33 @@ class EventsControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isNotFound());
+    }
+
+    // ─── POST ──────────────────────────────────────────────────
+    @Test
+    void createEvent_WhenValid_ShouldReturn200() throws Exception {
+        EventDTO newEvent = new EventDTO();
+        newEvent.setTitle("Desert Survival");
+        newEvent.setCategoryName("Survival");
+        newEvent.setType(com.campconnect.enums.EventType.CAMP);
+        newEvent.setCapacity(20);
+
+        when(eventService.createEvent(any(EventDTO.class))).thenReturn(newEvent);
+
+        mockMvc.perform(post("/api/events")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void createEvent_WhenInvalid_ShouldReturn400() throws Exception {
+        EventDTO invalidEvent = new EventDTO(); // Missing fields triggers @Valid
+
+        mockMvc.perform(post("/api/events")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidEvent)))
+                .andExpect(status().isBadRequest());
     }
 
     // ─── DELETE ────────────────────────────────────────────────

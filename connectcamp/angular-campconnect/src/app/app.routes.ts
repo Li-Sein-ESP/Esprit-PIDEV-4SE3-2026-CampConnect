@@ -142,6 +142,10 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/academy/certification-programs/certification-programs.component').then(m => m.CertificationProgramsComponent)
             },
             {
+                path: 'academy/certificate/:id',
+                loadComponent: () => import('./features/academy/certificate-view/certificate-view.component').then(m => m.CertificateViewComponent)
+            },
+            {
                 path: 'academy/my-progress',
                 loadComponent: () => import('./features/academy/certification-progress/certification-progress.component').then(m => m.CertificationProgressComponent)
             },

@@ -4,7 +4,8 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import {
   LucideAngularModule, Calendar, Users, MapPin, Clock, DollarSign, ChevronLeft,
   ArrowRight, Star, CheckCircle, Shield, Mountain, Award, Share2, Heart,
-  ChevronRight, Play, Tent, Info, Backpack, HelpCircle, AlertTriangle, BadgeCheck, Ban
+  ChevronRight, Play, Tent, Info, Backpack, HelpCircle, AlertTriangle, BadgeCheck, Ban,
+  MessageSquare
 } from 'lucide-angular';
 import { EventService } from '../services/event.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -49,6 +50,7 @@ export class EventDetailsComponent implements OnInit {
   readonly HelpCircle = HelpCircle;
   readonly AlertTriangle = AlertTriangle;
   readonly BadgeCheck = BadgeCheck;
+  readonly MessageSquare = MessageSquare;
   readonly Ban = Ban;
 
   event = signal<Event | null>(null);

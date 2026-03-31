@@ -40,6 +40,34 @@ describe('EventService', () => {
     req.flush(mockEventsResponse);
   });
 
+  it('should create an event', () => {
+    const newEvent = { title: 'New Hike' };
+    const mockResponse = { id: 'evt-123', ...newEvent };
+
+    service.createEvent(newEvent as any).subscribe(event => {
+      expect(event.id).toBe('evt-123');
+      expect(event.title).toBe('New Hike');
+    });
+
+    const req = httpTestingController.expectOne('http://localhost:8082/api/events');
+    expect(req.request.method).toBe('POST');
+    req.flush(mockResponse);
+  });
+
+  it('should update an event', () => {
+    const updatedEvent = { title: 'Updated Hike' };
+    const mockResponse = { id: '1', ...updatedEvent };
+
+    service.updateEvent('1', updatedEvent as any).subscribe(event => {
+      expect(event.id).toBe('1');
+      expect(event.title).toBe('Updated Hike');
+    });
+
+    const req = httpTestingController.expectOne('http://localhost:8082/api/events/1');
+    expect(req.request.method).toBe('PUT');
+    req.flush(mockResponse);
+  });
+
   it('should delete an event', () => {
     service.deleteEvent('1').subscribe(res => {
       expect(res).toBeNull();

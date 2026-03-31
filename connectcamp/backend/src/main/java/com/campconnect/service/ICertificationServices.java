@@ -12,4 +12,5 @@ public interface ICertificationServices {
     void deleteCertificationProgram(String id);
     List<UserCertificationDTO> getUserCertifications(String userId);
     UserCertificationDTO earnCertification(UserCertificationDTO dto);
+    CertificationDTO getCertificationByCourseId(String courseId);
 }

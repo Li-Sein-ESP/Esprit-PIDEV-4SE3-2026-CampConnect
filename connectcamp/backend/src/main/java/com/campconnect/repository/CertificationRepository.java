@@ -7,4 +7,5 @@ import java.util.List;
 
 @Repository
 public interface CertificationRepository extends MongoRepository<Certification, String> {
+    List<Certification> findByRequiredCoursesId(String courseId);
 }

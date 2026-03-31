@@ -144,6 +144,12 @@ public class AcademyController {
         return certificationService.getUserCertifications(userId);
     }
 
+    @GetMapping("/certifications/by-course/{courseId}")
+    public ResponseEntity<CertificationDTO> getCertificationByCourseId(@PathVariable String courseId) {
+        CertificationDTO cert = certificationService.getCertificationByCourseId(courseId);
+        return cert != null ? ResponseEntity.ok(cert) : ResponseEntity.notFound().build();
+    }
+
     @PostMapping("/users/certifications")
     public ResponseEntity<UserCertificationDTO> earnCertification(@Valid @RequestBody UserCertificationDTO dto) {
         return ResponseEntity.ok(certificationService.earnCertification(dto));

@@ -93,6 +93,10 @@ export class AcademyService {
         return this.http.delete<void>(`${API_URL}/certifications/${id}`);
     }
 
+    getCertificationByCourseId(courseId: string): Observable<Certification> {
+        return this.http.get<Certification>(`${API_URL}/certifications/by-course/${courseId}`);
+    }
+
     // ─── User Certifications ───
     getUserCertifications(userId: string): Observable<UserCertification[]> {
         return this.http.get<UserCertification[]>(`${API_URL}/users/${userId}/certifications`);

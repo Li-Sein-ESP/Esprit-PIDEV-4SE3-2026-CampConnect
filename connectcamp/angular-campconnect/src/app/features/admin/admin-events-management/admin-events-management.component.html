@@ -206,23 +206,31 @@
                     </div>
                 </div>
                 <div class="p-8">
-                    <form (ngSubmit)="saveEvent()" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <form #eventF="ngForm" (ngSubmit)="eventF.form.valid && saveEvent()" class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="space-y-6">
                             <div>
                                 <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Event Title</label>
-                                <input type="text" [(ngModel)]="eventForm.title" name="title" 
+                                <input type="text" [(ngModel)]="eventForm.title" name="title" #eTitle="ngModel" required minlength="5"
                                     class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all font-medium"
-                                    [class.ring-2]="formErrors['title']" [class.ring-red-500]="formErrors['title']">
-                                <span *ngIf="formErrors['title']" class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{ formErrors['title'] }}</span>
+                                    [class.ring-2]="formErrors['title'] || (eTitle.invalid && eTitle.touched)" [class.ring-red-500]="formErrors['title'] || (eTitle.invalid && eTitle.touched)">
+                                <span *ngIf="formErrors['title'] || (eTitle.invalid && eTitle.touched)" class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">
+                                    <span *ngIf="eTitle.errors?.['required']">Title is required</span>
+                                    <span *ngIf="eTitle.errors?.['minlength']">Min 5 characters</span>
+                                    {{ formErrors['title'] }}
+                                </span>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Category</label>
-                                    <input type="text" [(ngModel)]="eventForm.categoryName" name="category" class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0">
+                                    <input type="text" [(ngModel)]="eventForm.categoryName" name="category" #eCat="ngModel" required 
+                                        class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0"
+                                        [class.ring-2]="eCat.invalid && eCat.touched" [class.ring-red-500]="eCat.invalid && eCat.touched">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Type</label>
-                                    <select [(ngModel)]="eventForm.type" name="type" class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0">
+                                    <select [(ngModel)]="eventForm.type" name="type" #eType="ngModel" required 
+                                        class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0"
+                                        [class.ring-2]="eType.invalid && eType.touched" [class.ring-red-500]="eType.invalid && eType.touched">
                                         <ng-container *ngFor="let type of eventTypes">
                                             <option *ngIf="type.id !== 'all'" [value]="type.id">{{ type.label }}</option>
                                         </ng-container>
@@ -231,28 +239,36 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Mission Intelligence Image (URL)</label>
-                                <input type="text" [(ngModel)]="eventForm.imageUrl" name="imageUrl" placeholder="HTTPS highly recommended" class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0">
+                                <input type="text" [(ngModel)]="eventForm.imageUrl" name="imageUrl" #eImg="ngModel" required pattern="https?://.+"
+                                    placeholder="HTTPS highly recommended" class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0"
+                                    [class.ring-2]="eImg.invalid && eImg.touched" [class.ring-red-500]="eImg.invalid && eImg.touched">
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Start Date</label>
-                                    <input type="datetime-local" [(ngModel)]="eventForm.startDate" name="start" class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0">
+                                    <input type="datetime-local" [(ngModel)]="eventForm.startDate" name="start" #eStart="ngModel" required
+                                        class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0"
+                                        [class.ring-2]="eStart.invalid && eStart.touched" [class.ring-red-500]="eStart.invalid && eStart.touched">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">End Date</label>
-                                    <input type="datetime-local" [(ngModel)]="eventForm.endDate" name="end" class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0">
+                                    <input type="datetime-local" [(ngModel)]="eventForm.endDate" name="end" #eEnd="ngModel" required
+                                        class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0"
+                                        [class.ring-2]="eEnd.invalid && eEnd.touched" [class.ring-red-500]="eEnd.invalid && eEnd.touched">
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Deployment Site & Address</label>
                                 <div *ngIf="eventForm.location" class="flex flex-col gap-3">
                                     <div>
-                                        <input type="text" [(ngModel)]="eventForm.location.name" name="locName" placeholder="Site Name (ex: sector D5)" 
+                                        <input type="text" [(ngModel)]="eventForm.location.name" name="locName" #eLoc="ngModel" required placeholder="Site Name (ex: sector D5)" 
                                             class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all"
-                                            [class.ring-2]="formErrors['locationName']" [class.ring-red-500]="formErrors['locationName']">
-                                        <span *ngIf="formErrors['locationName']" class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{ formErrors['locationName'] }}</span>
+                                            [class.ring-2]="formErrors['locationName'] || (eLoc.invalid && eLoc.touched)" [class.ring-red-500]="formErrors['locationName'] || (eLoc.invalid && eLoc.touched)">
+                                        <span *ngIf="formErrors['locationName'] || (eLoc.invalid && eLoc.touched)" class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{ formErrors['locationName'] || 'Location name required' }}</span>
                                     </div>
-                                    <input type="text" [(ngModel)]="eventForm.location.address" name="locAddress" placeholder="Full Postal Protocol" class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0">
+                                    <input type="text" [(ngModel)]="eventForm.location.address" name="locAddress" #eAddr="ngModel" required placeholder="Full Postal Protocol" 
+                                        class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0"
+                                        [class.ring-2]="eAddr.invalid && eAddr.touched" [class.ring-red-500]="eAddr.invalid && eAddr.touched">
                                 </div>
                             </div>
                         </div>
@@ -273,25 +289,29 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Mission Briefing</label>
-                                <textarea [(ngModel)]="eventForm.description" name="description" rows="3" 
+                                <textarea [(ngModel)]="eventForm.description" name="description" #eDesc="ngModel" required minlength="20" rows="3" 
                                     class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all"
-                                    [class.ring-2]="formErrors['description']" [class.ring-red-500]="formErrors['description']"></textarea>
-                                <span *ngIf="formErrors['description']" class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{ formErrors['description'] }}</span>
+                                    [class.ring-2]="formErrors['description'] || (eDesc.invalid && eDesc.touched)" [class.ring-red-500]="formErrors['description'] || (eDesc.invalid && eDesc.touched)"></textarea>
+                                <span *ngIf="formErrors['description'] || (eDesc.invalid && eDesc.touched)" class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">
+                                    <span *ngIf="eDesc.errors?.['required']">Briefing is required</span>
+                                    <span *ngIf="eDesc.errors?.['minlength']">Min 20 characters</span>
+                                    {{ formErrors['description'] }}
+                                </span>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Capacity</label>
-                                    <input type="number" [(ngModel)]="eventForm.capacity" name="capacity" 
+                                    <input type="number" [(ngModel)]="eventForm.capacity" name="capacity" #eCap="ngModel" required min="1"
                                         class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all"
-                                        [class.ring-2]="formErrors['capacity']" [class.ring-red-500]="formErrors['capacity']">
-                                    <span *ngIf="formErrors['capacity']" class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{ formErrors['capacity'] }}</span>
+                                        [class.ring-2]="formErrors['capacity'] || (eCap.invalid && eCap.touched)" [class.ring-red-500]="formErrors['capacity'] || (eCap.invalid && eCap.touched)">
+                                    <span *ngIf="formErrors['capacity'] || (eCap.invalid && eCap.touched)" class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{ formErrors['capacity'] || 'Capacity min 1' }}</span>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Investment (DT)</label>
-                                    <input type="number" [(ngModel)]="eventForm.price" name="price" 
+                                    <input type="number" [(ngModel)]="eventForm.price" name="price" #ePrice="ngModel" required min="0"
                                         class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all"
-                                        [class.ring-2]="formErrors['price']" [class.ring-red-500]="formErrors['price']">
-                                    <span *ngIf="formErrors['price']" class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{ formErrors['price'] }}</span>
+                                        [class.ring-2]="formErrors['price'] || (ePrice.invalid && ePrice.touched)" [class.ring-red-500]="formErrors['price'] || (ePrice.invalid && ePrice.touched)">
+                                    <span *ngIf="formErrors['price'] || (ePrice.invalid && ePrice.touched)" class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{ formErrors['price'] || 'Price min 0' }}</span>
                                 </div>
                             </div>
                             <div>
@@ -303,7 +323,7 @@
                         </div>
                         <div class="md:col-span-2 flex justify-end gap-4 mt-6">
                             <app-button variant="ghost" type="button" (click)="closeForm()" customClass="text-red-500">Abort Changes</app-button>
-                            <app-button variant="primary" type="submit" customClass="px-12 py-3">Commit Mission</app-button>
+                            <app-button variant="primary" type="submit" [disabled]="!!eventF.invalid" customClass="px-12 py-3">Commit Mission</app-button>
                         </div>
                     </form>
                 </div>

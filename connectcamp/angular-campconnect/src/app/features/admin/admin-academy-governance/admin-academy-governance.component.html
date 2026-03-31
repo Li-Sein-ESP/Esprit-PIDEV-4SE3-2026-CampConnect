@@ -150,66 +150,60 @@
         </div>
         <div class="p-8">
           <!-- Course Form -->
-          <form *ngIf="formType === 'course'" (ngSubmit)="saveCourse()" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <form #courseF="ngForm" *ngIf="formType === 'course'" (ngSubmit)="courseF.form.valid && saveCourse()" class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="space-y-6">
               <div>
                 <label
                   class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Excellence
                   Title</label>
-                <input type="text" [(ngModel)]="courseForm.title" name="title"
+                <input type="text" [(ngModel)]="courseForm.title" name="title" #title="ngModel" required minlength="5"
                   class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all font-medium"
-                  placeholder="e.g. Master Desert Survival" [class.ring-2]="formErrors['title']"
-                  [class.ring-red-500]="formErrors['title']">
-                <span *ngIf="formErrors['title']"
-                  class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{ formErrors['title']
-                  }}</span>
+                  placeholder="e.g. Master Desert Survival" [class.ring-2]="formErrors['title'] || (title.invalid && title.touched)"
+                  [class.ring-red-500]="formErrors['title'] || (title.invalid && title.touched)">
+                <span *ngIf="formErrors['title'] || (title.invalid && title.touched)"
+                  class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">
+                  <span *ngIf="title.errors?.['required']">Title is required</span>
+                  <span *ngIf="title.errors?.['minlength']">Min 5 characters</span>
+                  {{ formErrors['title'] }}
+                </span>
               </div>
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label
                     class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Category</label>
-                  <select [(ngModel)]="courseForm.category" name="category"
+                  <select [(ngModel)]="courseForm.category" name="category" #cat="ngModel" required
                     class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all"
-                    [class.ring-2]="formErrors['category'] || formErrors['categoryName']"
-                    [class.ring-red-500]="formErrors['category'] || formErrors['categoryName']">
+                    [class.ring-2]="formErrors['category'] || formErrors['categoryName'] || (cat.invalid && cat.touched)"
+                    [class.ring-red-500]="formErrors['category'] || formErrors['categoryName'] || (cat.invalid && cat.touched)">
                     <option value="survival">Survival</option>
                     <option value="navigation">Navigation</option>
                     <option value="first-aid">First Aid</option>
                     <option value="wildlife">Wildlife</option>
                     <option value="camping-skills">Camping</option>
                   </select>
-                  <span *ngIf="formErrors['category'] || formErrors['categoryName']"
-                    class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{
-                    formErrors['category'] || formErrors['categoryName'] }}</span>
                 </div>
                 <div>
                   <label
                     class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Difficulty</label>
-                  <select [(ngModel)]="courseForm.difficulty" name="difficulty"
+                  <select [(ngModel)]="courseForm.difficulty" name="difficulty" #diff="ngModel" required
                     class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all"
-                    [class.ring-2]="formErrors['difficulty']" [class.ring-red-500]="formErrors['difficulty']">
+                    [class.ring-2]="formErrors['difficulty'] || (diff.invalid && diff.touched)" [class.ring-red-500]="formErrors['difficulty'] || (diff.invalid && diff.touched)">
                     <option value="beginner">Beginner</option>
                     <option value="intermediate">Intermediate</option>
                     <option value="advanced">Advanced</option>
                   </select>
-                  <span *ngIf="formErrors['difficulty']"
-                    class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{
-                    formErrors['difficulty'] }}</span>
                 </div>
               </div>
               <div>
                 <label
                   class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Lead
                   Instructor</label>
-                <select [(ngModel)]="courseForm.instructorId" name="instructorId"
+                <select [(ngModel)]="courseForm.instructorId" name="instructorId" #inst="ngModel" required
                   class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all"
-                  [class.ring-2]="formErrors['instructorId']" [class.ring-red-500]="formErrors['instructorId']">
+                  [class.ring-2]="formErrors['instructorId'] || (inst.invalid && inst.touched)" [class.ring-red-500]="formErrors['instructorId'] || (inst.invalid && inst.touched)">
                   <option value="">Choose an expert</option>
                   <option *ngFor="let expert of experts()" [value]="expert.id">{{ expert.name }}</option>
                 </select>
-                <span *ngIf="formErrors['instructorId']"
-                  class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{
-                  formErrors['instructorId'] }}</span>
               </div>
             </div>
             <div class="space-y-6">
@@ -218,34 +212,25 @@
                   <label
                     class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Price
                     ($)</label>
-                  <input type="number" [(ngModel)]="courseForm.price" name="price"
+                  <input type="number" [(ngModel)]="courseForm.price" name="price" #prc="ngModel" required min="0"
                     class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all"
-                    [class.ring-2]="formErrors['price']" [class.ring-red-500]="formErrors['price']">
-                  <span *ngIf="formErrors['price']"
-                    class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{
-                    formErrors['price'] }}</span>
+                    [class.ring-2]="formErrors['price'] || (prc.invalid && prc.touched)" [class.ring-red-500]="formErrors['price'] || (prc.invalid && prc.touched)">
                 </div>
                 <div>
                   <label
                     class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Duration
                     (h)</label>
-                  <input type="number" [(ngModel)]="courseForm.duration" name="duration"
+                  <input type="number" [(ngModel)]="courseForm.duration" name="duration" #dur="ngModel" required min="1"
                     class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all"
-                    [class.ring-2]="formErrors['duration']" [class.ring-red-500]="formErrors['duration']">
-                  <span *ngIf="formErrors['duration']"
-                    class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{
-                    formErrors['duration'] }}</span>
+                    [class.ring-2]="formErrors['duration'] || (dur.invalid && dur.touched)" [class.ring-red-500]="formErrors['duration'] || (dur.invalid && dur.touched)">
                 </div>
                 <div>
                   <label
                     class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Passing
                     %</label>
-                  <input type="number" [(ngModel)]="courseForm.passingScore" name="passingScore"
+                  <input type="number" [(ngModel)]="courseForm.passingScore" name="passingScore" #ps="ngModel" required min="0" max="100"
                     class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all"
-                    [class.ring-2]="formErrors['passingScore']" [class.ring-red-500]="formErrors['passingScore']">
-                  <span *ngIf="formErrors['passingScore']"
-                    class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{
-                    formErrors['passingScore'] }}</span>
+                    [class.ring-2]="formErrors['passingScore'] || (ps.invalid && ps.touched)" [class.ring-red-500]="formErrors['passingScore'] || (ps.invalid && ps.touched)">
                 </div>
               </div>
               <div>
@@ -280,13 +265,16 @@
                   <label
                     class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Program
                     Syllabus Digest</label>
-                  <textarea [(ngModel)]="courseForm.description" name="description" rows="4"
+                  <textarea [(ngModel)]="courseForm.description" name="description" #desc="ngModel" required minlength="20" rows="4"
                     class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all"
-                    placeholder="What will students master?" [class.ring-2]="formErrors['description']"
-                    [class.ring-red-500]="formErrors['description']"></textarea>
-                  <span *ngIf="formErrors['description']"
-                    class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{
-                    formErrors['description'] }}</span>
+                    placeholder="What will students master?" [class.ring-2]="formErrors['description'] || (desc.invalid && desc.touched)"
+                    [class.ring-red-500]="formErrors['description'] || (desc.invalid && desc.touched)"></textarea>
+                  <span *ngIf="formErrors['description'] || (desc.invalid && desc.touched)"
+                    class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">
+                    <span *ngIf="desc.errors?.['required']">Syllabus is required</span>
+                    <span *ngIf="desc.errors?.['minlength']">Min 20 characters</span>
+                    {{ formErrors['description'] }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -304,7 +292,7 @@
                   class="px-8 py-3 text-red-600 font-bold hover:bg-red-50 rounded-xl transition-all">
                   Discard Changes
                 </button>
-                <app-button variant="primary" type="submit" [disabled]="isSubmitting()" customClass="px-12 py-3">
+                <app-button variant="primary" type="submit" [disabled]="!!courseF.invalid || isSubmitting()" customClass="px-12 py-3">
                   {{ isSubmitting() ? 'Committing...' : 'Commit Course' }}
                 </app-button>
               </div>
@@ -312,7 +300,7 @@
           </form>
 
           <!-- Cert Form -->
-          <form *ngIf="formType === 'certification'" (ngSubmit)="saveCertification()"
+          <form #certF="ngForm" *ngIf="formType === 'certification'" (ngSubmit)="certF.form.valid && saveCertification()"
             class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <!-- Fields similar to course but for cert -->
             <div class="space-y-6">
@@ -320,31 +308,35 @@
                 <label
                   class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Certification
                   Title</label>
-                <input type="text" [(ngModel)]="certForm.name" name="name"
-                  class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all font-medium">
+                <input type="text" [(ngModel)]="certForm.name" name="name" required minlength="5" #cName="ngModel"
+                  class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl focus:ring-4 focus:ring-[var(--color-primary-100)] border-0 transition-all font-medium"
+                  [class.ring-2]="cName.invalid && cName.touched" [class.ring-red-500]="cName.invalid && cName.touched">
               </div>
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label
                     class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Issuer</label>
-                  <input type="text" [(ngModel)]="certForm.issuer" name="issuer"
-                    class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all">
+                  <input type="text" [(ngModel)]="certForm.issuer" name="issuer" required #cIssuer="ngModel"
+                    class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all"
+                    [class.ring-2]="cIssuer.invalid && cIssuer.touched" [class.ring-red-500]="cIssuer.invalid && cIssuer.touched">
                 </div>
                 <div>
                   <label
                     class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Validity
                     (Months)</label>
-                  <input type="number" [(ngModel)]="certForm.validityPeriod" name="validity"
-                    class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all">
+                  <input type="number" [(ngModel)]="certForm.validityPeriod" name="validity" required min="1" #cVal="ngModel"
+                    class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all"
+                    [class.ring-2]="cVal.invalid && cVal.touched" [class.ring-red-500]="cVal.invalid && cVal.touched">
                 </div>
               </div>
               <div>
                 <label
                   class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Certification
                   Description</label>
-                <textarea [(ngModel)]="certForm.description" name="certDescription" rows="3"
+                <textarea [(ngModel)]="certForm.description" name="certDescription" required minlength="10" #cDesc="ngModel" rows="3"
                   class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all"
-                  placeholder="Describe the knowledge required..."></textarea>
+                  placeholder="Describe the knowledge required..."
+                  [class.ring-2]="cDesc.invalid && cDesc.touched" [class.ring-red-500]="cDesc.invalid && cDesc.touched"></textarea>
               </div>
             </div>
             <div>
@@ -370,7 +362,7 @@
             </div>
             <div class="md:col-span-2 flex justify-end gap-4 mt-4">
               <app-button variant="ghost" type="button" (click)="closeForm()">Cancel</app-button>
-              <app-button variant="primary" type="submit" customClass="px-12 py-3">Seal Certification</app-button>
+              <app-button variant="primary" type="submit" [disabled]="!!certF.invalid" customClass="px-12 py-3">Seal Certification</app-button>
             </div>
           </form>
         </div>
