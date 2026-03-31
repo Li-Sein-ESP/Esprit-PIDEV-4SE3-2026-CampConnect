@@ -1,11 +1,34 @@
 import { Injectable, signal } from '@angular/core';
-import { Trip, TripBudget, PackingList, TripItinerary } from '../models/trip.model';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
+import { Trip, TripBudget, PackingList } from '../models/trip.model';
 
 @Injectable({
     providedIn: 'root'
 })
 export class TripService {
+    private readonly apiUrl = `${environment.apiUrl}/trips`;
+
+    // Local signal for in-session trip management (non-admin pages)
     trips = signal<Trip[]>(this.getMockTrips());
+
+    constructor(private http: HttpClient) { }
+
+    /** Admin: fetch all trips from the backend */
+    getAllTripsAdmin(): Observable<Trip[]> {
+        return this.http.get<Trip[]>(this.apiUrl);
+    }
+
+    /** Admin: delete a trip by ID */
+    deleteTrip(tripId: string): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/${tripId}`);
+    }
+
+    /** Create a new trip (POST to backend) */
+    createTrip(trip: Partial<Trip> & Record<string, any>): Observable<Trip> {
+        return this.http.post<Trip>(this.apiUrl, trip);
+    }
 
     getMockTrips(): Trip[] {
         return [
@@ -24,26 +47,6 @@ export class TripService {
                 updatedAt: '2024-06-15T14:30:00Z'
             }
         ];
-    }
-
-    createTrip(trip: Partial<Trip>): Trip {
-        const newTrip: Trip = {
-            id: 'trip-' + Math.random().toString(36).substr(2, 9),
-            name: trip.name || '',
-            description: trip.description || '',
-            destination: trip.destination || '',
-            startDate: trip.startDate || '',
-            endDate: trip.endDate || '',
-            duration: trip.duration || 1,
-            status: 'planning',
-            participants: trip.participants || 1,
-            createdBy: 'current-user',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        };
-
-        this.trips.update(trips => [...trips, newTrip]);
-        return newTrip;
     }
 
     getMockBudget(tripId: string): TripBudget {

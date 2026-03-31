@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap, map } from 'rxjs';
 import { Course, Badge, Certification, UserCertification, Video } from '../models/academy.model';
 
-const API_URL = 'http://localhost:8081/api/academy';
+const API_URL = 'http://localhost:8080/api/academy';
 
 @Injectable({
     providedIn: 'root'
@@ -18,7 +18,7 @@ export class AcademyService {
     uploadFile(file: File): Observable<{url: string}> {
         const formData = new FormData();
         formData.append('file', file);
-        return this.http.post<{url: string}>(`http://localhost:8081/api/upload`, formData);
+        return this.http.post<{url: string}>(`http://localhost:8080/api/upload`, formData);
     }
 
     // ─── Courses ───
@@ -107,7 +107,7 @@ export class AcademyService {
         if (!url) return '';
         
         const host = window.location.hostname;
-        const backendBase = `http://${host}:8081`;
+        const backendBase = `http://${host}:8080`;
         const timestamp = new Date().getTime();
 
         // If it's a relative path OR it's an absolute path containing /uploads/

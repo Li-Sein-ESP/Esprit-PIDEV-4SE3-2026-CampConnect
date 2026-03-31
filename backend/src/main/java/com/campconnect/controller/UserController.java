@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,7 +31,7 @@ public class UserController {
     @Operation(summary = "Get current user profile")
     public ResponseEntity<UserProfileResponse> getMe(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(userService.getProfile(userDetails.getId()));
+        return ResponseEntity.ok(userService.getProfile(resolveUserId(userDetails)));
     }
 
     @PutMapping("/me")
@@ -37,7 +39,7 @@ public class UserController {
     public ResponseEntity<UserProfileResponse> updateMe(
             @Valid @RequestBody UpdateProfileRequest request,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(userService.updateProfile(userDetails.getId(), request));
+        return ResponseEntity.ok(userService.updateProfile(resolveUserId(userDetails), request));
     }
 
     @PutMapping("/me/password")
@@ -45,7 +47,7 @@ public class UserController {
     public ResponseEntity<MessageResponse> changePassword(
             @Valid @RequestBody ChangePasswordRequest request,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        userService.changePassword(userDetails.getId(), request);
+        userService.changePassword(resolveUserId(userDetails), request);
         return ResponseEntity.ok(new MessageResponse("Password updated successfully"));
     }
 
@@ -53,6 +55,17 @@ public class UserController {
     @Operation(summary = "Get current user statistics")
     public ResponseEntity<UserStatsResponse> getMyStats(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(userService.getUserStats(userDetails.getId()));
+        return ResponseEntity.ok(userService.getUserStats(resolveUserId(userDetails)));
+    }
+
+    private String resolveUserId(UserDetailsImpl userDetails) {
+        if (userDetails != null) {
+            return userDetails.getId();
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetailsImpl principal) {
+            return principal.getId();
+        }
+        throw new IllegalStateException("Authenticated user not found");
     }
 }

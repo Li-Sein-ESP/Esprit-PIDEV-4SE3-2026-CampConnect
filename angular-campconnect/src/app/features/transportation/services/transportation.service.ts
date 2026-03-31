@@ -1,11 +1,53 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { TransportRoute, VehicleRental } from '../models/transportation.model';
+
+export interface TransportDTO {
+    id?: string;
+    tripId?: string | null;
+    mode: string;
+    provider: string;
+    duration: number;
+    cost: number;
+    imageUrl?: string;
+}
 
 @Injectable({
     providedIn: 'root'
 })
 export class TransportationService {
+    private http = inject(HttpClient);
+    private apiUrl = 'http://localhost:8080/api/transports';
     private routes = signal<TransportRoute[]>([]);
+
+    // ============ CRUD Operations for Admin ============
+
+    getAllTransports(): Observable<TransportDTO[]> {
+        return this.http.get<TransportDTO[]>(this.apiUrl);
+    }
+
+    getTransportById(id: string): Observable<TransportDTO> {
+        return this.http.get<TransportDTO>(`${this.apiUrl}/${id}`);
+    }
+
+    createTransport(transport: Omit<TransportDTO, 'id'>): Observable<TransportDTO> {
+        return this.http.post<TransportDTO>(this.apiUrl, transport);
+    }
+
+    updateTransport(id: string, transport: Omit<TransportDTO, 'id'>): Observable<TransportDTO> {
+        return this.http.put<TransportDTO>(`${this.apiUrl}/${id}`, transport);
+    }
+
+    deleteTransport(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    }
+
+    getTransportsByTrip(tripId: string): Observable<TransportDTO[]> {
+        return this.http.get<TransportDTO[]>(`${this.apiUrl}/trip/${tripId}`);
+    }
+
+    // ============ Mock Data for UI Development ============
 
     getMockRoutes(origin: string, destination: string): TransportRoute[] {
         return [

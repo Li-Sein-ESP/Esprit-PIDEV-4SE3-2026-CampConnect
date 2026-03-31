@@ -7,8 +7,8 @@ import { IncidentReport, SafetyAlert } from '../models/safety.model';
     providedIn: 'root'
 })
 export class SafetyService {
-    private apiUrl = 'http://localhost:8081/api/incidents';
-    private apiUrlAlerts = 'http://localhost:8081/api/alerts';
+    private apiUrl = 'http://localhost:8080/api/incidents';
+    private apiUrlAlerts = 'http://localhost:8080/api/alerts';
 
     constructor(private http: HttpClient) { }
 

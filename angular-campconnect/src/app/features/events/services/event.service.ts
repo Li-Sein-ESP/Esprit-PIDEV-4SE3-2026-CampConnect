@@ -4,7 +4,7 @@ import { Event, EventRegistration } from '../models/event.model';
 import { Observable, of, throwError } from 'rxjs';
 import { tap, catchError, map } from 'rxjs/operators';
 
-const API_URL = 'http://localhost:8081/api/events';
+const API_URL = 'http://localhost:8080/api/events';
 
 @Injectable({
     providedIn: 'root'

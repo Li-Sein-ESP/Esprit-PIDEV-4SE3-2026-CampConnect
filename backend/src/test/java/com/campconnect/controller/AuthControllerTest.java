@@ -93,7 +93,7 @@ class AuthControllerTest {
 
         when(userRepository.existsByUsername("newuser")).thenReturn(false);
         when(userRepository.existsByEmail("new@test.com")).thenReturn(false);
-        when(roleRepository.findByName(ERole.ROLE_USER)).thenReturn(Optional.of(new Role(ERole.ROLE_USER)));
+        when(roleRepository.findByName(ERole.ROLE_CAMPER)).thenReturn(Optional.of(new Role(ERole.ROLE_CAMPER)));
         when(encoder.encode("password")).thenReturn("encodedPassword");
 
         // Act & Assert

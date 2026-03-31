@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: campconnect-config
+  namespace: campconnect
+  labels:
+    app.kubernetes.io/name: campconnect
+data:
+  SPRING_DATA_MONGODB_URI: "mongodb://mongodb-service:27017/campconnectdb"
+  APP_JWTEXPIRATIONMS: "86400000"

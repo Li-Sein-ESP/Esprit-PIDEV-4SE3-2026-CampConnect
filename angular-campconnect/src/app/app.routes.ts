@@ -114,6 +114,46 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/admin/admin-user-management/admin-user-management.component').then(m => m.AdminUserManagementComponent)
             },
             {
+                path: 'analytics',
+                loadComponent: () => import('./features/admin/admin-analytics/admin-analytics.component').then(m => m.AdminAnalyticsComponent)
+            },
+            {
+                path: 'bookings',
+                loadComponent: () => import('./features/admin/admin-bookings/admin-bookings.component').then(m => m.AdminBookingsComponent)
+            },
+            {
+                path: 'sites',
+                loadComponent: () => import('./features/admin/admin-sites-management/admin-sites-management.component').then(m => m.AdminSitesManagementComponent)
+            },
+            {
+                path: 'marketplace',
+                loadComponent: () => import('./features/admin/admin-marketplace/admin-marketplace.component').then(m => m.AdminMarketplaceComponent)
+            },
+            {
+                path: 'incidents',
+                loadComponent: () => import('./features/admin/admin-incident-management/admin-incident-management.component').then(m => m.AdminIncidentManagementComponent)
+            },
+            {
+                path: 'moderation',
+                loadComponent: () => import('./features/admin/admin-moderation/admin-moderation.component').then(m => m.AdminModerationComponent)
+            },
+            {
+                path: 'trips',
+                loadComponent: () => import('./features/admin/admin-trips/admin-trips.component').then(m => m.AdminTripsComponent)
+            },
+            {
+                path: 'transports',
+                loadComponent: () => import('./features/admin/admin-transports/admin-transports.component').then(m => m.AdminTransportsComponent)
+            },
+            {
+                path: 'academy',
+                loadComponent: () => import('./features/admin/admin-academy-governance/admin-academy-governance.component').then(m => m.AdminAcademyGovernanceComponent)
+            },
+            {
+                path: 'settings',
+                loadComponent: () => import('./features/admin/admin-settings/admin-settings.component').then(m => m.AdminSettingsComponent)
+            },
+            {
                 path: '',
                 redirectTo: 'dashboard',
                 pathMatch: 'full'

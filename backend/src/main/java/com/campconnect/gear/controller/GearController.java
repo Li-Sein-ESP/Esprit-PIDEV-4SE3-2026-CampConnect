@@ -18,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -65,7 +67,7 @@ public class GearController {
                 ? Sort.Direction.ASC
                 : Sort.Direction.DESC;
         PageRequest pageable = PageRequest.of(page, size, Sort.by(dir, parts[0]));
-        return ResponseEntity.ok(gearService.findByOwner(userDetails.getId(), pageable));
+        return ResponseEntity.ok(gearService.findByOwner(resolveUserId(userDetails), pageable));
     }
 
     @PostMapping
@@ -75,7 +77,7 @@ public class GearController {
             @Valid @RequestBody GearRequest request,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(gearService.create(request, userDetails.getId()));
+                .body(gearService.create(request, resolveUserId(userDetails)));
     }
 
     @PutMapping("/{id}")
@@ -85,7 +87,7 @@ public class GearController {
             @PathVariable String id,
             @Valid @RequestBody GearRequest request,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(gearService.update(id, request, userDetails.getId()));
+        return ResponseEntity.ok(gearService.update(id, request, resolveUserId(userDetails)));
     }
 
     @DeleteMapping("/{id}")
@@ -94,7 +96,7 @@ public class GearController {
     public ResponseEntity<Void> delete(
             @PathVariable String id,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        gearService.softDelete(id, userDetails.getId());
+        gearService.softDelete(id, resolveUserId(userDetails));
         return ResponseEntity.noContent().build();
     }
 
@@ -105,7 +107,7 @@ public class GearController {
             @PathVariable String id,
             @RequestParam String imageUrl,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(gearService.addImage(id, imageUrl, userDetails.getId()));
+        return ResponseEntity.ok(gearService.addImage(id, imageUrl, resolveUserId(userDetails)));
     }
 
     @DeleteMapping("/{id}/images/{imageId}")
@@ -115,7 +117,7 @@ public class GearController {
             @PathVariable String id,
             @PathVariable String imageId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(gearService.removeImage(id, imageId, userDetails.getId()));
+        return ResponseEntity.ok(gearService.removeImage(id, imageId, resolveUserId(userDetails)));
     }
 
     @GetMapping("/{gearId}/analytics")
@@ -131,6 +133,17 @@ public class GearController {
     @Operation(summary = "Get aggregated stats for provider dashboard")
     public ResponseEntity<ProviderStatsResponse> getProviderStats(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(gearService.getProviderStats(userDetails.getId()));
+        return ResponseEntity.ok(gearService.getProviderStats(resolveUserId(userDetails)));
+    }
+
+    private String resolveUserId(UserDetailsImpl userDetails) {
+        if (userDetails != null) {
+            return userDetails.getId();
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetailsImpl principal) {
+            return principal.getId();
+        }
+        throw new IllegalStateException("Authenticated user not found");
     }
 }

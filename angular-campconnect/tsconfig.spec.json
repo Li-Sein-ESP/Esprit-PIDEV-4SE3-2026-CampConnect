@@ -7,7 +7,14 @@
     ]
   },
   "include": [
-    "src/**/*.spec.ts",
+    "src/app/features/delivery/services/delivery-api.service.spec.ts",
+    "src/app/features/delivery/delivery-profile/delivery-profile.component.spec.ts",
+    "src/app/features/delivery/delivery-earnings/delivery-earnings.component.spec.ts",
+    "src/app/features/gear/services/gear-api.service.spec.ts",
+    "src/app/features/gear/services/cart-api.service.spec.ts",
+    "src/app/features/gear/gear-cart/gear-cart.component.spec.ts",
+    "src/app/features/auth/services/user-api.service.spec.ts",
+    "src/app/features/auth/profile/camper-profile.component.spec.ts",
     "src/**/*.d.ts"
   ]
 }

@@ -35,8 +35,10 @@ export class TripCreateComponent {
 
   createTrip() {
     const duration = this.calculateDuration();
-    const trip = this.tripService.createTrip({ ...this.tripData, duration });
-    this.router.navigate(['/trips', trip.id]);
+    this.tripService.createTrip({ ...this.tripData, duration }).subscribe({
+      next: (trip) => this.router.navigate(['/trips', trip.id]),
+      error: () => this.router.navigate(['/trips'])
+    });
   }
 
   calculateDuration(): number {

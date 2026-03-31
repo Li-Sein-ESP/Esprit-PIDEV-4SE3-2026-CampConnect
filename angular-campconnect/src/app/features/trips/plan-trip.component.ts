@@ -270,9 +270,9 @@ export class PlanTripComponent {
       notes: this.notes
     };
     
-    this.tripService.createTrip(tripData);
-    console.log('Created trip:', tripData);
-    
-    this.router.navigate(['/trips']);
+    this.tripService.createTrip(tripData).subscribe({
+      next: () => this.router.navigate(['/trips']),
+      error: () => this.router.navigate(['/trips'])
+    });
   }
 }

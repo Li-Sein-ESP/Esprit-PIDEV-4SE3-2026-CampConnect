@@ -78,6 +78,38 @@
                         }
                     },
                     "defaultConfiguration": "development"
+                },
+                "test": {
+                    "builder": "@angular-devkit/build-angular:karma",
+                    "options": {
+                        "include": [
+                            "src/app/features/delivery/services/delivery-api.service.spec.ts",
+                            "src/app/features/delivery/delivery-profile/delivery-profile.component.spec.ts",
+                            "src/app/features/delivery/delivery-earnings/delivery-earnings.component.spec.ts",
+                            "src/app/features/gear/services/gear-api.service.spec.ts",
+                            "src/app/features/gear/services/cart-api.service.spec.ts",
+                            "src/app/features/gear/gear-cart/gear-cart.component.spec.ts",
+                            "src/app/features/auth/services/user-api.service.spec.ts",
+                            "src/app/features/auth/profile/camper-profile.component.spec.ts"
+                        ],
+                        "polyfills": [
+                            "zone.js",
+                            "zone.js/testing"
+                        ],
+                        "tsConfig": "tsconfig.spec.json",
+                        "karmaConfig": "karma.conf.js",
+                        "assets": [
+                            {
+                                "glob": "**/*",
+                                "input": "public"
+                            },
+                            "src/assets"
+                        ],
+                        "styles": [
+                            "src/styles/globals.css"
+                        ],
+                        "scripts": []
+                    }
                 }
             }
         }
