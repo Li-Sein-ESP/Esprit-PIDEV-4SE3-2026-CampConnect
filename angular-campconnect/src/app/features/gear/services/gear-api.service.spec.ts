@@ -24,7 +24,7 @@ describe('GearApiService', () => {
     service.getGear({ page: 2, size: 8, category: 'Tents', status: 'AVAILABLE' }).subscribe();
 
     const req = httpMock.expectOne((r) =>
-      r.url === 'http://localhost:8081/api/gear' &&
+      r.url === 'http://localhost:8080/api/gear' &&
       r.params.get('page') === '2' &&
       r.params.get('size') === '8' &&
       r.params.get('category') === 'Tents' &&
@@ -39,7 +39,7 @@ describe('GearApiService', () => {
       expect(res.id).toBe('gear-1');
     });
 
-    const req = httpMock.expectOne('http://localhost:8081/api/gear/gear-1');
+    const req = httpMock.expectOne('http://localhost:8080/api/gear/gear-1');
     expect(req.request.method).toBe('GET');
     req.flush({ id: 'gear-1' });
   });
@@ -49,7 +49,7 @@ describe('GearApiService', () => {
 
     service.createGear(payload).subscribe();
 
-    const req = httpMock.expectOne('http://localhost:8081/api/gear');
+    const req = httpMock.expectOne('http://localhost:8080/api/gear');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(payload);
     req.flush({ id: 'gear-1' });

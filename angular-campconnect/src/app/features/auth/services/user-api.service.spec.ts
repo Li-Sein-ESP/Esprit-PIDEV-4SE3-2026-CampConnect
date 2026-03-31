@@ -25,7 +25,7 @@ describe('UserApiService', () => {
       expect(res.id).toBe('user-1');
     });
 
-    const req = httpMock.expectOne('http://localhost:8081/api/users/me');
+    const req = httpMock.expectOne('http://localhost:8080/api/users/me');
     expect(req.request.method).toBe('GET');
     req.flush({ id: 'user-1' });
   });
@@ -35,7 +35,7 @@ describe('UserApiService', () => {
       expect(res.campsitesVisited).toBe(7);
     });
 
-    const req = httpMock.expectOne('http://localhost:8081/api/users/me/stats');
+    const req = httpMock.expectOne('http://localhost:8080/api/users/me/stats');
     expect(req.request.method).toBe('GET');
     req.flush({ campsitesVisited: 7 });
   });
@@ -45,7 +45,7 @@ describe('UserApiService', () => {
 
     service.updateProfile(payload).subscribe();
 
-    const req = httpMock.expectOne('http://localhost:8081/api/users/me');
+    const req = httpMock.expectOne('http://localhost:8080/api/users/me');
     expect(req.request.method).toBe('PUT');
     expect(req.request.body).toEqual(payload);
     req.flush({ id: 'user-1', name: 'Updated Camper' });

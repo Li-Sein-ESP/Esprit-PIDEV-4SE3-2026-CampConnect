@@ -28,7 +28,7 @@ describe('DeliveryApiService', () => {
       expect(res.activeJobs).toBe(2);
     });
 
-    const req = httpMock.expectOne('http://localhost:8081/api/deliveries/profile-stats');
+    const req = httpMock.expectOne('http://localhost:8080/api/deliveries/profile-stats');
     expect(req.request.method).toBe('GET');
     req.flush(mock);
   });
@@ -37,7 +37,7 @@ describe('DeliveryApiService', () => {
     service.getAll('PENDING', 'HIGH', 1, 20).subscribe();
 
     const req = httpMock.expectOne((r) =>
-      r.url === 'http://localhost:8081/api/deliveries' &&
+      r.url === 'http://localhost:8080/api/deliveries' &&
       r.params.get('status') === 'PENDING' &&
       r.params.get('priority') === 'HIGH' &&
       r.params.get('page') === '1' &&
@@ -51,7 +51,7 @@ describe('DeliveryApiService', () => {
     service.updateStatus('delivery-1', 'ASSIGNED').subscribe();
 
     const req = httpMock.expectOne((r) =>
-      r.url === 'http://localhost:8081/api/deliveries/delivery-1/status' &&
+      r.url === 'http://localhost:8080/api/deliveries/delivery-1/status' &&
       r.params.get('status') === 'ASSIGNED'
     );
     expect(req.request.method).toBe('PATCH');
