@@ -1,0 +1,1440 @@
+// ============================================
+// CampConnect – Private Messaging Page
+// Scoped under .cc-messaging (no global leaks)
+// ============================================
+
+// --- Design Tokens ---
+$cc-green-900: #1a3a2a;
+$cc-green-800: #234e38;
+$cc-green-700: #2d5a3f;
+$cc-green-600: #3a7252;
+$cc-green-500: #4a8c65;
+$cc-green-400: #6aad83;
+$cc-green-300: #8ec4a1;
+$cc-green-200: #b5d9c4;
+$cc-green-100: #e8f5ed;
+$cc-green-50: #f3faf6;
+
+$cc-sand-50: #fefcf8;
+$cc-sand-100: #faf6ee;
+$cc-sand-200: #f3ecda;
+$cc-sand-300: #e8ddc4;
+
+$cc-orange-500: #d4853a;
+$cc-orange-400: #e09a52;
+$cc-orange-100: #fdf0e0;
+
+$cc-stone-50: #fafaf9;
+$cc-stone-100: #f5f5f4;
+$cc-stone-200: #e7e5e4;
+$cc-stone-300: #d6d3d1;
+$cc-stone-400: #a8a29e;
+$cc-stone-500: #78716c;
+$cc-stone-600: #57534e;
+$cc-stone-700: #44403c;
+$cc-stone-800: #292524;
+$cc-stone-900: #1c1917;
+
+$cc-red-500: #dc4a4a;
+$cc-red-100: #fde8e8;
+$cc-blue-500: #3b82f6;
+
+$cc-radius: 20px;
+$cc-radius-md: 16px;
+$cc-radius-sm: 12px;
+$cc-radius-xs: 8px;
+$cc-shadow-sm: 0 1px 3px rgba(26, 58, 42, 0.06);
+$cc-shadow-md: 0 4px 20px rgba(26, 58, 42, 0.08);
+$cc-shadow-lg: 0 8px 40px rgba(26, 58, 42, 0.1);
+$cc-shadow-xl: 0 16px 56px rgba(26, 58, 42, 0.12);
+$cc-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+$cc-transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+
+// --- Host element: fill the parent <main> block ---
+:host {
+  display: block;
+  height: 100%;
+  overflow: hidden;
+}
+
+// --- Hide the global site footer when messaging is open ---
+// (messaging has its own full-height layout, footer should not be visible)
+:host ::ng-deep {
+
+  // target the <main> wrapper injected by MainLayoutComponent
+  &~footer,
+  &+footer {
+    display: none !important;
+  }
+}
+
+// Hides the footer that is rendered by the MainLayoutComponent when this
+// component is active — we target it via a global override scoped to this host
+// (Angular will scope this correctly with view encapsulation emulation)
+:host-context(div.min-h-screen) ::ng-deep footer {
+  display: none !important;
+}
+
+// --- Scoped Root ---
+.cc-messaging {
+
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  font-family: 'Inter',
+  -apple-system,
+  BlinkMacSystemFont,
+  'Segoe UI',
+  sans-serif;
+  background: linear-gradient(170deg, $cc-sand-50 0%, $cc-green-50 50%, $cc-sand-100 100%);
+  // Use fixed height so the component fills only the viewport — no page scroll / no footer
+  height: calc(100vh - 64px); // 64px = main app topbar
+  overflow: hidden;
+  color: $cc-stone-800;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+
+  // --- Background Decoration ---
+  &::before {
+    content: '';
+    position: fixed;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba($cc-green-400, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  // ========================
+  // TOP NAVIGATION BAR
+  // ========================
+  .cc-msg-topbar {
+    background: rgba(white, 0.82);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba($cc-green-400, 0.08);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    @media (max-width: 768px) {
+      padding: 12px 16px;
+    }
+
+    .cc-topbar-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: none;
+      border: none;
+      color: $cc-green-700;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 8px 14px;
+      border-radius: 50px;
+      transition: all $cc-transition;
+      font-family: inherit;
+      text-decoration: none;
+
+      svg {
+        width: 16px;
+        height: 16px;
+        transition: transform $cc-transition;
+      }
+
+      &:hover {
+        background: rgba($cc-green-400, 0.08);
+
+        svg {
+          transform: translateX(-3px);
+        }
+      }
+    }
+
+    .cc-topbar-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .cc-topbar-icon {
+        width: 38px;
+        height: 38px;
+        background: linear-gradient(135deg, $cc-green-500, $cc-green-600);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 12px rgba($cc-green-600, 0.25);
+
+        svg {
+          width: 20px;
+          height: 20px;
+          color: white;
+        }
+      }
+
+      h1 {
+        font-size: 18px;
+        font-weight: 700;
+        color: $cc-stone-900;
+        letter-spacing: -0.3px;
+      }
+    }
+
+    .cc-topbar-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .cc-topbar-btn {
+        width: 38px;
+        height: 38px;
+        background: transparent;
+        border: none;
+        border-radius: 12px;
+        color: $cc-stone-400;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all $cc-transition;
+        position: relative;
+
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+
+        &:hover {
+          background: $cc-green-50;
+          color: $cc-green-600;
+        }
+
+        .cc-notif-dot {
+          position: absolute;
+          top: 6px;
+          right: 6px;
+          width: 8px;
+          height: 8px;
+          background: $cc-orange-500;
+          border-radius: 50%;
+          border: 2px solid white;
+        }
+      }
+    }
+  }
+
+  // ========================
+  // MAIN LAYOUT
+  // ========================
+  .cc-msg-layout {
+    flex: 1;
+    display: flex;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    gap: 0;
+    position: relative;
+    z-index: 1;
+    // flex: 1 + overflow:hidden on parent gives us the correct remaining height
+    min-height: 0;
+
+    @media (max-width: 768px) {
+      padding: 0;
+    }
+  }
+
+  .cc-msg-container {
+    flex: 1;
+    display: flex;
+    background: white;
+    border-radius: $cc-radius;
+    box-shadow: $cc-shadow-lg;
+    overflow: hidden;
+    border: 1px solid rgba($cc-green-400, 0.06);
+
+    @media (max-width: 768px) {
+      border-radius: 0;
+      box-shadow: none;
+      border: none;
+    }
+  }
+
+  // ========================
+  // LEFT PANEL — Conversations
+  // ========================
+  .cc-conversations {
+    width: 380px;
+    min-width: 380px;
+    border-right: 1px solid $cc-stone-100;
+    display: flex;
+    flex-direction: column;
+    background: $cc-stone-50;
+
+    @media (max-width: 1100px) {
+      width: 320px;
+      min-width: 320px;
+    }
+
+    @media (max-width: 768px) {
+      width: 100%;
+      min-width: 100%;
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      background: white;
+      transition: transform $cc-transition;
+
+      &.cc-panel-hidden {
+        transform: translateX(-100%);
+        pointer-events: none;
+      }
+    }
+  }
+
+  .cc-conv-header {
+    padding: 20px 20px 12px;
+
+    .cc-conv-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+
+      h2 {
+        font-size: 20px;
+        font-weight: 700;
+        color: $cc-stone-900;
+        letter-spacing: -0.3px;
+      }
+
+      .cc-new-chat-btn {
+        width: 36px;
+        height: 36px;
+        background: $cc-green-100;
+        border: none;
+        border-radius: 10px;
+        color: $cc-green-600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all $cc-transition;
+
+        svg {
+          width: 18px;
+          height: 18px;
+        }
+
+        &:hover {
+          background: $cc-green-500;
+          color: white;
+          box-shadow: 0 3px 12px rgba($cc-green-500, 0.3);
+        }
+      }
+    }
+  }
+
+  .cc-conv-search {
+    position: relative;
+
+    .cc-search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: $cc-stone-400;
+      pointer-events: none;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px 14px 11px 40px;
+      background: white;
+      border: 2px solid $cc-stone-200;
+      border-radius: 50px;
+      font-size: 14px;
+      font-family: inherit;
+      color: $cc-stone-800;
+      transition: all $cc-transition;
+
+      &::placeholder {
+        color: $cc-stone-400;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $cc-green-400;
+        box-shadow: 0 0 0 4px rgba($cc-green-400, 0.08);
+      }
+    }
+  }
+
+  .cc-conv-tabs {
+    display: flex;
+    padding: 0 20px;
+    gap: 4px;
+    margin-top: 16px;
+
+    .cc-tab {
+      flex: 1;
+      padding: 8px 4px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      font-size: 13px;
+      font-weight: 600;
+      color: $cc-stone-400;
+      cursor: pointer;
+      transition: all $cc-transition;
+      font-family: inherit;
+      text-align: center;
+      position: relative;
+
+      &:hover {
+        color: $cc-stone-600;
+      }
+
+      &.cc-active {
+        color: $cc-green-700;
+        border-bottom-color: $cc-green-500;
+      }
+
+      .cc-tab-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 18px;
+        height: 18px;
+        background: $cc-orange-500;
+        color: white;
+        font-size: 10px;
+        font-weight: 700;
+        border-radius: 50px;
+        padding: 0 5px;
+        margin-left: 4px;
+      }
+    }
+  }
+
+  // --- Conversation List ---
+  .cc-conv-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: $cc-stone-200 transparent;
+
+    &::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $cc-stone-200;
+      border-radius: 10px;
+    }
+  }
+
+  .cc-conv-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: $cc-radius-sm;
+    cursor: pointer;
+    transition: all $cc-transition;
+    position: relative;
+
+    &:hover {
+      background: white;
+      box-shadow: $cc-shadow-sm;
+    }
+
+    &.cc-active {
+      background: $cc-green-50;
+      box-shadow: inset 3px 0 0 $cc-green-500;
+
+      .cc-conv-name {
+        color: $cc-green-800;
+      }
+    }
+
+    &.cc-unread {
+      .cc-conv-name {
+        font-weight: 700;
+      }
+
+      .cc-conv-preview {
+        color: $cc-stone-700;
+        font-weight: 500;
+      }
+    }
+
+    .cc-conv-avatar-wrap {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .cc-conv-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 16px;
+      object-fit: cover;
+      border: 2px solid white;
+      box-shadow: $cc-shadow-sm;
+    }
+
+    .cc-online-dot {
+      position: absolute;
+      bottom: 1px;
+      right: 1px;
+      width: 13px;
+      height: 13px;
+      background: #34d399;
+      border-radius: 50%;
+      border: 2.5px solid $cc-stone-50;
+
+      &.cc-offline {
+        background: $cc-stone-300;
+      }
+
+      &.cc-away {
+        background: $cc-orange-400;
+      }
+    }
+
+    .cc-conv-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .cc-conv-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 3px;
+    }
+
+    .cc-conv-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: $cc-stone-800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cc-conv-time {
+      font-size: 11px;
+      color: $cc-stone-400;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .cc-conv-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .cc-conv-preview {
+      font-size: 13px;
+      color: $cc-stone-400;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    .cc-unread-badge {
+      min-width: 20px;
+      height: 20px;
+      background: $cc-green-500;
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 6px;
+      flex-shrink: 0;
+    }
+
+    .cc-conv-typing {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      color: $cc-green-500;
+      font-size: 13px;
+      font-weight: 500;
+      font-style: italic;
+
+      .cc-typing-dots {
+        display: flex;
+        gap: 2px;
+
+        span {
+          width: 4px;
+          height: 4px;
+          background: $cc-green-500;
+          border-radius: 50%;
+          animation: ccTypingBounce 1.2s ease-in-out infinite;
+
+          &:nth-child(2) {
+            animation-delay: 0.15s;
+          }
+
+          &:nth-child(3) {
+            animation-delay: 0.3s;
+          }
+        }
+      }
+    }
+  }
+
+  // ========================
+  // RIGHT PANEL — Chat Area
+  // ========================
+  .cc-chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    position: relative;
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+
+  // --- Empty State ---
+  .cc-chat-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    text-align: center;
+
+    .cc-empty-icon {
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, $cc-green-100, $cc-green-50);
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+
+      svg {
+        width: 48px;
+        height: 48px;
+        color: $cc-green-400;
+      }
+    }
+
+    h3 {
+      font-size: 22px;
+      font-weight: 700;
+      color: $cc-stone-800;
+      margin-bottom: 8px;
+    }
+
+    p {
+      font-size: 15px;
+      color: $cc-stone-400;
+      max-width: 320px;
+      line-height: 1.6;
+    }
+  }
+
+  // --- Chat Header ---
+  .cc-chat-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid $cc-stone-100;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(white, 0.6);
+    backdrop-filter: blur(12px);
+
+    @media (max-width: 768px) {
+      padding: 14px 16px;
+    }
+
+    .cc-chat-back-btn {
+      display: none;
+      width: 36px;
+      height: 36px;
+      background: $cc-stone-50;
+      border: none;
+      border-radius: 10px;
+      color: $cc-stone-600;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      transition: all $cc-transition;
+      flex-shrink: 0;
+
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      &:hover {
+        background: $cc-green-50;
+        color: $cc-green-600;
+      }
+
+      @media (max-width: 768px) {
+        display: flex;
+      }
+    }
+
+    .cc-chat-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      cursor: pointer;
+
+      .cc-chat-avatar-wrap {
+        position: relative;
+        flex-shrink: 0;
+      }
+
+      .cc-chat-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        object-fit: cover;
+        border: 2px solid $cc-green-100;
+        transition: border-color $cc-transition;
+      }
+
+      &:hover .cc-chat-avatar {
+        border-color: $cc-green-400;
+      }
+
+      .cc-status-dot {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 12px;
+        height: 12px;
+        background: #34d399;
+        border-radius: 50%;
+        border: 2.5px solid white;
+      }
+
+      .cc-chat-user-info {
+        min-width: 0;
+
+        .cc-chat-name {
+          font-size: 15px;
+          font-weight: 650;
+          color: $cc-stone-900;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+
+          .cc-verified-sm {
+            width: 16px;
+            height: 16px;
+            background: $cc-green-500;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            svg {
+              width: 9px;
+              height: 9px;
+              color: white;
+            }
+          }
+        }
+
+        .cc-chat-status {
+          font-size: 12px;
+          color: #34d399;
+          font-weight: 500;
+
+          &.cc-offline {
+            color: $cc-stone-400;
+          }
+        }
+      }
+    }
+
+    .cc-chat-actions {
+      display: flex;
+      gap: 6px;
+
+      .cc-chat-action-btn {
+        width: 38px;
+        height: 38px;
+        background: transparent;
+        border: none;
+        border-radius: 12px;
+        color: $cc-stone-400;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all $cc-transition;
+
+        svg {
+          width: 19px;
+          height: 19px;
+        }
+
+        &:hover {
+          background: $cc-green-50;
+          color: $cc-green-600;
+        }
+      }
+    }
+  }
+
+  // --- Chat Messages ---
+  .cc-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: $cc-stone-200 transparent;
+
+    @media (max-width: 768px) {
+      padding: 16px;
+    }
+
+    &::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $cc-stone-200;
+      border-radius: 10px;
+    }
+  }
+
+  // --- Date Separator ---
+  .cc-date-separator {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0 8px;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: $cc-stone-200;
+    }
+
+    span {
+      font-size: 11px;
+      font-weight: 600;
+      color: $cc-stone-400;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+  }
+
+  // --- Message Bubble ---
+  .cc-message {
+    display: flex;
+    gap: 10px;
+    max-width: 75%;
+    animation: ccMsgIn 0.3s ease-out;
+
+    @media (max-width: 640px) {
+      max-width: 88%;
+    }
+
+    &.cc-sent {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+
+      .cc-msg-avatar {
+        display: none;
+      }
+
+      .cc-msg-bubble {
+        background: linear-gradient(135deg, $cc-green-600, $cc-green-500);
+        color: #ffffff !important; // Ensure text is always white on dark green bubble
+        border-radius: $cc-radius $cc-radius 6px $cc-radius;
+
+        // Force all text inside the sent bubble to be white
+        p,
+        span,
+        div {
+          color: #ffffff;
+        }
+
+        .cc-msg-time {
+          color: rgba(255, 255, 255, 0.65) !important;
+        }
+      }
+
+      .cc-msg-status {
+        text-align: right;
+      }
+    }
+
+    &.cc-received {
+      align-self: flex-start;
+
+      .cc-msg-bubble {
+        background: $cc-stone-50;
+        color: $cc-stone-800;
+        border-radius: 6px $cc-radius $cc-radius $cc-radius;
+        border: 1px solid $cc-stone-100;
+      }
+    }
+
+    .cc-msg-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      object-fit: cover;
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+
+    .cc-msg-content {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .cc-msg-bubble {
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.6;
+      position: relative;
+      word-wrap: break-word;
+
+      p {
+        margin-bottom: 0;
+      }
+
+      .cc-msg-time {
+        font-size: 10px;
+        color: $cc-stone-400;
+        margin-top: 6px;
+        display: block;
+      }
+    }
+
+    .cc-msg-status {
+      font-size: 10px;
+      color: $cc-stone-400;
+      padding: 0 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      svg {
+        width: 14px;
+        height: 14px;
+
+        &.cc-read {
+          color: $cc-green-500;
+        }
+      }
+    }
+  }
+
+  // --- Image Message ---
+  .cc-msg-image {
+    border-radius: $cc-radius-sm;
+    overflow: hidden;
+    margin-bottom: 4px;
+    cursor: pointer;
+    max-width: 280px;
+
+    img {
+      width: 100%;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover img {
+      transform: scale(1.03);
+    }
+  }
+
+  // --- Emoji Message ---
+  .cc-msg-emoji {
+    .cc-msg-bubble {
+      background: transparent !important;
+      border: none !important;
+      padding: 4px !important;
+      font-size: 42px;
+      line-height: 1.2;
+    }
+  }
+
+  // --- Typing Indicator ---
+  .cc-typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    align-self: flex-start;
+
+    .cc-typing-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+
+    .cc-typing-bubble {
+      background: $cc-stone-50;
+      border: 1px solid $cc-stone-100;
+      border-radius: 6px $cc-radius $cc-radius $cc-radius;
+      padding: 14px 20px;
+      display: flex;
+      gap: 4px;
+
+      span {
+        width: 7px;
+        height: 7px;
+        background: $cc-stone-300;
+        border-radius: 50%;
+        animation: ccTypingBounce 1.2s ease-in-out infinite;
+
+        &:nth-child(2) {
+          animation-delay: 0.15s;
+        }
+
+        &:nth-child(3) {
+          animation-delay: 0.3s;
+        }
+      }
+    }
+  }
+
+  // --- Chat Input Area ---
+  .cc-chat-input-area {
+    padding: 16px 24px 20px;
+    border-top: 1px solid $cc-stone-100;
+    background: rgba(white, 0.6);
+    backdrop-filter: blur(8px);
+
+    @media (max-width: 768px) {
+      padding: 12px 16px 16px;
+    }
+
+    .cc-input-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 10px;
+
+      .cc-toolbar-btn {
+        width: 34px;
+        height: 34px;
+        background: transparent;
+        border: none;
+        border-radius: 8px;
+        color: $cc-stone-400;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all $cc-transition-fast;
+        position: relative;
+
+        svg {
+          width: 18px;
+          height: 18px;
+        }
+
+        &:hover {
+          background: $cc-green-50;
+          color: $cc-green-600;
+        }
+
+        .cc-toolbar-tip {
+          position: absolute;
+          bottom: calc(100% + 6px);
+          left: 50%;
+          transform: translateX(-50%) scale(0.9);
+          background: $cc-stone-800;
+          color: white;
+          font-size: 11px;
+          font-weight: 500;
+          padding: 4px 10px;
+          border-radius: 6px;
+          white-space: nowrap;
+          opacity: 0;
+          visibility: hidden;
+          transition: all $cc-transition-fast;
+          pointer-events: none;
+
+          &::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top-color: $cc-stone-800;
+          }
+        }
+
+        &:hover .cc-toolbar-tip {
+          opacity: 1;
+          visibility: visible;
+          transform: translateX(-50%) scale(1);
+        }
+      }
+
+      .cc-toolbar-divider {
+        width: 1px;
+        height: 18px;
+        background: $cc-stone-200;
+        margin: 0 4px;
+      }
+    }
+
+    .cc-input-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .cc-msg-input-wrap {
+      flex: 1;
+      position: relative;
+
+      .cc-msg-input {
+        width: 100%;
+        min-height: 46px;
+        max-height: 140px;
+        resize: none;
+        border: 2px solid $cc-stone-200;
+        border-radius: 24px;
+        padding: 12px 50px 12px 20px;
+        font-size: 14px;
+        font-family: inherit;
+        color: $cc-stone-800;
+        line-height: 1.5;
+        transition: all $cc-transition;
+        background: white;
+        overflow-y: auto;
+
+        &::placeholder {
+          color: $cc-stone-400;
+        }
+
+        &:focus {
+          outline: none;
+          border-color: $cc-green-400;
+          box-shadow: 0 0 0 4px rgba($cc-green-400, 0.08);
+        }
+      }
+
+      .cc-emoji-trigger {
+        position: absolute;
+        right: 14px;
+        bottom: 10px;
+        width: 30px;
+        height: 30px;
+        background: none;
+        border: none;
+        border-radius: 50%;
+        color: $cc-stone-400;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all $cc-transition-fast;
+
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+
+        &:hover {
+          color: $cc-orange-500;
+          transform: scale(1.1);
+        }
+      }
+    }
+
+    .cc-send-btn {
+      width: 46px;
+      height: 46px;
+      background: linear-gradient(135deg, $cc-green-600, $cc-green-500);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all $cc-transition;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba($cc-green-600, 0.3);
+      position: relative;
+      overflow: hidden;
+
+      svg {
+        width: 20px;
+        height: 20px;
+        transition: transform $cc-transition;
+        position: relative;
+        z-index: 1;
+      }
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, $cc-green-500, $cc-green-400);
+        border-radius: 50%;
+        opacity: 0;
+        transition: opacity $cc-transition;
+      }
+
+      &:hover:not(:disabled) {
+        transform: scale(1.08);
+        box-shadow: 0 6px 20px rgba($cc-green-600, 0.35);
+
+        &::before {
+          opacity: 1;
+        }
+
+        svg {
+          transform: translateX(1px) translateY(-1px);
+        }
+      }
+
+      &:active:not(:disabled) {
+        transform: scale(0.95);
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      &.cc-sent-anim {
+        svg {
+          animation: ccSendFly 0.5s ease-out;
+        }
+      }
+    }
+  }
+
+  // --- Image Preview Bar ---
+  .cc-image-preview-bar {
+    display: flex;
+    gap: 8px;
+    padding: 0 0 12px;
+    overflow-x: auto;
+
+    &:empty {
+      display: none;
+    }
+
+    .cc-preview-thumb {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      border-radius: $cc-radius-xs;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 2px solid $cc-stone-200;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .cc-preview-remove {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 20px;
+        height: 20px;
+        background: rgba(black, 0.5);
+        border: none;
+        border-radius: 50%;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        line-height: 1;
+        transition: background $cc-transition-fast;
+
+        &:hover {
+          background: $cc-red-500;
+        }
+      }
+    }
+  }
+
+  // ========================
+  // IMAGE LIGHTBOX
+  // ========================
+  .cc-lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(black, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all $cc-transition;
+    cursor: pointer;
+
+    &.cc-visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: $cc-radius-sm;
+      box-shadow: 0 20px 60px rgba(black, 0.3);
+      animation: ccZoomIn 0.3s ease-out;
+    }
+
+    .cc-lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 44px;
+      height: 44px;
+      background: rgba(white, 0.15);
+      backdrop-filter: blur(8px);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: all $cc-transition;
+
+      &:hover {
+        background: rgba(white, 0.25);
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  // ========================
+  // ANIMATIONS
+  // ========================
+  @keyframes ccTypingBounce {
+
+    0%,
+    60%,
+    100% {
+      transform: translateY(0);
+    }
+
+    30% {
+      transform: translateY(-5px);
+    }
+  }
+
+  @keyframes ccMsgIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes ccSendFly {
+    0% {
+      transform: translateX(0) translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    50% {
+      transform: translateX(8px) translateY(-8px) scale(0.7);
+      opacity: 0;
+    }
+
+    51% {
+      transform: translateX(-8px) translateY(8px) scale(0.7);
+      opacity: 0;
+    }
+
+    100% {
+      transform: translateX(0) translateY(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes ccZoomIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}

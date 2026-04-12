@@ -1,0 +1,213 @@
+<div class="report-incident">
+
+  <!-- Header Section -->
+  <header class="report-incident__header">
+    <div class="report-incident__header-badge">
+      <span class="report-incident__header-badge-dot"></span>
+      <span class="report-incident__header-badge-label">Safety & Security</span>
+    </div>
+    <h1 class="report-incident__title">Report a Safety Incident</h1>
+    <p class="report-incident__subtitle">Help protect the community—your detailed report enables rapid response and local alerting.</p>
+  </header>
+
+  <!-- Success State -->
+  <main class="report-incident__body" *ngIf="showSuccess">
+    <section class="report-incident__success">
+      <div class="report-incident__success-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+      </div>
+      <h2 class="report-incident__card-title">Submission Successful</h2>
+      <p class="report-incident__card-desc">Your report has been encrypted and transmitted to site responders. We appreciate your vigilance in keeping CampConnect safe.</p>
+      
+      <div class="report-incident__success-ref">
+        REF ID: {{ referenceId }}
+      </div>
+
+      <div class="report-incident__success-actions">
+        <button class="report-incident__success-btn report-incident__success-btn--primary" (click)="returnToDashboard()">Return to Dashboard</button>
+        <button class="report-incident__success-btn report-incident__success-btn--secondary" (click)="resetForm()">Submit Another</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Form State -->
+  <main class="report-incident__body" *ngIf="!showSuccess">
+    
+    <!-- Left: Form Card -->
+    <section class="report-incident__card">
+      <h2 class="report-incident__card-title">Incident Details</h2>
+      <p class="report-incident__card-desc">Specify what occurred. Accurate data is crucial for assessing danger levels.</p>
+
+      <form class="report-incident__form" [formGroup]="incidentForm" (ngSubmit)="onSubmit()" novalidate>
+        
+        <fieldset class="report-incident__fieldset">
+          <legend class="report-incident__fieldset-legend">Basic Information</legend>
+          
+          <div class="report-incident__field">
+            <label class="report-incident__label" for="incident-type">
+              Incident Category <span class="report-incident__label-required">*</span>
+            </label>
+            <select class="report-incident__select" id="incident-type" formControlName="type">
+              <option value="" disabled selected>Select category...</option>
+              <option value="wildfire">Wildfire / Smoke</option>
+              <option value="wildlife">Dangerous Wildlife</option>
+              <option value="weather">Severe Weather</option>
+              <option value="injury">Medical Emergency</option>
+              <option value="security">Unauthorized Activity</option>
+            </select>
+            <div class="report-incident__error-msg" *ngIf="isInvalid('type')">Please select an incident type</div>
+          </div>
+
+          <!-- Risk Level Cards -->
+          <div class="report-incident__field">
+            <label class="report-incident__label">Relative Risk Level <span class="report-incident__label-required">*</span></label>
+            <div class="report-incident__risk-group" role="radiogroup">
+              
+              <div class="report-incident__risk-option report-incident__risk-option--low">
+                <input class="report-incident__risk-input" type="radio" id="risk-low" formControlName="level" value="low">
+                <label class="report-incident__risk-label" for="risk-low">
+                  <span class="report-incident__risk-dot"></span>
+                  <span class="report-incident__risk-name">Low</span>
+                </label>
+              </div>
+
+              <div class="report-incident__risk-option report-incident__risk-option--medium">
+                <input class="report-incident__risk-input" type="radio" id="risk-medium" formControlName="level" value="medium">
+                <label class="report-incident__risk-label" for="risk-medium">
+                  <span class="report-incident__risk-dot"></span>
+                  <span class="report-incident__risk-name">Medium</span>
+                </label>
+              </div>
+
+              <div class="report-incident__risk-option report-incident__risk-option--high">
+                <input class="report-incident__risk-input" type="radio" id="risk-high" formControlName="level" value="high">
+                <label class="report-incident__risk-label" for="risk-high">
+                  <span class="report-incident__risk-dot"></span>
+                  <span class="report-incident__risk-name">High</span>
+                </label>
+              </div>
+
+              <div class="report-incident__risk-option report-incident__risk-option--critical">
+                <input class="report-incident__risk-input" type="radio" id="risk-critical" formControlName="level" value="critical">
+                <label class="report-incident__risk-label" for="risk-critical">
+                  <span class="report-incident__risk-dot"></span>
+                  <span class="report-incident__risk-name">Critical</span>
+                </label>
+              </div>
+
+            </div>
+            <div class="report-incident__error-msg" *ngIf="isInvalid('level')">Risk level is required for assessment</div>
+          </div>
+        </fieldset>
+
+        <fieldset class="report-incident__fieldset">
+          <legend class="report-incident__fieldset-legend">Geo-Location</legend>
+          <div class="report-incident__field">
+            <label class="report-incident__label" for="location-region">Region / Landmark <span class="report-incident__label-required">*</span></label>
+            <input class="report-incident__input" type="text" id="location-region" formControlName="regionName" placeholder="e.g. Black Bear Trail, North Ridge">
+            <div class="report-incident__error-msg" *ngIf="isInvalid('regionName')">Location description is required</div>
+          </div>
+
+          <div class="report-incident__row">
+            <div class="report-incident__field">
+              <label class="report-incident__label">Latitude</label>
+              <input class="report-incident__input" type="text" formControlName="latitude" placeholder="e.g. 44.4280">
+            </div>
+            <div class="report-incident__field">
+              <label class="report-incident__label">Longitude</label>
+              <input class="report-incident__input" type="text" formControlName="longitude" placeholder="e.g. -110.5885">
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="report-incident__fieldset">
+          <legend class="report-incident__fieldset-legend">Situation Analysis</legend>
+          <div class="report-incident__field">
+            <label class="report-incident__label">Observation Details <span class="report-incident__label-required">*</span></label>
+            <textarea class="report-incident__textarea" formControlName="description" rows="5" placeholder="Describe the current state, potential trajectory, and immediate needs..."></textarea>
+            <div class="report-incident__error-msg" *ngIf="isInvalid('description')">
+              <span *ngIf="f['description'].errors?.['required']">Detailed description is required.</span>
+              <span *ngIf="f['description'].errors?.['minlength']">Min. 50 characters required for technical assessment.</span>
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="report-incident__confirm">
+          <input class="report-incident__checkbox" type="checkbox" id="confirm-accuracy" formControlName="confirmed">
+          <label class="report-incident__confirm-text" for="confirm-accuracy">
+            <strong>Confirm Transmission</strong>: I certify that all data provided is accurate to my best knowledge. False reporting is subject to site ban.
+          </label>
+        </div>
+        <div class="report-incident__error-msg report-incident__error-msg--confirm" *ngIf="isInvalid('confirmed')">
+          You must acknowledge the terms to submit the report.
+        </div>
+
+        <div class="report-incident__actions">
+          <button class="report-incident__submit" type="submit" [disabled]="incidentForm.invalid || isSubmitting">
+            <span *ngIf="!isSubmitting">Submit Formal Report</span>
+            <span *ngIf="isSubmitting">Transmitting Data...</span>
+          </button>
+          <button class="report-incident__cancel" type="button" (click)="resetForm()">Clear Entry</button>
+        </div>
+
+      </form>
+    </section>
+
+    <!-- Right: Sidebar -->
+    <aside class="report-incident__sidebar">
+      
+      <div class="report-incident__sidebar-card report-incident__emergency">
+        <div class="report-incident__emergency-icon">
+          <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+        </div>
+        <h3 class="report-incident__emergency-title">Critical Emergency?</h3>
+        <p class="report-incident__emergency-text">Do not wait. If life is in danger, contact emergency dispatch immediately.</p>
+        <div class="report-incident__emergency-number">
+          <svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.58.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.58 1 1 0 01-.24 1.01l-2.21 2.2z"/></svg>
+          911
+        </div>
+      </div>
+
+      <div class="report-incident__sidebar-card">
+        <h3 class="report-incident__guidelines-title">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          Protocol Guidelines
+        </h3>
+        <ul class="report-incident__guidelines-list">
+          <li class="report-incident__guidelines-item">
+            <span class="report-incident__guidelines-bullet"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg></span>
+            Specify exact visible landmarks.
+          </li>
+          <li class="report-incident__guidelines-item">
+            <span class="report-incident__guidelines-bullet"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg></span>
+            Include wind direction for wildfires.
+          </li>
+          <li class="report-incident__guidelines-item">
+            <span class="report-incident__guidelines-bullet"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg></span>
+            Monitor local FM alerts.
+          </li>
+        </ul>
+      </div>
+
+      <div class="report-incident__secure">
+        <span class="report-incident__secure-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 15l-4-4 1.41-1.41L11 13.17l5.59-5.59L18 9l-7 7z"/></svg>
+        </span>
+        <div class="report-incident__secure-text">
+          <strong>Secure Transmission</strong>
+          AES-256 Encrypted channel.
+        </div>
+      </div>
+
+    </aside>
+
+  </main>
+
+</div>
+<style>
+    @keyframes spin {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>

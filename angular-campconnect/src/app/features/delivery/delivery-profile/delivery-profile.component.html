@@ -1,0 +1,321 @@
+<div class="dp">
+    <!-- HEADER -->
+    <header class="dp__header">
+        <div class="dp__cover">
+            <svg class="dp__cover-pattern" viewBox="0 0 1200 320" preserveAspectRatio="xMidYMid slice">
+                <defs>
+                    <pattern id="dp-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(16,185,129,0.25)" stroke-width="1" />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#dp-grid)" />
+            </svg>
+        </div>
+
+        <div class="dp__meta-wrap">
+            <div class="dp__identity">
+                <!-- Logo -->
+                <div class="dp__logo-wrap">
+                    <div class="dp__logo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" class="dp__logo-icon">
+                            <path
+                                d="M12 21.0001L19.414 13.5861C20.195 12.8051 20.195 11.5391 19.414 10.7581C18.633 9.97705 17.367 9.97705 16.586 10.7581L12 15.3441L7.414 10.7581C6.633 9.97705 5.367 9.97705 4.586 10.7581C3.80498 11.5391 3.80498 12.8051 4.586 13.5861L12 21.0001ZM12 4.17105L16.586 8.75805C17.367 9.53905 18.633 9.53905 19.414 8.75805C20.195 7.97705 20.195 6.71105 19.414 5.92905L12 1.50005L4.586 5.92905C3.80498 6.71105 3.80498 7.97705 4.586 8.75805C5.367 9.53905 6.633 9.53905 7.414 8.75805L12 4.17105Z" />
+                        </svg>
+                    </div>
+                    <div class="dp__verified-badge" *ngIf="verified" title="Verified Delivery Partner">
+                        <svg viewBox="0 0 16 16" fill="white" width="12" height="12">
+                            <path d="M6.5 11.5L2.5 7.5l1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="dp__info">
+                    <div class="dp__name-row">
+                        <h1 class="dp__name">{{ providerName }}</h1>
+                        <span class="dp__chip dp__chip--verified" *ngIf="verified">✓ Verified Driver</span>
+                    </div>
+
+                    <div class="dp__rating-row">
+                        <span class="dp__star" *ngFor="let s of starArray">★</span>
+                        <span class="dp__rating-val">{{ rating }}</span>
+                        <span class="dp__rating-count">({{ reviewCount }} reviews)</span>
+                    </div>
+
+                    <p class="dp__bio">{{ bio }}</p>
+                </div>
+
+                <div class="dp__actions">
+                    <button class="dp__btn dp__btn--outline">✎ Edit Profile</button>
+                    <button class="dp__btn dp__btn--primary" [routerLink]="['/delivery/vehicles']">+ Add
+                        Vehicle</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- KPI STATS -->
+    <section class="dp__stats-row">
+        <div class="dp__stat-card">
+            <div class="dp__stat-icon dp__stat-icon--emerald">📦</div>
+            <div class="dp__stat-body">
+                <p class="dp__stat-label">Total Deliveries</p>
+                <p class="dp__stat-val">{{ stats.totalDeliveries }}</p>
+            </div>
+            <span class="dp__stat-trend dp__stat-trend--up">↑ 12%</span>
+        </div>
+        <div class="dp__stat-card">
+            <div class="dp__stat-icon dp__stat-icon--amber">🚚</div>
+            <div class="dp__stat-body">
+                <p class="dp__stat-label">Active Jobs</p>
+                <p class="dp__stat-val">{{ stats.activeJobs }}</p>
+            </div>
+            <span class="dp__stat-trend dp__stat-trend--up">↑ 8%</span>
+        </div>
+        <div class="dp__stat-card">
+            <div class="dp__stat-icon dp__stat-icon--green">💵</div>
+            <div class="dp__stat-body">
+                <p class="dp__stat-label">Total Earnings</p>
+                <p class="dp__stat-val">{{ stats.totalEarnings }}</p>
+            </div>
+            <span class="dp__stat-trend dp__stat-trend--up">↑ 24%</span>
+        </div>
+        <div class="dp__stat-card">
+            <div class="dp__stat-icon dp__stat-icon--yellow">⭐</div>
+            <div class="dp__stat-body">
+                <p class="dp__stat-label">Avg. Rating</p>
+                <p class="dp__stat-val">{{ stats.avgRating }}</p>
+            </div>
+            <span class="dp__stat-trend dp__stat-trend--neutral">Steady</span>
+        </div>
+    </section>
+
+    <!-- TABBED PANEL -->
+    <section class="dp__panel">
+        <nav class="dp__tabs" role="tablist">
+            <button class="dp__tab" [class.dp__tab--active]="activeTab === 'overview'"
+                (click)="setActiveTab('overview')">Overview</button>
+            <button class="dp__tab" [class.dp__tab--active]="activeTab === 'vehicles'"
+                (click)="setActiveTab('vehicles')">Vehicles</button>
+            <button class="dp__tab" [class.dp__tab--active]="activeTab === 'history'"
+                (click)="setActiveTab('history')">History</button>
+            <button class="dp__tab" [class.dp__tab--active]="activeTab === 'reviews'"
+                (click)="setActiveTab('reviews')">Reviews</button>
+            <button class="dp__tab" [class.dp__tab--active]="activeTab === 'earnings'"
+                (click)="setActiveTab('earnings')">Earnings</button>
+        </nav>
+
+        <div class="dp__tab-body">
+            <!-- OVERVIEW -->
+            <div class="dp__pane" *ngIf="activeTab === 'overview'">
+                <div class="dp__overview-grid">
+                    <div class="dp__chart-card">
+                        <div class="dp__chart-header">
+                            <h3 class="dp__section-title">Earnings (Last 30 Days)</h3>
+                            <span class="dp__legend"><span class="dp__legend-dot"></span> Earnings</span>
+                        </div>
+                        <div class="dp__chart-area">
+                            <svg viewBox="0 0 400 120" class="dp__sparkline" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#10B981" stop-opacity="0.3" />
+                                        <stop offset="100%" stop-color="#10B981" stop-opacity="0" />
+                                    </linearGradient>
+                                </defs>
+                                <path
+                                    d="M0 100 C50 80 80 60 120 50 C160 40 180 90 220 70 C260 50 280 20 320 30 C360 40 380 25 400 10 L400 120 L0 120 Z"
+                                    fill="url(#revGrad)" />
+                                <path
+                                    d="M0 100 C50 80 80 60 120 50 C160 40 180 90 220 70 C260 50 280 20 320 30 C360 40 380 25 400 10"
+                                    fill="none" stroke="#10B981" stroke-width="2.5" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="dp__top-product-card">
+                        <h3 class="dp__section-title">Most Output Vehicle</h3>
+                        <div class="dp__top-product">
+                            <div class="dp__top-product-img">🚐</div>
+                            <h4 class="dp__top-product-name">Ford Transit Van</h4>
+                            <p class="dp__top-product-cat">Large Cargo</p>
+                            <div class="dp__top-product-footer">
+                                <span class="dp__price">312 trips</span>
+                                <span class="dp__muted">Active</span>
+                            </div>
+                            <div class="dp__perf-row">
+                                <span class="dp__muted">Utilization</span>
+                                <span class="dp__perf-val">84%</span>
+                            </div>
+                            <div class="dp__progress-track">
+                                <div class="dp__progress-fill" style="width:84%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dp__metrics-row">
+                    <div class="dp__metric">
+                        <div class="dp__metric-icon dp__metric-icon--emerald">⏱</div>
+                        <div>
+                            <p class="dp__muted">On-Time Rate</p>
+                            <p class="dp__metric-val">{{ stats.onTimeRate }}</p>
+                        </div>
+                    </div>
+                    <div class="dp__metric">
+                        <div class="dp__metric-icon dp__metric-icon--amber">🔁</div>
+                        <div>
+                            <p class="dp__muted">Repeat Customers</p>
+                            <p class="dp__metric-val">{{ stats.repeatCustomers }}</p>
+                        </div>
+                    </div>
+                    <div class="dp__metric">
+                        <div class="dp__metric-icon dp__metric-icon--green">🗺️</div>
+                        <div>
+                            <p class="dp__muted">Avg. Job Distance</p>
+                            <p class="dp__metric-val">{{ stats.avgDistance }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VEHICLES -->
+            <div class="dp__pane" *ngIf="activeTab === 'vehicles'">
+                <div class="dp__pane-header">
+                    <h3 class="dp__section-title">Fleet / Vehicles</h3>
+                    <button class="dp__btn dp__btn--primary" [routerLink]="['/delivery/vehicles']">+ Add
+                        Vehicle</button>
+                </div>
+                <div class="dp__products-grid">
+                    <div class="dp__product-card" *ngFor="let p of vehicles; trackBy: trackById"
+                        [routerLink]="['/delivery/vehicles']">
+                        <div class="dp__product-img">{{ p.icon }}</div>
+                        <h4 class="dp__product-name">{{ p.name }}</h4>
+                        <p class="dp__muted">{{ p.type }} - {{ p.capacity }}</p>
+                        <div class="dp__product-footer">
+                            <span class="dp__status" [ngClass]="statusClass(p.status)">{{ p.status }}</span>
+                            <span class="dp__muted">{{ p.trips }} trips</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HISTORY -->
+            <div class="dp__pane" *ngIf="activeTab === 'history'">
+                <div class="dp__pane-header">
+                    <h3 class="dp__section-title">Delivery History</h3>
+                </div>
+                <div class="dp__table-wrap">
+                    <table class="dp__table">
+                        <thead>
+                            <tr>
+                                <th>Customer</th>
+                                <th>Pickup → Dropoff</th>
+                                <th>Date</th>
+                                <th>Earnings</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let r of history; trackBy: trackById">
+                                <td>
+                                    <div class="dp__customer">
+                                        <div class="dp__avatar" [style.background-color]="r.avatarColor + '22'"
+                                            [style.color]="r.avatarColor">{{ r.customerInitials }}</div>
+                                        <div>
+                                            <p class="dp__customer-name">{{ r.customer }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="dp__td-product">{{ r.pickup }}</span><br><span class="dp__muted">→ {{
+                                        r.dropoff }}</span></td>
+                                <td class="dp__muted">{{ r.date }}</td>
+                                <td class="dp__td-total">{{ r.earnings | currency }}</td>
+                                <td><span class="dp__status" [ngClass]="statusClass(r.status)">{{ r.status }}</span>
+                                </td>
+                                <td><button class="dp__link" [routerLink]="['/delivery/history']">View</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- REVIEWS -->
+            <div class="dp__pane" *ngIf="activeTab === 'reviews'">
+                <div class="dp__pane-header">
+                    <h3 class="dp__section-title">Customer Reviews</h3>
+                </div>
+                <div class="dp__rating-summary">
+                    <div class="dp__rating-big">
+                        <p class="dp__rating-num">{{ rating }}</p>
+                        <div class="dp__stars-row">
+                            <span class="dp__star dp__star--filled" *ngFor="let s of starArray">★</span>
+                        </div>
+                        <p class="dp__muted">{{ reviewCount }} reviews</p>
+                    </div>
+                    <div class="dp__rating-bars">
+                        <div class="dp__rating-bar-row" *ngFor="let rb of ratingBreakdown">
+                            <span class="dp__bar-label">{{ rb.stars }}★</span>
+                            <div class="dp__bar-track">
+                                <div class="dp__bar-fill" [style.width.%]="rb.pct"></div>
+                            </div>
+                            <span class="dp__bar-count">{{ rb.count }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="dp__reviews-list">
+                    <div class="dp__review-card" *ngFor="let rv of reviews; trackBy: trackById">
+                        <div class="dp__review-header">
+                            <div class="dp__review-author">
+                                <div class="dp__avatar dp__avatar--lg" [style.background-color]="rv.avatarColor + '22'"
+                                    [style.color]="rv.avatarColor">{{ rv.customerInitials }}</div>
+                                <div>
+                                    <div class="dp__review-name-row">
+                                        <h4 class="dp__review-name">{{ rv.customer }}</h4>
+                                        <span class="dp__muted">· {{ rv.date }}</span>
+                                    </div>
+                                    <div class="dp__review-stars">
+                                        <span *ngFor="let s of starArray"
+                                            [class.dp__star--filled]="s <= rv.rating">★</span>
+                                    </div>
+                                    <p class="dp__review-text">{{ rv.text }}</p>
+                                </div>
+                            </div>
+                            <button class="dp__btn dp__btn--outline dp__btn--sm" (click)="toggleResponse(rv)">
+                                💬 {{ rv.showResponse ? 'Cancel' : 'Respond' }}
+                            </button>
+                        </div>
+                        <div class="dp__response-form" *ngIf="rv.showResponse">
+                            <textarea class="dp__textarea" rows="3" placeholder="Write your response..."></textarea>
+                            <div class="dp__response-actions">
+                                <button class="dp__btn dp__btn--ghost" (click)="toggleResponse(rv)">Cancel</button>
+                                <button class="dp__btn dp__btn--primary">Post Response</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EARNINGS -->
+            <div class="dp__pane" *ngIf="activeTab === 'earnings'">
+                <div class="dp__pane-header">
+                    <h3 class="dp__section-title">Earnings Analytics</h3>
+                    <button class="dp__btn dp__btn--outline" [routerLink]="['/delivery/earnings']">Detailed
+                        Report</button>
+                </div>
+                <div class="dp__analytics-section">
+                    <h4 class="dp__sub-title">Recent Payouts</h4>
+                    <div class="dp__analytics-rows">
+                        <div class="dp__analytics-row" *ngFor="let r of history; trackBy: trackById">
+                            <span class="dp__analytics-icon">💰</span>
+                            <div class="dp__analytics-info">
+                                <p class="dp__analytics-name">Delivery for {{ r.customer }}</p>
+                                <p class="dp__muted">{{ r.date }}</p>
+                            </div>
+                            <span class="dp__price">{{ r.earnings | currency }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

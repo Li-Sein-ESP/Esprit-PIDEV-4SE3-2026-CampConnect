@@ -1,0 +1,20 @@
+<div class="timeline-container">
+    <!-- Progress Bar Track -->
+    <div class="progress-bar-bg">
+        <div class="progress-bar-fill" [style.width]="progressWidth"></div>
+    </div>
+
+    <!-- Steps -->
+    <div class="steps-wrapper">
+        <div class="step" *ngFor="let step of steps" [class.active]="currentStep === step.id"
+            [class.completed]="currentStep > step.id" [class.upcoming]="currentStep < step.id">
+            <div class="icon-circle">
+                <lucide-icon [img]="step.icon" class="step-icon"></lucide-icon>
+            </div>
+            <div class="step-info">
+                <span class="step-label">{{ step.label }}</span>
+                <span class="step-desc">{{ step.description }}</span>
+            </div>
+        </div>
+    </div>
+</div>

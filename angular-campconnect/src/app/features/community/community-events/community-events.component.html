@@ -1,0 +1,356 @@
+<!-- ===== HERO ===== -->
+<header class="cc-hero">
+    <h1 class="cc-hero__heading">Upcoming Adventures</h1>
+    <p class="cc-hero__sub">Find your next outdoor experience and connect with fellow campers</p>
+    <div class="cc-hero__stats">
+        <div class="cc-hero__stat">
+            <div class="cc-hero__stat-icon cc-hero__stat-icon--green">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+            </div>
+            <div>
+                <div class="cc-hero__stat-value">24</div>
+                <div class="cc-hero__stat-label">This Month</div>
+            </div>
+        </div>
+        <div class="cc-hero__stat">
+            <div class="cc-hero__stat-icon cc-hero__stat-icon--amber">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+            </div>
+            <div>
+                <div class="cc-hero__stat-value">482</div>
+                <div class="cc-hero__stat-label">Campers Joined</div>
+            </div>
+        </div>
+        <div class="cc-hero__stat">
+            <div class="cc-hero__stat-icon cc-hero__stat-icon--brown">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                </svg>
+            </div>
+            <div>
+                <div class="cc-hero__stat-value">12</div>
+                <div class="cc-hero__stat-label">Locations</div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ===== MAIN LAYOUT ===== -->
+<div class="cc-events-layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="cc-sidebar">
+        <div class="cc-sidebar__card">
+
+            <!-- Search -->
+            <div class="cc-sidebar__section">
+                <div class="cc-sidebar__search-wrap">
+                    <span class="cc-sidebar__search-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                    </span>
+                    <input type="text" class="cc-sidebar__search" placeholder="Search events..." id="searchInput">
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="cc-sidebar__section">
+                <div class="cc-sidebar__label">Categories</div>
+                <div class="cc-categories" id="categoryFilters">
+                    <button class="cc-category cc-category--active" data-category="all">
+                        <span class="cc-category__icon">🏕️</span>
+                        <span>All Events</span>
+                        <span class="cc-category__count">8</span>
+                    </button>
+                    <button class="cc-category" data-category="weekend-camp">
+                        <span class="cc-category__icon">⛺</span>
+                        <span>Weekend Camp</span>
+                        <span class="cc-category__count">3</span>
+                    </button>
+                    <button class="cc-category" data-category="hiking-trip">
+                        <span class="cc-category__icon">🥾</span>
+                        <span>Hiking Trip</span>
+                        <span class="cc-category__count">2</span>
+                    </button>
+                    <button class="cc-category" data-category="gear-testing">
+                        <span class="cc-category__icon">🎒</span>
+                        <span>Gear Testing</span>
+                        <span class="cc-category__count">2</span>
+                    </button>
+                    <button class="cc-category" data-category="survival-workshop">
+                        <span class="cc-category__icon">🔥</span>
+                        <span>Survival Workshop</span>
+                        <span class="cc-category__count">1</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="cc-sidebar__divider"></div>
+
+            <!-- Date Filter -->
+            <div class="cc-sidebar__section">
+                <div class="cc-sidebar__label">Date Range</div>
+                <div class="cc-datepicker">
+                    <input type="date" class="cc-datepicker__input" id="dateFrom" value="2025-07-01">
+                    <input type="date" class="cc-datepicker__input" id="dateTo" value="2025-08-31">
+                </div>
+            </div>
+
+            <!-- Location Filter -->
+            <div class="cc-sidebar__section">
+                <div class="cc-sidebar__label">Location</div>
+                <select class="cc-location-filter" id="locationFilter">
+                    <option value="all">All Locations</option>
+                    <option value="yosemite">Yosemite Valley, CA</option>
+                    <option value="rockies">Rocky Mountains, CO</option>
+                    <option value="smoky">Smoky Mountains, TN</option>
+                    <option value="cascades">North Cascades, WA</option>
+                    <option value="glacier">Glacier National Park, MT</option>
+                    <option value="adirondacks">Adirondacks, NY</option>
+                </select>
+            </div>
+
+            <!-- Create Event CTA -->
+            <button class="cc-btn-create" (click)="openCreateModal()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                Create Event
+            </button>
+        </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="cc-main">
+
+        <!-- Toolbar -->
+        <div class="cc-main__toolbar">
+            <div class="cc-main__result-count">
+                Showing <span>{{events.length}}</span> events
+            </div>
+            <div class="cc-view-toggle">
+                <button class="cc-view-toggle__btn" [class.cc-view-toggle__btn--active]="viewMode === 'grid'"
+                    (click)="toggleView('grid')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round">
+                        <rect x="3" y="3" width="7" height="7" />
+                        <rect x="14" y="3" width="7" height="7" />
+                        <rect x="3" y="14" width="7" height="7" />
+                        <rect x="14" y="14" width="7" height="7" />
+                    </svg>
+                    Grid
+                </button>
+                <button class="cc-view-toggle__btn" [class.cc-view-toggle__btn--active]="viewMode === 'list'"
+                    (click)="toggleView('list')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round">
+                        <line x1="8" y1="6" x2="21" y2="6" />
+                        <line x1="8" y1="12" x2="21" y2="12" />
+                        <line x1="8" y1="18" x2="21" y2="18" />
+                        <line x1="3" y1="6" x2="3.01" y2="6" />
+                        <line x1="3" y1="12" x2="3.01" y2="12" />
+                        <line x1="3" y1="18" x2="3.01" y2="18" />
+                    </svg>
+                    List
+                </button>
+                <button class="cc-view-toggle__btn" [class.cc-view-toggle__btn--active]="viewMode === 'map'"
+                    (click)="toggleView('map')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round">
+                        <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
+                        <line x1="8" y1="2" x2="8" y2="18" />
+                        <line x1="16" y1="6" x2="16" y2="22" />
+                    </svg>
+                    Map
+                </button>
+            </div>
+        </div>
+
+        <!-- GRID VIEW -->
+        <div class="cc-events-grid" [style.display]="viewMode === 'list' || viewMode === 'map' ? 'none' : 'grid'">
+            <article class="cc-event-card" *ngFor="let ev of events" [routerLink]="['/community/event', ev.id]">
+                <div class="cc-event-card__cover">
+                    <img class="cc-event-card__img" [src]="ev.image" [alt]="ev.title" loading="lazy">
+                    <span class="cc-event-card__badge cc-event-card__badge--green">Event</span>
+                    <button class="cc-event-card__favorite">
+                        🤍
+                    </button>
+                    <div class="cc-event-card__date-chip">
+                        <div class="cc-event-card__date-month">{{ ev.date.split(' ')[0] }}</div>
+                        <div class="cc-event-card__date-day">{{ ev.date.split(' ')[1] }}</div>
+                    </div>
+                </div>
+                <div class="cc-event-card__body">
+                    <h3 class="cc-event-card__title">{{ev.title}}</h3>
+                    <div class="cc-event-card__meta">
+                        <div class="cc-event-card__meta-item">
+                            <span class="cc-event-card__meta-icon">📅</span> {{ev.date}}
+                        </div>
+                        <div class="cc-event-card__meta-item">
+                            <span class="cc-event-card__meta-icon">📍</span> {{ev.location}}
+                        </div>
+                    </div>
+                    <p class="cc-event-card__desc">{{ev.description}}</p>
+                    <div class="cc-event-card__footer">
+                        <div class="cc-event-card__host" [routerLink]="['/community/profile', ev.host.id]"
+                            (click)="$event.stopPropagation()">
+                            <img [src]="ev.host.avatar" alt="Avatar" class="cc-event-card__host-avatar">
+                            <div>
+                                <div class="cc-event-card__host-name">{{ev.host.name}}</div>
+                                <div class="cc-event-card__host-role">Host</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:0.75rem;">
+                            <div class="cc-event-card__attendees">
+                                <div class="cc-event-card__attendee-avatar" style="background:#3A7350">AK</div>
+                                <div class="cc-event-card__attendee-avatar cc-event-card__attendee-count">
+                                    +{{ev.attendees}}</div>
+                            </div>
+                            <button class="cc-event-card__join" [class.cc-event-card__join--joined]="ev.joined"
+                                (click)="toggleJoin(ev, $event)">
+                                {{ ev.joined ? '✓ Joined' : 'Join' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <!-- LIST VIEW -->
+        <div class="cc-events-list" [class.cc-events-list--active]="viewMode === 'list'">
+            <article class="cc-event-list-item" *ngFor="let ev of events" [routerLink]="['/community/event', ev.id]">
+                <img class="cc-event-list-item__img" [src]="ev.image" [alt]="ev.title" loading="lazy">
+                <div class="cc-event-list-item__body">
+                    <div>
+                        <div class="cc-event-list-item__top">
+                            <h3 class="cc-event-list-item__title">{{ev.title}}</h3>
+                        </div>
+                        <div class="cc-event-list-item__meta">
+                            <span class="cc-event-list-item__meta-item">📅 {{ev.date}}</span>
+                            <span class="cc-event-list-item__meta-item">📍 {{ev.location}}</span>
+                            <span class="cc-event-list-item__meta-item">👥 {{ev.attendees}} joined</span>
+                        </div>
+                        <p class="cc-event-list-item__desc">{{ev.description}}</p>
+                    </div>
+                    <div class="cc-event-list-item__footer">
+                        <div class="cc-event-card__host" [routerLink]="['/community/profile', ev.host.id]"
+                            (click)="$event.stopPropagation()">
+                            <img [src]="ev.host.avatar" alt="Avatar" class="cc-event-card__host-avatar">
+                            <div>
+                                <div class="cc-event-card__host-name">{{ev.host.name}}</div>
+                                <div class="cc-event-card__host-role">Host</div>
+                            </div>
+                        </div>
+                        <button class="cc-event-card__join" [class.cc-event-card__join--joined]="ev.joined"
+                            (click)="toggleJoin(ev, $event)">
+                            {{ ev.joined ? '✓ Joined' : 'Join' }}
+                        </button>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <!-- MAP VIEW -->
+        <div class="cc-map-container" [class.cc-map-container--active]="viewMode === 'map'">
+            <div class="cc-map__canvas" id="mapCanvas">
+                <div class="cc-map__terrain"></div>
+                <div class="cc-map__grid"></div>
+                <div class="cc-map__river"></div>
+                <div class="cc-map__label" style="top:12%;left:15%;">Pine Ridge</div>
+                <div class="cc-map__label" style="top:65%;left:55%;">Eagle Valley</div>
+                <div class="cc-map__label" style="top:40%;right:12%;">Bear Creek</div>
+                <div class="cc-map__label" style="bottom:15%;left:20%;">Wildflower Meadow</div>
+
+                <!-- Mock Map Pins -->
+                <div class="cc-map-pin" style="top:28%;left:22%;">
+                    <div class="cc-map-pin__pulse"></div>
+                    <div class="cc-map-pin__marker cc-map-pin__marker--green"><span class="cc-map-pin__icon">⛺</span>
+                    </div>
+                </div>
+                <!-- Adding a couple more for effect -->
+                <div class="cc-map-pin" style="top:45%;left:48%;">
+                    <div class="cc-map-pin__pulse"></div>
+                    <div class="cc-map-pin__marker cc-map-pin__marker--amber"><span class="cc-map-pin__icon">⛺</span>
+                    </div>
+                </div>
+                <div class="cc-map-pin" style="top:75%;left:42%;">
+                    <div class="cc-map-pin__pulse"></div>
+                    <div class="cc-map-pin__marker cc-map-pin__marker--brown"><span class="cc-map-pin__icon">⛺</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ===== CREATE EVENT MODAL ===== -->
+<div class="cc-modal-overlay" *ngIf="isCreateModalOpen" (click)="closeCreateModal()">
+    <div class="cc-modal" (click)="$event.stopPropagation()">
+        <div class="cc-modal__header">
+            <h2 class="cc-modal__title">Create New Event</h2>
+            <button class="cc-modal__close" (click)="closeCreateModal()">✕</button>
+        </div>
+        <div class="cc-modal__body">
+            <form>
+                <div class="cc-modal__field">
+                    <label class="cc-modal__label">Event Title</label>
+                    <input class="cc-modal__input" type="text" placeholder="e.g., Sunrise Peak Summit Hike" required>
+                </div>
+
+                <div class="cc-modal__field">
+                    <label class="cc-modal__label">Description</label>
+                    <textarea class="cc-modal__textarea" placeholder="Describe the adventure you're planning..."
+                        required></textarea>
+                </div>
+
+                <div class="cc-modal__row">
+                    <div class="cc-modal__field">
+                        <label class="cc-modal__label">Date</label>
+                        <input class="cc-modal__input" type="date" required>
+                    </div>
+                    <div class="cc-modal__field">
+                        <label class="cc-modal__label">Time</label>
+                        <input class="cc-modal__input" type="time" required>
+                    </div>
+                </div>
+
+                <div class="cc-modal__row">
+                    <div class="cc-modal__field">
+                        <label class="cc-modal__label">Location</label>
+                        <select class="cc-modal__select" required>
+                            <option value="">Select a location</option>
+                            <option>Yosemite Valley, CA</option>
+                            <option>Rocky Mountains, CO</option>
+                            <option>North Cascades, WA</option>
+                        </select>
+                    </div>
+                    <div class="cc-modal__field">
+                        <label class="cc-modal__label">Max Attendees</label>
+                        <input class="cc-modal__input" type="number" min="2" max="100" value="20" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="cc-modal__submit" (click)="$event.preventDefault(); closeCreateModal()">
+                    🏕️ Publish Event
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

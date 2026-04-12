@@ -1,0 +1,264 @@
+<div class="container py-6 max-w-3xl mx-auto">
+
+    <!-- ── Page Header ─────────────────────────────────────────────────── -->
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-[var(--color-text-heading)]">My Connections</h2>
+        <p class="text-[var(--color-text-secondary)] text-sm mt-1">Manage your connection requests and matches.</p>
+    </div>
+
+    <!-- ── Tabs ────────────────────────────────────────────────────────── -->
+    <div class="flex gap-1 bg-[var(--color-neutral-100)] p-1 rounded-xl mb-6 border border-[var(--color-border-light)]">
+
+        <!-- Received -->
+        <button (click)="setTab('received')"
+            [class]="activeTab === 'received'
+                ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-white shadow-sm text-[var(--color-primary-600)] font-semibold text-sm transition-all'
+                : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] font-medium text-sm transition-all'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            Received
+            <span *ngIf="pendingCount > 0"
+                class="bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {{ pendingCount }}
+            </span>
+        </button>
+
+        <!-- Sent -->
+        <button (click)="setTab('sent')"
+            [class]="activeTab === 'sent'
+                ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-white shadow-sm text-[var(--color-primary-600)] font-semibold text-sm transition-all'
+                : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] font-medium text-sm transition-all'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" x2="11" y1="2" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+            Sent
+        </button>
+
+        <!-- Accepted -->
+        <button (click)="setTab('accepted')"
+            [class]="activeTab === 'accepted'
+                ? 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-white shadow-sm text-[var(--color-primary-600)] font-semibold text-sm transition-all'
+                : 'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] font-medium text-sm transition-all'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            Accepted
+            <span *ngIf="accepted.length > 0"
+                class="bg-green-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {{ accepted.length }}
+            </span>
+        </button>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <!--  TAB: RECEIVED                                                      -->
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="activeTab === 'received'">
+        <!-- Empty state -->
+        <div *ngIf="received.length === 0" class="text-center py-16 text-[var(--color-text-tertiary)]">
+            <div class="text-5xl mb-4">📭</div>
+            <p class="font-semibold text-[var(--color-text-secondary)]">No pending requests</p>
+            <p class="text-sm mt-1">Go to <strong>Discovery</strong> to connect with campers!</p>
+        </div>
+
+        <!-- Request cards -->
+        <div class="space-y-4">
+            <div *ngFor="let req of received"
+                class="rounded-2xl border border-[var(--color-border-light)] bg-[var(--color-surface)] p-5 shadow-sm hover:shadow-md transition-shadow">
+
+                <div class="flex items-start gap-4">
+                    <!-- Avatar -->
+                    <img [src]="req.fromUserAvatar" alt="Avatar"
+                        class="w-14 h-14 rounded-full object-cover border-2 border-[var(--color-primary-200)] flex-shrink-0">
+
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-2 flex-wrap">
+                            <h3 class="font-bold text-[var(--color-text-heading)]">{{ req.fromUserName }}</h3>
+                            <span class="text-xs text-[var(--color-text-tertiary)]">{{ timeAgo(req.createdAt) }}</span>
+                        </div>
+                        <div class="flex gap-2 mt-1 flex-wrap">
+                            <span
+                                class="text-xs bg-[var(--color-primary-50)] text-[var(--color-primary-700)] px-2 py-0.5 rounded-full">{{
+                                req.campingStyle }}</span>
+                            <span class="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">{{
+                                req.experienceLevel }}</span>
+                            <span class="text-xs font-bold text-green-600">{{ req.matchScore }}% match</span>
+                        </div>
+                        <p *ngIf="req.message"
+                            class="text-sm text-[var(--color-text-secondary)] mt-2 italic bg-[var(--color-neutral-50)] rounded-lg px-3 py-2 border-l-4 border-[var(--color-primary-300)]">
+                            "{{ req.message }}"
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-3 mt-4">
+                    <button (click)="accept(req.id, req.fromUserName)"
+                        class="flex-1 py-2.5 bg-[var(--color-primary-600)] hover:bg-[var(--color-primary-700)] text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        Accept
+                    </button>
+                    <button (click)="decline(req.id, req.fromUserName)"
+                        class="flex-1 py-2.5 border border-red-200 hover:bg-red-50 text-red-500 font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                        Decline
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <!--  TAB: SENT                                                          -->
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="activeTab === 'sent'">
+        <!-- Empty state -->
+        <div *ngIf="sent.length === 0" class="text-center py-16 text-[var(--color-text-tertiary)]">
+            <div class="text-5xl mb-4">🚀</div>
+            <p class="font-semibold text-[var(--color-text-secondary)]">No requests sent yet</p>
+            <p class="text-sm mt-1">Open a compatibility radar and hit <strong>"Send Request"</strong></p>
+        </div>
+
+        <div class="space-y-4">
+            <div *ngFor="let req of sent"
+                class="rounded-2xl border border-[var(--color-border-light)] bg-[var(--color-surface)] p-5 shadow-sm hover:shadow-md transition-shadow">
+
+                <div class="flex items-start gap-4">
+                    <img [src]="req.toUserAvatar" alt="Avatar"
+                        class="w-14 h-14 rounded-full object-cover border-2 border-[var(--color-border-light)] flex-shrink-0">
+
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-2 flex-wrap">
+                            <h3 class="font-bold text-[var(--color-text-heading)]">{{ req.toUserName }}</h3>
+                            <span [class]="'text-xs font-semibold px-2.5 py-1 rounded-full ' + statusColor(req.status)">
+                                {{ statusLabel(req.status) }}
+                            </span>
+                        </div>
+                        <div class="flex gap-2 mt-1 flex-wrap">
+                            <span
+                                class="text-xs bg-[var(--color-primary-50)] text-[var(--color-primary-700)] px-2 py-0.5 rounded-full">{{
+                                req.campingStyle }}</span>
+                            <span class="text-xs font-bold text-green-600">{{ req.matchScore }}% match</span>
+                            <span class="text-xs text-[var(--color-text-tertiary)]">{{ timeAgo(req.createdAt) }}</span>
+                        </div>
+                        <p *ngIf="req.message"
+                            class="text-sm text-[var(--color-text-secondary)] mt-2 italic bg-[var(--color-neutral-50)] rounded-lg px-3 py-2 border-l-4 border-[var(--color-primary-300)]">
+                            "{{ req.message }}"
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Cancel button (only if still pending) -->
+                <div class="mt-4" *ngIf="req.status === 'pending'">
+                    <button (click)="cancel(req.id, req.toUserName)"
+                        class="w-full py-2.5 border border-[var(--color-border-light)] hover:bg-[var(--color-neutral-50)] text-[var(--color-text-secondary)] font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="15" y1="9" x2="9" y2="15" />
+                            <line x1="9" y1="9" x2="15" y2="15" />
+                        </svg>
+                        Cancel Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <!--  TAB: ACCEPTED                                                      -->
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="activeTab === 'accepted'">
+        <!-- Empty state -->
+        <div *ngIf="accepted.length === 0" class="text-center py-16 text-[var(--color-text-tertiary)]">
+            <div class="text-5xl mb-4">🤝</div>
+            <p class="font-semibold text-[var(--color-text-secondary)]">No connections yet</p>
+            <p class="text-sm mt-1">Accept a received request or send one to start connecting!</p>
+        </div>
+
+        <div class="space-y-4">
+            <div *ngFor="let req of accepted"
+                class="rounded-2xl border border-green-200 bg-green-50/40 p-5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+
+                <!-- Connected ribbon -->
+                <div
+                    class="absolute top-0 right-0 bg-green-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl">
+                    CONNECTED
+                </div>
+
+                <div class="flex items-start gap-4">
+                    <img [src]="partnerAvatar(req)" alt="Avatar"
+                        class="w-14 h-14 rounded-full object-cover border-2 border-green-300 flex-shrink-0">
+
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-bold text-[var(--color-text-heading)]">{{ partnerName(req) }}</h3>
+                        <div class="flex gap-2 mt-1 flex-wrap">
+                            <span
+                                class="text-xs bg-[var(--color-primary-50)] text-[var(--color-primary-700)] px-2 py-0.5 rounded-full">{{
+                                req.campingStyle }}</span>
+                            <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">{{
+                                req.experienceLevel }}</span>
+                            <span class="text-xs font-bold text-green-600">{{ req.matchScore }}% match</span>
+                        </div>
+                        <p class="text-xs text-[var(--color-text-tertiary)] mt-1">Connected {{ timeAgo(req.updatedAt) }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Unmatch with confirm -->
+                <div class="mt-4">
+                    <div *ngIf="confirmUnmatchId !== req.id">
+                        <button (click)="confirmUnmatch(req.id)"
+                            class="w-full py-2.5 border border-red-200 hover:bg-red-50 text-red-400 hover:text-red-600 font-medium rounded-xl text-sm flex items-center justify-center gap-2 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <path
+                                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                <line x1="4" y1="4" x2="20" y2="20" />
+                            </svg>
+                            Unmatch
+                        </button>
+                    </div>
+
+                    <!-- Confirm dialog -->
+                    <div *ngIf="confirmUnmatchId === req.id" class="bg-red-50 border border-red-200 rounded-xl p-4">
+                        <p class="text-sm font-semibold text-red-700 mb-3">
+                            Are you sure you want to unmatch {{ partnerName(req) }}?
+                        </p>
+                        <div class="flex gap-2">
+                            <button (click)="unmatch(req.id, partnerName(req))"
+                                class="flex-1 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg text-sm transition-colors">
+                                Yes, Unmatch
+                            </button>
+                            <button (click)="cancelUnmatch()"
+                                class="flex-1 py-2 border border-[var(--color-border-light)] text-[var(--color-text-secondary)] rounded-lg text-sm hover:bg-[var(--color-neutral-50)] transition-colors">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Toast ────────────────────────────────────────────────────────────── -->
+<div *ngIf="toastVisible"
+    class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[999] bg-[var(--color-primary-700)] text-white px-6 py-3 rounded-2xl shadow-2xl text-sm font-medium">
+    {{ toastMessage }}
+</div>

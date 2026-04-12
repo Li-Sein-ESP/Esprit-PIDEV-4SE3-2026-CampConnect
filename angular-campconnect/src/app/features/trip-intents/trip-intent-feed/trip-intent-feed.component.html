@@ -1,0 +1,99 @@
+<div class="feed-container animate-fade-in">
+    <!-- Header Section -->
+    <div class="header-section">
+        <div>
+            <h1 class="page-title">Découvrir des projets de voyage</h1>
+            <p class="page-subtitle">Rejoignez une aventure ou trouvez des compagnons pour la vôtre.</p>
+        </div>
+        <div class="actions">
+            <button class="btn btn-secondary" routerLink="/my-trip-intents">
+                <lucide-icon [img]="Users" size="20"></lucide-icon>
+                Mes Projets
+            </button>
+            <button class="btn btn-primary" routerLink="/trip-intents/create">
+                <lucide-icon [img]="Plus" size="20"></lucide-icon>
+                Créer un Projet
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters Area -->
+    <div class="filters-card">
+        <div class="filter-header">
+            <lucide-icon [img]="ListFilter" size="18"></lucide-icon>
+            <span>Filtres rapides</span>
+        </div>
+        <div class="filter-tags">
+            <span class="filter-tag active">Tous</span>
+            <span class="filter-tag">Sauvage</span>
+            <span class="filter-tag">Glamping</span>
+            <span class="filter-tag">Budget < 2000 MAD</span>
+                    <span class="filter-tag">Ce mois</span>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Recherche des aventures en cours...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && intents.length === 0" class="empty-state">
+        <lucide-icon [img]="Target" size="48" class="text-muted"></lucide-icon>
+        <h3>Aucun projet trouvé</h3>
+        <p>Il n'y a pas encore de projets de voyage ouverts. Soyez le premier !</p>
+        <button class="btn btn-primary mt-4" routerLink="/trip-intents/create">
+            Créer une Intention de Voyage
+        </button>
+    </div>
+
+    <!-- Intents Grid -->
+    <div *ngIf="!loading && intents.length > 0" class="intents-grid">
+        <app-card *ngFor="let intent of intents" class="intent-card hover-lift"
+            [routerLink]="['/trip-intents', intent.id]">
+            <div class="card-image-bg" [ngClass]="'style-' + intent.campingStyle.toLowerCase()">
+                <div class="card-badges">
+                    <app-badge variant="default">{{ getStyleLabel(intent.campingStyle) }}</app-badge>
+                </div>
+            </div>
+
+            <app-card-header>
+                <div class="creator-mini">
+                    <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Creator"
+                        class="avatar-small">
+                    <span class="creator-name">Organisé par {{ intent.creatorUserId }}</span>
+                </div>
+                <app-card-title class="mt-2">{{ intent.title || 'Projet de camping' }}</app-card-title>
+            </app-card-header>
+
+            <app-card-content>
+                <div class="intent-details">
+
+                    <div class="detail-row">
+                        <lucide-icon [img]="Calendar" size="16" class="text-muted"></lucide-icon>
+                        <span>Du {{ formatDate(intent.dateFrom) }} au {{ formatDate(intent.dateTo) }}</span>
+                    </div>
+
+                    <div class="detail-row" *ngIf="intent.preferredZone">
+                        <lucide-icon [img]="MapPin" size="16" class="text-muted"></lucide-icon>
+                        <span class="truncate">{{ intent.preferredZone }}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <lucide-icon [img]="DollarSign" size="16" class="text-muted"></lucide-icon>
+                        <span>Max {{ intent.budgetMax }} MAD / pers.</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <lucide-icon [img]="Target" size="16" class="text-muted"></lucide-icon>
+                        <span>Expérience: {{ intent.experienceLevel | titlecase }}</span>
+                    </div>
+
+                </div>
+
+                <button class="btn-full-width mt-4">Voir les détails</button>
+            </app-card-content>
+        </app-card>
+    </div>
+</div>

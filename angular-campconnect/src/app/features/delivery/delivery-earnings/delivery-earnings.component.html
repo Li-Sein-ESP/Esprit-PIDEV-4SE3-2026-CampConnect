@@ -1,0 +1,421 @@
+<div class="cc-delivery-earnings">
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+    </div>
+
+    <!-- Main Content -->
+    <ng-container *ngIf="!loading">
+
+    <!-- PAGE HEADER -->
+    <header class="cc-de-header">
+        <div class="cc-de-header__left">
+            <h1 class="cc-de-title">Delivery Earnings</h1>
+            <p class="cc-de-subtitle">Track your revenue, deliveries, and financial performance</p>
+        </div>
+        <div class="cc-de-header__right">
+            <div class="cc-period-selector" id="ccPeriodSelector">
+                <button class="cc-period-btn" [class.cc-period-btn--active]="activePeriod === '7d'"
+                    (click)="setPeriod('7d')">7 Days</button>
+                <button class="cc-period-btn" [class.cc-period-btn--active]="activePeriod === '30d'"
+                    (click)="setPeriod('30d')">30 Days</button>
+                <button class="cc-period-btn" [class.cc-period-btn--active]="activePeriod === '90d'"
+                    (click)="setPeriod('90d')">90 Days</button>
+                <button class="cc-period-btn" [class.cc-period-btn--active]="activePeriod === '12m'"
+                    (click)="setPeriod('12m')">12 Months</button>
+            </div>
+            <button class="cc-btn cc-btn--secondary" type="button">
+                <span class="material-icons-outlined">download</span>
+                Export
+            </button>
+            <button class="cc-btn cc-btn--primary" type="button">
+                <span class="material-icons-outlined">receipt_long</span>
+                Generate Report
+            </button>
+        </div>
+    </header>
+
+    <!-- KPI STATS ROW -->
+    <section class="cc-de-stats" aria-label="Earnings statistics">
+        <article class="cc-de-stat cc-animate" style="animation-delay:0s">
+            <div class="cc-de-stat__header">
+                <div class="cc-de-stat__icon cc-de-stat__icon--earnings">
+                    <span class="material-icons-outlined">account_balance_wallet</span>
+                </div>
+                <span class="cc-de-stat__trend cc-de-stat__trend--up">
+                    <span class="material-icons-outlined">trending_up</span>
+                    +12.5%
+                </span>
+            </div>
+            <div class="cc-de-stat__value cc-de-stat__value--currency">{{ earnings.total | number:'1.0-0' }}</div>
+            <div class="cc-de-stat__label">Total Earnings</div>
+        </article>
+
+        <article class="cc-de-stat cc-animate" style="animation-delay:0.05s">
+            <div class="cc-de-stat__header">
+                <div class="cc-de-stat__icon cc-de-stat__icon--week">
+                    <span class="material-icons-outlined">date_range</span>
+                </div>
+                <span class="cc-de-stat__trend cc-de-stat__trend--up">
+                    <span class="material-icons-outlined">trending_up</span>
+                    +8.3%
+                </span>
+            </div>
+            <div class="cc-de-stat__value cc-de-stat__value--currency">{{ earnings.weekly | number:'1.0-0' }}</div>
+            <div class="cc-de-stat__label">This Week</div>
+        </article>
+
+        <article class="cc-de-stat cc-animate" style="animation-delay:0.1s">
+            <div class="cc-de-stat__header">
+                <div class="cc-de-stat__icon cc-de-stat__icon--month">
+                    <span class="material-icons-outlined">calendar_month</span>
+                </div>
+                <span class="cc-de-stat__trend cc-de-stat__trend--up">
+                    <span class="material-icons-outlined">trending_up</span>
+                    +15.2%
+                </span>
+            </div>
+            <div class="cc-de-stat__value cc-de-stat__value--currency">{{ earnings.monthly | number:'1.0-0' }}</div>
+            <div class="cc-de-stat__label">This Month</div>
+        </article>
+
+        <article class="cc-de-stat cc-animate" style="animation-delay:0.15s">
+            <div class="cc-de-stat__header">
+                <div class="cc-de-stat__icon cc-de-stat__icon--deliveries">
+                    <span class="material-icons-outlined">local_shipping</span>
+                </div>
+                <span class="cc-de-stat__trend cc-de-stat__trend--neutral">
+                    <span class="material-icons-outlined">trending_flat</span>
+                    Steady
+                </span>
+            </div>
+            <div class="cc-de-stat__value">{{ earnings.deliveriesCompleted }}</div>
+            <div class="cc-de-stat__label">Deliveries Completed</div>
+        </article>
+    </section>
+
+    <!-- CHARTS ROW -->
+    <section class="cc-de-charts" aria-label="Earnings charts">
+        <!-- LINE CHART — Daily Earnings -->
+        <div class="cc-chart-card cc-animate" style="animation-delay:0.1s">
+            <div class="cc-chart-card__header">
+                <div>
+                    <div class="cc-chart-card__title">Daily Earnings</div>
+                    <div class="cc-chart-card__subtitle">Revenue over the last {{ activePeriod }}</div>
+                </div>
+                <div style="text-align:right">
+                    <div style="font-size:22px;font-weight:800;color:var(--cc-text-primary);letter-spacing:-0.3px">{{
+                        earnings.monthly | currency }}</div>
+                    <div style="font-size:12px;color:var(--cc-green-700);font-weight:600">↑ 15.2% vs last month</div>
+                </div>
+            </div>
+            <div class="cc-chart-card__body">
+                <div class="cc-chart-canvas-wrap">
+                    <canvas #lineChartCanvas width="800" height="300"></canvas>
+                </div>
+                <div class="cc-chart-tooltip" #tooltipContainer>
+                    <div class="cc-chart-tooltip__label"></div>
+                    <div class="cc-chart-tooltip__value"></div>
+                </div>
+            </div>
+            <div class="cc-chart-legend">
+                <div class="cc-chart-legend__item">
+                    <span class="cc-chart-legend__dot" style="background:var(--cc-earth-500)"></span>
+                    Current Period
+                </div>
+                <div class="cc-chart-legend__item">
+                    <span class="cc-chart-legend__dot" style="background:var(--cc-border)"></span>
+                    Previous Period
+                </div>
+            </div>
+        </div>
+
+        <!-- DONUT CHART — Earnings by Vehicle -->
+        <div class="cc-chart-card cc-animate" style="animation-delay:0.15s">
+            <div class="cc-chart-card__header">
+                <div>
+                    <div class="cc-chart-card__title">By Vehicle Type</div>
+                    <div class="cc-chart-card__subtitle">Earnings distribution</div>
+                </div>
+            </div>
+            <div class="cc-chart-card__body"
+                style="display:flex;align-items:center;justify-content:center;flex-direction:column;">
+                <div class="cc-chart-canvas-wrap" style="max-width:220px;margin:0 auto 20px auto;">
+                    <canvas #donutChartCanvas width="220" height="220"></canvas>
+                </div>
+                <div style="width:100%;">
+                    <div *ngFor="let seg of earnings.vehicleBreakdown"
+                        style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--cc-border-light)">
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <span [style.background]="seg.color"
+                                style="width:10px;height:10px;border-radius:50%;flex-shrink:0"></span>
+                            <span style="font-size:13px;font-weight:600;color:var(--cc-text-primary)">{{ seg.emoji }} {{
+                                seg.label }}</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px">
+                            <span style="font-size:13px;font-weight:700;color:var(--cc-text-primary)">{{ seg.value |
+                                currency:'USD':'symbol':'1.0-0' }}</span>
+                            <span
+                                style="font-size:11px;font-weight:600;color:var(--cc-text-tertiary);background:var(--cc-earth-100);padding:2px 7px;border-radius:10px">
+                                {{ ((seg.value / 8950) * 100) | number:'1.0-0' }}%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BREAKDOWN ROW -->
+    <div class="cc-section-label">
+        <span class="material-icons-outlined cc-section-label__icon">analytics</span>
+        <span class="cc-section-label__text">Revenue Breakdown</span>
+        <div class="cc-section-label__line"></div>
+    </div>
+
+    <section class="cc-de-breakdown" aria-label="Revenue breakdown">
+        <!-- By Vehicle Type -->
+        <div class="cc-breakdown-card cc-animate" style="animation-delay:0.15s">
+            <div class="cc-breakdown-card__header">
+                <div class="cc-chart-card__title">By Vehicle Type</div>
+            </div>
+            <div class="cc-breakdown-item" *ngFor="let seg of earnings.vehicleBreakdown">
+                <div class="cc-breakdown-item__icon" [style.background]="seg.color + '20'">{{ seg.emoji }}</div>
+                <div class="cc-breakdown-item__info">
+                    <div class="cc-breakdown-item__name">{{ seg.label }} Deliveries</div>
+                    <div class="cc-breakdown-item__bar-wrap">
+                        <div class="cc-breakdown-item__bar" [style.background]="seg.color"
+                            [style.width.%]="(seg.value / 8950) * 100"></div>
+                    </div>
+                </div>
+                <div class="cc-breakdown-item__stats">
+                    <div class="cc-breakdown-item__amount">{{ seg.value | currency:'USD':'symbol':'1.0-0' }}</div>
+                    <div class="cc-breakdown-item__count">{{ seg.count }} trips</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- By Delivery Zone -->
+        <div class="cc-breakdown-card cc-animate" style="animation-delay:0.2s">
+            <div class="cc-breakdown-card__header">
+                <div class="cc-chart-card__title">By Delivery Zone</div>
+            </div>
+            <div class="cc-breakdown-item">
+                <div class="cc-breakdown-item__icon cc-breakdown-item__icon--urban">🏙️</div>
+                <div class="cc-breakdown-item__info">
+                    <div class="cc-breakdown-item__name">Urban Zone</div>
+                    <div class="cc-breakdown-item__bar-wrap">
+                        <div class="cc-breakdown-item__bar cc-breakdown-item__bar--purple" style="width:42%"></div>
+                    </div>
+                </div>
+                <div class="cc-breakdown-item__stats">
+                    <div class="cc-breakdown-item__amount">{{ 3759 | currency:'USD':'symbol':'1.0-0' }}</div>
+                    <div class="cc-breakdown-item__count">168 trips</div>
+                </div>
+            </div>
+            <div class="cc-breakdown-item">
+                <div class="cc-breakdown-item__icon cc-breakdown-item__icon--suburban">🏘️</div>
+                <div class="cc-breakdown-item__info">
+                    <div class="cc-breakdown-item__name">Suburban Zone</div>
+                    <div class="cc-breakdown-item__bar-wrap">
+                        <div class="cc-breakdown-item__bar cc-breakdown-item__bar--blue" style="width:28%"></div>
+                    </div>
+                </div>
+                <div class="cc-breakdown-item__stats">
+                    <div class="cc-breakdown-item__amount">{{ 2506 | currency:'USD':'symbol':'1.0-0' }}</div>
+                    <div class="cc-breakdown-item__count">94 trips</div>
+                </div>
+            </div>
+            <div class="cc-breakdown-item">
+                <div class="cc-breakdown-item__icon cc-breakdown-item__icon--rural">🌾</div>
+                <div class="cc-breakdown-item__info">
+                    <div class="cc-breakdown-item__name">Rural Zone</div>
+                    <div class="cc-breakdown-item__bar-wrap">
+                        <div class="cc-breakdown-item__bar cc-breakdown-item__bar--green" style="width:18%"></div>
+                    </div>
+                </div>
+                <div class="cc-breakdown-item__stats">
+                    <div class="cc-breakdown-item__amount">{{ 1610 | currency:'USD':'symbol':'1.0-0' }}</div>
+                    <div class="cc-breakdown-item__count">52 trips</div>
+                </div>
+            </div>
+            <div class="cc-breakdown-item">
+                <div class="cc-breakdown-item__icon cc-breakdown-item__icon--remote">⛰️</div>
+                <div class="cc-breakdown-item__info">
+                    <div class="cc-breakdown-item__name">Remote / Off-Road</div>
+                    <div class="cc-breakdown-item__bar-wrap">
+                        <div class="cc-breakdown-item__bar cc-breakdown-item__bar--orange" style="width:12%"></div>
+                    </div>
+                </div>
+                <div class="cc-breakdown-item__stats">
+                    <div class="cc-breakdown-item__amount">{{ 1075 | currency:'USD':'symbol':'1.0-0' }}</div>
+                    <div class="cc-breakdown-item__count">28 trips</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RECENT PAYMENTS TABLE -->
+    <div class="cc-section-label" style="margin-top:28px;">
+        <span class="material-icons-outlined cc-section-label__icon">payments</span>
+        <span class="cc-section-label__text">Recent Payments</span>
+        <div class="cc-section-label__line"></div>
+    </div>
+
+    <section class="cc-de-table-card cc-animate" style="animation-delay:0.15s">
+        <div class="cc-de-table-header">
+            <div class="cc-de-table-header__left">
+                <div class="cc-de-table-header__title">Completed Deliveries</div>
+                <div class="cc-de-table-header__count">Showing {{ filteredPayments.length }} of {{
+                    earnings.recentPayments.length }} deliveries</div>
+            </div>
+            <div class="cc-de-table-header__right">
+                <div class="cc-de-search">
+                    <span class="material-icons-outlined cc-de-search__icon">search</span>
+                    <input type="text" class="cc-de-search__input" (input)="onFilterPayments($event)"
+                        placeholder="Search deliveries…" aria-label="Search deliveries">
+                </div>
+                <button class="cc-btn cc-btn--secondary cc-btn--sm" type="button">
+                    <span class="material-icons-outlined">filter_list</span>
+                    Filter
+                </button>
+            </div>
+        </div>
+        <div class="cc-de-table-wrap">
+            <table class="cc-de-table" role="table" aria-label="Recent payments">
+                <thead>
+                    <tr>
+                        <th scope="col">Delivery <span class="material-icons-outlined">unfold_more</span></th>
+                        <th scope="col">Date <span class="material-icons-outlined">unfold_more</span></th>
+                        <th scope="col">Vehicle</th>
+                        <th scope="col">Distance <span class="material-icons-outlined">unfold_more</span></th>
+                        <th scope="col">Duration</th>
+                        <th scope="col">Earnings <span class="material-icons-outlined">unfold_more</span></th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngIf="filteredPayments.length === 0">
+                        <td colspan="8" style="text-align:center;padding:40px;color:var(--cc-text-tertiary)">
+                            <span class="material-icons-outlined"
+                                style="font-size:40px;opacity:0.3;display:block;margin-bottom:8px">receipt_long</span>
+                            No deliveries found
+                        </td>
+                    </tr>
+                    <tr class="cc-animate" *ngFor="let payment of filteredPayments; let i = index"
+                        [style.animation-delay]="(i * 0.03) + 's'">
+                        <td>
+                            <div class="cc-de-table__delivery-info">
+                                <div class="cc-de-table__delivery-icon" [style]="getTypeIconBg(payment.vehicle)">
+                                    {{ getTypeEmoji(payment.vehicle) }}
+                                </div>
+                                <div>
+                                    <div class="cc-de-table__delivery-id">{{ payment.id }}</div>
+                                    <div class="cc-de-table__delivery-zone">{{ getZoneEmoji(payment.zone) }} {{
+                                        payment.zone }} · {{ payment.customer }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="font-size:13px;color:var(--cc-text-secondary)">{{ payment.date | date:'MMM d, y' }}
+                        </td>
+                        <td><span class="cc-badge" [ngClass]="getTypeBadgeClass(payment.vehicle)">{{
+                                getTypeLabel(payment.vehicle) }}</span></td>
+                        <td>
+                            <div class="cc-de-table__distance">
+                                <span class="material-icons-outlined">straighten</span>
+                                {{ payment.distance }} km
+                            </div>
+                        </td>
+                        <td style="font-size:13px;color:var(--cc-text-secondary)">{{ payment.duration }}</td>
+                        <td><span class="cc-de-table__amount">{{ payment.amount | currency }}</span></td>
+                        <td>
+                            <span class="cc-badge" [ngClass]="getStatusBadgeClass(payment.status)">
+                                <span class="cc-badge__dot"></span>{{ payment.status | titlecase }}
+                            </span>
+                        </td>
+                        <td>
+                            <div *ngIf="payment.rating; else pendingRating" class="cc-stars">
+                                <span class="cc-star" *ngFor="let star of generateStarsArray(payment.rating)"
+                                    [class.cc-star--filled]="star === 1">★</span>
+                                <span class="cc-stars__value">{{ payment.rating | number:'1.1-1' }}</span>
+                            </div>
+                            <ng-template #pendingRating>
+                                <span style="font-size:12px;color:var(--cc-text-tertiary)">Pending</span>
+                            </ng-template>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="cc-pagination">
+            <div class="cc-pagination__info">Showing 1–{{ filteredPayments.length > 10 ? 10 : filteredPayments.length }}
+                of {{ filteredPayments.length }}</div>
+            <div class="cc-pagination__controls">
+                <button class="cc-pagination__btn" disabled data-tooltip="Previous">
+                    <span class="material-icons-outlined">chevron_left</span>
+                </button>
+                <button class="cc-pagination__btn cc-pagination__btn--active">1</button>
+                <button class="cc-pagination__btn">2</button>
+                <button class="cc-pagination__btn">3</button>
+                <button class="cc-pagination__btn"
+                    style="pointer-events:none;border:none;background:none;color:var(--cc-text-tertiary)">…</button>
+                <button class="cc-pagination__btn">35</button>
+                <button class="cc-pagination__btn" data-tooltip="Next">
+                    <span class="material-icons-outlined">chevron_right</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- INSIGHTS SECTION -->
+    <div class="cc-section-label">
+        <span class="material-icons-outlined cc-section-label__icon">lightbulb</span>
+        <span class="cc-section-label__text">Earnings Insights</span>
+        <div class="cc-section-label__line"></div>
+    </div>
+
+    <section class="cc-de-insights" aria-label="Earnings insights">
+        <article class="cc-insight-card cc-animate" style="animation-delay:0.1s">
+            <div class="cc-insight-card__icon cc-insight-card__icon--green">
+                <span class="material-icons-outlined">trending_up</span>
+            </div>
+            <div class="cc-insight-card__body">
+                <div class="cc-insight-card__title">Peak Earning Hours</div>
+                <p class="cc-insight-card__text">
+                    Your highest earnings occur between <span class="cc-insight-card__stat">9AM – 12PM</span> on
+                    weekdays. Consider prioritizing morning shifts for maximum revenue.
+                </p>
+            </div>
+        </article>
+
+        <article class="cc-insight-card cc-animate" style="animation-delay:0.15s">
+            <div class="cc-insight-card__icon cc-insight-card__icon--blue">
+                <span class="material-icons-outlined">speed</span>
+            </div>
+            <div class="cc-insight-card__body">
+                <div class="cc-insight-card__title">Average Per Delivery</div>
+                <p class="cc-insight-card__text">
+                    Your average earning is <span class="cc-insight-card__stat">$26.17</span> per delivery. Van
+                    deliveries yield the highest at $31.45 per trip on average.
+                </p>
+            </div>
+        </article>
+
+        <article class="cc-insight-card cc-animate" style="animation-delay:0.2s">
+            <div class="cc-insight-card__icon cc-insight-card__icon--amber">
+                <span class="material-icons-outlined">star</span>
+            </div>
+            <div class="cc-insight-card__body">
+                <div class="cc-insight-card__title">Customer Rating Impact</div>
+                <p class="cc-insight-card__text">
+                    Drivers with <span class="cc-insight-card__stat">4.8+ ratings</span> receive 23% more delivery
+                    requests. Your current average is 4.7 — keep it up!
+                </p>
+            </div>
+        </article>
+    </section>
+
+    </ng-container>
+</div>

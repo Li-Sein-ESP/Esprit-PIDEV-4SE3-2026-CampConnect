@@ -1,0 +1,15 @@
+<div class="flex h-screen bg-[#fafaf9] text-stone-800 font-sans w-full overflow-hidden cc-provider-layout-root">
+    <!-- Shared Sidebar -->
+    <app-provider-sidebar></app-provider-sidebar>
+
+    <!-- Main Content Area Wrapper -->
+    <div class="flex-1 overflow-x-hidden overflow-y-auto flex flex-col cc-main">
+        <!-- Unified Header with actions -->
+        <app-provider-header></app-provider-header>
+
+        <!-- Child Route Content -->
+        <div class="flex-1 relative flex flex-col">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,62 @@
+<div class="calendar-container">
+
+  <div class="calendar-main">
+    <div class="header">
+      <button class="nav-btn" (click)="previousMonth()">&#8592;</button>
+      <h2>{{ formatMonthYear() }}</h2>
+      <button class="nav-btn" (click)="nextMonth()">&#8594;</button>
+    </div>
+
+    <div class="calendar-grid">
+      <div class="weekday" *ngFor="let day of weekDays">{{ day }}</div>
+
+      <div *ngFor="let day of daysInMonth" class="day-cell" [class.not-current-month]="!day.isCurrentMonth"
+        [class.booked]="day.isBooked" [class.high-demand]="day.isHighDemand" [class.selected]="day.isSelected"
+        [class.in-range]="day.isInRange" (click)="selectDate(day)">
+        <span class="date-num">{{ day.date.getDate() }}</span>
+        <span class="fire-icon" *ngIf="day.isHighDemand && !day.isBooked">&#128293;</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary-sidebar">
+    <div class="glass-card">
+      <h3>Reservation Summary</h3>
+
+      <div class="dates-info" *ngIf="selectedStartDate; else noSelection">
+        <p><strong>Check-in:</strong> {{ selectedStartDate | date:'mediumDate' }}</p>
+        <p *ngIf="selectedEndDate"><strong>Check-out:</strong> {{ selectedEndDate | date:'mediumDate' }}</p>
+        <p *ngIf="!selectedEndDate"><strong>Check-out:</strong> Select a date</p>
+      </div>
+      <ng-template #noSelection>
+        <p class="placeholder-text">Please select your dates on the calendar.</p>
+      </ng-template>
+
+      <div class="divider"></div>
+
+      <div class="price-breakdown" *ngIf="selectedStartDate && selectedEndDate">
+        <div class="price-row">
+          <span>Base Price ({{ numberOfNights }} nights &times; {{ basePricePerNight }}€)</span>
+          <span>{{ numberOfNights * basePricePerNight }}€</span>
+        </div>
+        <div class="price-row surcharge" *ngIf="applicableWeekendSurcharges > 0">
+          <span>Weekend Adjustment ({{ applicableWeekendSurcharges }} &times; +{{ weekendSurcharge }}€)</span>
+          <span>+{{ applicableWeekendSurcharges * weekendSurcharge }}€</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="price-row total">
+          <span>Total</span>
+          <span class="total-amount">{{ totalPrice }}€</span>
+        </div>
+
+        <button class="book-btn" (click)="confirmReservation()" [disabled]="!selectedStartDate || !selectedEndDate">
+          Confirm Reservation
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

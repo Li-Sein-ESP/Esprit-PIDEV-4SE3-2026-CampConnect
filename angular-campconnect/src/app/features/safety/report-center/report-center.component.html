@@ -1,0 +1,245 @@
+<div class="cc-report-issue">
+    <main class="cc-container">
+
+        <!-- Breadcrumb -->
+        <nav class="cc-breadcrumb" aria-label="Breadcrumb">
+            <a href="javascript:void(0)" (click)="onCancel()">Home</a>
+            <span class="cc-sep">▸</span>
+            <a href="javascript:void(0)">Safety</a>
+            <span class="cc-sep">▸</span>
+            <span class="cc-current">Report an Issue</span>
+        </nav>
+
+        <!-- Page Header -->
+        <header class="cc-page-header">
+            <div class="cc-header-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 9v4" />
+                    <path d="M12 17h.01" />
+                    <path
+                        d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                </svg>
+                Safety Center
+            </div>
+            <h1>Report an Issue</h1>
+            <p>Help us keep the community safe and respectful. All reports are reviewed by our trust & safety team
+                within 24 hours.</p>
+        </header>
+
+        <!-- Report Form -->
+        <form [formGroup]="reportForm" (ngSubmit)="onSubmit()" novalidate>
+
+            <!-- Card: Issue Details -->
+            <section class="cc-card">
+                <div class="cc-section-label">Issue Details</div>
+
+                <!-- Issue Type -->
+                <div class="cc-form-group" [class.cc-error]="isInvalid('issueType')">
+                    <label class="cc-label" for="issueType">
+                        Type of Issue <span class="cc-required">*</span>
+                    </label>
+                    <select class="cc-select" id="issueType" formControlName="issueType">
+                        <option value="" disabled selected>Select the type of issue…</option>
+                        <option value="inappropriate_content">Inappropriate Content</option>
+                        <option value="harassment">Harassment</option>
+                        <option value="fake_product">Fake Product</option>
+                        <option value="scam">Scam</option>
+                        <option value="delivery_problem">Delivery Problem</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <div class="cc-error-msg" *ngIf="isInvalid('issueType')">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M12 8v4" />
+                            <path d="M12 16h.01" />
+                        </svg>
+                        Please select an issue type
+                    </div>
+                </div>
+
+                <!-- Reference ID -->
+                <div class="cc-form-group" [class.cc-error]="isInvalid('referenceId')">
+                    <label class="cc-label" for="referenceId">
+                        Reference <span class="cc-required">*</span>
+                    </label>
+                    <input type="text" class="cc-input" id="referenceId" formControlName="referenceId"
+                        placeholder="Post ID, Product ID, Username, or Order ID">
+                    <p class="cc-helper">Enter the ID or username associated with the issue you're reporting.</p>
+                    <div class="cc-error-msg" *ngIf="isInvalid('referenceId')">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M12 8v4" />
+                            <path d="M12 16h.01" />
+                        </svg>
+                        Please enter a reference ID or username
+                    </div>
+                </div>
+
+                <hr class="cc-divider">
+
+                <!-- Description -->
+                <div class="cc-form-group" [class.cc-error]="isInvalid('description')">
+                    <label class="cc-label" for="description">
+                        Description <span class="cc-required">*</span>
+                    </label>
+                    <textarea class="cc-textarea" id="description" formControlName="description"
+                        placeholder="Please describe the issue in detail. Include what happened, when it occurred, and any other relevant context…"
+                        maxlength="2000"></textarea>
+                    <div class="cc-char-count" [class.cc-warn]="charCount > 1800">{{ charCount | number }} / 2,000</div>
+
+                    <div class="cc-error-msg" *ngIf="isInvalid('description')">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M12 8v4" />
+                            <path d="M12 16h.01" />
+                        </svg>
+                        <span *ngIf="f['description'].errors?.['required']">Please describe the issue</span>
+                        <span *ngIf="f['description'].errors?.['minlength']">Please provide at least 20
+                            characters</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Card: Evidence Upload -->
+            <section class="cc-card">
+                <div class="cc-section-label">Supporting Evidence</div>
+
+                <div class="cc-form-group">
+                    <label class="cc-label">Upload Evidence</label>
+
+                    <div class="cc-upload-zone" [class.cc-dragover]="isDragging" (dragenter)="onDragOver($event)"
+                        (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+                        <input type="file" class="cc-upload-input" id="fileInput"
+                            accept="image/png,image/jpeg,image/webp,.pdf" multiple (change)="onFileSelect($event)">
+                        <div class="cc-upload-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                        </div>
+                        <p class="cc-upload-title">Drag & drop files here, or <span>browse</span></p>
+                        <p class="cc-upload-hint">PNG, JPG, WebP or PDF — Max {{maxFiles}} files, 10 MB each</p>
+                    </div>
+
+                    <div class="cc-preview-grid" *ngIf="uploadedFiles.length > 0">
+                        <div class="cc-preview-item" *ngFor="let pf of uploadedFiles; let i = index">
+                            <img *ngIf="pf.isImage && pf.url" [src]="pf.url" [alt]="pf.file.name" />
+                            <div *ngIf="!pf.isImage"
+                                style="display:flex;align-items:center;justify-content:center;height:100%;background:#f8fafc;">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8"
+                                    stroke-width="1.5">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                    <line x1="16" y1="13" x2="8" y2="13" />
+                                    <line x1="16" y1="17" x2="8" y2="17" />
+                                </svg>
+                            </div>
+                            <div class="cc-preview-name">{{ pf.file.name }}</div>
+                            <button type="button" class="cc-preview-remove" (click)="removeFile(i)"
+                                [attr.aria-label]="'Remove ' + pf.file.name">×</button>
+                        </div>
+                    </div>
+                    <p class="cc-helper" *ngIf="uploadedFiles.length > 0" style="margin-top:8px;">
+                        {{uploadedFiles.length}} of {{maxFiles}} files selected
+                    </p>
+                </div>
+            </section>
+
+            <!-- Card: Contact Preferences -->
+            <section class="cc-card">
+                <div class="cc-section-label">Contact Preferences</div>
+
+                <div class="cc-form-group">
+                    <div class="cc-checkbox-wrapper" [class.cc-checked]="f['contactConsent'].value"
+                        (click)="toggleContact()" (keydown.space)="$event.preventDefault(); toggleContact()"
+                        (keydown.enter)="$event.preventDefault(); toggleContact()" role="checkbox" tabindex="0"
+                        [attr.aria-checked]="f['contactConsent'].value">
+
+                        <div class="cc-checkbox-custom">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                        </div>
+                        <div class="cc-checkbox-text">
+                            <div class="cc-checkbox-label">I'd like to be contacted about this report</div>
+                            <div class="cc-checkbox-desc">Our team may reach out for additional details or to provide
+                                updates on your report.</div>
+                        </div>
+                    </div>
+
+                    <div class="cc-contact-fields" [class.cc-open]="f['contactConsent'].value">
+                        <div class="cc-contact-row">
+                            <div>
+                                <label class="cc-label" for="contactEmail">Email Address</label>
+                                <input type="email" class="cc-input" id="contactEmail" formControlName="contactEmail"
+                                    placeholder="your@email.com">
+                            </div>
+                            <div>
+                                <label class="cc-label" for="contactPhone">Phone (optional)</label>
+                                <input type="tel" class="cc-input" id="contactPhone" formControlName="contactPhone"
+                                    placeholder="+1 (555) 000-0000">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Notice -->
+                <div class="cc-notice">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4" />
+                        <path d="M12 8h.01" />
+                    </svg>
+                    <p>Your report is confidential. We take privacy seriously and will never share your identity with
+                        the reported party. Reports are typically reviewed within 24 hours.</p>
+                </div>
+            </section>
+
+            <!-- Actions -->
+            <div class="cc-actions">
+                <button type="button" class="cc-btn cc-btn-secondary" (click)="onCancel()"
+                    [disabled]="isSubmitting">Cancel</button>
+                <button type="submit" class="cc-btn cc-btn-primary" [disabled]="reportForm.invalid || isSubmitting">
+                    <span class="cc-spinner" *ngIf="isSubmitting" style="margin-right:8px;"></span>
+                    <svg *ngIf="!isSubmitting" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 2L11 13" />
+                        <path d="M22 2L15 22 11 13 2 9z" />
+                    </svg>
+                    {{ isSubmitting ? 'Submitting…' : 'Submit Report' }}
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <!-- Success Overlay -->
+    <div class="cc-success-overlay" [class.cc-visible]="showSuccess" role="dialog" aria-modal="true"
+        aria-labelledby="successTitle">
+        <div class="cc-success-card">
+            <div class="cc-success-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+            </div>
+            <h2 id="successTitle">Report Submitted</h2>
+            <p>Thank you for helping keep CampConnect safe. Our trust & safety team will review your report promptly.
+            </p>
+            <div class="cc-ref-id">{{referenceIdDisplay}}</div>
+            <p style="font-size:13px; color:#94a3b8;">You'll receive a confirmation email shortly.</p>
+            <button type="button" class="cc-btn cc-btn-primary" (click)="onSuccessDone()"
+                style="margin-top:24px; width:100%;">
+                Back to Home
+            </button>
+        </div>
+    </div>
+</div>

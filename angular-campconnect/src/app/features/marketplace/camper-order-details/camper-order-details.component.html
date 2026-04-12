@@ -1,0 +1,339 @@
+<div class="min-h-screen camper-order-details">
+    <!-- Main Container -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <button class="back-btn" aria-label="Go back" (click)="goBack()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" class="text-slate-600">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+            </button>
+            <div class="flex-1">
+                <div class="flex items-center gap-3 mb-1">
+                    <h1 class="text-xl font-semibold text-slate-900">Order #{{ order.id }}</h1>
+                    <span class="badge" [ngClass]="'badge-' + order.status.replace('-', '')">
+                        <span class="w-1.5 h-1.5 rounded-full"
+                            [ngClass]="{'bg-blue-600': order.status === 'on-the-way', 'bg-green-600': order.status === 'delivered', 'bg-yellow-600': order.status === 'preparing'}"></span>
+                        {{ order.statusLabel }}
+                    </span>
+                </div>
+                <p class="text-sm text-slate-500">Placed on {{ order.date }}</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-2xl font-bold text-slate-900">${{ order.totalAmount | number:'1.2-2' }}</span>
+            </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="details-grid pb-12">
+
+            <!-- Left Column -->
+            <div class="space-y-6">
+
+                <!-- Rental Summary Card -->
+                <div class="card p-6">
+                    <div class="section-header">
+                        <h2 class="section-title">Rental Summary</h2>
+                        <div class="status-indicator" [class.pulse]="isDeliveryActive">
+                            {{ isDelivered ? 'Delivery Complete' : 'Delivery in progress' }}
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-slate-50 rounded-lg">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="icon-circle accent">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                </div>
+                                <span class="text-sm text-slate-500">Start Date</span>
+                            </div>
+                            <p class="text-base font-semibold text-slate-900">{{ order.rentalStart }}</p>
+                            <p class="text-sm text-slate-500">{{ order.rentalStartTime }}</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-lg">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="icon-circle accent">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                        <path d="M9 16l2 2 4-4"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-sm text-slate-500">End Date</span>
+                            </div>
+                            <p class="text-base font-semibold text-slate-900">{{ order.rentalEnd }}</p>
+                            <p class="text-sm text-slate-500">{{ order.rentalEndTime }}</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-slate-100">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="icon-circle">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-slate-500">Duration</p>
+                                    <p class="text-sm font-medium text-slate-900">{{ order.duration }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="icon-circle">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="1" y="3" width="15" height="13"></rect>
+                                        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                                        <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                        <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-slate-500">Delivery</p>
+                                    <p class="text-sm font-medium text-slate-900">{{ order.deliveryMethod }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Items Section -->
+                <div class="card p-6">
+                    <div class="section-header">
+                        <h2 class="section-title">Rented Items</h2>
+                        <span class="text-sm text-slate-500">{{ order.items.length }} items</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="item-card" *ngFor="let item of order.items">
+                            <img [src]="item.image" [alt]="item.name" class="item-image">
+                            <div class="flex-1">
+                                <h3 class="font-medium text-slate-900 mb-1">{{ item.name }}</h3>
+                                <p class="text-sm text-slate-500 mb-2">{{ item.brand }} • {{ item.condition }}</p>
+                                <div class="flex items-center gap-4 text-sm">
+                                    <span class="text-slate-600">${{ item.pricePerDay | number:'1.2-2' }}/day</span>
+                                    <span class="text-slate-400">×</span>
+                                    <span class="text-slate-600">{{ item.quantity }}</span>
+                                    <span class="text-slate-400">×</span>
+                                    <span class="text-slate-600">{{ item.days }} days</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold text-slate-900">${{ item.totalPrice | number:'1.2-2' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delivery Information -->
+                <div class="card p-6">
+                    <div class="section-header">
+                        <h2 class="section-title">Delivery Information</h2>
+                        <a *ngIf="isDeliveryActive" [routerLink]="['/delivery/track', order.id]"
+                            class="btn btn-secondary text-sm decoration-none">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            Track Delivery
+                        </a>
+                    </div>
+                    <div class="delivery-card">
+                        <div class="flex items-start gap-4 mb-6">
+                            <div class="icon-circle accent">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm text-slate-500 mb-1">Delivery Address</p>
+                                <p class="font-medium text-slate-900">{{ order.delivery.address }}</p>
+                                <p class="text-sm text-slate-600">{{ order.delivery.details }}</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="text-center p-3 bg-white rounded-lg">
+                                <p class="text-xs text-slate-500 mb-1">Estimated Arrival</p>
+                                <p class="text-sm font-semibold text-slate-900">{{ order.delivery.estimatedArrival }}
+                                </p>
+                            </div>
+                            <div class="text-center p-3 bg-white rounded-lg">
+                                <p class="text-xs text-slate-500 mb-1">Vehicle</p>
+                                <p class="text-sm font-semibold text-slate-900">{{ order.delivery.vehicle }}</p>
+                            </div>
+                            <div class="text-center p-3 bg-white rounded-lg">
+                                <p class="text-xs text-slate-500 mb-1">Provider</p>
+                                <p class="text-sm font-semibold text-slate-900">{{ order.delivery.provider }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Delivery Timeline -->
+                    <div class="mt-6">
+                        <p class="text-sm font-medium text-slate-900 mb-4">Delivery Progress</p>
+                        <div class="timeline">
+                            <div class="timeline-item" *ngFor="let event of order.delivery.timeline">
+                                <div class="timeline-dot" [class]="event.status"></div>
+                                <div>
+                                    <p class="text-sm font-medium"
+                                        [ngClass]="event.status === 'pending' ? 'text-slate-500' : 'text-slate-900'">{{
+                                        event.label }}</p>
+                                    <p class="text-xs text-slate-500"
+                                        [ngClass]="event.status === 'pending' ? 'text-slate-400' : 'text-slate-500'">{{
+                                        event.time }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-6">
+
+                <!-- Payment Breakdown -->
+                <div class="card p-6">
+                    <div class="section-header">
+                        <h2 class="section-title">Payment Breakdown</h2>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="price-row">
+                            <span class="price-label">Subtotal</span>
+                            <span class="price-value">${{ order.payment.subtotal | number:'1.2-2' }}</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="price-label">Delivery Fee</span>
+                            <span class="price-value">${{ order.payment.deliveryFee | number:'1.2-2' }}</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="price-label">Refundable Deposit</span>
+                            <span class="price-value">${{ order.payment.deposit | number:'1.2-2' }}</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="price-label">Taxes (8.5%)</span>
+                            <span class="price-value">${{ order.payment.taxes | number:'1.2-2' }}</span>
+                        </div>
+                        <div class="price-row" *ngIf="order.payment.discount">
+                            <span class="price-label">Discount</span>
+                            <span class="price-value text-emerald-600">-${{ order.payment.discount | number:'1.2-2'
+                                }}</span>
+                        </div>
+                        <div class="price-row total">
+                            <span class="price-label text-base font-medium text-slate-900">Grand Total</span>
+                            <span class="price-value total">${{ order.totalAmount | number:'1.2-2' }}</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-slate-50 rounded-lg">
+                        <div class="flex items-center gap-2 text-sm text-slate-600">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                <line x1="1" y1="10" x2="23" y2="10"></line>
+                            </svg>
+                            <span>Paid with {{ order.payment.method }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Details -->
+                <div class="card p-6">
+                    <div class="section-header">
+                        <h2 class="section-title">Order Details</h2>
+                    </div>
+                    <div>
+                        <div class="info-row">
+                            <span class="info-label">Order ID</span>
+                            <span class="info-value">{{ order.id }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Customer</span>
+                            <span class="info-value">{{ order.customer.name }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Email</span>
+                            <span class="info-value">{{ order.customer.email }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Phone</span>
+                            <span class="info-value">{{ order.customer.phone }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Rental Period</span>
+                            <span class="info-value">{{ order.duration.split(',')[0] }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Return Due</span>
+                            <span class="info-value">{{ order.rentalEnd }}, {{ order.rentalEndTime }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="card p-6">
+                    <div class="section-header">
+                        <h2 class="section-title">Actions</h2>
+                    </div>
+                    <div class="space-y-3">
+                        <button class="btn btn-secondary w-full justify-start">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            Download Invoice
+                        </button>
+                        <button class="btn btn-primary w-full justify-start" [disabled]="!isDelivered"
+                            [attr.title]="!isDelivered ? 'Available after delivery' : null">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                                <polygon
+                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                                </polygon>
+                            </svg>
+                            Leave Review
+                            <span class="ml-auto text-xs opacity-70" *ngIf="!isDelivered">After delivery</span>
+                        </button>
+                        <button class="btn btn-ghost w-full justify-start">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                                <polyline points="1 4 1 10 7 10"></polyline>
+                                <polyline points="23 20 23 14 17 14"></polyline>
+                                <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                            </svg>
+                            Reorder Items
+                        </button>
+                        <button class="btn btn-ghost w-full justify-start text-red-600 hover:bg-red-50">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="mr-2"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            Need Help?
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>

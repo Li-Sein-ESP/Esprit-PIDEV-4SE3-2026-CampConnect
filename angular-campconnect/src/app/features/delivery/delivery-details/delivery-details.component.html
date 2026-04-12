@@ -1,0 +1,314 @@
+<div class="cc-delivery-details-root">
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-20 hidden transition-opacity opacity-0"
+        [class.hidden]="!isMobileMenuOpen" [class.opacity-0]="!isMobileMenuOpen" (click)="toggleMobileMenu()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between fixed inset-y-0 left-0 z-30 transform transition-transform duration-300 md:translate-x-0 md:static md:flex"
+        [class.-translate-x-full]="!isMobileMenuOpen">
+        <div>
+            <!-- Logo -->
+            <div class="h-20 flex items-center justify-between px-6 md:px-8 border-b border-slate-100">
+                <div class="flex items-center gap-2 text-emerald-800 font-bold text-xl">
+                    <i class="fa-solid fa-campground"></i>
+                    <span>CampConnect</span>
+                </div>
+                <button (click)="toggleMobileMenu()" class="md:hidden text-slate-500 hover:text-slate-800 p-2">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="mt-6 flex flex-col gap-1 px-4">
+                <a routerLink="/delivery/dashboard"
+                    class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 transition-colors">
+                    <i class="fa-solid fa-gauge-high w-5 text-center"></i>
+                    Dashboard
+                </a>
+                <a
+                    class="nav-item active flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-slate-700 hover:bg-slate-50 transition-colors cursor-default">
+                    <i class="fa-solid fa-truck-fast w-5 text-center"></i>
+                    Active Deliveries
+                </a>
+                <a href="#"
+                    class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 transition-colors">
+                    <i class="fa-solid fa-clock-rotate-left w-5 text-center"></i>
+                    Delivery History
+                </a>
+                <a href="#"
+                    class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 transition-colors">
+                    <i class="fa-solid fa-van-shuttle w-5 text-center"></i>
+                    Vehicles
+                </a>
+                <a href="#"
+                    class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-slate-600 hover:bg-slate-50 transition-colors">
+                    <i class="fa-solid fa-wallet w-5 text-center"></i>
+                    Earnings
+                </a>
+            </nav>
+        </div>
+
+        <!-- User Profile -->
+        <div class="p-4 border-t border-slate-100">
+            <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 cursor-pointer">
+                <div
+                    class="flex items-center justify-center w-10 h-10 rounded-full bg-slate-200 text-slate-600 font-bold border border-slate-300">
+                    {{ delivery.driver.initials }}
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-sm font-semibold text-slate-700">{{ delivery.driver.name }}</span>
+                    <span class="text-xs text-slate-500">Pro Driver</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto h-full p-4 md:p-8 lg:p-10 relative">
+        <div class="max-w-6xl mx-auto">
+
+            <div *ngIf="loading" class="flex justify-center items-center py-20">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+            </div>
+
+            <div *ngIf="error && !loading" class="bg-red-50 text-red-600 p-4 rounded-lg">
+                {{ error }}
+            </div>
+
+            <div *ngIf="!loading && !error">
+                <!-- Header -->
+                <div class="mb-8">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <button (click)="goBack()"
+                                class="text-slate-500 hover:text-slate-800 text-sm font-medium flex items-center gap-2 mb-4 transition-colors">
+                                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+                            </button>
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
+                                <h1 class="text-3xl font-bold text-slate-800">#{{ delivery.id }}</h1>
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="bg-emerald-100 text-emerald-800 text-sm font-bold px-3 py-1 rounded-full">{{
+                                        formatStatus(delivery.status) }}</span>
+                                    <span *ngIf="delivery.urgency"
+                                        class="bg-red-50 text-red-600 text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
+                                        <i class="fa-solid fa-bolt"></i> {{ delivery.urgency }}
+                                    </span>
+                                </div>
+                            </div>
+                            <p class="text-slate-500">Est. Arrival: <span class="text-slate-800 font-semibold">{{
+                                    delivery.estimatedArrival }}</span></p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button (click)="toggleMobileMenu()"
+                                class="md:hidden px-4 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50">
+                                <i class="fa-solid fa-bars"></i>
+                            </button>
+                            <button
+                                class="hidden md:block bg-white border border-slate-200 text-slate-700 font-medium px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors">Contact
+                                Support</button>
+                            <button
+                                class="hidden md:block bg-emerald-600 text-white font-medium px-6 py-2 rounded-lg hover:bg-emerald-700 shadow-sm shadow-emerald-200 transition-colors">Map
+                                View</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Left Column -->
+                    <div class="lg:col-span-2 flex flex-col gap-6">
+                        <!-- Route Information -->
+                        <section class="dashboard-card p-6">
+                            <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                                <i class="fa-solid fa-map-location-dot text-slate-400"></i> Route Details
+                            </h2>
+                            <div class="relative">
+                                <!-- Connecting Line -->
+                                <div class="absolute left-3 top-8 bottom-8 w-0.5 bg-slate-200 -z-10"></div>
+
+                                <!-- Pickup -->
+                                <div class="flex gap-4 mb-8">
+                                    <div class="w-6 h-6 rounded-full border-4 border-slate-300 bg-white shrink-0 mt-1">
+                                    </div>
+                                    <div class="flex-1 bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                        <div class="flex justify-between mb-2">
+                                            <span
+                                                class="text-xs font-bold text-slate-500 uppercase tracking-wide">Pickup
+                                                Point</span>
+                                            <span class="text-xs font-medium text-slate-400">{{ delivery.pickup.time
+                                                }}</span>
+                                        </div>
+                                        <h3 class="text-slate-800 font-semibold mb-1">{{ delivery.pickup.locationName }}
+                                        </h3>
+                                        <p class="text-sm text-slate-600 mb-3">{{ delivery.pickup.addressLine1 }}, {{
+                                            delivery.pickup.addressLine2 }}</p>
+                                        <div
+                                            class="flex items-center gap-2 text-sm text-slate-500 border-t border-slate-200 pt-3">
+                                            <i class="fa-regular fa-user"></i> Contact: {{ delivery.pickup.contactName
+                                            }}
+                                            <span class="w-1 h-1 bg-slate-300 rounded-full mx-1"></span>
+                                            <a href="#"
+                                                class="text-emerald-700 font-medium hover:underline flex items-center gap-1">
+                                                <i class="fa-solid fa-phone text-xs"></i> Call
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Dropoff -->
+                                <div class="flex gap-4">
+                                    <div
+                                        class="w-6 h-6 rounded-full bg-emerald-600 ring-4 ring-emerald-100 shrink-0 mt-1 shadow-sm">
+                                    </div>
+                                    <div class="flex-1 bg-white rounded-xl p-4 border border-emerald-100 shadow-sm">
+                                        <div class="flex justify-between mb-2">
+                                            <span
+                                                class="text-xs font-bold text-emerald-600 uppercase tracking-wide">Drop-off
+                                                Point</span>
+                                            <span class="text-xs font-medium text-slate-400">Est. {{
+                                                delivery.estimatedArrival }}</span>
+                                        </div>
+                                        <h3 class="text-slate-800 font-semibold mb-1">{{ delivery.dropoff.locationName
+                                            }}
+                                        </h3>
+                                        <p class="text-sm text-slate-600 mb-3">{{ delivery.dropoff.addressLine1 }}, {{
+                                            delivery.dropoff.addressLine2 }}</p>
+                                        <div class="p-3 bg-amber-50 rounded-lg border border-amber-100 mb-3"
+                                            *ngIf="delivery.dropoff.instructions">
+                                            <p class="text-xs text-amber-800 font-medium"><i
+                                                    class="fa-solid fa-circle-info mr-1"></i> Note: {{
+                                                delivery.dropoff.instructions }}</p>
+                                        </div>
+                                        <div
+                                            class="flex items-center gap-2 text-sm text-slate-500 border-t border-slate-100 pt-3">
+                                            <i class="fa-regular fa-user"></i> Customer: {{
+                                            delivery.dropoff.customerName }}
+                                            <span class="w-1 h-1 bg-slate-300 rounded-full mx-1"></span>
+                                            <a href="#"
+                                                class="text-emerald-700 font-medium hover:underline flex items-center gap-1">
+                                                <i class="fa-solid fa-message text-xs"></i> Message
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Package Info -->
+                        <section class="dashboard-card p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                    <i class="fa-solid fa-box text-slate-400"></i> Package Contents
+                                </h2>
+                                <span
+                                    class="bg-slate-100 text-slate-600 text-xs font-semibold px-2 py-1 rounded">Weight:
+                                    {{
+                                    delivery.totalWeight }}</span>
+                            </div>
+
+                            <div class="space-y-3">
+                                <!-- Items -->
+                                <div class="flex items-center gap-4 p-3 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-colors"
+                                    *ngFor="let item of delivery.items">
+                                    <div
+                                        class="w-12 h-12 rounded-lg bg-slate-200 flex items-center justify-center text-slate-500">
+                                        <i class="fa-solid fa-box-open"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-slate-800">{{ item.name }}</p>
+                                        <p class="text-xs text-slate-500">{{ item.desc }} • Qty: {{ item.qty }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 pt-6 border-t border-slate-100 grid grid-cols-3 gap-4">
+                                <div class="text-center">
+                                    <p class="text-xs text-slate-400 uppercase font-bold mb-1">Vehicle</p>
+                                    <div class="flex items-center justify-center gap-1 text-slate-700 font-semibold">
+                                        <i class="fa-solid fa-van-shuttle"></i> {{ delivery.vehicleType }}
+                                    </div>
+                                </div>
+                                <div class="text-center border-l border-slate-100">
+                                    <p class="text-xs text-slate-400 uppercase font-bold mb-1">Distance</p>
+                                    <p class="text-slate-700 font-semibold">{{ delivery.distance }}</p>
+                                </div>
+                                <div class="text-center border-l border-slate-100">
+                                    <p class="text-xs text-slate-400 uppercase font-bold mb-1">Est. Duration</p>
+                                    <p class="text-slate-700 font-semibold">{{ delivery.duration }}</p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="flex flex-col gap-6">
+                        <!-- Status History -->
+                        <section class="dashboard-card p-6">
+                            <h2 class="text-lg font-bold text-slate-800 mb-6">Tracking History</h2>
+                            <div class="relative pl-2">
+                                <div class="absolute left-[7px] top-2 bottom-2 w-0.5 bg-slate-100"></div>
+
+                                <!-- Timeline Items -->
+                                <div class="flex gap-4 mb-6 relative"
+                                    *ngFor="let step of statusOrder; let i = index; let last = last"
+                                    [class.opacity-50]="i > currentStatusIndex">
+                                    <div class="w-4 h-4 rounded-full shrink-0 mt-1 z-10" [ngClass]="{
+                                    'bg-emerald-500 border-2 border-white ring-2 ring-emerald-100 animate-pulse': i === currentStatusIndex,
+                                    'bg-emerald-500 border-2 border-white ring-2 ring-emerald-100': i < currentStatusIndex,
+                                    'border-2 border-slate-300 bg-white': i > currentStatusIndex
+                                }"></div>
+                                    <div>
+                                        <p class="text-sm font-bold"
+                                            [ngClass]="i <= currentStatusIndex ? 'text-slate-800' : 'text-slate-600'">{{
+                                            formatStatus(step) }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Actions -->
+                        <section class="dashboard-card p-6 sticky top-6">
+                            <h2 class="text-lg font-bold text-slate-800 mb-4">Driver Actions</h2>
+                            <div class="flex flex-col gap-3">
+                                <button
+                                    class="w-full py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all"
+                                    [ngClass]="isPickedUpDisabled ? 'bg-slate-50 text-slate-400 text-sm font-semibold cursor-not-allowed' : 'bg-white border border-slate-200 text-slate-700 font-medium hover:bg-slate-50 hover:shadow-sm'"
+                                    (click)="advanceStatus('pickedup')" [disabled]="isPickedUpDisabled">
+                                    <i class="fa-solid fa-check"></i> Mark Picked Up
+                                </button>
+
+                                <button
+                                    class="w-full py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all"
+                                    [ngClass]="isOnTheWayDisabled ? 'bg-slate-50 text-slate-400 text-sm font-semibold cursor-not-allowed' : 'bg-white border border-slate-200 text-slate-700 font-medium hover:bg-slate-50 hover:shadow-sm'"
+                                    (click)="advanceStatus('ontheway')" [disabled]="isOnTheWayDisabled">
+                                    <i class="fa-solid fa-truck-fast"></i> On the Way
+                                </button>
+
+                                <button
+                                    class="w-full py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all"
+                                    [ngClass]="isDeliveredDisabled ? 'bg-slate-50 text-slate-400 text-sm font-semibold cursor-not-allowed' : 'bg-emerald-600 text-white text-sm font-bold shadow-md hover:bg-emerald-700 hover:shadow-lg'"
+                                    (click)="advanceStatus('delivered')" [disabled]="isDeliveredDisabled">
+                                    <i class="fa-solid fa-flag-checkered"></i> Mark as Delivered
+                                </button>
+
+                                <div class="my-2 border-t border-slate-100"></div>
+
+                                <button
+                                    class="w-full py-3 px-4 rounded-lg border border-red-200 text-red-600 bg-red-50 text-sm font-semibold hover:bg-red-100 transition-colors">
+                                    Report Issue
+                                </button>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="cc-toast" [class.cc-toast--visible]="toast.show">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>{{ toast.msg }}</span>
+    </div>
+</div>

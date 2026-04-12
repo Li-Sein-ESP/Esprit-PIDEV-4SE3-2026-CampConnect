@@ -1,0 +1,145 @@
+.timeline-container {
+    width: 100%;
+    padding: 2rem 1rem;
+    position: relative;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Track and Progress Bar setup */
+.progress-bar-bg {
+    position: absolute;
+    top: 50px;
+    /* Aligned with the center of the icons */
+    left: 12.5%;
+    /* Start from center of first item */
+    right: 12.5%;
+    /* End at center of last item */
+    height: 4px;
+    background-color: var(--color-neutral-200);
+    border-radius: 4px;
+    z-index: 1;
+}
+
+.progress-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(to right, #0d9488, #1e3a8a);
+    /* Teal to Deep Blue */
+    border-radius: 4px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 10px rgba(13, 148, 136, 0.5);
+    /* Subtle glow */
+    z-index: 2;
+}
+
+/* Flex Wrapper for Steps */
+.steps-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    z-index: 3;
+}
+
+/* Individual Step Styling */
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    text-align: center;
+}
+
+.icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: white;
+    border: 4px solid var(--color-neutral-200);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--color-neutral-400);
+    transition: all 0.4s ease;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.step-icon {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2.5px;
+}
+
+/* Status: Completed */
+.step.completed .icon-circle {
+    border-color: #0d9488;
+    /* Teal */
+    background-color: #0d9488;
+    color: white;
+}
+
+.step.completed .step-label {
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
+/* Status: Active (Current step) */
+.step.active .icon-circle {
+    border-color: #1e3a8a;
+    /* Deep Blue */
+    background-color: white;
+    color: #1e3a8a;
+    transform: scale(1.15);
+    /* Slight pop */
+    box-shadow: 0 8px 16px -4px rgba(30, 58, 138, 0.2);
+}
+
+.step.active .step-label {
+    color: #1e3a8a;
+    font-weight: 700;
+}
+
+.step.active .step-desc {
+    color: var(--color-text-secondary);
+}
+
+/* Labels */
+.step-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.step-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-neutral-400);
+    transition: color 0.3s ease;
+}
+
+.step-desc {
+    font-size: 0.75rem;
+    color: var(--color-neutral-400);
+    transition: color 0.3s ease;
+}
+
+/* Status: Upcoming */
+.step.upcoming .icon-circle {
+    transition: all 0.4s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .step-desc {
+        display: none;
+        /* Hide descriptions on very small screens for cleanliness */
+    }
+
+    .icon-circle {
+        width: 40px;
+        height: 40px;
+    }
+}

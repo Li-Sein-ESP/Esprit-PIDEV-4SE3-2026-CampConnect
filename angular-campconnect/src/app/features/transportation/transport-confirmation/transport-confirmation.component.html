@@ -1,0 +1,27 @@
+<div class="min-h-screen bg-[var(--color-background)] py-12">
+  <div class="container max-w-2xl text-center">
+    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+      <lucide-icon [img]="CheckCircle" class="w-10 h-10 text-green-600"></lucide-icon>
+    </div>
+    <h2 class="mb-4">Booking Confirmed!</h2>
+    <p class="text-[var(--color-text-secondary)] mb-8">Your transportation has been successfully booked.</p>
+
+    <app-card variant="elevated" class="mb-8">
+      <app-card-content class="p-8 text-left">
+        <h4 class="mb-4">Booking Details</h4>
+        <div class="space-y-3">
+          <div class="flex items-center gap-3">
+            <lucide-icon [img]="Calendar" class="w-5 h-5 text-[var(--color-primary-600)]"></lucide-icon>
+            <span>Pickup: July 15, 2024 at 9:00 AM</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <lucide-icon [img]="MapPin" class="w-5 h-5 text-[var(--color-primary-600)]"></lucide-icon>
+            <span>Location: San Francisco Airport</span>
+          </div>
+        </div>
+      </app-card-content>
+    </app-card>
+
+    <app-button routerLink="/dashboard">Return to Dashboard</app-button>
+  </div>
+</div>
