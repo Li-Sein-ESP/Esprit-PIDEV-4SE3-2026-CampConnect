@@ -22,6 +22,9 @@ $border-light: #dce5dd;
 $accent: #2e7d32;
 $accent-hover: #1b5e20;
 $accent-light: #e8f5e9;
+$map-height-desktop: 600px;
+$map-height-tablet: 420px;
+$map-height-mobile: 320px;
 
 :host {
     display: block;
@@ -120,6 +123,7 @@ $accent-light: #e8f5e9;
         padding: 24px;
         gap: 24px;
         min-height: 0;
+        align-items: stretch;
     }
 
     // ──────────────────────────────
@@ -127,16 +131,17 @@ $accent-light: #e8f5e9;
     // ──────────────────────────────
     &__map-wrapper {
         flex: 1;
+        min-width: 0;
         position: relative;
         border-radius: $radius-lg;
         overflow: hidden;
         box-shadow: $shadow-card;
-        height: 600px;
+        height: $map-height-desktop;
     }
 
     &__map-surface {
         width: 100%;
-        height: 600px;
+        height: 100%;
         background: $bg-map;
         position: relative;
         border-radius: $radius-lg;
@@ -215,6 +220,7 @@ $accent-light: #e8f5e9;
     // ──────────────────────────────
     &__alerts-panel {
         width: 400px;
+        height: $map-height-desktop;
         flex-shrink: 0;
         display: flex;
         flex-direction: column;
@@ -288,6 +294,7 @@ $accent-light: #e8f5e9;
 
     &__alerts-list {
         flex: 1;
+        min-height: 0;
         overflow-y: auto;
         padding: 12px;
         display: flex;
@@ -494,14 +501,14 @@ $accent-light: #e8f5e9;
         }
 
         &__map-wrapper {
-            min-height: 400px;
+            height: $map-height-tablet;
             border-radius: 16px 16px 0 0;
         }
 
         &__alerts-panel {
             width: 100%;
+            height: $map-height-tablet;
             border-radius: 0 0 16px 16px;
-            max-height: 420px;
         }
     }
 }
@@ -532,7 +539,7 @@ $accent-light: #e8f5e9;
         }
 
         &__map-wrapper {
-            min-height: 300px;
+            height: $map-height-mobile;
         }
 
         &__legend {
@@ -543,6 +550,10 @@ $accent-light: #e8f5e9;
 
         &__alerts-filters {
             padding: 12px 16px;
+        }
+
+        &__alerts-panel {
+            height: 360px;
         }
 
         &__alert-card {
