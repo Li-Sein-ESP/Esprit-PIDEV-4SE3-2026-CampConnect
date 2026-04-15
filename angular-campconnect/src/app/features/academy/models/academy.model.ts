@@ -1,72 +1,77 @@
-// Academy Module Interfaces
+// Academy Module Interfaces — Aligned with Backend DTOs
+
+// ─── Course (mirrors CourseDTO.java) ───
+// Note: Backend uses @JsonProperty("category") on categoryName, so JSON key is "category"
 export interface Course {
     id: string;
     title: string;
     description: string;
-    category: 'survival' | 'navigation' | 'first-aid' | 'wildlife' | 'camping-skills';
-    difficulty: 'beginner' | 'intermediate' | 'advanced';
+    category: string;          // JSON key "category" (mapped from categoryName via @JsonProperty)
+    difficulty: string;        // DifficultyLevel enum: BEGINNER, INTERMEDIATE, ADVANCED, MODERATE, ALL_LEVELS
     duration: number;
-    instructor: Instructor;
-    modules: CourseModule[];
     enrolledCount: number;
     rating: number;
     reviews: number;
     price: number;
     imageUrl: string;
+    documentUrl?: string;
     tags: string[];
-    prerequisites?: string[];
+    prerequisites: string[];
+    passingScore: number;
+    creatorId?: string;
+    creatorName?: string;
+    instructorId?: string;
+    instructorName?: string;
 }
 
-export interface Instructor {
-    id: string;
-    name: string;
-    title: string;
-    bio: string;
-    avatar?: string;
-    expertise: string[];
-    rating: number;
-    studentsCount: number;
-    verified: boolean;
-}
-
-export interface CourseModule {
+// ─── Video (mirrors VideoDTO.java) ───
+export interface Video {
     id: string;
     title: string;
     description: string;
-    order: number;
-    duration: number;
-    lessons: Lesson[];
-    quiz?: Quiz;
+    videoUrl: string;
+    thumbnailUrl: string;
+    category: string;
+    type: string;              // REEL, EXPERIENCE, TUTORIAL
+    views: number;
+    helpfulCount: number;
+    createdAt: string;         // LocalDateTime → ISO string in JSON
+    creator: UserSummary;
+    takeaways: string[];
+    comments: CommentDTO[];
 }
 
-export interface Lesson {
+// ─── UserSummary (mirrors UserSummaryDTO.java) ───
+export interface UserSummary {
     id: string;
-    title: string;
-    type: 'video' | 'article' | 'interactive' | 'quiz';
-    duration: number;
+    username: string;
+    name: string;
+    verifiedExpert: boolean;
+}
+
+// ─── CommentDTO (mirrors CommentDTO.java) ───
+export interface CommentDTO {
+    id: string;
     content: string;
-    videoUrl?: string;
-    completed: boolean;
-    order: number;
+    authorId: string;
+    authorName: string;
+    createdAt: string;
 }
 
-export interface Quiz {
+// ─── Badge (mirrors BadgeDTO.java) ───
+export interface Badge {
     id: string;
-    title: string;
-    questions: QuizQuestion[];
-    passingScore: number;
-    timeLimit?: number;
+    name: string;
+    description: string;
+    icon: string;
+    categoryName: string;      // Badge uses categoryName directly (no @JsonProperty)
+    rarity: string;            // BadgeRarity enum: COMMON, RARE, EPIC, LEGENDARY
+    requirements: string[];
+    creatorId?: string;
+    creatorName?: string;
 }
 
-export interface QuizQuestion {
-    id: string;
-    question: string;
-    type: 'multiple-choice' | 'true-false' | 'short-answer';
-    options?: string[];
-    correctAnswer: string | number;
-    explanation?: string;
-}
-
+// ─── Certification (mirrors CertificationDTO.java) ───
 export interface Certification {
     id: string;
     name: string;
@@ -75,27 +80,24 @@ export interface Certification {
     validityPeriod: number;
     imageUrl: string;
     issuer: string;
+    creatorId?: string;
+    creatorName?: string;
+    requiredCourseIds?: string[];
 }
 
+// ─── UserCertification (mirrors UserCertificationDTO.java) ───
 export interface UserCertification {
     certificationId: string;
+    certificationName: string;
     userId: string;
-    earnedDate: string;
+    username: string;
+    earnedDate: string;        // LocalDateTime → ISO string in JSON
     expiryDate: string;
     certificateUrl: string;
-    status: 'active' | 'expired' | 'revoked';
+    status: string;            // CertificationStatus enum: ACTIVE, EXPIRED, REVOKED
 }
 
-export interface Badge {
-    id: string;
-    name: string;
-    description: string;
-    icon: string;
-    category: string;
-    rarity: 'common' | 'rare' | 'epic' | 'legendary';
-    requirements: string[];
-}
-
+// ─── UserProgress (frontend-only, for tracking) ───
 export interface UserProgress {
     userId: string;
     courseId: string;
@@ -106,4 +108,14 @@ export interface UserProgress {
     lastAccessedAt: string;
     enrolledAt: string;
     completedAt?: string;
+}
+
+// ─── CertificationStats (mirrors CertificationStatsDTO.java) ───
+// TÂCHE 2 – Used by the Admin Analytics Dashboard (complex aggregation / JOIN equivalent)
+export interface CertificationStats {
+    certificationId: string;
+    certificationName: string;
+    totalIssued: number;
+    activeCount: number;
+    expiredCount: number;
 }

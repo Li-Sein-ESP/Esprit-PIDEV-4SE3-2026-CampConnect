@@ -1,0 +1,137 @@
+<div class="gl">
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;" *ngIf="isProvider">
+        <a routerLink="/gear/create" class="gl__btn gl__btn--primary">
+            + Create Gear
+        </a>
+    </div>
+
+    <!-- ── Toolbar ── -->
+    <div class="gl__toolbar">
+        <div class="gl__filters">
+            <!-- Category -->
+            <select class="gl__select" [(ngModel)]="categoryFilter" (ngModelChange)="onFilterChange()">
+                <option value="">All Categories</option>
+                <option *ngFor="let cat of CATEGORIES.slice(1)" [value]="cat">{{ cat }}</option>
+            </select>
+
+            <!-- Sort -->
+            <select class="gl__select" [(ngModel)]="sortField" (ngModelChange)="onSortChange(sortField)">
+                <option *ngFor="let opt of SORT_OPTIONS" [value]="opt.value">{{ opt.label }}</option>
+            </select>
+
+            <!-- Available toggle -->
+            <label class="gl__toggle">
+                <input type="checkbox" [(ngModel)]="availableOnly" (ngModelChange)="onFilterChange()">
+                Available only
+            </label>
+
+            <!-- Clear -->
+            <button class="gl__btn gl__btn--ghost" (click)="clearFilters()" *ngIf="categoryFilter || availableOnly">
+                ✕ Clear filters
+            </button>
+        </div>
+
+        <!-- Page size -->
+        <div class="gl__size">
+            <span>Show</span>
+            <select class="gl__select gl__select--sm" [(ngModel)]="pageSize"
+                (ngModelChange)="onPageSizeChange(pageSize)">
+                <option *ngFor="let n of PAGE_SIZES" [value]="n">{{ n }}</option>
+            </select>
+            <span>per page</span>
+        </div>
+    </div>
+
+    <!-- ── Loading skeleton ── -->
+    <ng-container *ngIf="loading">
+        <div class="gl__grid">
+            <div class="gl__skeleton" *ngFor="let s of [1,2,3,4,5,6]">
+                <div class="gl__skeleton-img"></div>
+                <div class="gl__skeleton-line gl__skeleton-line--title"></div>
+                <div class="gl__skeleton-line gl__skeleton-line--sub"></div>
+                <div class="gl__skeleton-line gl__skeleton-line--price"></div>
+            </div>
+        </div>
+    </ng-container>
+
+    <!-- ── Error state ── -->
+    <div class="gl__error" *ngIf="!loading && error">
+        <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        <p class="gl__error-msg">{{ error }}</p>
+        <button class="gl__btn gl__btn--primary" (click)="retry()">Try again</button>
+    </div>
+
+    <!-- ── Empty state ── -->
+    <div class="gl__empty" *ngIf="!loading && !error && gearPage && gearPage.content.length === 0">
+        <svg width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+            <path d="M16 7V5a4 4 0 00-8 0v2" />
+        </svg>
+        <p>No gear found matching your filters.</p>
+        <button class="gl__btn gl__btn--ghost" (click)="clearFilters()">Clear filters</button>
+    </div>
+
+    <!-- ── Gear grid ── -->
+    <ng-container *ngIf="!loading && !error && gearPage && gearPage.content.length > 0">
+
+        <p class="gl__summary">{{ resultSummary }}</p>
+
+        <div class="gl__grid">
+            <article class="gl__card" *ngFor="let gear of gearPage.content; trackBy: trackById"
+                [routerLink]="['/gear', gear.id]">
+                <!-- Image -->
+                <div class="gl__card-img-wrap">
+                    <img class="gl__card-img" [src]="firstImage(gear)" [alt]="gear.name" loading="lazy"
+                        onError="this.src='assets/images/gear-placeholder.jpg'">
+                    <span class="gl__badge gl__badge--avail" *ngIf="isAvailable(gear)">Available</span>
+                    <span class="gl__badge gl__badge--unavail" *ngIf="!isAvailable(gear)">Unavailable</span>
+                    <span class="gl__badge gl__badge--condition" [class]="conditionClass(gear.condition)">
+                        {{ conditionLabel(gear.condition) }}
+                    </span>
+                </div>
+
+                <!-- Body -->
+                <div class="gl__card-body">
+                    <p class="gl__card-category">{{ gear.category }}</p>
+                    <h3 class="gl__card-title">{{ gear.name }}</h3>
+                    <p class="gl__card-owner text-muted">{{ gear.ownerName }}</p>
+
+                    <!-- Stock indicator -->
+                    <p class="gl__card-stock" *ngIf="gear.quantity > 0">
+                        {{ gear.quantity }} in stock
+                    </p>
+
+                    <!-- Price + CTA -->
+                    <div class="gl__card-footer">
+                        <div class="gl__card-price">
+                            <span class="gl__card-price-val">{{ gear.price | currency }}</span>
+                            <span class="gl__card-price-unit">/day</span>
+                        </div>
+                        <button class="gl__btn gl__btn--primary gl__btn--sm" [disabled]="!isAvailable(gear)"
+                            (click)="$event.stopPropagation()" [routerLink]="['/gear', gear.id]">
+                            {{ isAvailable(gear) ? 'Rent' : 'Unavailable' }}
+                        </button>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <!-- ── Pagination ── -->
+        <nav class="gl__pager" *ngIf="gearPage.totalPages > 1" aria-label="Gear pagination">
+            <button class="gl__pager-btn" [disabled]="isFirstPage" (click)="goToPage(gearPage.page - 1)"
+                aria-label="Previous page">‹</button>
+
+            <button *ngFor="let p of pageNumbers" class="gl__pager-btn"
+                [class.gl__pager-btn--active]="p === gearPage.page" (click)="goToPage(p)"
+                [attr.aria-current]="p === gearPage.page ? 'page' : null">{{ p + 1 }}</button>
+
+            <button class="gl__pager-btn" [disabled]="gearPage.last" (click)="goToPage(gearPage.page + 1)"
+                aria-label="Next page">›</button>
+        </nav>
+
+    </ng-container>
+</div>

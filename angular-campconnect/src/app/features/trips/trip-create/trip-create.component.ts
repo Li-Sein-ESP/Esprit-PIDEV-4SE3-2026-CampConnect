@@ -1,17 +1,34 @@
-import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { LucideAngularModule, Calendar, MapPin, Users, Plus } from 'lucide-angular';
-import { TripService } from '../../../core/services/trip.service';
-import { ButtonComponent } from '../../../shared/components/button.component';
-import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
+import { Component, signal } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
+import { Router } from "@angular/router";
+import {
+  LucideAngularModule,
+  Calendar,
+  MapPin,
+  Users,
+  Plus,
+} from "lucide-angular";
+import { TripService } from "../services/trip.service";
+import { AuthService } from "../../../core/services/auth.service";
+import { ButtonComponent } from "../../../shared/components/button.component";
+import {
+  CardComponent,
+  CardContentComponent,
+} from "../../../shared/components/card.component";
 
 @Component({
-  selector: 'app-trip-create',
+  selector: "app-trip-create",
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, ButtonComponent, CardComponent, CardContentComponent],
-  templateUrl: './trip-create.component.html'
+  imports: [
+    CommonModule,
+    FormsModule,
+    LucideAngularModule,
+    ButtonComponent,
+    CardComponent,
+    CardContentComponent,
+  ],
+  templateUrl: "./trip-create.component.html",
 })
 export class TripCreateComponent {
   readonly Calendar = Calendar;
@@ -20,47 +37,37 @@ export class TripCreateComponent {
   readonly Plus = Plus;
 
   tripData = {
-    name: '',
-    destination: '',
-    startDate: '',
-    endDate: '',
+    name: "",
+    destination: "",
+    startDate: "",
+    endDate: "",
     participants: 1,
-    description: ''
+    description: "",
   };
 
   constructor(
     private tripService: TripService,
-    private router: Router
-  ) { }
+    private router: Router,
+    private authService: AuthService,
+  ) {}
 
   createTrip() {
-    if (!this.tripData.destination || !this.tripData.startDate || !this.tripData.endDate) {
-      alert('Please fill in Destination and Dates.');
-      return;
-    }
+    const duration = this.calculateDuration();
+    this.tripService
+      .createTrip(
+        { ...this.tripData, duration },
+        this.authService.currentUserValue?.id,
+      )
+      .subscribe({
+        next: (trip) => this.router.navigate(["/trips", trip.id]),
+        error: () => this.router.navigate(["/trips"]),
+      });
+  }
 
-    // Backend expects LocalDateTime (ISO format with time) and DifficultyLevel Enum
-    const payload = {
-      destination: this.tripData.destination,
-      startDate: this.tripData.startDate + 'T00:00:00',
-      endDate: this.tripData.endDate + 'T00:00:00',
-      difficulty: 'MEDIUM', // enum: EASY, MEDIUM, HARD, EXTREME
-      // Note: Backend Trip model/DTO currently doesn't have 'name', 'participants' or 'description'
-      // We send them anyway in case the model is updated or they are handled elsewhere
-      name: this.tripData.name,
-      notes: this.tripData.description
-    };
-
-    console.log('Creating trip via real service:', payload);
-    this.tripService.saveTrip(payload as any).subscribe({
-      next: (savedTrip) => {
-        alert('Trip created successfully!');
-        this.router.navigate(['/trips', savedTrip.id]);
-      },
-      error: (err) => {
-        console.error('Full error details:', err);
-        alert('Failed to create trip. Please check your connection and try again.');
-      }
-    });
+  calculateDuration(): number {
+    if (!this.tripData.startDate || !this.tripData.endDate) return 1;
+    const start = new Date(this.tripData.startDate);
+    const end = new Date(this.tripData.endDate);
+    return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
   }
 }

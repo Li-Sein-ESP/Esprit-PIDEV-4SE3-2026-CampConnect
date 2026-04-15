@@ -1,21 +1,24 @@
 package com.campconnect.model;
 
-import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "community_groups")
-@Getter
-@Setter
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Document(collection = "groups")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Group {
-
     @Id
     private String id;
 
@@ -23,18 +26,19 @@ public class Group {
 
     private String description;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private String creatorUserId;
 
-    @DBRef
-    private List<Trip> trips = new ArrayList<>();
+    private String tripId;
 
+    @Builder.Default
+    private List<String> memberUserIds = new ArrayList<>();
+
+    private GroupStatus status;
+
+    @CreatedDate
+    private LocalDateTime createdAt;
+    
     public void addTrip(Trip trip) {
-        trips.add(trip);
-        trip.setGroup(this);
-    }
-
-    public void removeTrip(Trip trip) {
-        trips.remove(trip);
-        trip.setGroup(null);
+        this.tripId = trip.getId();
     }
 }

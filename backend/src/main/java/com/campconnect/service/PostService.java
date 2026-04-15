@@ -5,6 +5,7 @@ import java.util.List;
 
 public interface PostService {
     PostDTO createPost(PostDTO postDTO);
+    List<PostDTO> getAllPosts();
     PostDTO getPostById(String id);
     List<PostDTO> getPostsByThreadId(String threadId);
     PostDTO updatePost(String id, PostDTO postDTO);

@@ -3,12 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, map } from 'rxjs';
 import { IncidentReport, SafetyAlert } from '../models/safety.model';
 
+import { environment } from '../../../../environments/environment';
+
 @Injectable({
     providedIn: 'root'
 })
 export class SafetyService {
-    private apiUrl = 'http://localhost:8081/api/incidents';
-    private apiUrlAlerts = 'http://localhost:8081/api/alerts';
+    private apiUrl = `${environment.apiUrl}/incidents`;
+    private apiUrlAlerts = `${environment.apiUrl}/alerts`;
 
     constructor(private http: HttpClient) { }
 

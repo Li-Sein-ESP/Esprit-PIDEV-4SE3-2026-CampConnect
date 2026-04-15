@@ -8,6 +8,6 @@ public interface IncidentService {
     IncidentDTO getIncidentById(String id);
     List<IncidentDTO> getIncidentsByTripId(String tripId);
     List<IncidentDTO> getAllIncidents();
-    IncidentDTO updateIncident(String id, IncidentDTO incidentDTO);
     void deleteIncident(String id);
+    IncidentDTO updateIncident(String id, IncidentDTO incidentDTO);
 }

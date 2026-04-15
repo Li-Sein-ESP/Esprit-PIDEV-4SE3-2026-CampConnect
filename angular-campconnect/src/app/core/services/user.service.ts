@@ -1,26 +1,29 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+
+export interface UserProfile {
+  id: string;
+  username: string;
+  email: string;
+  name?: string;
+  avatar?: string;
+}
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class UserService {
-    private apiUrl = 'http://localhost:8081/api/users';
+  private apiUrl = `${environment.apiUrl}/users`;
 
-    constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { }
 
-    getAllUsers(): Observable<any[]> {
-        return this.http.get<any[]>(this.apiUrl);
-    } getUserById(id: string): Observable<any> {
-        return this.http.get<any>(`${this.apiUrl}/${id}`);
-    }
+  getUserById(id: string): Observable<UserProfile> {
+    return this.http.get<UserProfile>(`${this.apiUrl}/${id}`);
+  }
 
-    assignRole(username: string, roleName: string): Observable<any> {
-        return this.http.post(`${this.apiUrl}/${username}/roles/${roleName}`, {});
-    }
-
-    removeRole(username: string, roleName: string): Observable<any> {
-        return this.http.delete(`${this.apiUrl}/${username}/roles/${roleName}`);
-    }
+  getUserByUsername(username: string): Observable<UserProfile> {
+    return this.http.get<UserProfile>(`${this.apiUrl}/username/${username}`);
+  }
 }

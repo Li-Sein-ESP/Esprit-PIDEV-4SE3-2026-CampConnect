@@ -1,20 +1,30 @@
 package com.campconnect.dto;
 
-import com.campconnect.model.DifficultyLevel;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class TripDTO {
     private String id;
     private String name;
-    private String destination;
     private String notes;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
-    private DifficultyLevel difficulty;
+    
+    @NotBlank(message = "Destination is required")
+    private String destination;
+    
+    @NotBlank(message = "Category is required")
+    private String categoryName;
+    
+    private String difficulty;
+    private String status;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private String creatorId;
     private String groupId;
 }

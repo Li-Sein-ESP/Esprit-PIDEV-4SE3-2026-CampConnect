@@ -1,19 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CardComponent, CardContentComponent } from '../../shared/components/card.component';
 import { BadgeComponent } from '../../shared/components/badge.component';
 import { DropdownComponent, DropdownOption } from '../../shared/components/dropdown.component';
-import { LucideAngularModule, ShoppingBag, Star, DollarSign, Search } from 'lucide-angular';
+import { LucideAngularModule, ShoppingBag, DollarSign, Search } from 'lucide-angular';
+import { GearApiService } from './services/gear-api.service';
+import { GearResponse } from './models/gear.model';
 
 interface GearItem {
     id: string;
     name: string;
     category: string;
     price: number;
-    rating: number;
-    reviews: number;
     available: boolean;
     image: string;
 }
@@ -90,17 +90,33 @@ interface GearItem {
         </div>
       </div>
 
+      <!-- Loading -->
+      <div *ngIf="loading" class="text-center py-16 text-[var(--color-text-secondary)]">
+        <div class="w-10 h-10 border-4 border-[var(--color-primary-600)] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p>Loading gear...</p>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="!loading && error" class="text-center py-16">
+        <p class="text-red-500 mb-4">{{ error }}</p>
+        <button (click)="loadGear()" class="px-4 py-2 bg-[var(--color-primary-600)] text-white rounded-lg">Try Again</button>
+      </div>
+
       <!-- Results -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" *ngIf="!loading && !error">
         <app-card
           *ngFor="let item of getFilteredGear()"
           variant="default"
           padding="none"
           customClass="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+          [routerLink]="['/gear', item.id]"
         >
           <!-- Image -->
-          <div class="h-48 bg-gradient-to-br from-[var(--color-accent-400)] to-[var(--color-accent-600)] relative flex items-center justify-center">
-            <lucide-icon [img]="ShoppingBagIcon" [size]="64" class="text-white/30"></lucide-icon>
+          <div class="h-48 relative overflow-hidden bg-[var(--color-neutral-100)]">
+            <img *ngIf="item.image" [src]="item.image" [alt]="item.name" class="w-full h-full object-cover" />
+            <div *ngIf="!item.image" class="w-full h-full bg-gradient-to-br from-[var(--color-accent-400)] to-[var(--color-accent-600)] flex items-center justify-center">
+              <lucide-icon [img]="ShoppingBagIcon" [size]="64" class="text-white/30"></lucide-icon>
+            </div>
             <div *ngIf="!item.available" class="absolute top-4 right-4">
               <app-badge variant="error">Unavailable</app-badge>
             </div>
@@ -114,13 +130,6 @@ interface GearItem {
             <h3 class="text-base font-semibold text-[var(--color-text-heading)] mb-2">
               {{ item.name }}
             </h3>
-            
-            <!-- Rating -->
-            <div class="flex items-center gap-1 mb-3">
-              <lucide-icon [img]="StarIcon" [size]="14" class="text-yellow-500"></lucide-icon>
-              <span class="text-sm font-medium">{{ item.rating }}</span>
-              <span class="text-xs text-[var(--color-text-tertiary)]">({{ item.reviews }})</span>
-            </div>
 
             <!-- Price -->
             <div class="flex items-center justify-between pt-3 border-t border-[var(--color-border-light)]">
@@ -131,9 +140,11 @@ interface GearItem {
               </div>
               <button
                 [disabled]="!item.available"
+                [routerLink]="['/gear', item.id]"
+                (click)="$event.stopPropagation()"
                 class="px-3 py-1.5 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Rent
+                {{ item.available ? 'Rent' : 'Unavailable' }}
               </button>
             </div>
           </app-card-content>
@@ -143,15 +154,16 @@ interface GearItem {
   `,
     styles: []
 })
-export class GearComponent {
+export class GearComponent implements OnInit {
     ShoppingBagIcon = ShoppingBag;
-    StarIcon = Star;
     DollarSignIcon = DollarSign;
     SearchIcon = Search;
 
     searchQuery = '';
     category = '';
     availability = '';
+    loading = true;
+    error: string | null = null;
 
     categoryOptions: DropdownOption[] = [
         { label: 'All Categories', value: '' },
@@ -167,18 +179,35 @@ export class GearComponent {
         { label: 'Available Only', value: 'available' },
     ];
 
-    gearItems: GearItem[] = [
-        { id: '1', name: '4-Person Tent', category: 'Tents', price: 45, rating: 4.8, reviews: 124, available: true, image: '' },
-        { id: '2', name: 'Sleeping Bag (-10°F)', category: 'Sleeping Bags', price: 25, rating: 4.6, reviews: 89, available: true, image: '' },
-        { id: '3', name: '65L Backpack', category: 'Backpacks', price: 30, rating: 4.7, reviews: 156, available: false, image: '' },
-        { id: '4', name: 'Camp Stove', category: 'Cooking', price: 15, rating: 4.5, reviews: 67, available: true, image: '' },
-        { id: '5', name: 'LED Lantern', category: 'Lighting', price: 10, rating: 4.9, reviews: 203, available: true, image: '' },
-        { id: '6', name: '2-Person Tent', category: 'Tents', price: 35, rating: 4.7, reviews: 98, available: true, image: '' },
-        { id: '7', name: 'Camping Cookware Set', category: 'Cooking', price: 20, rating: 4.6, reviews: 74, available: true, image: '' },
-        { id: '8', name: 'Headlamp', category: 'Lighting', price: 8, rating: 4.8, reviews: 145, available: false, image: '' },
-    ];
+    gearItems: GearItem[] = [];
 
-    constructor(private router: Router) { }
+    constructor(private router: Router, private gearApi: GearApiService) { }
+
+    ngOnInit(): void {
+        this.loadGear();
+    }
+
+    loadGear(): void {
+        this.loading = true;
+        this.error = null;
+        this.gearApi.getGear({ page: 0, size: 24 }).subscribe({
+            next: (page) => {
+                this.gearItems = page.content.map((g: GearResponse) => ({
+                    id: g.id,
+                    name: g.name,
+                    category: g.category,
+                    price: g.price,
+                    available: g.status === 'AVAILABLE' && g.quantity > 0,
+                    image: g.images?.[0]?.imageUrl || ''
+                }));
+                this.loading = false;
+            },
+            error: () => {
+                this.error = 'Failed to load gear items. Please try again.';
+                this.loading = false;
+            }
+        });
+    }
 
     getFilteredGear(): GearItem[] {
         let filtered = [...this.gearItems];

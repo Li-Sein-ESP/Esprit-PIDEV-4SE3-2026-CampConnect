@@ -1,3 +1,115 @@
+// ─── Backend DTO Models ──────────────────────────────────────────────────────
+
+export type GearStatus = 'AVAILABLE' | 'RENTED' | 'MAINTENANCE' | 'OUT_OF_STOCK';
+export type ListingType = 'FOR_SALE' | 'FOR_RENT' | 'BOTH';
+
+/** Matches GearImageDto from the Spring Boot backend. */
+export interface GearImageDto {
+    id: string;
+    imageUrl: string;
+}
+
+/**
+ * Matches the GearResponse DTO returned by GET /api/gear and GET /api/gear/{id}.
+ * Field names align exactly with the Spring Boot backend.
+ */
+export interface GearResponse {
+    id: string;
+    name: string;
+    description: string;
+    /** Backward-compat price — equals dailyPrice for FOR_RENT listings */
+    price: number;
+    /** Price per day when listed for rent */
+    dailyPrice?: number;
+    /** Sale price when listed for purchase */
+    salePrice?: number;
+    /** How this item is offered */
+    listingType: ListingType;
+    /** Available stock count (backend field: quantity) */
+    quantity: number;
+    condition: string;
+    status: GearStatus;
+    category: string;
+    ownerId: string;
+    ownerName: string;
+    images: GearImageDto[];
+    createdAt: string;
+    updatedAt?: string;
+}
+
+/** Convenience getter: true when gear is available for rental. */
+export function isGearAvailable(gear: GearResponse): boolean {
+    return gear.status === 'AVAILABLE' && gear.quantity > 0;
+}
+
+/** Returns the first image URL or a placeholder. */
+export function gearFirstImage(gear: GearResponse): string {
+    return gear.images?.[0]?.imageUrl ?? 'assets/images/gear-placeholder.jpg';
+}
+
+export interface GearCreateRequest {
+    name: string;
+    description: string;
+    /** Backward-compat — set to dailyPrice when listing for rent */
+    price: number;
+    /** Daily rental price (required for FOR_RENT or BOTH) */
+    dailyPrice?: number;
+    /** Sale price (required for FOR_SALE or BOTH) */
+    salePrice?: number;
+    listingType: ListingType;
+    /** Stock quantity */
+    quantity: number;
+    condition: string;
+    category: string;
+    imageUrls: string[];
+    status?: GearStatus;
+}
+
+export interface GearUpdateRequest extends Partial<GearCreateRequest> { }
+
+export interface PurchaseRequest {
+    gearId: string;
+    quantity: number;
+}
+
+export interface PurchaseResponse {
+    id: string;
+    gearId: string;
+    gearName: string;
+    buyerId: string;
+    buyerName: string;
+    quantity: number;
+    unitPrice: number;
+    totalPrice: number;
+    status: 'PENDING' | 'CONFIRMED' | 'CANCELLED';
+    createdAt: string;
+    updatedAt?: string;
+}
+
+export interface GearParams {
+    page?: number;
+    size?: number;
+    sort?: string;
+    category?: string;
+    status?: string;
+}
+
+/**
+ * Generic paged response wrapper matching Spring Boot PagedResponse<T>.
+ * Backend fields: content, page (0-based), size, totalElements, totalPages, last.
+ */
+export interface PagedResponse<T> {
+    content: T[];
+    /** Current page index (0-based). */
+    page: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
+    last: boolean;
+}
+
+// ─── Frontend-facing Models (kept for UI components unrelated to backend) ────
+
 // Gear Module Interfaces
 export interface GearItem {
     id: string;
@@ -80,6 +192,7 @@ export interface DeliveryTracking {
 export interface DeliveryUpdate {
     timestamp: string;
     status: string;
+    imageUrl?: string;
     location: string;
     description: string;
 }

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { LucideAngularModule, MapPin, Calendar, Users, MessageSquare, UserPlus, UserMinus, Award, BookOpen, MessageCircle, FileText, ChevronLeft, Share2, MoreHorizontal } from 'lucide-angular';
 import { TrustScoreComponent } from '../../../shared/components/trust-score/trust-score.component';
-import { CampBadgeComponent } from '../../../shared/components/badge/badge.component';
+import { CampBadgeComponent } from '../../../shared/components/camp-badge/camp-badge.component';
 import { UserProfile, Post, UserRole } from '../models/community.model';
 import { UserService } from '../../../core/services/user.service';
 
@@ -70,8 +70,9 @@ export class PublicProfileComponent implements OnInit {
         this.userService.getUserById(this.userId).subscribe({
             next: (user) => {
                 let userRole = 'Camper';
-                if (Array.isArray(user.roles)) {
-                    if (user.roles.some((r: any) => r.name === 'ROLE_ADMIN' || r === 'ROLE_ADMIN')) {
+                const userData: any = user;
+                if (Array.isArray(userData.roles)) {
+                    if (userData.roles.some((r: any) => r.name === 'ROLE_ADMIN' || r === 'ROLE_ADMIN')) {
                         userRole = 'Admin';
                     }
                 }
@@ -84,8 +85,8 @@ export class PublicProfileComponent implements OnInit {
                     banner: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&h=400&fit=crop',
                     role: userRole as UserRole,
                     trustScore: 85,
-                    bio: user.bio || 'Outdoor enthusiast sharing trail experiences.',
-                    location: user.location || 'Unknown location',
+                    bio: userData.bio || 'Outdoor enthusiast sharing trail experiences.',
+                    location: userData.location || 'Unknown location',
                     joinDate: 'Joined recently',
                     isFollowed: false,
                     stats: {

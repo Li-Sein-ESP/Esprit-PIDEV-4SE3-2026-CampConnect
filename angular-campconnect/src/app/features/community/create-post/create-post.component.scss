@@ -515,6 +515,22 @@
   }
 }
 
+.cc-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--cp-text-secondary) 50%),
+    linear-gradient(135deg, var(--cp-text-secondary) 50%, transparent 50%);
+  background-position:
+    calc(100% - 22px) calc(50% - 3px),
+    calc(100% - 16px) calc(50% - 3px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 44px;
+  cursor: pointer;
+}
+
 /* ---- Location wrapper (relative for dropdown) ---- */
 .cc-location-wrap {
   position: relative;

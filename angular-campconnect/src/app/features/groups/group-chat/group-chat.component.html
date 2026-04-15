@@ -1,0 +1,96 @@
+<div
+    class="chat-container flex flex-col h-full bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border-light)] overflow-hidden shadow-sm">
+
+    <!-- Chat Header -->
+    <div
+        class="chat-header p-4 border-b border-[var(--color-border-light)] flex items-center justify-between bg-white relative z-10">
+        <div>
+            <h2 class="font-bold text-[var(--color-text-primary)]">Discussion Générale</h2>
+            <p class="text-xs text-[var(--color-text-secondary)] flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                En ligne
+            </p>
+        </div>
+        <div class="flex gap-2">
+            <!-- Pinned messages or search could go here -->
+        </div>
+    </div>
+
+    <!-- Messages Area -->
+    <div id="chat-scroll-container"
+        class="messages-area flex-1 overflow-y-auto p-4 md:p-6 bg-[var(--color-bg-muted)] relative">
+        <div *ngIf="loading && messages.length === 0" class="flex justify-center items-center h-full">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary-600)]"></div>
+        </div>
+
+        <div class="space-y-6 flex flex-col justify-end min-h-full pb-4">
+
+            <ng-container *ngFor="let msg of messages; let i = index">
+                <!-- Date separator could be calculated here -->
+
+                <!-- Message bubble -->
+                <div class="flex w-full animate-fade-in"
+                    [ngClass]="{'justify-end': msg.senderUserId === currentUserId, 'justify-start': msg.senderUserId !== currentUserId}">
+
+                    <!-- Avatar for others -->
+                    <img *ngIf="msg.senderUserId !== currentUserId" [src]="getAvatar(msg.senderUserId)" alt="Avatar"
+                        class="w-8 h-8 rounded-full mr-2 self-end mb-1">
+
+                    <div class="flex flex-col max-w-[75%] md:max-w-[60%]">
+                        <!-- Sender Name -->
+                        <span
+                            *ngIf="msg.senderUserId !== currentUserId && (i === 0 || messages[i-1].senderUserId !== msg.senderUserId)"
+                            class="text-xs text-[var(--color-text-tertiary)] ml-1 mb-1 font-medium">
+                            {{msg.senderUserId}}
+                        </span>
+
+                        <!-- Bubble -->
+                        <div class="bubble px-4 py-2.5 rounded-2xl relative shadow-sm"
+                            [ngClass]="msg.senderUserId === currentUserId ? 'bubble-mine' : 'bubble-theirs'">
+                            <p class="text-sm break-words">{{msg.content}}</p>
+
+                            <!-- Timestamp -->
+                            <span class="text-[0.65rem] opacity-70 mt-1 block text-right"
+                                [ngClass]="msg.senderUserId === currentUserId ? 'text-green-100' : 'text-[var(--color-text-tertiary)]'">
+                                {{ formatTime(msg.createdAt) }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+
+        </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-area p-3 bg-white border-t border-[var(--color-border-light)] relative z-10">
+        <div
+            class="flex items-end gap-2 bg-[var(--color-bg-muted)] rounded-2xl p-2 border border-[var(--color-border-light)] focus-within:ring-2 focus-within:ring-[var(--color-primary-200)] focus-within:border-[var(--color-primary-400)] transition-all">
+
+            <button
+                class="p-2 text-[var(--color-text-tertiary)] hover:text-[var(--color-primary-600)] transition shrink-0 hidden sm:block">
+                <lucide-icon [img]="Paperclip" size="20"></lucide-icon>
+            </button>
+            <button
+                class="p-2 text-[var(--color-text-tertiary)] hover:text-[var(--color-primary-600)] transition shrink-0">
+                <lucide-icon [img]="Image" size="20"></lucide-icon>
+            </button>
+
+            <textarea [(ngModel)]="newMessage" (keydown.enter)="$event.preventDefault(); sendMessage()"
+                placeholder="Écrivez un message..."
+                class="flex-1 bg-transparent border-none focus:ring-0 resize-none py-2 px-1 text-sm text-[var(--color-text-primary)] min-h-[40px] max-h-[120px]"
+                rows="1"></textarea>
+
+            <button
+                class="p-2 text-[var(--color-text-tertiary)] hover:text-[var(--color-primary-600)] transition shrink-0 hidden sm:block">
+                <lucide-icon [img]="Smile" size="20"></lucide-icon>
+            </button>
+
+            <button (click)="sendMessage()" [disabled]="!newMessage.trim()"
+                class="p-2 shrink-0 bg-[var(--color-primary-600)] text-white rounded-xl hover:bg-[var(--color-primary-700)] transition disabled:opacity-50 disabled:cursor-not-allowed">
+                <lucide-icon [img]="Send" size="18"></lucide-icon>
+            </button>
+        </div>
+    </div>
+
+</div>

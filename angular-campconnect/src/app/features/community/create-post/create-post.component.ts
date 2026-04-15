@@ -12,6 +12,7 @@ import { AuthService } from '../../../core/services/auth.service';
 export interface MediaPreview {
   id: number;
   url: SafeUrl;
+  rawUrl: string;
   type: 'image' | 'video';
   file: File;
 }
@@ -51,12 +52,30 @@ export class CreatePostComponent implements OnInit {
 
   /* ── Location autocomplete ───────────────── */
   locationSuggestions = [
-    { name: 'Yosemite Valley', region: 'California, USA' },
-    { name: 'Yellowstone', region: 'Wyoming, USA' },
-    { name: 'Grand Canyon', region: 'Arizona, USA' },
-    { name: 'Banff National Park', region: 'Alberta, Canada' },
-    { name: 'Zion National Park', region: 'Utah, USA' },
-    { name: 'Glacier National Park', region: 'Montana, USA' }
+    { name: 'Tunis', region: 'Grand Tunis, Tunisie' },
+    { name: 'Ariana', region: 'Grand Tunis, Tunisie' },
+    { name: 'Ben Arous', region: 'Grand Tunis, Tunisie' },
+    { name: 'Manouba', region: 'Grand Tunis, Tunisie' },
+    { name: 'Nabeul', region: 'Nord-Est, Tunisie' },
+    { name: 'Zaghouan', region: 'Nord-Est, Tunisie' },
+    { name: 'Bizerte', region: 'Nord-Est, Tunisie' },
+    { name: 'Beja', region: 'Nord-Ouest, Tunisie' },
+    { name: 'Jendouba', region: 'Nord-Ouest, Tunisie' },
+    { name: 'Kef', region: 'Nord-Ouest, Tunisie' },
+    { name: 'Siliana', region: 'Nord-Ouest, Tunisie' },
+    { name: 'Sousse', region: 'Centre-Est, Tunisie' },
+    { name: 'Monastir', region: 'Centre-Est, Tunisie' },
+    { name: 'Mahdia', region: 'Centre-Est, Tunisie' },
+    { name: 'Sfax', region: 'Centre-Est, Tunisie' },
+    { name: 'Kairouan', region: 'Centre-Ouest, Tunisie' },
+    { name: 'Kasserine', region: 'Centre-Ouest, Tunisie' },
+    { name: 'Sidi Bouzid', region: 'Centre-Ouest, Tunisie' },
+    { name: 'Gabes', region: 'Sud-Est, Tunisie' },
+    { name: 'Medenine', region: 'Sud-Est, Tunisie' },
+    { name: 'Tataouine', region: 'Sud-Est, Tunisie' },
+    { name: 'Gafsa', region: 'Sud-Ouest, Tunisie' },
+    { name: 'Tozeur', region: 'Sud-Ouest, Tunisie' },
+    { name: 'Kebili', region: 'Sud-Ouest, Tunisie' }
   ];
   filteredLocations: typeof this.locationSuggestions = [];
   showLocationSuggestions = false;
@@ -167,9 +186,11 @@ export class CreatePostComponent implements OnInit {
       if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) return;
       const reader = new FileReader();
       reader.onload = (ev: any) => {
+        const rawUrl = String(ev.target.result || '');
         this.uploadedFiles.push({
           id: Date.now() + idx,
-          url: this.sanitizer.bypassSecurityTrustUrl(ev.target.result),
+          url: this.sanitizer.bypassSecurityTrustUrl(rawUrl),
+          rawUrl,
           type: file.type.startsWith('video/') ? 'video' : 'image',
           file
         });
@@ -246,23 +267,39 @@ export class CreatePostComponent implements OnInit {
   onSubmit(): void {
     if (!this.canSubmit || this.isPosting) return;
 
+    const content = (this.postForm.value.content || '').trim();
+    const title = (this.postForm.value.title || content.substring(0, 30) + '...').trim();
+    const location = (this.postForm.value.location || '').trim();
+    const authorName = this.currentUser?.name || this.authService.currentUserValue?.username || 'Explorer';
+    const authorUsername = String(authorName).toLowerCase().replace(/\s+/g, '');
+    const imageUrls = this.uploadedFiles
+      .filter(media => media.type === 'image' && !!media.rawUrl)
+      .map(media => media.rawUrl);
+
     const payload = {
-      title: this.postForm.value.title || (this.postForm.value.content.substring(0, 30) + '...'),
-      description: this.postForm.value.content,
+      title,
+      content,
+      description: content,
       category: 'General',
       tags: this.tags,
-      authorId: this.currentUser?.id
+      authorId: this.currentUser?.id,
+      authorName,
+      authorUsername,
+      location,
+      imageUrls,
+      media: imageUrls,
+      images: imageUrls
     };
 
     console.log('Sending Post to Backend:', payload);
 
     this.isPosting = true;
-    this.communityService.createPost(payload).subscribe({
+    this.communityService.createPost(payload as any).subscribe({
       next: () => {
         this.isPosting = false;
         this.showSuccess = true;
         this.showToast('🎉', 'Your adventure has been shared with the community!');
-        setTimeout(() => this.router.navigate(['/community']), 2000);
+        setTimeout(() => this.router.navigate(['/community/feed']), 2000);
       },
       error: (err) => {
         console.error('Error creating post', err);
@@ -275,10 +312,10 @@ export class CreatePostComponent implements OnInit {
   onCancel(): void {
     if (this.canSubmit) {
       if (confirm('You have unsaved changes. Discard this post?')) {
-        this.router.navigate(['/community']);
+        this.router.navigate(['/community/feed']);
       }
     } else {
-      this.router.navigate(['/community']);
+      this.router.navigate(['/community/feed']);
     }
   }
 

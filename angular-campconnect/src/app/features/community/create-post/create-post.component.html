@@ -110,20 +110,12 @@
               Location
               <span class="cc-field__label-optional">— optional</span>
             </label>
-            <input id="locationInput" type="text" class="cc-input" formControlName="location"
-              placeholder="e.g. Yosemite Valley, California" autocomplete="off" (focus)="onLocationFocus()"
-              aria-autocomplete="list">
-            <!-- Location suggestions dropdown -->
-            <div class="cc-dropdown" *ngIf="showLocationSuggestions" role="listbox">
-              <button type="button" class="cc-dropdown__item" *ngFor="let loc of filteredLocations"
-                (click)="selectLocation(loc.name)" role="option">
-                <span class="cc-dropdown__icon">📍</span>
-                <span>
-                  <strong>{{ loc.name }}</strong>
-                  <small>{{ loc.region }}</small>
-                </span>
-              </button>
-            </div>
+            <select id="locationInput" class="cc-input cc-select" formControlName="location" aria-label="Location">
+              <option value="">Choisir un gouvernorat</option>
+              <option *ngFor="let loc of locationSuggestions" [value]="loc.name">
+                {{ loc.name }} — {{ loc.region }}
+              </option>
+            </select>
           </div>
 
           <!-- Tags -->

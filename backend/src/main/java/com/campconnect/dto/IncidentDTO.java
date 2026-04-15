@@ -1,22 +1,27 @@
 package com.campconnect.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class IncidentDTO {
     private String id;
     private String title;
     private String description;
+    private String severity;
     private String level;
     private String regionName;
-    private double latitude;
-    private double longitude;
-    private String reporterId;
-    private LocalDateTime reportedAt;
+    private Double latitude;
+    private Double longitude;
     private String tripId;
-    private String status; // Pending, Review, Resolved, Rejected
+    private String reporterId;
+    private String location;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime reportedAt;
+    private String status;
 }

@@ -1,11 +1,11 @@
 package com.campconnect.dto;
 
-import com.campconnect.model.AlertSeverity;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class SafetyAlertDTO {
@@ -13,9 +13,11 @@ public class SafetyAlertDTO {
     private String title;
     private String description;
     private String type;
-    private AlertSeverity severity;
+    private String severity;
+    private String status;
     private String locationName;
     private String regionName;
-    private LocalDateTime createdAt;
     private String tripId;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

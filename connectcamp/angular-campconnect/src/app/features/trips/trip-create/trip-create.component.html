@@ -1,0 +1,57 @@
+<div class="min-h-screen bg-[var(--color-background)] py-12">
+  <div class="container max-w-2xl">
+    <h2 class="mb-8">Create New Trip</h2>
+
+    <app-card variant="elevated">
+      <app-card-content class="p-8">
+        <div class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium mb-2">Trip Name</label>
+            <input [(ngModel)]="tripData.name" placeholder="e.g., Yosemite Summer Adventure"
+              class="w-full px-4 py-2 rounded-lg border-2 border-[var(--color-border-light)] focus:border-[var(--color-primary-600)]" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">Destination</label>
+            <div class="relative">
+              <lucide-icon [img]="MapPin"
+                class="absolute left-3 top-3 w-5 h-5 text-[var(--color-text-tertiary)]"></lucide-icon>
+              <input [(ngModel)]="tripData.destination" placeholder="Where are you going?"
+                class="w-full pl-10 pr-4 py-2 rounded-lg border-2 border-[var(--color-border-light)] focus:border-[var(--color-primary-600)]" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-2">Start Date</label>
+              <input type="date" [(ngModel)]="tripData.startDate"
+                class="w-full px-4 py-2 rounded-lg border-2 border-[var(--color-border-light)]" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">End Date</label>
+              <input type="date" [(ngModel)]="tripData.endDate"
+                class="w-full px-4 py-2 rounded-lg border-2 border-[var(--color-border-light)]" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">Number of Participants</label>
+            <input type="number" [(ngModel)]="tripData.participants" min="1"
+              class="w-full px-4 py-2 rounded-lg border-2 border-[var(--color-border-light)]" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">Description</label>
+            <textarea [(ngModel)]="tripData.description" rows="4" placeholder="Tell us about your trip..."
+              class="w-full px-4 py-2 rounded-lg border-2 border-[var(--color-border-light)] focus:border-[var(--color-primary-600)]"></textarea>
+          </div>
+
+          <app-button size="lg" [fullWidth]="true" (click)="createTrip()">
+            <lucide-icon [img]="Plus" class="w-5 h-5 mr-2"></lucide-icon>
+            Create Trip
+          </app-button>
+        </div>
+      </app-card-content>
+    </app-card>
+  </div>
+</div>

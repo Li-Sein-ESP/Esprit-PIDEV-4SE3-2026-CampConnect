@@ -1,0 +1,401 @@
+/* ── Container ────────────────────────────────── */
+.gl {
+    padding: 24px;
+    max-width: 1280px;
+    margin: 0 auto;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+.gl__summary {
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 16px;
+}
+
+/* ── Toolbar ──────────────────────────────────── */
+.gl__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.gl__filters {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.gl__size {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    color: #555;
+}
+
+.gl__select {
+    padding: 8px 12px;
+    border: 1px solid #d4d4d4;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.875rem;
+    color: #1a1a1a;
+    cursor: pointer;
+    transition: border-color 0.2s;
+
+    &:focus {
+        outline: none;
+        border-color: #3d6b1a;
+    }
+
+    &--sm {
+        padding: 6px 10px;
+    }
+}
+
+.gl__toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    color: #555;
+    cursor: pointer;
+
+    input {
+        cursor: pointer;
+        accent-color: #3d6b1a;
+    }
+}
+
+/* ── Buttons ──────────────────────────────────── */
+.gl__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    transition: all 0.2s ease;
+
+    &--primary {
+        background: linear-gradient(135deg, #2d5016, #4a7c24);
+        color: #fff;
+
+        &:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3);
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+
+    &--ghost {
+        background: transparent;
+        color: #666;
+        border: 1px solid #d4d4d4;
+
+        &:hover {
+            background: #f5f5f5;
+        }
+    }
+
+    &--sm {
+        padding: 6px 14px;
+        font-size: 0.8rem;
+    }
+}
+
+/* ── Grid ─────────────────────────────────────── */
+.gl__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+/* ── Gear Card ────────────────────────────────── */
+.gl__card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e8e2d8;
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.25s ease, transform 0.2s ease;
+
+    &:hover {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transform: translateY(-3px);
+    }
+}
+
+.gl__card-img-wrap {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    background: #f0ede8;
+}
+
+.gl__card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+
+    .gl__card:hover & {
+        transform: scale(1.04);
+    }
+}
+
+/* Badges */
+.gl__badge {
+    position: absolute;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &--avail {
+        top: 10px;
+        left: 10px;
+        background: #2d5016;
+        color: #fff;
+    }
+
+    &--unavail {
+        top: 10px;
+        left: 10px;
+        background: #c0392b;
+        color: #fff;
+    }
+
+    &--condition {
+        top: 10px;
+        right: 10px;
+
+        &.badge--new {
+            background: #e8f4e3;
+            color: #2d5016;
+        }
+
+        &.badge--like-new {
+            background: #edf6ff;
+            color: #1a56db;
+        }
+
+        &.badge--good {
+            background: #fef9e7;
+            color: #9a6800;
+        }
+
+        &.badge--fair {
+            background: #fdf2f8;
+            color: #9e1068;
+        }
+    }
+}
+
+.gl__card-body {
+    padding: 16px;
+}
+
+.gl__card-category {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #4a7c24;
+    margin-bottom: 6px;
+}
+
+.gl__card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.gl__card-brand,
+.gl__card-location {
+    font-size: 0.8rem;
+    color: #777;
+    margin-bottom: 4px;
+}
+
+.gl__card-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 8px 0;
+}
+
+.gl__star {
+    color: #f4a120;
+    font-size: 1rem;
+}
+
+.gl__card-reviews {
+    font-weight: 400;
+    color: #999;
+}
+
+.gl__card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid #f0ede8;
+    margin-top: 8px;
+}
+
+.gl__card-price {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+}
+
+.gl__card-price-val {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.gl__card-price-unit {
+    font-size: 0.75rem;
+    color: #999;
+}
+
+/* ── Loading Skeleton ─────────────────────────── */
+.gl__skeleton {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e8e2d8;
+    overflow: hidden;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.gl__skeleton-img {
+    height: 200px;
+    background: linear-gradient(90deg, #f0ede8 25%, #e8e2d8 50%, #f0ede8 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+.gl__skeleton-line {
+    margin: 14px 16px;
+    border-radius: 6px;
+    background: #f0ede8;
+
+    &--title {
+        height: 16px;
+        width: 70%;
+    }
+
+    &--sub {
+        height: 12px;
+        width: 45%;
+    }
+
+    &--price {
+        height: 14px;
+        width: 30%;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* ── Error / Empty ────────────────────────────── */
+.gl__error,
+.gl__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 64px 24px;
+    text-align: center;
+    color: #888;
+}
+
+.gl__error {
+    color: #c0392b;
+}
+
+.gl__error-msg {
+    font-weight: 500;
+}
+
+/* ── Pagination ───────────────────────────────── */
+.gl__pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 36px;
+}
+
+.gl__pager-btn {
+    min-width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid #e8e2d8;
+    background: #fff;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #444;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled):not(.gl__pager-btn--active) {
+        background: #f7f4ef;
+        border-color: #c8a96e;
+    }
+
+    &--active {
+        background: #2d5016;
+        color: #fff;
+        border-color: #2d5016;
+        font-weight: 700;
+    }
+
+    &:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+}
+
+/* ── Responsive ───────────────────────────────── */
+@media (max-width: 768px) {
+    .gl__toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .gl__grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+}

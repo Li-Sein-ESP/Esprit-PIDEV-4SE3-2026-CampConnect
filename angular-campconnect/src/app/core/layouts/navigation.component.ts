@@ -1,215 +1,205 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router, RouterModule, NavigationEnd } from '@angular/router';
-import { LucideAngularModule, Menu, X, User, Sun, Moon, Plus, AlertTriangle, Phone, BarChart2 } from 'lucide-angular';
-import { AuthService } from '../services/auth.service';
-import { filter } from 'rxjs/operators';
+import { Component, OnInit, HostListener } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { Router, RouterModule, NavigationEnd } from "@angular/router";
+import {
+  LucideAngularModule,
+  Menu,
+  X,
+  User,
+  Sun,
+  Moon,
+  ChevronDown,
+  Truck,
+} from "lucide-angular";
+import { AuthService } from "../services/auth.service";
+import { filter } from "rxjs/operators";
 
 @Component({
-  selector: 'app-navigation',
+  selector: "app-navigation",
   standalone: true,
   imports: [CommonModule, RouterModule, LucideAngularModule],
-  template: `
-    <!-- Desktop Navigation -->
-    <nav class="hidden md:flex items-center justify-between px-6 py-4 bg-[var(--color-nav-background)] text-[var(--color-nav-text)]">
-      <!-- Logo -->
-      <a routerLink="/" class="flex items-center gap-2">
-        <div class="w-10 h-10 bg-[var(--color-accent-500)] rounded-lg flex items-center justify-center">
-          <span class="text-white font-bold text-xl">C</span>
-        </div>
-        <span class="text-xl font-bold">CampConnect</span>
-      </a>
-
-      <!-- Main Navigation Links -->
-      <div class="flex items-center gap-6">
-        <a routerLink="/" routerLinkActive="text-white" [routerLinkActiveOptions]="{exact: true}" class="hover:text-white transition-colors">Home</a>
-        <a routerLink="/discover" routerLinkActive="text-white" class="hover:text-white transition-colors">Discover</a>
-        <a routerLink="/dashboard/bookings" routerLinkActive="text-white" class="hover:text-white transition-colors">Bookings</a>
-        <a routerLink="/trips" routerLinkActive="text-white" class="hover:text-white transition-colors">My Trips</a>
-        <a routerLink="/events" routerLinkActive="text-white" class="hover:text-white transition-colors">Events</a>
-        <a routerLink="/safety/alerts" routerLinkActive="text-white" class="hover:text-white transition-colors">Safety</a>
-        <a routerLink="/transportation" routerLinkActive="text-white" class="hover:text-white transition-colors">Transportation</a>
-        <a routerLink="/gear" routerLinkActive="text-white" class="hover:text-white transition-colors">Gear</a>
-        <a routerLink="/community" routerLinkActive="text-white" class="hover:text-white transition-colors">Community</a>
-        <a routerLink="/academy" routerLinkActive="text-white" class="hover:text-white transition-colors">Academy</a>
-        <div class="h-4 w-px bg-white/20 mx-2 hidden xl:block"></div>
-        <a routerLink="/safety/analytics" routerLinkActive="text-white" class="hidden xl:flex items-center gap-1 hover:text-white transition-colors text-[var(--color-accent-300)]">
-          <lucide-icon [img]="BarChartIcon" [size]="14"></lucide-icon>
-          Analytics
-        </a>
-      </div>
-
-      <!-- Right Side: Theme Toggle + User Menu -->
-      <div class="flex items-center gap-4">
-        <!-- Theme Toggle -->
-        <button
-          (click)="toggleTheme()"
-          class="p-2 rounded-lg hover:bg-[var(--color-nav-hover)] transition-colors"
-          [attr.aria-label]="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'"
-        >
-          <lucide-icon *ngIf="!isDarkMode" [img]="MoonIcon" [size]="20"></lucide-icon>
-          <lucide-icon *ngIf="isDarkMode" [img]="SunIcon" [size]="20"></lucide-icon>
-        </button>
-
-        <!-- Emergency Contacts Button -->
-        <a
-          routerLink="/safety/emergency"
-          class="hidden lg:flex items-center gap-2 px-4 py-2 border border-red-200 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors font-medium shadow-sm"
-        >
-          <lucide-icon [img]="PhoneIcon" [size]="18"></lucide-icon>
-          <span>Emergency</span>
-        </a>
-
-        <!-- Report Incident Button -->
-        <a
-          routerLink="/safety/report"
-          class="hidden lg:flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium shadow-sm"
-        >
-          <lucide-icon [img]="AlertTriangleIcon" [size]="18"></lucide-icon>
-          <span>Report Incident</span>
-        </a>
-
-        <!-- New Topic Button (Forum only) -->
-        <a
-          *ngIf="isForumPage && (authService.isAuthenticated() | async)"
-          routerLink="/community/forum/create"
-          class="flex items-center gap-2 px-4 py-2 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors font-medium shadow-sm"
-        >
-          <lucide-icon [img]="PlusIcon" [size]="18"></lucide-icon>
-          <span>New Topic</span>
-        </a>
-
-
-        <!-- User Menu Button -->
-        <button
-          (click)="toggleUserMenu()"
-          class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--color-nav-hover)] transition-colors relative"
-        >
-          <lucide-icon [img]="UserIcon" [size]="20"></lucide-icon>
-          <span class="hidden lg:inline">{{ (authService.getCurrentUser() | async)?.username || 'Account' }}</span>
-          
-          <!-- User Dropdown -->
-          <div
-            *ngIf="isUserMenuOpen"
-            class="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-[var(--color-border-light)] py-2 z-50 text-left"
-          >
-            <ng-container *ngIf="authService.isAuthenticated() | async; else loginTpl">
-              <div class="px-4 py-2 border-b border-[var(--color-border-light)] bg-gray-50">
-                <p class="text-xs text-gray-500">Logged in as</p>
-                <p class="text-sm font-semibold truncate capitalize text-primary-700">{{ (authService.getCurrentUser() | async)?.username }}</p>
-              </div>
-              <a routerLink="/dashboard" (click)="isUserMenuOpen = false" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors">Dashboard</a>
-              <a routerLink="/profile" (click)="isUserMenuOpen = false" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors">Profile</a>
-              <a routerLink="/trips" (click)="isUserMenuOpen = false" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors">My Trips</a>
-              <hr class="my-2 border-[var(--color-border-light)]">
-              <button (click)="logout()" class="w-full text-left block px-4 py-2 text-red-600 hover:bg-red-50 transition-colors">Logout</button>
-            </ng-container>
-            <ng-template #loginTpl>
-              <a routerLink="/login" (click)="isUserMenuOpen = false" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors font-medium">Sign In</a>
-              <a routerLink="/signup" (click)="isUserMenuOpen = false" class="block px-4 py-2 text-[var(--color-text-primary)] hover:bg-[var(--color-neutral-100)] transition-colors font-medium text-primary-600">Create Account</a>
-            </ng-template>
-          </div>
-        </button>
-      </div>
-    </nav>
-
-    <!-- Mobile Bottom Navigation -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[var(--color-border-light)] z-40">
-      <div class="flex items-center justify-around py-2">
-        <a routerLink="/" routerLinkActive="text-[var(--color-primary-600)]" [routerLinkActiveOptions]="{exact: true}" class="flex flex-col items-center gap-1 px-3 py-2 text-[var(--color-text-tertiary)]">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-          </svg>
-          <span class="text-xs">Home</span>
-        </a>
-        <a routerLink="/campsites" routerLinkActive="text-[var(--color-primary-600)]" class="flex flex-col items-center gap-1 px-3 py-2 text-[var(--color-text-tertiary)]">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-            <circle cx="12" cy="10" r="3"></circle>
-          </svg>
-          <span class="text-xs">Sites</span>
-        </a>
-        <a routerLink="/trips" routerLinkActive="text-[var(--color-primary-600)]" class="flex flex-col items-center gap-1 px-3 py-2 text-[var(--color-text-tertiary)]">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-          </svg>
-          <span class="text-xs">Trips</span>
-        </a>
-        <a *ngIf="authService.isAuthenticated() | async" routerLink="/dashboard" routerLinkActive="text-[var(--color-primary-600)]" class="flex flex-col items-center gap-1 px-3 py-2 text-[var(--color-text-tertiary)]">
-          <lucide-icon [img]="UserIcon" [size]="24"></lucide-icon>
-          <span class="text-xs">Account</span>
-        </a>
-        <a *ngIf="!(authService.isAuthenticated() | async)" routerLink="/login" routerLinkActive="text-[var(--color-primary-600)]" class="flex flex-col items-center gap-1 px-3 py-2 text-[var(--color-text-tertiary)]">
-          <lucide-icon [img]="UserIcon" [size]="24"></lucide-icon>
-          <span class="text-xs">Login</span>
-        </a>
-      </div>
-    </nav>
-  `,
-  styles: []
+  templateUrl: "./navigation.component.html",
+  styles: [],
 })
 export class NavigationComponent implements OnInit {
-  UserIcon = User;
-  MoonIcon = Moon;
-  SunIcon = Sun;
-  MenuIcon = Menu;
-  XIcon = X;
-  PlusIcon = Plus;
-  AlertTriangleIcon = AlertTriangle;
-  PhoneIcon = Phone;
-  BarChartIcon = BarChart2;
+  // Icons
+  readonly UserIcon = User;
+  readonly MoonIcon = Moon;
+  readonly SunIcon = Sun;
+  readonly MenuIcon = Menu;
+  readonly XIcon = X;
+  readonly ChevronDown = ChevronDown;
+  readonly TruckIcon = Truck;
 
+  // State
+  isScrolled = false;
+  isLandingPage = false;
   isUserMenuOpen = false;
+  isMobileMenuOpen = false;
   isDarkMode = false;
-  isForumPage = false;
+  currentUser$ = this.authService.getCurrentUser();
+  isLoggedIn = false;
+  userRoles: string[] = [];
+  dashboardLink = "/dashboard";
+
+  // Menu Structure
+  menuItems: any[] = [];
+  activeDropdown: string | null = null;
 
   constructor(
-    public router: Router,
-    public authService: AuthService
-  ) { }
+    private router: Router,
+    private authService: AuthService,
+  ) {
+    // Listen to route changes to determine if we are on a landing page
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        this.checkLandingPage(event.url);
+        this.isMobileMenuOpen = false; // Close mobile menu on nav
+      });
+  }
 
   ngOnInit(): void {
     // Check for saved theme preference
-    const savedTheme = localStorage.getItem('theme');
-    this.isDarkMode = savedTheme === 'dark';
+    const savedTheme = localStorage.getItem("theme");
+    this.isDarkMode = savedTheme === "dark";
     this.applyTheme();
 
-    // Check if we are on a forum page
-    this.checkForumPage(this.router.url);
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: NavigationEnd) => {
-      this.checkForumPage(event.url);
+    this.authService
+      .isAuthenticated()
+      .subscribe((isAuthenticated) => (this.isLoggedIn = isAuthenticated));
+
+    this.currentUser$.subscribe((user) => {
+      if (user) {
+        this.userRoles = user.roles || [];
+      } else {
+        this.userRoles = [];
+      }
+      this.updateNavigationForRole();
     });
+
+    // Initial check
+    this.checkLandingPage(this.router.url);
   }
 
-  private checkForumPage(url: string): void {
-    this.isForumPage = url.includes('/community/forum');
+  @HostListener("window:scroll", [])
+  onWindowScroll() {
+    this.isScrolled = window.scrollY > 20;
+  }
+
+  checkLandingPage(url: string) {
+    // Logic: If url is '/' or starts with '/marketplace' (and not category detail maybe? actually marketplace landing is consistent),
+    // we assume it is a "landing" style page requiring transparency.
+    // However, the user request says "use the one in the marketplace... for the whole project leading to main interfaces".
+    // We will apply transparency logic to Home ('/') and Marketplace ('/marketplace').
+    // Other functional pages might need a solid header properly positioned.
+
+    const path = url.split("?")[0];
+    this.isLandingPage =
+      path === "/" || path === "/marketplace" || path === "/marketplace/";
+  }
+
+  hasRole(role: string): boolean {
+    return this.authService.hasRole(role);
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(["/login"]);
   }
 
   toggleUserMenu(): void {
     this.isUserMenuOpen = !this.isUserMenuOpen;
   }
 
+  toggleMobileMenu(): void {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
+  setActiveDropdown(label: string | null) {
+    this.activeDropdown = label;
+  }
+
   toggleTheme(): void {
     this.isDarkMode = !this.isDarkMode;
     this.applyTheme();
-    localStorage.setItem('theme', this.isDarkMode ? 'dark' : 'light');
+    localStorage.setItem("theme", this.isDarkMode ? "dark" : "light");
+  }
+
+  private updateNavigationForRole(): void {
+    const defaultCamperNav = [
+      {
+        label: "Explore",
+        children: [
+          { label: "Campsites", link: "/campsites" },
+          { label: "Academy", link: "/academy" },
+          { label: "Events", link: "/events" },
+          { label: "Safety Alerts", link: "/safety/alerts" },
+          { label: "Safety Map", link: "/safety/map" },
+          { label: "Report Incident", link: "/safety/report-incident" },
+        ],
+      },
+      {
+        label: "Plan",
+        children: [
+          { label: "My Trips", link: "/trips" },
+          { label: "Trip Planner", link: "/plan-trip" },
+          { label: "Transportation", link: "/transportation" },
+          { label: "Gear", link: "/gear" },
+          { label: "Companions", link: "/companions" },
+        ],
+      },
+      {
+        label: "Marketplace",
+        children: [
+          { label: "Browse", link: "/marketplace" },
+          { label: "Cart", link: "/cart" },
+          { label: "Track Delivery", link: "/profile/orders" },
+        ],
+      },
+      {
+        label: "Community",
+        children: [
+          { label: "Feed", link: "/community/feed" },
+          { label: "Forums", link: "/community/forums" },
+          { label: "My Groups", link: "/groups/my-groups" },
+          { label: "Create Group", link: "/groups/create" },
+          { label: "Group Invitations", link: "/groups/invitations" },
+          { label: "Trip Stories", link: "/community/stories" },
+          { label: "Leaderboard", link: "/community/leaderboard" },
+          { label: "Events", link: "/community/events" },
+          { label: "Messaging", link: "/community/messaging" },
+        ],
+      },
+    ];
+
+    if (this.hasRole("ROLE_ADMIN")) {
+      this.dashboardLink = "/admin";
+      this.menuItems = []; // Admins usually just use the dashboard
+    } else if (this.hasRole("ROLE_SITE_OWNER")) {
+      this.dashboardLink = "/site-dashboard";
+      this.menuItems = [];
+    } else if (this.hasRole("ROLE_EQUIPMENT_PROVIDER")) {
+      this.dashboardLink = "/provider/dashboard";
+      this.menuItems = []; // Providers have their own sidebar dashboard
+    } else if (this.hasRole("ROLE_ORGANIZER")) {
+      this.dashboardLink = "/organizer-dashboard";
+      this.menuItems = [];
+    } else if (this.hasRole("ROLE_DELIVERY_PROVIDER")) {
+      this.dashboardLink = "/delivery/dashboard";
+      this.menuItems = [];
+    } else {
+      // Default to regular camper navigation map
+      this.dashboardLink = "/profile";
+      this.menuItems = defaultCamperNav;
+    }
   }
 
   private applyTheme(): void {
     if (this.isDarkMode) {
-      document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.setAttribute("data-theme", "dark");
     } else {
-      document.documentElement.removeAttribute('data-theme');
+      document.documentElement.removeAttribute("data-theme");
     }
-  }
-
-  logout(): void {
-    this.authService.logout();
-    this.isUserMenuOpen = false;
-    this.router.navigate(['/']);
   }
 }

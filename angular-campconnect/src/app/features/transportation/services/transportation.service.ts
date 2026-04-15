@@ -1,11 +1,45 @@
 import { Injectable, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 import { TransportRoute, VehicleRental } from '../models/transportation.model';
 
 @Injectable({
     providedIn: 'root'
 })
 export class TransportationService {
+    private apiUrl = `${environment.apiUrl}/transports`;
     private routes = signal<TransportRoute[]>([]);
+
+    constructor(private http: HttpClient) { }
+
+    /**
+     * Get all transports for administration
+     */
+    getAllTransports(): Observable<any[]> {
+        return this.http.get<any[]>(this.apiUrl);
+    }
+
+    /**
+     * Create a new transport option
+     */
+    createTransport(payload: any): Observable<any> {
+        return this.http.post<any>(this.apiUrl, payload);
+    }
+
+    /**
+     * Update an existing transport option
+     */
+    updateTransport(id: string, payload: any): Observable<any> {
+        return this.http.put<any>(`${this.apiUrl}/${id}`, payload);
+    }
+
+    /**
+     * Delete a transport option
+     */
+    deleteTransport(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    }
 
     getMockRoutes(origin: string, destination: string): TransportRoute[] {
         return [
@@ -74,5 +108,12 @@ export class TransportationService {
                 available: true
             }
         ];
+    }
+
+    /**
+     * Obtenir les statistiques de popularité des transports (JPQL/Aggregation Analytics)
+     */
+    getPopularity(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/popularity-stats`);
     }
 }

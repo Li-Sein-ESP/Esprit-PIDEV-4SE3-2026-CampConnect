@@ -1,0 +1,834 @@
+/* ═══════════════════════════════════════════════════════════
+   CampConnect Delivery Tracking — Scoped Styles
+   All classes prefixed with .cc-tracking to avoid globals.
+   Angular-ready: drop into a component with ViewEncapsulation.None
+   ═══════════════════════════════════════════════════════════ */
+
+
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.cc-tracking {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #1a1a1a;
+  background: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* ── Entrance animation ── */
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cc-tracking__status-section,
+.cc-tracking__progress-section,
+.cc-tracking__map-section,
+.cc-tracking__delivery-section,
+.cc-tracking__order-section {
+  opacity: 0;
+  animation: slideUpFade 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.cc-tracking__status-section {
+  animation-delay: 0.1s;
+}
+
+.cc-tracking__progress-section {
+  animation-delay: 0.2s;
+}
+
+.cc-tracking__map-section {
+  animation-delay: 0.3s;
+}
+
+.cc-tracking__delivery-section {
+  animation-delay: 0.4s;
+}
+
+.cc-tracking__order-section {
+  animation-delay: 0.5s;
+}
+
+
+/* ═══════════════════════════════════════════
+   1. TOP STATUS SECTION
+   ═══════════════════════════════════════════ */
+.cc-tracking__status-section {
+  padding: 56px 24px 40px;
+  text-align: center;
+  background: linear-gradient(180deg, #f9faf8 0%, #ffffff 100%);
+}
+
+.cc-tracking__status-inner {
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.cc-tracking__status-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.cc-tracking__pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: #2d6a4f;
+  border-radius: 50%;
+  position: relative;
+}
+
+.cc-tracking__pulse-dot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background: #2d6a4f;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: ccPulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes ccPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(3.5);
+    opacity: 0;
+  }
+}
+
+.cc-tracking__status-badge {
+  font-size: 12px;
+  font-weight: 600;
+  color: #2d6a4f;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.cc-tracking__status-title {
+  font-size: clamp(28px, 5vw, 40px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.15;
+  color: #111;
+  margin-bottom: 8px;
+}
+
+.cc-tracking__status-subtitle {
+  font-size: 15px;
+  color: #888;
+  margin-bottom: 24px;
+  font-weight: 400;
+}
+
+.cc-tracking__eta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.cc-tracking__eta-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f5f3f0;
+  border-radius: 14px;
+  padding: 12px 18px 8px;
+  min-width: 68px;
+}
+
+.cc-tracking__eta-number {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1;
+  color: #1a1a1a;
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-tracking__eta-unit {
+  font-size: 11px;
+  font-weight: 500;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.cc-tracking__eta-sep {
+  font-size: 26px;
+  font-weight: 700;
+  color: #ccc;
+  padding-bottom: 14px;
+}
+
+.cc-tracking__status-eta-time {
+  font-size: 14px;
+  color: #777;
+}
+
+.cc-tracking__status-eta-time strong {
+  color: #2d6a4f;
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════
+   2. PROGRESS TIMELINE
+   ═══════════════════════════════════════════ */
+.cc-tracking__progress-section {
+  padding: 0 24px 48px;
+}
+
+.cc-tracking__progress-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.cc-tracking__timeline {
+  position: relative;
+}
+
+.cc-tracking__timeline-track {
+  position: absolute;
+  top: 16px;
+  left: 10%;
+  right: 10%;
+  height: 3px;
+  background: #e8e5e0;
+  border-radius: 3px;
+  z-index: 1;
+}
+
+.cc-tracking__timeline-fill {
+  height: 100%;
+  background: #2d6a4f;
+  border-radius: 3px;
+  position: relative;
+  transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cc-tracking__timeline-fill::after {
+  content: '';
+  position: absolute;
+  right: -3px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2d6a4f;
+  box-shadow: 0 0 12px rgba(45, 106, 79, 0.5);
+}
+
+.cc-tracking__timeline-steps {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+
+.cc-tracking__step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.cc-tracking__step-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* Completed step */
+.cc-tracking__step--completed .cc-tracking__step-dot {
+  background: #2d6a4f;
+}
+
+.cc-tracking__step--completed .cc-tracking__step-dot svg {
+  width: 16px;
+  height: 16px;
+  color: #fff;
+  stroke: #fff;
+}
+
+.cc-tracking__step--completed .cc-tracking__step-label {
+  color: #2d6a4f;
+  font-weight: 600;
+}
+
+.cc-tracking__step--completed .cc-tracking__step-time {
+  color: #888;
+}
+
+/* Active step */
+.cc-tracking__step--active .cc-tracking__step-dot {
+  background: #2d6a4f;
+  box-shadow: 0 0 0 6px rgba(45, 106, 79, 0.15);
+}
+
+.cc-tracking__step--active .cc-tracking__step-dot-pulse {
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border-radius: 50%;
+  animation: ccDotPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes ccDotPulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.3);
+    opacity: 0.7;
+  }
+}
+
+.cc-tracking__step--active .cc-tracking__step-label {
+  color: #2d6a4f;
+  font-weight: 700;
+}
+
+.cc-tracking__step--active .cc-tracking__step-time {
+  color: #2d6a4f;
+  font-weight: 600;
+}
+
+/* Pending step */
+.cc-tracking__step--pending .cc-tracking__step-dot {
+  background: #e8e5e0;
+  border: 2px solid #d4d0c8;
+}
+
+.cc-tracking__step--pending .cc-tracking__step-label {
+  color: #aaa;
+}
+
+.cc-tracking__step--pending .cc-tracking__step-time {
+  color: #bbb;
+}
+
+.cc-tracking__step-label {
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.cc-tracking__step-time {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════════════════════════════════
+   3. MAP SECTION
+   ═══════════════════════════════════════════ */
+.cc-tracking__map-section {
+  padding: 0 24px 48px;
+}
+
+.cc-tracking__map-inner {
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+.cc-tracking__map-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.cc-tracking__section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.3px;
+}
+
+.cc-tracking__map-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid #e0ddd6;
+  border-radius: 10px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.cc-tracking__map-toggle:hover {
+  background: #f5f3f0;
+  border-color: #ccc;
+}
+
+.cc-tracking__map-toggle-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.cc-tracking__map-container {
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
+  transition: max-height 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.4s ease;
+  max-height: 500px;
+  opacity: 1;
+}
+
+.cc-tracking__map-container--hidden {
+  max-height: 0;
+  opacity: 0;
+  box-shadow: none;
+}
+
+.cc-tracking__map-canvas {
+  position: relative;
+  background: #f7f5f2;
+}
+
+.cc-tracking__map-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  min-height: 280px;
+}
+
+.cc-tracking__vehicle-marker {
+  animation: ccVehicleFloat 3s ease-in-out infinite;
+}
+
+@keyframes ccVehicleFloat {
+
+  0%,
+  100% {
+    transform: translate(560px, 180px);
+  }
+
+  50% {
+    transform: translate(564px, 177px);
+  }
+}
+
+.cc-tracking__map-overlay {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+}
+
+.cc-tracking__map-overlay-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #444;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.cc-tracking__map-overlay-pill svg {
+  width: 14px;
+  height: 14px;
+  color: #2d6a4f;
+}
+
+/* ═══════════════════════════════════════════
+   4. DELIVERY INFO CARD
+   ═══════════════════════════════════════════ */
+.cc-tracking__delivery-section {
+  padding: 0 24px 48px;
+}
+
+.cc-tracking__delivery-inner {
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+.cc-tracking__delivery-inner .cc-tracking__section-title {
+  margin-bottom: 16px;
+}
+
+.cc-tracking__delivery-card {
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.cc-tracking__delivery-card:hover {
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.08);
+}
+
+.cc-tracking__delivery-card-main {
+  padding: 28px 28px 24px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.cc-tracking__driver-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cc-tracking__driver-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #eef2ed 0%, #dce5da 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cc-tracking__driver-avatar svg {
+  width: 28px;
+  height: 28px;
+  color: #2d6a4f;
+}
+
+.cc-tracking__driver-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+  letter-spacing: -0.2px;
+}
+
+.cc-tracking__driver-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cc-tracking__stars {
+  display: flex;
+  gap: 1px;
+}
+
+.cc-tracking__stars svg {
+  width: 14px;
+  height: 14px;
+}
+
+.cc-tracking__rating-number {
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+}
+
+.cc-tracking__rating-count {
+  font-size: 12px;
+  color: #999;
+}
+
+.cc-tracking__delivery-meta {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.cc-tracking__meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cc-tracking__meta-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.cc-tracking__meta-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+.cc-tracking__vehicle-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 8px;
+  color: #2d6a4f;
+  background: #eef2ed;
+}
+
+.cc-tracking__vehicle-badge svg {
+  width: 15px;
+  height: 15px;
+}
+
+.cc-tracking__delivery-card-actions {
+  display: flex;
+  gap: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.cc-tracking__contact-btn,
+.cc-tracking__message-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  border: none;
+  background: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.cc-tracking__contact-btn {
+  color: #2d6a4f;
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.cc-tracking__contact-btn:hover {
+  background: #f0f7f3;
+}
+
+.cc-tracking__message-btn {
+  color: #555;
+}
+
+.cc-tracking__message-btn:hover {
+  background: #f5f3f0;
+}
+
+.cc-tracking__contact-btn svg,
+.cc-tracking__message-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* ═══════════════════════════════════════════
+   5. ORDER SUMMARY
+   ═══════════════════════════════════════════ */
+.cc-tracking__order-section {
+  padding: 0 24px 64px;
+}
+
+.cc-tracking__order-inner {
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+.cc-tracking__order-inner .cc-tracking__section-title {
+  margin-bottom: 16px;
+}
+
+.cc-tracking__order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+.cc-tracking__order-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 24px;
+  background: #fff;
+  transition: background 0.2s ease;
+}
+
+.cc-tracking__order-item:hover {
+  background: #fafaf8;
+}
+
+.cc-tracking__item-image {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.cc-tracking__item-image svg {
+  width: 56px;
+  height: 56px;
+  display: block;
+}
+
+.cc-tracking__item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cc-tracking__item-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 2px;
+  letter-spacing: -0.1px;
+}
+
+.cc-tracking__item-detail {
+  font-size: 13px;
+  color: #888;
+}
+
+.cc-tracking__item-duration {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.cc-tracking__duration-value {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d6a4f;
+  margin-bottom: 2px;
+}
+
+.cc-tracking__duration-dates {
+  display: block;
+  font-size: 12px;
+  color: #aaa;
+  white-space: nowrap;
+}
+
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════ */
+@media (max-width: 680px) {
+  .cc-tracking__header-order-id {
+    display: none;
+  }
+
+  .cc-tracking__timeline-track {
+    left: 6%;
+    right: 6%;
+  }
+
+  .cc-tracking__step-label {
+    font-size: 10px;
+  }
+
+  .cc-tracking__step-time {
+    font-size: 9px;
+  }
+
+  .cc-tracking__step-dot {
+    width: 28px;
+    height: 28px;
+  }
+
+  .cc-tracking__step--completed .cc-tracking__step-dot svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .cc-tracking__delivery-card-main {
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .cc-tracking__delivery-meta {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .cc-tracking__eta-block {
+    padding: 10px 14px 6px;
+    min-width: 56px;
+  }
+
+  .cc-tracking__eta-number {
+    font-size: 26px;
+  }
+
+  .cc-tracking__order-item {
+    padding: 14px 16px;
+  }
+
+  .cc-tracking__item-image {
+    width: 44px;
+    height: 44px;
+  }
+
+  .cc-tracking__item-image svg {
+    width: 44px;
+    height: 44px;
+  }
+
+  .cc-tracking__status-section {
+    padding: 40px 20px 32px;
+  }
+}
+
+@media (max-width: 400px) {
+  .cc-tracking__delivery-meta {
+    gap: 16px;
+  }
+
+  .cc-tracking__item-duration {
+    display: none;
+  }
+}

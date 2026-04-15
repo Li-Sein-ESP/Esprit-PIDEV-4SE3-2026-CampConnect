@@ -20,7 +20,8 @@ public class SafetyAlert {
     private String title;
     private String description;
     private String type;
-    private AlertSeverity severity;
+    private String severity;
+    private String status = "PENDING";
     private String locationName;
     private String regionName;
     private LocalDateTime createdAt = LocalDateTime.now();

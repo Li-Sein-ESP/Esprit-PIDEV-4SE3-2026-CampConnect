@@ -1,0 +1,88 @@
+<div class="flex flex-col min-h-screen">
+
+    <!-- Hero Section -->
+    <section class="relative bg-emerald-900 text-white py-32 overflow-hidden">
+        <div class="absolute inset-0 z-0 opacity-40">
+            <img src="https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=1920&q=80" alt="Hero Background"
+                class="w-full h-full object-cover">
+        </div>
+        <div class="container mx-auto px-6 relative z-10 text-center">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6">Discover Your Next Adventure</h1>
+            <p class="text-xl md:text-2xl text-emerald-100 max-w-2xl mx-auto mb-10">
+                The all-in-one platform for camping enthusiasts. Find sites, rent gear, and plan unforgettable trips.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a routerLink="/campsites"
+                    class="px-8 py-4 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-lg font-bold transition-colors">
+                    Find a Campsite
+                </a>
+                <a routerLink="/marketplace"
+                    class="px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/30 backdrop-blur-sm rounded-lg text-lg font-bold transition-colors">
+                    Rent Gear
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section class="py-20 bg-stone-50">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-stone-900 mb-16">Everything You Need for the Outdoors</h2>
+            <div class="grid md:grid-cols-3 gap-10">
+                <div *ngFor="let feature of features"
+                    class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                    <div class="text-4xl mb-4">{{feature.icon}}</div>
+                    <h3 class="text-xl font-bold text-stone-900 mb-3">{{feature.title}}</h3>
+                    <p class="text-stone-600 mb-6">{{feature.description}}</p>
+                    <a [routerLink]="feature.link"
+                        class="text-emerald-700 font-semibold hover:text-emerald-800 flex items-center gap-1">
+                        Explore <span aria-hidden="true">&rarr;</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Spots Preview -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-between items-end mb-10">
+                <h2 class="text-3xl font-bold text-stone-900">Trending Destinations</h2>
+                <a routerLink="/campsites" class="text-emerald-700 font-medium hover:text-emerald-800">View All
+                    Locations</a>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div *ngFor="let site of popularCampsites" class="group cursor-pointer">
+                    <div class="aspect-[4/3] rounded-xl overflow-hidden mb-4">
+                        <img [src]="site.image" [alt]="site.name"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-lg font-bold text-stone-900">{{site.name}}</h3>
+                            <p class="text-stone-500 text-sm">{{site.location}}</p>
+                        </div>
+                        <div class="flex items-center gap-1 bg-stone-100 px-2 py-1 rounded">
+                            <span class="text-amber-500 text-sm">★</span>
+                            <span class="font-bold text-sm text-stone-700">{{site.rating}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="py-24 bg-emerald-900 text-white text-center">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Start Your Journey?</h2>
+            <p class="text-emerald-200 mb-10 max-w-xl mx-auto">Join thousands of campers who trust CampConnect for their
+                outdoor experiences.</p>
+            <a routerLink="/signup"
+                class="inline-block px-10 py-4 bg-white text-emerald-900 font-bold rounded-full hover:bg-emerald-50 transition-colors">
+                Create Free Account
+            </a>
+        </div>
+    </section>
+</div>

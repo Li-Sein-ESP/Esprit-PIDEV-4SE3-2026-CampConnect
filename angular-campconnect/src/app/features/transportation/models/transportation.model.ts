@@ -8,6 +8,8 @@ export interface TransportRoute {
     mode: 'car' | 'bus' | 'train' | 'flight' | 'carpool';
     price?: number;
     provider?: string;
+    averageRating?: number;
+    reviewCount?: number;
 }
 
 export interface Location {

@@ -135,7 +135,7 @@ export class ForumHomeComponent implements OnInit {
         this.loading = true;
         this.communityService.getPosts().subscribe({
             next: (posts) => {
-                this.allTopics = posts.map(p => this.mapToRecentTopic(p));
+                this.allTopics = posts.map(p => this.mapToRecentTopic(p as any));
                 this.loading = false;
             },
             error: (err) => {
@@ -145,12 +145,12 @@ export class ForumHomeComponent implements OnInit {
         });
     }
 
-    private mapToRecentTopic(post: Post): RecentTopic {
+    private mapToRecentTopic(post: any): RecentTopic {
         return {
             id: post.id.toString(),
             title: post.title,
             author: post.author.name,
-            authorInitials: post.author.name.split(' ').map(n => n[0]).join(''),
+            authorInitials: post.author.name.split(' ').map((n: string) => n[0]).join(''),
             replies: typeof post.comments === 'number' ? post.comments : (post.comments?.length || 0),
             lastReplyDate: 'Recent',
             trustScore: post.author.trustScore,

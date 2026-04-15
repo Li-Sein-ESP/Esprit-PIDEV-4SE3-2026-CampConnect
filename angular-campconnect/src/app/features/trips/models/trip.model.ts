@@ -12,6 +12,8 @@ export interface Trip {
     createdBy: string;
     createdAt: string;
     updatedAt: string;
+    imageUrl?: string;
+    template?: boolean;
 }
 
 export interface TripItinerary {

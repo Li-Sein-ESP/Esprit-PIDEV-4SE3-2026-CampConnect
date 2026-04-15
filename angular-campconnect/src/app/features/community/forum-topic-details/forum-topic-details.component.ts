@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TrustScoreComponent } from '../../../shared/components/trust-score/trust-score.component';
-import { CampBadgeComponent } from '../../../shared/components/badge/badge.component';
+import { CampBadgeComponent } from '../../../shared/components/camp-badge/camp-badge.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommunityService } from '../../../core/services/community.service';
 import { ForumTopic, ForumReply, AuthorPreview, UserRole, Post } from '../models/community.model';
@@ -51,8 +51,12 @@ export class ForumTopicDetailsComponent implements OnInit {
         this.loading = true;
         this.communityService.getPostById(id).subscribe({
             next: (post) => {
-                this.topic = this.mapPostToForumTopic(post);
-                this.loadReplies(id);
+                if (post) {
+                    this.topic = this.mapPostToForumTopic(post as any);
+                    this.loadReplies(id);
+                } else {
+                    this.loading = false;
+                }
             },
             error: (err) => {
                 console.error('Error loading topic', err);
@@ -151,15 +155,19 @@ export class ForumTopicDetailsComponent implements OnInit {
         const text = this.replyText.trim();
         if (!text) return;
 
+        const user = this.authService.currentUserValue;
         const replyDTO = {
             content: text,
-            threadId: this.topicId,
-            authorId: this.authService.currentUserValue?.id
+            postId: this.topicId,
+            author: {
+                name: user?.username || 'Explorer',
+                avatar: `https://ui-avatars.com/api/?name=${user?.username || 'User'}&background=random`
+            }
         };
 
         this.communityService.createReply(replyDTO).subscribe({
             next: (savedPost) => {
-                const newReply = this.mapPostDTOToForumReply(savedPost);
+                const newReply = this.mapPostDTOToForumReply(savedPost as any);
                 this.replies = [...this.replies, newReply];
                 this.topic.replyCount++;
                 this.replyText = '';

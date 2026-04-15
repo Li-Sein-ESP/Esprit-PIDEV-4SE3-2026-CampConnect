@@ -66,6 +66,8 @@ export class SafetyAlertsComponent implements OnInit {
   isEditingAlert = false;
   saving = false;
   savingAlert = false;
+  alertFormSubmitted = false;
+  alertFormErrors: Record<string, string> = {};
 
   constructor(
     private router: Router,
@@ -161,6 +163,22 @@ export class SafetyAlertsComponent implements OnInit {
 
   viewDetails(id: string): void {
     this.router.navigate(['/safety/alerts', id]);
+  }
+
+  openSafetyMap(): void {
+    this.router.navigateByUrl('/safety/map').then((ok) => {
+      if (!ok) {
+        window.location.href = '/safety/map';
+      }
+    });
+  }
+
+  openReportIncident(): void {
+    this.router.navigateByUrl('/safety/report-incident').then((ok) => {
+      if (!ok) {
+        window.location.href = '/safety/report-incident';
+      }
+    });
   }
 
   formatDate(isoDate: string): string {
@@ -259,6 +277,8 @@ export class SafetyAlertsComponent implements OnInit {
     };
     this.editingAlert = newAlert;
     this.isEditingAlert = false;
+    this.alertFormSubmitted = false;
+    this.alertFormErrors = {};
     this.showEditModal = true;
   }
 
@@ -267,6 +287,8 @@ export class SafetyAlertsComponent implements OnInit {
     event.stopPropagation();
     this.editingAlert = JSON.parse(JSON.stringify(alert)); // Deep copy
     this.isEditingAlert = true;
+    this.alertFormSubmitted = false;
+    this.alertFormErrors = {};
     this.showEditModal = true;
   }
 
@@ -290,10 +312,21 @@ export class SafetyAlertsComponent implements OnInit {
     this.showEditModal = false;
     this.editingAlert = null;
     this.isEditingAlert = false;
+    this.alertFormSubmitted = false;
+    this.alertFormErrors = {};
   }
 
   saveAlert(): void {
     if (!this.editingAlert) return;
+
+    this.alertFormSubmitted = true;
+    if (!this.validateAlertForm()) {
+      return;
+    }
+
+    // sanitize string fields before sending
+    this.editingAlert.title = (this.editingAlert.title || '').trim();
+    this.editingAlert.description = (this.editingAlert.description || '').trim();
     
     this.savingAlert = true;
     const alertData = this.editingAlert;
@@ -326,5 +359,49 @@ export class SafetyAlertsComponent implements OnInit {
         alert('Failed to save safety alert. Please try again.');
       }
     });
+  }
+
+  validateAlertForm(): boolean {
+    this.alertFormErrors = {};
+    if (!this.editingAlert) {
+      return false;
+    }
+
+    const title = (this.editingAlert.title || '').trim();
+    const description = (this.editingAlert.description || '').trim();
+    const type = (this.editingAlert.type || '').trim();
+    const severity = (this.editingAlert.severity || '').trim();
+
+    if (!title) {
+      this.alertFormErrors['title'] = 'Title is required.';
+    } else if (title.length < 4) {
+      this.alertFormErrors['title'] = 'Title must be at least 4 characters.';
+    } else if (title.length > 120) {
+      this.alertFormErrors['title'] = 'Title cannot exceed 120 characters.';
+    }
+
+    if (!description) {
+      this.alertFormErrors['description'] = 'Description is required.';
+    } else if (description.length < 15) {
+      this.alertFormErrors['description'] = 'Description must be at least 15 characters.';
+    } else if (description.length > 500) {
+      this.alertFormErrors['description'] = 'Description cannot exceed 500 characters.';
+    }
+
+    const validTypes = ['weather', 'fire', 'wildlife', 'closure', 'advisory'];
+    if (!type || !validTypes.includes(type)) {
+      this.alertFormErrors['type'] = 'Please select a valid category.';
+    }
+
+    const validSeverities = ['critical', 'danger', 'warning', 'info'];
+    if (!severity || !validSeverities.includes(severity)) {
+      this.alertFormErrors['severity'] = 'Please select a valid severity.';
+    }
+
+    return Object.keys(this.alertFormErrors).length === 0;
+  }
+
+  hasAlertFieldError(field: string): boolean {
+    return this.alertFormSubmitted && !!this.alertFormErrors[field];
   }
 }

@@ -1,74 +1,34 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
 
+/**
+ * TrustScoreComponent — displays a user's trust score as a badge/pill.
+ */
 @Component({
     selector: 'app-trust-score',
     standalone: true,
-    imports: [CommonModule],
-    templateUrl: './trust-score.component.html',
-    styleUrl: './trust-score.component.scss'
+    imports: [],
+    template: `
+        @if (score != null) {
+            <span
+                [class]="getClass()"
+                [title]="'Trust Score: ' + score">
+                {{ score }}
+            </span>
+        }
+    `,
+    styles: [`
+        .trust-high  { display:inline-flex; align-items:center; padding:2px 8px; border-radius:9999px; font-size:0.75rem; font-weight:600; background:#d1fae5; color:#065f46; }
+        .trust-mid   { display:inline-flex; align-items:center; padding:2px 8px; border-radius:9999px; font-size:0.75rem; font-weight:600; background:#fef3c7; color:#92400e; }
+        .trust-new   { display:inline-flex; align-items:center; padding:2px 8px; border-radius:9999px; font-size:0.75rem; font-weight:600; background:#f3f4f6; color:#6b7280; }
+    `]
 })
-export class TrustScoreComponent implements OnInit, OnChanges {
-    @Input() score: number = 0;
-    @Input() variant: 'default' | 'small' | 'admin' = 'default';
+export class TrustScoreComponent {
+    @Input() score: number | null = null;
 
-    level: number = 1;
-    levelLabel: string = 'Newcomer';
-    isAnimating: boolean = false;
-    circumference: number = 2 * Math.PI * 52; // r=52 in SVG
-    dashArray: string = `0 ${this.circumference}`;
-
-    ngOnInit() {
-        this.updateBadge();
-        // Trigger animation slightly after load if default or admin
-        setTimeout(() => {
-            this.isAnimating = true;
-        }, 100);
-    }
-
-    ngOnChanges(changes: SimpleChanges) {
-        if (changes['score']) {
-            this.updateBadge();
-        }
-    }
-
-    updateBadge() {
-        this.calculateLevel();
-        // Set dash array for progress
-        const dashLen = (this.score / 100) * this.circumference;
-        // Use timeout to ensure CSS transition triggers if it was 0
-        setTimeout(() => {
-            this.dashArray = `${dashLen} ${this.circumference - dashLen}`;
-        }, 50);
-    }
-
-    calculateLevel() {
-        if (this.score <= 20) {
-            this.level = 1;
-            this.levelLabel = 'Newcomer';
-        } else if (this.score <= 40) {
-            this.level = 2;
-            this.levelLabel = 'Explorer';
-        } else if (this.score <= 60) {
-            this.level = 3;
-            this.levelLabel = 'Trailblazer';
-        } else if (this.score <= 80) {
-            this.level = 4;
-            this.levelLabel = 'Ranger';
-        } else {
-            this.level = 5;
-            this.levelLabel = 'Summit Guide'; // or 'Summit' for admin but we can let CSS handle it or just use one
-            if (this.variant === 'admin') this.levelLabel = 'Summit';
-        }
-    }
-
-    // Helper getters for CSS classes
-    get badgeClasses() {
-        return {
-            'trust-badge': true,
-            [`trust-badge--level-${this.level}`]: true,
-            'trust-badge--small': this.variant === 'small',
-            'trust-badge--admin': this.variant === 'admin'
-        };
+    getClass(): string {
+        if (this.score == null) return 'trust-new';
+        if (this.score >= 80) return 'trust-high';
+        if (this.score >= 50) return 'trust-mid';
+        return 'trust-new';
     }
 }

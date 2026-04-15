@@ -1,0 +1,261 @@
+﻿<!-- Loading state -->
+<div *ngIf="loading" class="flex justify-center items-center py-16">
+    <div class="text-center text-gray-500">
+        <div class="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4">
+        </div>
+        <p>Loading deliveries...</p>
+    </div>
+</div>
+
+<!-- Error state -->
+<div *ngIf="!loading && error" class="bg-red-50 border border-red-200 rounded-2xl p-6 mb-6 flex items-center gap-4">
+    <p class="text-red-600 m-0">{{ error }}</p>
+    <button (click)="loadDeliveries()" class="ml-auto text-sm text-red-600 underline">Retry</button>
+</div>
+
+<!-- KPI Cards Section -->
+<section *ngIf="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Card 1 -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-sm font-medium text-gray-500 m-0">Active Deliveries</p>
+                <h3 class="text-3xl font-bold text-gray-900 mt-2 m-0">{{ activeDeliveries.length }}</h3>
+            </div>
+            <div class="p-2 bg-blue-50 rounded-lg">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-sm font-medium text-gray-500 m-0">Pending Requests</p>
+                <h3 class="text-3xl font-bold text-gray-900 mt-2 m-0">{{ pendingDeliveries.length }}</h3>
+            </div>
+            <div class="p-2 bg-amber-50 rounded-lg">
+                <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+        </div>
+        <div class="mt-4 flex items-center text-sm">
+            <span class="text-gray-500">Needs approval</span>
+        </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-sm font-medium text-gray-500 m-0">Total Deliveries</p>
+                <h3 class="text-3xl font-bold text-gray-900 mt-2 m-0">{{ deliveries.length }}</h3>
+            </div>
+            <div class="p-2 bg-emerald-50 rounded-lg">
+                <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-sm font-medium text-gray-500 m-0">Completed</p>
+                <h3 class="text-3xl font-bold text-gray-900 mt-2 m-0">
+                    {{ completedDeliveries.length }}
+                </h3>
+            </div>
+            <div class="p-2 bg-purple-50 rounded-lg">
+                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <!-- Active Deliveries List -->
+    <div class="lg:col-span-2 space-y-6">
+        <div class="flex justify-between items-center">
+            <h2 class="text-lg font-bold text-gray-900 m-0">Active Deliveries</h2>
+        </div>
+
+        <!-- Empty state -->
+        <div *ngIf="!loading && activeDeliveries.length === 0"
+            class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center">
+            <p class="text-gray-400">No active deliveries at the moment.</p>
+        </div>
+
+        <!-- Delivery Cards using ngFor -->
+        <div *ngFor="let delivery of activeDeliveries"
+            class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer group">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                <div class="flex items-center space-x-3 mb-2 md:mb-0">
+                    <span class="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded uppercase tracking-wide">
+                        #{{ delivery.id | slice:0:8 }}
+                    </span>
+                    <span *ngIf="delivery.priority === 'HIGH' || delivery.priority === 'URGENT'"
+                        class="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-full flex items-center w-fit">
+                        <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5 animate-pulse"></span>
+                        {{ delivery.priority }}
+                    </span>
+                    <span *ngIf="delivery.priority === 'NORMAL' || delivery.priority === 'LOW'"
+                        class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded-full flex items-center w-fit">
+                        {{ delivery.priority }}
+                    </span>
+                </div>
+                <span class="text-sm text-gray-500">{{ delivery.scheduledDate | date:'mediumDate' }}</span>
+            </div>
+
+            <div class="flex items-start space-x-4 mb-4">
+                <div class="flex flex-col items-center mt-1">
+                    <div class="w-3 h-3 rounded-full bg-emerald-500 border-2 border-white shadow-sm"></div>
+                    <div class="h-10 w-0.5 bg-gray-200 my-1"></div>
+                    <div class="w-3 h-3 rounded-full bg-gray-300 border-2 border-white shadow-sm"></div>
+                </div>
+                <div class="flex-1 space-y-4">
+                    <div>
+                        <p class="text-xs text-gray-400 font-medium uppercase m-0">Pickup</p>
+                        <p class="text-sm font-semibold text-gray-800 m-0">{{ delivery.pickupAddress }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400 font-medium uppercase m-0">Drop-off</p>
+                        <p class="text-sm font-semibold text-gray-800 m-0">{{ delivery.deliveryAddress }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-4 border-t border-gray-50">
+                <div class="flex space-x-4">
+                    <span class="text-xs font-medium px-2 py-0.5 rounded-full"
+                        [class.bg-blue-100]="delivery.status === 'IN_TRANSIT'"
+                        [class.text-blue-700]="delivery.status === 'IN_TRANSIT'"
+                        [class.bg-yellow-100]="delivery.status === 'ASSIGNED'"
+                        [class.text-yellow-700]="delivery.status === 'ASSIGNED'"
+                        [class.bg-orange-100]="delivery.status === 'CREATED' || delivery.status === 'PENDING'"
+                        [class.text-orange-700]="delivery.status === 'CREATED' || delivery.status === 'PENDING'"
+                        [class.bg-emerald-100]="delivery.status === 'PICKED_UP' || delivery.status === 'DELIVERED'"
+                        [class.text-emerald-700]="delivery.status === 'PICKED_UP' || delivery.status === 'DELIVERED'">
+                        {{ delivery.status | titlecase }}
+                    </span>
+                </div>
+                <div class="flex gap-2">
+                    <button *ngIf="delivery.status === 'CREATED' || delivery.status === 'PENDING'"
+                        (click)="updateStatus(delivery.id, 'ASSIGNED')"
+                        class="text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-medium hover:bg-orange-200 transition-colors">
+                        Assign to Me
+                    </button>
+                    <button *ngIf="delivery.status === 'ASSIGNED'" (click)="updateStatus(delivery.id, 'PICKED_UP')"
+                        class="text-xs bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-medium hover:bg-emerald-200 transition-colors">
+                        Mark Picked Up
+                    </button>
+                    <button *ngIf="delivery.status === 'PICKED_UP'" (click)="updateStatus(delivery.id, 'IN_TRANSIT')"
+                        class="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium hover:bg-blue-200 transition-colors">
+                        Mark In Transit
+                    </button>
+                    <button *ngIf="delivery.status === 'IN_TRANSIT'" (click)="updateStatus(delivery.id, 'DELIVERED')"
+                        class="text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded-full font-medium hover:bg-purple-200 transition-colors">
+                        Mark Delivered
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Route & Stats -->
+    <div class="space-y-8">
+
+        <!-- Route Summary -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <h2 class="text-lg font-bold text-gray-900 mb-4 mt-0">Route Summary</h2>
+
+            <!-- Mock Map -->
+            <div class="map-bg rounded-xl h-48 w-full mb-4 relative">
+                <!-- SVG Route Overlay -->
+                <svg class="absolute inset-0 w-full h-full pointer-events-none" style="overflow: visible;">
+                    <path d="M 40 140 Q 100 40 200 100 T 350 60" fill="none" stroke="#10B981" stroke-width="4"
+                        stroke-linecap="round" class="map-route" />
+                    <circle cx="40" cy="140" r="6" fill="#059669" stroke="white" stroke-width="2" />
+                    <circle cx="350" cy="60" r="6" fill="#EF4444" stroke="white" stroke-width="2" />
+                </svg>
+                <!-- Map Labels -->
+                <div
+                    class="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-2 py-1 rounded text-xs font-bold text-gray-700 shadow-sm leading-none m-0">
+                    Start</div>
+                <div
+                    class="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded text-xs font-bold text-gray-700 shadow-sm leading-none m-0">
+                    Finish</div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gray-50 p-3 rounded-xl">
+                    <p class="text-xs text-gray-500 m-0">Total Distance</p>
+                    <p class="text-lg font-bold text-gray-900 m-0">142 km</p>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-xl">
+                    <p class="text-xs text-gray-500 m-0">Est. Time</p>
+                    <p class="text-lg font-bold text-gray-900 m-0">2h 45m</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Chart -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold text-gray-900 m-0">Weekly Earnings</h2>
+                <select
+                    class="text-xs border-none bg-gray-50 rounded-lg px-2 py-1 text-gray-600 focus:ring-0 cursor-pointer outline-none">
+                    <option>Last 7 Days</option>
+                    <option>Last Month</option>
+                </select>
+            </div>
+
+            <!-- CSS Bar Chart -->
+            <div class="bar-chart">
+                <div class="bar h-[40%]">
+                    <div class="bar-label">Mon</div>
+                </div>
+                <div class="bar h-[65%]">
+                    <div class="bar-label">Tue</div>
+                </div>
+                <div class="bar h-[50%]">
+                    <div class="bar-label">Wed</div>
+                </div>
+                <div class="bar h-[85%]">
+                    <div class="bar-label">Thu</div>
+                </div>
+                <div class="bar active h-[60%]">
+                    <div class="bar-label">Fri</div>
+                </div>
+                <div class="bar h-[75%]">
+                    <div class="bar-label">Sat</div>
+                </div>
+                <div class="bar h-[30%]">
+                    <div class="bar-label">Sun</div>
+                </div>
+            </div>
+
+            <div class="mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
+                <div>
+                    <p class="text-xs text-gray-500 m-0">Total This Week</p>
+                    <p class="text-xl font-bold text-gray-900 m-0">$1,240.50</p>
+                </div>
+                <span
+                    class="text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg text-xs font-bold inline-flex h-fit leading-none">+8.5%</span>
+            </div>
+        </div>
+
+    </div>
+</div>

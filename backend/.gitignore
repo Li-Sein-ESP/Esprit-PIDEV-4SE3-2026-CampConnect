@@ -73,3 +73,16 @@ build/
 
 # Windows
 Thumbs.db
+
+# Uploads directory (user uploaded files)
+uploads/
+
+# Test/debug files
+err.json
+headers.txt
+product.json
+
+# Maven wrapper (optional - uncomment if you want to exclude)
+# .mvn/
+# mvnw
+# mvnw.cmd

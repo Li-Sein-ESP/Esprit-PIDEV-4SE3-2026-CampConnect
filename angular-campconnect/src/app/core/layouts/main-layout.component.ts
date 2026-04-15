@@ -1,17 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { NavigationComponent } from './navigation.component';
+import { filter } from 'rxjs/operators';
 
 @Component({
-    selector: 'app-main-layout',
-    standalone: true,
-    imports: [CommonModule, RouterModule, NavigationComponent],
-    template: `
+  selector: 'app-main-layout',
+  standalone: true,
+  imports: [CommonModule, RouterModule, NavigationComponent],
+  template: `
     <div class="min-h-screen flex flex-col">
       <app-navigation></app-navigation>
       
-      <main class="flex-1 pb-16 md:pb-0">
+      <!-- Main Content Container with dynamic padding -->
+      <main class="flex-1" [class.pt-20]="!isLandingPage" [class.pt-0]="isLandingPage">
         <router-outlet></router-outlet>
       </main>
 
@@ -39,7 +41,7 @@ import { NavigationComponent } from './navigation.component';
                 <li><a routerLink="/campsites" class="hover:text-white transition-colors">Campsites</a></li>
                 <li><a routerLink="/academy" class="hover:text-white transition-colors">Academy</a></li>
                 <li><a routerLink="/events" class="hover:text-white transition-colors">Events</a></li>
-                <li><a routerLink="/safety" class="hover:text-white transition-colors">Safety</a></li>
+                <li><a routerLink="/safety/alerts" class="hover:text-white transition-colors">Safety</a></li>
               </ul>
             </div>
 
@@ -47,6 +49,7 @@ import { NavigationComponent } from './navigation.component';
             <div>
               <h4 class="font-semibold mb-4">Plan</h4>
               <ul class="space-y-2 text-sm text-gray-400">
+                <li><a routerLink="/trips" class="hover:text-white transition-colors">My Trips</a></li>
                 <li><a routerLink="/plan-trip" class="hover:text-white transition-colors">Trip Planner</a></li>
                 <li><a routerLink="/transportation" class="hover:text-white transition-colors">Transportation</a></li>
                 <li><a routerLink="/gear" class="hover:text-white transition-colors">Gear</a></li>
@@ -60,7 +63,7 @@ import { NavigationComponent } from './navigation.component';
               <ul class="space-y-2 text-sm text-gray-400">
                 <li><a routerLink="/community" class="hover:text-white transition-colors">Forums</a></li>
                 <li><a routerLink="/community/stories" class="hover:text-white transition-colors">Trip Stories</a></li>
-                <li><a routerLink="/community/help" class="hover:text-white transition-colors">Help Center</a></li>
+                <li><a routerLink="/community/ask-for-help" class="hover:text-white transition-colors">Help Center</a></li>
               </ul>
             </div>
           </div>
@@ -72,6 +75,26 @@ import { NavigationComponent } from './navigation.component';
       </footer>
     </div>
   `,
-    styles: []
+  styles: []
 })
-export class MainLayoutComponent { }
+export class MainLayoutComponent implements OnInit {
+  isLandingPage = false;
+
+  constructor(private router: Router) {
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      this.checkLandingPage(event.url);
+    });
+  }
+
+  ngOnInit() {
+    this.checkLandingPage(this.router.url);
+  }
+
+  checkLandingPage(url: string) {
+    const path = url.split('?')[0];
+    // Same logic as navigation to ensure sync
+    this.isLandingPage = path === '/' || path === '/marketplace' || path === '/marketplace/';
+  }
+}

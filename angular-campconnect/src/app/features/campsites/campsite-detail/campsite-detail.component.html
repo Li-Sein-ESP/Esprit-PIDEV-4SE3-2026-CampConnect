@@ -355,7 +355,7 @@
 
                             <div class="space-y-3 mb-6">
                                 <app-button size="lg" [fullWidth]="true"
-                                    (click)="navigate('/discover', { state: { preselectedSite: campsite } })">
+                                    (click)="navigate('/booking/dates/' + campsite.id)">
                                     <lucide-icon [name]="Calendar" class="w-5 h-5"></lucide-icon>
                                     Check Availability
                                 </app-button>

@@ -2,58 +2,47 @@ package com.campconnect.model;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "trips")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Trip {
-
+    
     @Id
     private String id;
-
+    
     private String name;
-    private String destination;
+    private String description;
     private String notes;
-
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
-
-    private DifficultyLevel difficulty;
-
-    @DBRef
+    private String destination;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private String creatorId;
+    @Builder.Default
+    private List<String> participants = new ArrayList<>();
+    private String status;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    
+    private Double latitude;
+    private Double longitude;
+    private String difficulty;
+    private Integer maxParticipants;
+    private String groupId;
     private Group group;
-
-    @DBRef
+    
+    @Builder.Default
     private List<Incident> incidents = new ArrayList<>();
 
-    @DBRef
-    private List<SafetyAlert> alerts = new ArrayList<>();
-
     public void addIncident(Incident incident) {
-        incidents.add(incident);
-        incident.setTrip(this);
-    }
-
-    public void removeIncident(Incident incident) {
-        incidents.remove(incident);
-        incident.setTrip(null);
-    }
-
-    public void addSafetyAlert(SafetyAlert alert) {
-        alerts.add(alert);
-        alert.setTrip(this);
-    }
-
-    public void removeSafetyAlert(SafetyAlert alert) {
-        alerts.remove(alert);
-        alert.setTrip(null);
+        this.incidents.add(incident);
     }
 }

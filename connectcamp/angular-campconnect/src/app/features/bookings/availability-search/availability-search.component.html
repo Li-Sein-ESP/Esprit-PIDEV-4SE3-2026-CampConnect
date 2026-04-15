@@ -1,0 +1,210 @@
+<div class="min-h-screen bg-[var(--color-background)] py-12">
+  <div class="container max-w-7xl">
+    <!-- Header -->
+    <div class="mb-8">
+      <h2 class="mb-2">Find Your Perfect Campsite</h2>
+      <p class="text-[var(--color-text-secondary)]">
+        Search for available campsites and book your next outdoor adventure
+      </p>
+    </div>
+
+    <!-- Search Card -->
+    <app-card variant="elevated" class="mb-8">
+      <app-card-content class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- Check-in Date -->
+          <div>
+            <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+              <lucide-icon [img]="Calendar" class="inline w-4 h-4 mr-1"></lucide-icon>
+              Check-in
+            </label>
+            <input type="date" [value]="searchParams().startDate"
+              (change)="updateSearchParam('startDate', $any($event.target).value)" [min]="minDate"
+              class="w-full px-4 py-2 rounded-lg border-2 border-[var(--color-border-light)] focus:border-[var(--color-primary-600)] focus:ring-2 focus:ring-[var(--color-primary-100)] transition-all" />
+          </div>
+
+          <!-- Check-out Date -->
+          <div>
+            <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+              <lucide-icon [img]="Calendar" class="inline w-4 h-4 mr-1"></lucide-icon>
+              Check-out
+            </label>
+            <input type="date" [value]="searchParams().endDate"
+              (change)="updateSearchParam('endDate', $any($event.target).value)" [min]="minEndDate"
+              class="w-full px-4 py-2 rounded-lg border-2 border-[var(--color-border-light)] focus:border-[var(--color-primary-600)] focus:ring-2 focus:ring-[var(--color-primary-100)] transition-all" />
+          </div>
+
+          <!-- Guests -->
+          <div>
+            <label class="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+              <lucide-icon [img]="Users" class="inline w-4 h-4 mr-1"></lucide-icon>
+              Guests
+            </label>
+            <input type="number" [value]="searchParams().guests"
+              (change)="updateSearchParam('guests', +$any($event.target).value || 1)" min="1" max="20"
+              class="w-full px-4 py-2 rounded-lg border-2 border-[var(--color-border-light)] focus:border-[var(--color-primary-600)] focus:ring-2 focus:ring-[var(--color-primary-100)] transition-all" />
+          </div>
+
+          <!-- Search Button -->
+          <div class="flex items-end">
+            <app-button size="lg" [fullWidth]="true" (click)="handleSearch()"
+              [disabled]="!searchParams().startDate || !searchParams().endDate || isSearching()" class="w-full">
+              @if (isSearching()) {
+              <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+              Searching...
+              } @else {
+              <lucide-icon [img]="Search" class="w-5 h-5 mr-2"></lucide-icon>
+              Search
+              }
+            </app-button>
+          </div>
+        </div>
+
+        @if (nights > 0) {
+        <div class="mt-4 flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
+          <lucide-icon [img]="Info" class="w-4 h-4"></lucide-icon>
+          <span>
+            {{ nights }} {{ nights === 1 ? 'night' : 'nights' }} •
+            {{ searchParams().guests }} {{ searchParams().guests === 1 ? 'guest' : 'guests' }}
+          </span>
+        </div>
+        }
+      </app-card-content>
+    </app-card>
+
+    <!-- Results -->
+    @if (showResults()) {
+    <!-- Results Header -->
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h3 class="mb-1">{{ filteredSites.length }} Campsites Found</h3>
+        <p class="text-sm text-[var(--color-text-secondary)]">
+          {{ formatDate(searchParams().startDate, { month: 'short', day: 'numeric' }) }}
+          -
+          {{ formatDate(searchParams().endDate, { month: 'short', day: 'numeric', year: 'numeric' }) }}
+        </p>
+      </div>
+      <app-button variant="outline" size="sm">
+        <lucide-icon [img]="Filter" class="w-4 h-4 mr-2"></lucide-icon>
+        Filters
+      </app-button>
+    </div>
+
+    <!-- Campsite Cards -->
+    <div class="space-y-6">
+      @for (site of filteredSites; track site.id) {
+      <app-card variant="elevated" padding="none" class="overflow-hidden hover:shadow-xl transition-shadow">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-0">
+          <!-- Image -->
+          <div class="relative h-64 md:h-auto">
+            <img [src]="site.imageUrl" [alt]="site.name" class="w-full h-full object-cover" />
+            <div class="absolute top-4 left-4">
+              <app-badge [variant]="availabilityConfig[site.availability].variant">
+                {{ availabilityConfig[site.availability].label }}
+              </app-badge>
+            </div>
+            @if (site.tags.length > 0) {
+            <div class="absolute bottom-4 left-4 flex gap-2">
+              @for (tag of site.tags.slice(0, 2); track tag) {
+              <app-badge variant="default" class="bg-white/90 backdrop-blur">
+                {{ tag }}
+              </app-badge>
+              }
+            </div>
+            }
+          </div>
+
+          <!-- Details -->
+          <div class="md:col-span-2 p-6">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <h4>{{ site.name }}</h4>
+                  <div class="flex items-center gap-1">
+                    <lucide-icon [img]="Star" class="w-4 h-4 text-amber-500 fill-current"></lucide-icon>
+                    <span class="font-medium">{{ site.rating }}</span>
+                    <span class="text-sm text-[var(--color-text-tertiary)]">
+                      ({{ site.reviews }})
+                    </span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] mb-3">
+                  <lucide-icon [img]="MapPin" class="w-4 h-4"></lucide-icon>
+                  <span>{{ site.location }}</span>
+                  <span class="text-[var(--color-text-tertiary)]">•</span>
+                  <lucide-icon [img]="TreePine" class="w-4 h-4"></lucide-icon>
+                  <span>{{ site.terrain }}</span>
+                </div>
+              </div>
+            </div>
+
+            <p class="text-[var(--color-text-secondary)] mb-4 line-clamp-2">
+              {{ site.description }}
+            </p>
+
+            <!-- Amenities -->
+            <div class="flex items-center gap-4 mb-4">
+              @for (amenity of site.amenities; track amenity) {
+              @if (getAmenityIcon(amenity); as icon) {
+              <div class="flex items-center gap-1.5 text-sm text-[var(--color-text-secondary)]">
+                <lucide-icon [img]="icon" class="w-4 h-4"></lucide-icon>
+                <span class="capitalize">{{ amenity }}</span>
+              </div>
+              }
+              }
+              <div class="flex items-center gap-1.5 text-sm text-[var(--color-text-secondary)]">
+                <lucide-icon [img]="Users" class="w-4 h-4"></lucide-icon>
+                <span>Up to {{ site.maxCapacity }}</span>
+              </div>
+            </div>
+
+            <!-- Pricing & Action -->
+            <div class="flex items-center justify-between pt-4 border-t border-[var(--color-border-light)]">
+              <div>
+                <div class="flex items-baseline gap-2">
+                  <span class="text-2xl font-bold text-[var(--color-primary-600)]">
+                    ${{ getTotalPrice(site.basePrice) }}
+                  </span>
+                  <span class="text-sm text-[var(--color-text-secondary)]">
+                    total
+                  </span>
+                </div>
+                <div class="text-sm text-[var(--color-text-tertiary)]">
+                  ${{ site.basePrice }} × {{ nights }} {{ nights === 1 ? 'night' : 'nights' }}
+                </div>
+              </div>
+
+              @if (site.availability === 'full') {
+              <app-button variant="outline" [disabled]="true">
+                Fully Booked
+              </app-button>
+              } @else {
+              <app-button (click)="reserveSite(site)">
+                Reserve Now
+                <lucide-icon [img]="ChevronRight" class="w-5 h-5 ml-2"></lucide-icon>
+              </app-button>
+              }
+            </div>
+          </div>
+        </div>
+      </app-card>
+      }
+    </div>
+    }
+
+    <!-- Empty State -->
+    @if (!showResults()) {
+    <app-card variant="elevated" class="text-center py-16">
+      <div class="max-w-md mx-auto">
+        <div class="w-16 h-16 bg-[var(--color-primary-50)] rounded-full flex items-center justify-center mx-auto mb-4">
+          <lucide-icon [img]="Tent" class="w-8 h-8 text-[var(--color-primary-600)]"></lucide-icon>
+        </div>
+        <h3 class="mb-2">Start Your Search</h3>
+        <p class="text-[var(--color-text-secondary)] mb-6">
+          Enter your dates and group size to find available campsites
+        </p>
+      </div>
+    </app-card>
+    }
+  </div>
+</div>

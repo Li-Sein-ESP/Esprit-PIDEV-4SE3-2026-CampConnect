@@ -4,6 +4,7 @@ import { SafetyService } from '../services/safety.service';
 import { of } from 'rxjs';
 import { LucideAngularModule, AlertTriangle, ShieldCheck, Search, Filter, Info, CloudRain, Flame, AlertCircle, MapPin, Calendar, Clock, ChevronRight, Map as LucideMap, Edit3, Trash2 } from 'lucide-angular';
 import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 describe('SafetyAlertsComponent', () => {
@@ -33,7 +34,30 @@ describe('SafetyAlertsComponent', () => {
           description: 'Flash floods possible'
         }
       ])),
+      getIncidents: jasmine.createSpy('getIncidents').and.returnValue(of([
+        {
+          id: 'inc-1',
+          type: 'Wildlife',
+          level: 'medium',
+          regionName: 'Forest',
+          latitude: 12.34,
+          longitude: 56.78,
+          description: 'Bear seen near trail',
+          reporterId: 'u1',
+          createdAt: new Date().toISOString(),
+          status: 'pending'
+        }
+      ])),
       deleteAlert: jasmine.createSpy('deleteAlert').and.returnValue(of(null)),
+      deleteIncident: jasmine.createSpy('deleteIncident').and.returnValue(of(null)),
+      createAlert: jasmine.createSpy('createAlert').and.returnValue(of({
+        id: '3',
+        title: 'New Alert',
+        type: 'weather',
+        severity: 'warning',
+        location: { name: 'South Lake', region: 'Valley' },
+        description: 'Strong winds expected'
+      })),
       updateAlert: jasmine.createSpy('updateAlert').and.returnValue(of({ id: '1', title: 'Updated Fire' }))
     };
     mockRouter = { navigate: jasmine.createSpy('navigate') };
@@ -50,7 +74,8 @@ describe('SafetyAlertsComponent', () => {
       ],
       providers: [
         { provide: SafetyService, useValue: mockSafetyService },
-        { provide: Router, useValue: mockRouter }
+        { provide: Router, useValue: mockRouter },
+        { provide: ActivatedRoute, useValue: {} }
       ]
     }).compileComponents();
 
@@ -65,8 +90,10 @@ describe('SafetyAlertsComponent', () => {
 
   it('should load alerts on initialization', () => {
     expect(mockSafetyService.getAlerts).toHaveBeenCalled();
+    expect(mockSafetyService.getIncidents).toHaveBeenCalled();
     expect(component.alerts.length).toBe(2);
     expect(component.filteredAlerts.length).toBe(2);
+    expect(component.incidents.length).toBe(1);
   });
 
   it('should filter alerts by searching for title', () => {
@@ -102,5 +129,43 @@ describe('SafetyAlertsComponent', () => {
     
     expect(mockSafetyService.deleteAlert).toHaveBeenCalledWith('1');
     expect(component.alerts.length).toBe(1);
+  });
+
+  it('should add a new alert through saveAlert in create mode', () => {
+    component.openAddAlertModal();
+    component.editingAlert.title = 'New Alert';
+    component.editingAlert.description = 'Strong winds expected';
+    component.editingAlert.type = 'weather';
+    component.editingAlert.severity = 'warning';
+    component.editingAlert.location = { name: 'South Lake', region: 'Valley' };
+
+    component.saveAlert();
+
+    expect(mockSafetyService.createAlert).toHaveBeenCalled();
+    expect(component.alerts[0].title).toBe('New Alert');
+  });
+
+  it('should prevent saving alert when validation fails', () => {
+    component.openAddAlertModal();
+    component.editingAlert.title = 'a';
+    component.editingAlert.description = 'short';
+    component.editingAlert.type = 'invalid';
+    component.editingAlert.severity = 'invalid';
+
+    component.saveAlert();
+
+    expect(mockSafetyService.createAlert).not.toHaveBeenCalled();
+    expect(component.alertFormErrors['title']).toBeTruthy();
+    expect(component.alertFormErrors['description']).toBeTruthy();
+    expect(component.alertFormErrors['type']).toBeTruthy();
+    expect(component.alertFormErrors['severity']).toBeTruthy();
+  });
+
+  it('should return correct stats from loaded alerts', () => {
+    const s = component.stats;
+    expect(s.active).toBe(0);
+    expect(s.critical).toBe(1);
+    expect(s.warning).toBe(1);
+    expect(s.info).toBe(0);
   });
 });
