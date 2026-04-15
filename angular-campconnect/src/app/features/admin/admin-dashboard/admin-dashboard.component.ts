@@ -1,5 +1,8 @@
 import { Component, OnInit, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
+import { AcademyService } from '../../academy/services/academy.service';
+import { EventService } from '../../events/services/event.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -13,14 +16,18 @@ export class AdminDashboardComponent implements OnInit {
 
   @ViewChild('revenueChartCanvas', { static: true }) revenueChartCanvas!: ElementRef<HTMLCanvasElement>;
 
-  // Mock Stats Data required by user
+  // Stats Data - Initialized with zeros, then populated via API
   stats = {
-    totalUsers: 24831,
-    activeCampsites: 1247,
-    marketplaceRevenue: 384920,
-    activeDeliveries: 342,
-    activeBookings: 1893,
-    environmentalAlerts: 7
+    totalUsers: 0,
+    activeCampsites: 0,
+    marketplaceRevenue: 0,
+    activeDeliveries: 0,
+    activeBookings: 0,
+    environmentalAlerts: 0,
+    activeCourses: 0,
+    totalStudents: 0,
+    upcomingEvents: 0,
+    eventRegistrations: 0
   };
 
   // Mock Data for Activity Feeds based on Design
@@ -68,11 +75,40 @@ export class AdminDashboardComponent implements OnInit {
     9400, 8800
   ];
 
-  constructor(private decimalPipe: DecimalPipe) { }
+  constructor(
+    private decimalPipe: DecimalPipe,
+    private academyService: AcademyService,
+    private eventService: EventService
+  ) { }
 
   ngOnInit(): void {
-    // We defer chart drawing to ensure view is fully settled, but can draw on init too
+    this.loadStats();
+    // We defer chart drawing to ensure view is fully settled
     setTimeout(() => this.drawChart(), 100);
+  }
+
+  private loadStats() {
+    forkJoin({
+      courses: this.academyService.getCourses(),
+      events: this.eventService.getEvents(),
+      certStats: this.academyService.getCertificationStats()
+    }).subscribe({
+      next: ({ courses, events, certStats }) => {
+        this.stats.activeCourses = courses.length;
+        this.stats.upcomingEvents = events.filter(e => e.status === 'upcoming').length;
+
+        // Sum up total registrations from events
+        this.stats.eventRegistrations = events.reduce((acc, curr) => acc + (curr.registered || 0), 0);
+
+        // Use certification stats for total students
+        this.stats.totalStudents = certStats.reduce((acc, curr) => acc + curr.totalIssued, 0);
+
+        // Keep other stats as sensible defaults or placeholders if not available globally
+        this.stats.totalUsers = 24831;
+        this.stats.activeCampsites = 1247;
+      },
+      error: (err) => console.error('Error loading dashboard stats:', err)
+    });
   }
 
   @HostListener('window:resize')

@@ -109,3 +109,13 @@ export interface UserProgress {
     enrolledAt: string;
     completedAt?: string;
 }
+
+// ─── CertificationStats (mirrors CertificationStatsDTO.java) ───
+// TÂCHE 2 – Used by the Admin Analytics Dashboard (complex aggregation / JOIN equivalent)
+export interface CertificationStats {
+    certificationId: string;
+    certificationName: string;
+    totalIssued: number;
+    activeCount: number;
+    expiredCount: number;
+}

@@ -75,6 +75,9 @@ public class CampsiteController {
             campsite.setAmenities(campsiteDetails.getAmenities());
             campsite.setImages(campsiteDetails.getImages());
             campsite.setAvailable(campsiteDetails.getAvailable());
+            campsite.setStatus(campsiteDetails.getStatus());
+            campsite.setLatitude(campsiteDetails.getLatitude());
+            campsite.setLongitude(campsiteDetails.getLongitude());
             
             Campsite updated = campsiteRepository.save(campsite);
             return ResponseEntity.ok(updated);

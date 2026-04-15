@@ -18,4 +18,6 @@ public interface ITransportService {
     List<Transport> findByTripId(String tripId);
 
     void assignToTrip(String transportId, String tripId);
+
+    List<java.util.Map<String, Object>> getPopularityStats();
 }

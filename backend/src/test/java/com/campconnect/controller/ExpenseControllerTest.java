@@ -1,6 +1,6 @@
 package com.campconnect.controller;
 
-import com.campconnect.dto.ExpenseDto;
+import com.campconnect.dto.ExpenseDTO;
 import com.campconnect.dto.GroupBalances;
 import com.campconnect.model.Expense;
 import com.campconnect.service.IExpenseService;
@@ -38,7 +38,7 @@ class ExpenseControllerTest {
     @Test
     void addExpense_ShouldReturnCreated() throws Exception {
         // Arrange
-        ExpenseDto dto = new ExpenseDto();
+        ExpenseDTO dto = new ExpenseDTO();
         dto.setAmount(100.0);
         dto.setGroupId("group-1");
 

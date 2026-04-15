@@ -1,20 +1,25 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-camp-badge',
     standalone: true,
-    imports: [CommonModule],
+    imports: [],
     template: `
         <div class="camp-badge" [title]="title + (description ? ': ' + description : '')" [class.locked]="!unlocked" [class.small]="size === 'small'" [class.large]="size === 'large'">
             <div class="icon-container">
-                <i *ngIf="icon" [class]="'lucide-' + icon"></i>
-                <span *ngIf="!icon">🏆</span>
+                @if (icon) {
+                    <i [class]="'lucide-' + icon"></i>
+                }
+                @if (!icon) {
+                    <span>🏆</span>
+                }
             </div>
-            <div class="badge-tooltip" *ngIf="description">
-                <strong>{{ title }}</strong>
-                <p>{{ description }}</p>
-            </div>
+            @if (description) {
+                <div class="badge-tooltip">
+                    <strong>{{ title }}</strong>
+                    <p>{{ description }}</p>
+                </div>
+            }
         </div>
     `,
     styles: [`

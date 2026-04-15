@@ -7,7 +7,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class GroupInviteDetailDto {
+public class GroupInviteDetailDTO {
     private String id;
     private String tripIntentId;
     private String groupId;

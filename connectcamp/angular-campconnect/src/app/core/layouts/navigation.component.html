@@ -1,0 +1,155 @@
+<!-- Header -->
+<header
+    [ngClass]="{'bg-white/90 backdrop-blur-xl shadow-sm': isScrolled || !isLandingPage, 'bg-transparent': !isScrolled && isLandingPage}"
+    class="fixed left-0 right-0 top-0 z-50 transition-all duration-500">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        <!-- Logo -->
+        <a routerLink="/" class="flex items-center gap-2">
+            <svg [ngClass]="{'text-emerald-800': isScrolled || !isLandingPage, 'text-white': !isScrolled && isLandingPage}"
+                class="h-8 w-8 transition-colors" viewBox="0 0 32 32" fill="none">
+                <path d="M16 2L3 28h26L16 2z" stroke="currentColor" stroke-width="2" fill="none" />
+                <path d="M10 28l6-10 6 10" stroke="currentColor" stroke-width="2" fill="none" />
+                <circle cx="16" cy="12" r="2" fill="currentColor" />
+            </svg>
+            <span
+                [ngClass]="{'text-emerald-900': isScrolled || !isLandingPage, 'text-white': !isScrolled && isLandingPage}"
+                class="text-xl font-semibold tracking-tight transition-colors">
+                CampConnect V2
+            </span>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden items-center gap-8 md:flex">
+            <div *ngFor="let item of menuItems" class="relative group" (mouseenter)="setActiveDropdown(item.label)"
+                (mouseleave)="setActiveDropdown(null)">
+                <div class="flex items-center">
+                    <a [routerLink]="item.link" routerLinkActive="text-emerald-700"
+                        [ngClass]="{'text-stone-600 hover:text-emerald-700': isScrolled || !isLandingPage, 'text-white/90 hover:text-white': !isScrolled && isLandingPage}"
+                        class="flex items-center gap-1 text-sm font-medium transition-colors py-2">
+                        {{item.label}}
+                    </a>
+                    <button *ngIf="item.children && item.children.length > 0"
+                        [ngClass]="{'text-stone-600 hover:text-emerald-700': isScrolled || !isLandingPage, 'text-white/90 hover:text-white': !isScrolled && isLandingPage}"
+                        class="p-1 transition-colors">
+                        <lucide-icon [name]="ChevronDown" class="w-4 h-4 transition-transform duration-200"
+                            [class.rotate-180]="activeDropdown === item.label"></lucide-icon>
+                    </button>
+                </div>
+
+                <!-- Dropdown -->
+                <div *ngIf="activeDropdown === item.label"
+                    class="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-48 animate-fade-in z-50">
+                    <div class="bg-white rounded-xl shadow-xl border border-stone-100 overflow-hidden py-1">
+                        <a *ngFor="let child of item.children" [routerLink]="child.link"
+                            routerLinkActive="bg-emerald-50 text-emerald-700"
+                            class="block px-4 py-2.5 text-sm text-stone-600 hover:bg-stone-50 hover:text-emerald-700 transition-colors">
+                            {{child.label}}
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+
+        </nav>
+
+        <!-- Right Side Actions -->
+        <div class="flex items-center gap-4">
+            <!-- Theme Toggle (Simplified for design) -->
+            <button (click)="toggleTheme()"
+                [ngClass]="{'text-stone-600 hover:bg-stone-100': isScrolled || !isLandingPage, 'text-white/80 hover:bg-white/10': !isScrolled && isLandingPage}"
+                class="hidden md:flex p-2 rounded-full transition-colors">
+                <lucide-icon *ngIf="!isDarkMode" [name]="MoonIcon" class="w-5 h-5"></lucide-icon>
+                <lucide-icon *ngIf="isDarkMode" [name]="SunIcon" class="w-5 h-5"></lucide-icon>
+            </button>
+
+            <!-- Auth Buttons -->
+            <ng-container *ngIf="!isLoggedIn">
+                <a routerLink="/login"
+                    [ngClass]="{'bg-emerald-800 text-white hover:bg-emerald-900': isScrolled || !isLandingPage, 'bg-white/20 text-white backdrop-blur-sm hover:bg-white/30': !isScrolled && isLandingPage}"
+                    class="hidden rounded-full px-5 py-2.5 text-sm font-medium transition-all hover:scale-105 md:block">
+                    Sign In
+                </a>
+            </ng-container>
+
+            <!-- User Menu -->
+            <div *ngIf="isLoggedIn" class="relative ml-2">
+                <button (click)="toggleUserMenu()"
+                    [ngClass]="{'bg-stone-100 text-stone-700': isScrolled || !isLandingPage, 'bg-white/20 text-white': !isScrolled && isLandingPage}"
+                    class="flex items-center gap-2 rounded-full px-3 py-1.5 transition-all hover:scale-105">
+                    <div
+                        class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold">
+                        {{ userRoles[0]?.substring(5, 7) || 'US' }}
+                    </div>
+                    <span class="hidden md:block text-sm font-medium max-w-[100px] truncate">Account</span>
+                    <lucide-icon [name]="ChevronDown" class="w-4 h-4"></lucide-icon>
+                </button>
+
+                <!-- User Dropdown with new design -->
+                <div *ngIf="isUserMenuOpen" (mouseleave)="isUserMenuOpen = false"
+                    class="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-stone-100 py-2 z-50 animate-fade-in">
+                    <div class="px-4 py-3 border-b border-stone-100">
+                        <p class="text-xs font-medium text-stone-500 uppercase tracking-wider">Signed in as</p>
+                        <p class="text-sm font-bold text-stone-900 truncate">User</p>
+                        <!-- Replace with actual user name if available -->
+                    </div>
+
+                    <a [routerLink]="dashboardLink"
+                        class="flex items-center gap-2 px-4 py-2.5 text-sm text-stone-600 hover:bg-stone-50 hover:text-emerald-700 transition-colors">
+                        Dashboard
+                    </a>
+                    <a routerLink="/profile"
+                        class="flex items-center gap-2 px-4 py-2.5 text-sm text-stone-600 hover:bg-stone-50 hover:text-emerald-700 transition-colors">
+                        Profile
+                    </a>
+
+                    <div class="my-1 border-t border-stone-100"></div>
+
+                    <button (click)="logout()"
+                        class="w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                        Sign Out
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button (click)="toggleMobileMenu()"
+                [ngClass]="{'text-stone-900': isScrolled || !isLandingPage, 'text-white': !isScrolled && isLandingPage}"
+                class="md:hidden p-1">
+                <lucide-icon [name]="isMobileMenuOpen ? XIcon : MenuIcon" class="w-6 h-6"></lucide-icon>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div *ngIf="isMobileMenuOpen"
+        class="md:hidden fixed inset-0 top-[72px] bg-white z-40 overflow-y-auto animate-fade-in">
+        <div class="p-6 space-y-6">
+            <div *ngFor="let item of menuItems" class="space-y-3">
+                <h3 class="font-semibold text-stone-900 text-lg">{{item.label}}</h3>
+                <div class="flex flex-col space-y-2 pl-4 border-l-2 border-stone-100">
+                    <a *ngFor="let child of item.children" [routerLink]="child.link" (click)="toggleMobileMenu()"
+                        class="text-stone-600 py-1 hover:text-emerald-700">
+                        {{child.label}}
+                    </a>
+                </div>
+            </div>
+
+
+
+            <div class="pt-6 border-t border-stone-100">
+                <ng-container *ngIf="!isLoggedIn">
+                    <a routerLink="/login" (click)="toggleMobileMenu()"
+                        class="block w-full text-center rounded-lg bg-emerald-800 text-white px-5 py-3 font-medium hover:bg-emerald-900">
+                        Sign In
+                    </a>
+                </ng-container>
+                <ng-container *ngIf="isLoggedIn">
+                    <a [routerLink]="dashboardLink" (click)="toggleMobileMenu()"
+                        class="block w-full text-center rounded-lg bg-emerald-800 text-white px-5 py-3 font-medium hover:bg-emerald-900">
+                        Go to Dashboard
+                    </a>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</header>

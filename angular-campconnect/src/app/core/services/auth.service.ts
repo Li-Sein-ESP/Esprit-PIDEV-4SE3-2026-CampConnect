@@ -4,6 +4,8 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { User, LoginRequest, LoginResponse, SignupRequest, JwtPayload } from '../models/auth.models';
 
+export type { User } from '../models/auth.models';
+
 const httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 };

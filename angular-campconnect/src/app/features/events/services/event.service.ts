@@ -4,7 +4,9 @@ import { Event, EventRegistration } from '../models/event.model';
 import { Observable, of, throwError } from 'rxjs';
 import { tap, catchError, map } from 'rxjs/operators';
 
-const API_URL = 'http://localhost:8081/api/events';
+import { environment } from '../../../../environments/environment';
+
+const API_URL = `${environment.apiUrl}/events`;
 
 @Injectable({
     providedIn: 'root'
@@ -255,10 +257,5 @@ export class EventService {
 
     getParticipants(eventId: string): Observable<EventRegistration[]> {
         return this.http.get<EventRegistration[]>(`${API_URL}/${eventId}/participants`);
-    }
-
-    // Legacy method for backwards compatibility
-    getMockEvents(): Event[] {
-        return this.mockEvents;
     }
 }

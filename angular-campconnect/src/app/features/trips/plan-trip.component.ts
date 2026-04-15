@@ -57,812 +57,600 @@ import { TransportRoute } from "../transportation/models/transportation.model";
     LucideAngularModule,
   ],
   template: `
-    <div class="container py-8">
-      <!-- Header -->
-      <div class="mb-10 text-center lg:text-left">
-        <h1 class="text-4xl font-bold text-[var(--color-primary-900)] mb-3">
-          Create New Trip
-        </h1>
-        <p class="text-lg text-[var(--color-text-secondary)]">
-          Let's plan your perfect camping adventure in just a few steps
-        </p>
-      </div>
-
-      <!-- Stepper Progress -->
-      <div class="mb-12 max-w-4xl mx-auto px-4">
-        <div class="relative flex justify-between items-center">
-          <!-- Step 1 -->
-          <div class="flex flex-col items-center relative z-10 w-1/4">
-            <div
-              class="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300"
-              [ngClass]="getStepClass(1)"
-            >
-              <lucide-icon
-                *ngIf="currentStep <= 1"
-                [img]="InfoIcon"
-                [size]="20"
-              ></lucide-icon>
-              <lucide-icon
-                *ngIf="currentStep > 1"
-                [img]="CheckIcon"
-                [size]="20"
-              ></lucide-icon>
-            </div>
-            <div class="mt-3 text-center">
-              <span
-                class="block text-xs font-bold uppercase tracking-wider"
-                [ngClass]="
-                  currentStep >= 1
-                    ? 'text-[var(--color-primary-600)]'
-                    : 'text-[var(--color-text-tertiary)]'
-                "
-                >Basic Info</span
-              >
-              <span
-                class="text-[10px] text-[var(--color-text-secondary)] hidden md:block"
-                >Trip essentials</span
-              >
-            </div>
-          </div>
-
-          <!-- Connecting Line -->
+    <div class="min-h-screen bg-[var(--color-neutral-50)] pb-20">
+      <!-- Premium Hero Header -->
+      <section class="bg-slate-900 pt-32 pb-20 px-6 relative overflow-hidden">
+        <div class="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1537225228614-56cc3556d7ed?auto=format&fit=crop&q=80"
+            class="w-full h-full object-cover opacity-30 scale-110 blur-sm"
+          />
           <div
-            class="absolute left-[12.5%] right-[12.5%] top-[24px] h-[3px] bg-[var(--color-neutral-200)] -z-0"
+            class="absolute inset-0 bg-gradient-to-b from-slate-900/50 to-slate-900"
+          ></div>
+        </div>
+
+        <div class="container relative z-10">
+          <div
+            class="max-w-3xl animate-in fade-in slide-in-from-bottom-8 duration-700"
           >
+            <h1
+              class="text-5xl md:text-7xl font-black text-white mb-6 tracking-tighter"
+            >
+              Plan Your <span class="text-emerald-400">Next Mission</span>
+            </h1>
+            <p
+              class="text-xl text-slate-400 font-medium max-w-2xl leading-relaxed"
+            >
+              Configure your expedition parameters and let our tactical planning
+              system generate your optimal wilderness itinerary.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Futurist Stepper -->
+      <div class="container -mt-12 relative z-20 px-6 mb-16">
+        <div
+          class="bg-white/80 backdrop-blur-2xl p-6 rounded-[32px] border border-white shadow-2xl shadow-black/5 max-w-5xl mx-auto flex items-center justify-between gap-4"
+        >
+          <div
+            *ngFor="let step of [1, 2, 3, 4]; let last = last"
+            class="flex items-center gap-4 flex-1 last:flex-none"
+          >
+            <div class="flex items-center gap-3">
+              <div
+                [ngClass]="
+                  currentStep >= step
+                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200'
+                    : 'bg-slate-100 text-slate-400'
+                "
+                class="w-12 h-12 rounded-2xl flex items-center justify-center font-black transition-all duration-500 scale-100 group-hover:scale-110"
+              >
+                <lucide-icon
+                  *ngIf="currentStep > step"
+                  [img]="CheckIcon"
+                  [size]="20"
+                ></lucide-icon>
+                <span *ngIf="currentStep <= step">{{ step }}</span>
+              </div>
+              <div class="hidden md:block">
+                <p
+                  class="text-[10px] font-black uppercase tracking-widest leading-none mb-1"
+                  [ngClass]="
+                    currentStep >= step ? 'text-emerald-600' : 'text-slate-400'
+                  "
+                >
+                  Phase 0{{ step }}
+                </p>
+                <p class="text-sm font-bold text-slate-900 whitespace-nowrap">
+                  {{ getStepLabel(step) }}
+                </p>
+              </div>
+            </div>
             <div
-              class="h-full bg-[var(--color-primary-500)] transition-all duration-500"
-              [style.width.%]="getProgressBarWidth()"
+              *ngIf="!last"
+              class="flex-1 h-[2px] rounded-full hidden lg:block"
+              [ngClass]="currentStep > step ? 'bg-emerald-600' : 'bg-slate-100'"
             ></div>
-          </div>
-
-          <!-- Step 2 -->
-          <div class="flex flex-col items-center relative z-10 w-1/4">
-            <div
-              class="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300"
-              [ngClass]="getStepClass(2)"
-            >
-              <span *ngIf="currentStep <= 2">2</span>
-              <lucide-icon
-                *ngIf="currentStep > 2"
-                [img]="CheckIcon"
-                [size]="20"
-              ></lucide-icon>
-            </div>
-            <div class="mt-3 text-center">
-              <span
-                class="block text-xs font-bold uppercase tracking-wider"
-                [ngClass]="
-                  currentStep >= 2
-                    ? 'text-[var(--color-primary-600)]'
-                    : 'text-[var(--color-text-tertiary)]'
-                "
-                >Preferences</span
-              >
-              <span
-                class="text-[10px] text-[var(--color-text-secondary)] hidden md:block"
-                >Customize your experience</span
-              >
-            </div>
-          </div>
-
-          <!-- Step 3 -->
-          <div class="flex flex-col items-center relative z-10 w-1/4">
-            <div
-              class="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300"
-              [ngClass]="getStepClass(3)"
-            >
-              <span *ngIf="currentStep <= 3">3</span>
-              <lucide-icon
-                *ngIf="currentStep > 3"
-                [img]="CheckIcon"
-                [size]="20"
-              ></lucide-icon>
-            </div>
-            <div class="mt-3 text-center">
-              <span
-                class="block text-xs font-bold uppercase tracking-wider"
-                [ngClass]="
-                  currentStep >= 3
-                    ? 'text-[var(--color-primary-600)]'
-                    : 'text-[var(--color-text-tertiary)]'
-                "
-                >Transportation</span
-              >
-              <span
-                class="text-[10px] text-[var(--color-text-secondary)] hidden md:block"
-                >Select how to get there</span
-              >
-            </div>
-          </div>
-
-          <!-- Step 4 -->
-          <div class="flex flex-col items-center relative z-10 w-1/4">
-            <div
-              class="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300"
-              [ngClass]="getStepClass(4)"
-            >
-              <span *ngIf="currentStep <= 4">4</span>
-              <lucide-icon
-                *ngIf="currentStep > 4"
-                [img]="CheckIcon"
-                [size]="20"
-              ></lucide-icon>
-            </div>
-            <div class="mt-3 text-center">
-              <span
-                class="block text-xs font-bold uppercase tracking-wider"
-                [ngClass]="
-                  currentStep === 4
-                    ? 'text-[var(--color-primary-600)]'
-                    : 'text-[var(--color-text-tertiary)]'
-                "
-                >Review & Generate</span
-              >
-              <span
-                class="text-[10px] text-[var(--color-text-secondary)] hidden md:block"
-                >Finalize your plan</span
-              >
-            </div>
           </div>
         </div>
       </div>
 
-      <!-- Main Form Area -->
-      <div
-        class="max-w-4xl mx-auto mb-20 animate-in fade-in slide-in-from-bottom-5 duration-500"
-      >
-        <app-card
-          variant="elevated"
-          padding="none"
-          customClass="overflow-hidden border-0 shadow-xl rounded-2xl"
-        >
-          <app-card-content customClass="p-0">
-            <!-- STEP 1: BASIC INFO -->
-            <div *ngIf="currentStep === 1" class="p-8 lg:p-12 space-y-8">
-              <div class="border-b border-[var(--color-neutral-100)] pb-6 mb-8">
-                <h2 class="text-2xl font-bold text-[var(--color-primary-800)]">
-                  Basic Trip Information
+      <!-- Main Config Console -->
+      <div class="container px-6">
+        <div class="max-w-5xl mx-auto">
+          <!-- PHASE 1: LOGISTICS -->
+          <div
+            *ngIf="currentStep === 1"
+            class="animate-in fade-in slide-in-from-right-8 duration-500 bg-white rounded-[40px] p-8 lg:p-16 border border-white shadow-xl"
+          >
+            <div class="flex items-end justify-between mb-12">
+              <div class="max-w-xl">
+                <span
+                  class="text-emerald-600 font-black text-xs uppercase tracking-widest mb-2 block"
+                  >Configuration 01</span
+                >
+                <h2 class="text-4xl font-black text-slate-900 leading-tight">
+                  Expedition <span class="text-emerald-600">Fundamentals</span>
                 </h2>
-                <p class="text-[var(--color-text-secondary)] mt-1">
-                  Tell us about your trip destination and timing
-                </p>
               </div>
+              <div class="hidden lg:block w-32 h-[1px] bg-slate-100 mb-4"></div>
+            </div>
 
-              <div class="space-y-6">
-                <!-- Trip Name -->
-                <div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+              <div class="space-y-8">
+                <div class="group">
                   <label
-                    class="block text-sm font-semibold text-[var(--color-text-primary)] mb-2"
-                    >Trip Name</label
+                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1"
+                    >Mission Title</label
                   >
-                  <div class="relative group">
-                    <div
-                      class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[var(--color-text-tertiary)] group-focus-within:text-[var(--color-primary-500)] transition-colors"
-                    >
-                      <lucide-icon [img]="TentIcon" [size]="20"></lucide-icon>
-                    </div>
+                  <div class="relative h-16">
+                    <lucide-icon
+                      [img]="TentIcon"
+                      [size]="18"
+                      class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500"
+                    ></lucide-icon>
                     <input
                       type="text"
                       [(ngModel)]="tripModel.title"
-                      placeholder="e.g., Yosemite Summer Adventure"
-                      class="w-full pl-12 pr-4 py-3.5 rounded-xl bg-[var(--color-neutral-50)] border-2 border-transparent focus:bg-white focus:border-[var(--color-primary-500)] focus:ring-4 focus:ring-[var(--color-primary-100)] transition-all outline-none"
+                      placeholder="e.g., North Shore High Intensity"
+                      class="w-full h-full pl-16 pr-6 bg-slate-50 border-2 border-transparent focus:bg-white focus:border-emerald-500/30 rounded-2xl font-bold transition-all outline-none"
                     />
                   </div>
                 </div>
 
-                <!-- Destination -->
-                <div>
+                <div class="group">
                   <label
-                    class="block text-sm font-semibold text-[var(--color-text-primary)] mb-2"
-                    >Destination</label
+                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1"
+                    >Arrival Zone</label
                   >
-                  <div class="relative group">
-                    <div
-                      class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[var(--color-text-tertiary)] group-focus-within:text-[var(--color-primary-500)] transition-colors"
-                    >
-                      <lucide-icon [img]="MapPinIcon" [size]="20"></lucide-icon>
-                    </div>
+                  <div class="relative h-16">
+                    <lucide-icon
+                      [img]="MapPinIcon"
+                      [size]="18"
+                      class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500"
+                    ></lucide-icon>
                     <input
                       type="text"
                       [(ngModel)]="tripModel.destinationName"
-                      placeholder="e.g., Yosemite National Park, CA"
-                      class="w-full pl-12 pr-4 py-3.5 rounded-xl bg-[var(--color-neutral-50)] border-2 border-transparent focus:bg-white focus:border-[var(--color-primary-500)] focus:ring-4 focus:ring-[var(--color-primary-100)] transition-all outline-none"
+                      placeholder="Search campsites or regions..."
+                      class="w-full h-full pl-16 pr-6 bg-slate-50 border-2 border-transparent focus:bg-white focus:border-emerald-500/30 rounded-2xl font-bold transition-all outline-none"
                     />
                   </div>
-                  <p
-                    class="mt-2 text-[10px] text-[var(--color-text-tertiary)] italic"
-                  >
-                    Specific campsite or general area
-                  </p>
                 </div>
 
-                <!-- Dates -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="group">
                     <label
-                      class="block text-sm font-semibold text-[var(--color-text-primary)] mb-2"
-                      >Start Date</label
+                      class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1"
+                      >Deployment</label
                     >
-                    <div class="relative group">
-                      <div
-                        class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[var(--color-text-tertiary)] group-focus-within:text-[var(--color-primary-500)] transition-colors"
-                      >
-                        <lucide-icon
-                          [img]="CalendarIcon"
-                          [size]="20"
-                        ></lucide-icon>
-                      </div>
+                    <div class="relative h-14">
                       <input
                         type="date"
                         [(ngModel)]="tripModel.startDate"
-                        [min]="getTodayString()"
-                        class="w-full pl-12 pr-4 py-3.5 rounded-xl bg-[var(--color-neutral-50)] border-2 border-transparent focus:bg-white focus:border-[var(--color-primary-500)] transition-all outline-none"
+                        class="w-full h-full px-4 bg-slate-50 border-2 border-transparent focus:border-emerald-500/30 rounded-xl font-bold transition-all outline-none"
                       />
                     </div>
                   </div>
-                  <div>
+                  <div class="group">
                     <label
-                      class="block text-sm font-semibold text-[var(--color-text-primary)] mb-2"
-                      >End Date</label
+                      class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1"
+                      >Extraction</label
                     >
-                    <div class="relative group">
-                      <div
-                        class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[var(--color-text-tertiary)] group-focus-within:text-[var(--color-primary-500)] transition-colors"
-                      >
-                        <lucide-icon
-                          [img]="CalendarIcon"
-                          [size]="20"
-                        ></lucide-icon>
-                      </div>
+                    <div class="relative h-14">
                       <input
                         type="date"
                         [(ngModel)]="tripModel.endDate"
-                        [min]="tripModel.startDate || getTodayString()"
-                        class="w-full pl-12 pr-4 py-3.5 rounded-xl bg-[var(--color-neutral-50)] border-2 border-transparent focus:bg-white focus:border-[var(--color-primary-500)] transition-all outline-none"
+                        class="w-full h-full px-4 bg-slate-50 border-2 border-transparent focus:border-emerald-500/30 rounded-xl font-bold transition-all outline-none"
                       />
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <!-- Group Size -->
-                <div>
+              <div class="space-y-8">
+                <div class="group">
                   <label
-                    class="block text-sm font-semibold text-[var(--color-text-primary)] mb-2"
-                    >Group Size</label
+                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1"
+                    >Group Capacity</label
                   >
-                  <div class="relative group">
-                    <div
-                      class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[var(--color-text-tertiary)] group-focus-within:text-[var(--color-primary-500)] transition-colors"
-                    >
-                      <lucide-icon [img]="UsersIcon" [size]="20"></lucide-icon>
-                    </div>
+                  <div class="relative h-16">
+                    <lucide-icon
+                      [img]="UsersIcon"
+                      [size]="18"
+                      class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500"
+                    ></lucide-icon>
                     <input
                       type="number"
                       [(ngModel)]="tripModel.participants"
-                      min="1"
-                      class="w-full pl-12 pr-4 py-3.5 rounded-xl bg-[var(--color-neutral-50)] border-2 border-transparent focus:bg-white focus:border-[var(--color-primary-500)] transition-all outline-none"
+                      class="w-full h-full pl-16 pr-6 bg-slate-50 border-2 border-transparent focus:bg-white focus:border-emerald-500/30 rounded-2xl font-bold transition-all outline-none"
                     />
                   </div>
-                  <p class="mt-2 text-[10px] text-[var(--color-text-tertiary)]">
-                    Including yourself — minimum 1 person
-                  </p>
                 </div>
 
-                <!-- Description -->
                 <div>
                   <label
-                    class="block text-sm font-semibold text-[var(--color-text-primary)] mb-2"
-                    >Description</label
+                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1"
+                    >Mission briefing</label
                   >
                   <textarea
                     [(ngModel)]="tripModel.description"
                     rows="5"
-                    placeholder="Tell us about your trip..."
-                    class="w-full px-4 py-3.5 rounded-xl bg-[var(--color-neutral-50)] border-2 border-transparent focus:bg-white focus:border-[var(--color-primary-500)] transition-all outline-none resize-none"
+                    placeholder="Operational details/notes..."
+                    class="w-full p-6 bg-slate-50 border-2 border-transparent focus:border-emerald-500/30 rounded-3xl font-bold transition-all outline-none resize-none"
                   ></textarea>
-                </div>
-
-                <!-- Validation Errors for Step 1 -->
-                <div
-                  *ngIf="currentStep === 1 && getStep1Errors().length > 0"
-                  class="p-4 mt-2 bg-red-50 text-red-600 rounded-xl text-sm font-medium border border-red-100 flex flex-col gap-2"
-                >
-                  <div
-                    *ngFor="let err of getStep1Errors()"
-                    class="flex items-center gap-2"
-                  >
-                    <lucide-icon
-                      [img]="AlertCircleIcon"
-                      [size]="16"
-                      class="flex-shrink-0"
-                    ></lucide-icon>
-                    <span>{{ err }}</span>
-                  </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- STEP 2: PREFERENCES -->
-            <div *ngIf="currentStep === 2" class="p-8 lg:p-12 space-y-10">
-              <div class="border-b border-[var(--color-neutral-100)] pb-6 mb-8">
-                <h2 class="text-2xl font-bold text-[var(--color-primary-800)]">
-                  Customize Your Experience
-                </h2>
-                <p class="text-[var(--color-text-secondary)] mt-1">
-                  Help us tailor the perfect trip plan for you
-                </p>
-              </div>
+          <!-- PHASE 2: PARAMETERS -->
+          <div
+            *ngIf="currentStep === 2"
+            class="animate-in fade-in slide-in-from-right-8 duration-500 bg-white rounded-[40px] p-8 lg:p-16 border border-white shadow-xl"
+          >
+            <div class="mb-12">
+              <span
+                class="text-emerald-600 font-black text-xs uppercase tracking-widest mb-2 block"
+                >Configuration 02</span
+              >
+              <h2 class="text-4xl font-black text-slate-900 mb-8">
+                Adventure <span class="text-emerald-600">Thresholds</span>
+              </h2>
+            </div>
 
+            <div class="space-y-12">
               <!-- Adventure Level -->
-              <div class="space-y-4">
+              <div>
                 <label
-                  class="block text-sm font-bold text-[var(--color-text-primary)] uppercase tracking-wider"
-                  >Adventure Level</label
+                  class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4"
+                  >Operational Difficulty</label
                 >
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div
                     *ngFor="let level of adventureLevels"
                     (click)="tripModel.adventureLevel = level.value"
-                    class="p-4 rounded-xl border-2 transition-all cursor-pointer group"
+                    class="relative group cursor-pointer overflow-hidden rounded-3xl p-6 border-2 transition-all duration-300"
                     [ngClass]="
                       tripModel.adventureLevel === level.value
-                        ? 'bg-[var(--color-primary-50)] border-[var(--color-primary-500)] ring-4 ring-[var(--color-primary-100)]'
-                        : 'bg-white border-[var(--color-neutral-100)] hover:border-[var(--color-primary-200)] hover:bg-[var(--color-neutral-50)]'
+                        ? 'border-emerald-500 bg-emerald-50 scale-100 shadow-xl'
+                        : 'border-slate-100 bg-slate-50 opacity-60 grayscale hover:opacity-100 hover:grayscale-0'
                     "
                   >
-                    <div class="flex flex-col gap-1">
-                      <span
-                        class="font-bold text-[var(--color-text-heading)] group-hover:text-[var(--color-primary-700)]"
-                        >{{ level.label }}</span
-                      >
-                      <span
-                        class="text-xs text-[var(--color-text-secondary)]"
-                        >{{ level.desc }}</span
-                      >
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Comfort Level -->
-              <div class="space-y-4">
-                <label
-                  class="block text-sm font-bold text-[var(--color-text-primary)] uppercase tracking-wider"
-                  >Comfort Level</label
-                >
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div
-                    *ngFor="let comfort of comfortLevelsEnum"
-                    (click)="tripModel.comfortLevel = comfort.value"
-                    class="p-4 rounded-xl border-2 transition-all cursor-pointer text-center"
-                    [ngClass]="
-                      tripModel.comfortLevel === comfort.value
-                        ? 'bg-[var(--color-primary-50)] border-[var(--color-primary-500)]'
-                        : 'bg-white border-[var(--color-neutral-100)] hover:bg-[var(--color-neutral-50)]'
-                    "
-                  >
-                    <div class="flex flex-col gap-1">
-                      <span class="font-bold text-sm">{{ comfort.label }}</span>
-                      <span
-                        class="text-[10px] text-[var(--color-text-secondary)]"
-                        >{{ comfort.desc }}</span
-                      >
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Activities -->
-              <div class="space-y-4">
-                <div class="flex justify-between items-center">
-                  <label
-                    class="block text-sm font-bold text-[var(--color-text-primary)] uppercase tracking-wider"
-                    >Activities & Interests</label
-                  >
-                  <span
-                    class="text-[10px] px-2 py-1 bg-[var(--color-neutral-100)] rounded-full text-[var(--color-text-secondary)]"
-                    >Select all that apply</span
-                  >
-                </div>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  <div
-                    *ngFor="let activity of allActivities"
-                    (click)="toggleActivity(activity)"
-                    class="flex items-center justify-between p-3.5 rounded-xl border-2 transition-all cursor-pointer"
-                    [ngClass]="
-                      isActivitySelected(activity)
-                        ? 'bg-[var(--color-primary-50)] border-[var(--color-primary-500)]'
-                        : 'bg-white border-[var(--color-neutral-100)]'
-                    "
-                  >
-                    <span class="text-sm font-medium">{{ activity }}</span>
-                    <lucide-icon
-                      *ngIf="isActivitySelected(activity)"
-                      [img]="CheckIcon"
-                      [size]="16"
-                      class="text-[var(--color-primary-600)]"
-                    ></lucide-icon>
-                    <div
-                      *ngIf="!isActivitySelected(activity)"
-                      class="w-4 h-4 rounded-md border-2 border-[var(--color-neutral-200)]"
-                    ></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- STEP 3: TRANSPORTATION -->
-            <div *ngIf="currentStep === 3" class="p-8 lg:p-12 space-y-10">
-              <div class="border-b border-[var(--color-neutral-100)] pb-6 mb-8">
-                <h2 class="text-2xl font-bold text-[var(--color-primary-800)]">
-                  Select Transportation
-                </h2>
-                <p class="text-[var(--color-text-secondary)] mt-1">
-                  Choose how you will reach your destination
-                </p>
-              </div>
-
-              <!-- Loading state -->
-              <div
-                *ngIf="isLoadingTransports"
-                class="flex flex-col items-center justify-center py-16 gap-4"
-              >
-                <div
-                  class="w-10 h-10 border-4 border-[var(--color-primary-200)] border-t-[var(--color-primary-600)] rounded-full animate-spin"
-                ></div>
-                <p class="text-[var(--color-text-secondary)] text-sm">
-                  Loading available transports...
-                </p>
-              </div>
-
-              <!-- Empty state -->
-              <div
-                *ngIf="!isLoadingTransports && transportOptions.length === 0"
-                class="flex flex-col items-center justify-center py-16 gap-3 text-center"
-              >
-                <lucide-icon
-                  [img]="InfoIcon"
-                  [size]="40"
-                  class="text-[var(--color-text-tertiary)]"
-                ></lucide-icon>
-                <p class="text-lg font-bold text-[var(--color-text-heading)]">
-                  No transports available
-                </p>
-                <p class="text-sm text-[var(--color-text-secondary)]">
-                  The admin has not added any transport options yet. Please
-                  check back later.
-                </p>
-              </div>
-
-              <div
-                *ngIf="!isLoadingTransports && transportOptions.length > 0"
-                class="space-y-3"
-              >
-                <div
-                  *ngFor="let option of transportOptions"
-                  (click)="tripModel.selectedTransportId = option.id"
-                  class="flex items-center justify-between p-4 px-6 rounded-2xl border-2 transition-all cursor-pointer bg-white group"
-                  [ngClass]="
-                    tripModel.selectedTransportId === option.id
-                      ? 'border-[var(--color-primary-500)] ring-4 ring-[var(--color-primary-100)]'
-                      : 'border-[var(--color-neutral-100)] hover:border-[var(--color-primary-200)]'
-                  "
-                >
-                  <div class="flex items-center gap-4">
-                    <!-- Transport image or icon -->
-                    <div
-                      class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border border-[var(--color-neutral-100)] shadow-sm"
-                    >
-                      <img
-                        *ngIf="option.imageUrl"
-                        [src]="option.imageUrl"
-                        class="w-full h-full object-cover"
-                        [alt]="option.mode"
-                      />
-                      <div
-                        *ngIf="!option.imageUrl"
-                        class="w-full h-full flex items-center justify-center"
-                        [ngClass]="
-                          tripModel.selectedTransportId === option.id
-                            ? 'bg-[var(--color-primary-100)] text-[var(--color-primary-600)]'
-                            : 'bg-[var(--color-neutral-50)] text-[var(--color-text-tertiary)]'
-                        "
-                      >
-                        <lucide-icon
-                          [img]="getTransportIcon(option.mode)"
-                          [size]="28"
-                        ></lucide-icon>
-                      </div>
-                    </div>
-                    <div>
-                      <div class="flex items-center gap-2">
-                        <span
-                          class="font-bold text-base uppercase tracking-tight text-[var(--color-text-heading)]"
-                          >{{ option.mode }}</span
-                        >
-                        <span class="text-xs text-[var(--color-text-secondary)]"
-                          >by {{ option.provider || "Private Provider" }}</span
-                        >
-                      </div>
-                      <div
-                        class="flex items-center gap-2 text-xs text-[var(--color-text-tertiary)] mt-1"
-                      >
-                        <lucide-icon
-                          [img]="ClockIcon"
-                          [size]="14"
-                        ></lucide-icon>
-                        <span>{{ option.duration }} mins</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="flex items-center gap-6">
-                    <div class="text-right">
-                      <span
-                        class="block font-black text-lg text-[var(--color-success-700)]"
-                        >{{ option.price }} TND</span
-                      >
+                    <div class="flex flex-col gap-2">
+                      <span class="text-sm font-black text-slate-900">{{
+                        level.label
+                      }}</span>
+                      <span class="text-xs text-slate-500 leading-relaxed">{{
+                        level.desc
+                      }}</span>
                     </div>
                     <div
-                      class="w-6 h-6 rounded-full border-2 transition-all flex items-center justify-center"
-                      [ngClass]="
-                        tripModel.selectedTransportId === option.id
-                          ? 'border-[var(--color-primary-500)] bg-[var(--color-primary-500)]'
-                          : 'border-[var(--color-neutral-300)]'
-                      "
+                      *ngIf="tripModel.adventureLevel === level.value"
+                      class="absolute -right-2 -bottom-2 opacity-10"
                     >
                       <lucide-icon
-                        *ngIf="tripModel.selectedTransportId === option.id"
                         [img]="CheckIcon"
-                        [size]="14"
-                        class="text-white"
+                        [size]="80"
+                        class="text-emerald-600"
                       ></lucide-icon>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div
-                class="p-4 rounded-xl bg-[var(--color-primary-50)] border border-[var(--color-primary-100)] flex gap-4"
-              >
-                <lucide-icon
-                  [img]="InfoIcon"
-                  [size]="20"
-                  class="text-[var(--color-primary-600)] mt-0.5"
-                ></lucide-icon>
-                <p
-                  class="text-[11px] text-[var(--color-primary-800)] leading-relaxed"
+              <!-- Comfort Level (Added to fix validation) -->
+              <div>
+                <label
+                  class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4"
+                  >Base Comfort Parameters</label
                 >
-                  The estimated costs and durations are subject to real-time
-                  availability and season variance. Final booking will happen
-                  after trip generation.
-                </p>
-              </div>
-            </div>
-
-            <!-- STEP 4: REVIEW -->
-            <div *ngIf="currentStep === 4" class="p-8 lg:p-12 space-y-10">
-              <div class="border-b border-[var(--color-neutral-100)] pb-6 mb-8">
-                <h2 class="text-2xl font-bold text-[var(--color-primary-800)]">
-                  Review Your Trip Plan
-                </h2>
-                <p class="text-[var(--color-text-secondary)] mt-1">
-                  Confirm your details before we generate your personalized
-                  itinerary
-                </p>
-              </div>
-
-              <div
-                class="rounded-3xl bg-[var(--color-success-50)]/50 border border-[var(--color-success-100)] p-8 space-y-8"
-              >
-                <div class="flex justify-between items-start">
-                  <div>
-                    <h3
-                      class="text-3xl font-black text-[var(--color-primary-900)]"
-                    >
-                      {{ tripModel.title }}
-                    </h3>
-                    <div
-                      class="flex items-center gap-2 mt-2 font-medium text-[var(--color-accent-700)]"
-                    >
-                      <lucide-icon [img]="MapPinIcon" [size]="16"></lucide-icon>
-                      <span>{{ tripModel.destinationName }}</span>
-                    </div>
-                  </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div
-                    class="px-4 py-2 bg-white rounded-2xl shadow-sm text-sm font-bold border border-[var(--color-success-200)] text-[var(--color-primary-800)]"
+                    *ngFor="let level of comfortLevelsEnum"
+                    (click)="tripModel.comfortLevel = level.value"
+                    class="relative group cursor-pointer overflow-hidden rounded-2xl p-4 border-2 transition-all duration-300 text-center"
+                    [ngClass]="
+                      tripModel.comfortLevel === level.value
+                        ? 'border-emerald-500 bg-emerald-50 shadow-md'
+                        : 'border-slate-100 bg-slate-50 opacity-60 hover:opacity-100'
+                    "
                   >
-                    {{ calculateDuration() }} days
-                  </div>
-                </div>
-
-                <div
-                  class="grid grid-cols-2 gap-8 border-y border-[var(--color-success-200)] py-6"
-                >
-                  <div class="space-y-4">
-                    <div class="flex flex-col gap-1">
-                      <span
-                        class="text-[10px] uppercase font-bold tracking-widest text-[var(--color-text-secondary)]"
-                        >Dates</span
-                      >
-                      <div
-                        class="flex items-center gap-2 text-sm font-semibold"
-                      >
-                        <lucide-icon
-                          [img]="CalendarIcon"
-                          [size]="16"
-                          class="text-[var(--color-primary-500)]"
-                        ></lucide-icon>
-                        <span
-                          >{{ tripModel.startDate | date: "yyyy-MM-dd" }} —
-                          {{ tripModel.endDate | date: "yyyy-MM-dd" }}</span
-                        >
-                      </div>
-                    </div>
-                    <div class="flex flex-col gap-1">
-                      <span
-                        class="text-[10px] uppercase font-bold tracking-widest text-[var(--color-text-secondary)]"
-                        >Adventure Level</span
-                      >
-                      <div
-                        class="flex items-center gap-2 text-sm font-semibold"
-                      >
-                        <lucide-icon
-                          [img]="CompassIcon"
-                          [size]="16"
-                          class="text-[var(--color-primary-500)]"
-                        ></lucide-icon>
-                        <span class="capitalize">{{
-                          tripModel.adventureLevel.toLowerCase()
-                        }}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="space-y-4">
-                    <div class="flex flex-col gap-1">
-                      <span
-                        class="text-[10px] uppercase font-bold tracking-widest text-[var(--color-text-secondary)]"
-                        >Group Size</span
-                      >
-                      <div
-                        class="flex items-center gap-2 text-sm font-semibold"
-                      >
-                        <lucide-icon
-                          [img]="UsersIcon"
-                          [size]="16"
-                          class="text-[var(--color-primary-500)]"
-                        ></lucide-icon>
-                        <span>{{ tripModel.participants }} people</span>
-                      </div>
-                    </div>
-                    <div class="flex flex-col gap-1">
-                      <span
-                        class="text-[10px] uppercase font-bold tracking-widest text-[var(--color-text-secondary)]"
-                        >Transportation</span
-                      >
-                      <div
-                        class="flex items-center gap-2 text-sm font-semibold"
-                      >
-                        <lucide-icon
-                          [img]="getTransportIcon(getSelectedTransport()?.mode)"
-                          [size]="16"
-                          class="text-[var(--color-primary-500)]"
-                        ></lucide-icon>
-                        <span
-                          >{{ getSelectedTransport()?.mode || "None" }} by
-                          {{
-                            getSelectedTransport()?.provider || "Hertz"
-                          }}</span
-                        >
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <span
-                    class="text-[10px] uppercase font-bold tracking-widest text-[var(--color-text-secondary)]"
-                    >Activities to Include</span
-                  >
-                  <div class="flex flex-wrap gap-2 mt-3">
-                    <span
-                      *ngFor="let act of tripModel.activities"
-                      class="px-4 py-1.5 bg-[var(--color-success-100)] text-[var(--color-success-800)] rounded-full text-xs font-bold"
+                    <p
+                      class="text-[10px] font-black text-slate-900 uppercase tracking-widest"
                     >
-                      {{ act }}
-                    </span>
+                      {{ level.label }}
+                    </p>
+                    <p class="text-[9px] text-slate-400 mt-1 uppercase">
+                      {{ level.desc }}
+                    </p>
                   </div>
                 </div>
               </div>
 
-              <div
-                class="p-6 rounded-3xl border-2 border-dashed border-[var(--color-primary-200)] bg-[var(--color-primary-50)]/30 flex items-start gap-5"
-              >
-                <div
-                  class="w-10 h-10 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-sm"
+              <!-- Activities -->
+              <div>
+                <label
+                  class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4"
+                  >Specific Directives</label
                 >
-                  <lucide-icon
-                    [img]="PlusIcon"
-                    [size]="20"
-                    class="text-[var(--color-accent-500)]"
-                  ></lucide-icon>
-                </div>
-                <div>
-                  <h4 class="font-bold text-[var(--color-primary-900)]">
-                    AI-Powered Trip Planning
-                  </h4>
-                  <p
-                    class="text-xs text-[var(--color-text-secondary)] mt-1 leading-relaxed"
+                <div class="flex flex-wrap gap-3">
+                  <button
+                    *ngFor="let act of allActivities"
+                    (click)="toggleActivity(act)"
+                    class="px-6 py-3 rounded-full text-sm font-bold transition-all border-2"
+                    [ngClass]="
+                      isActivitySelected(act)
+                        ? 'bg-slate-900 border-slate-900 text-white shadow-xl'
+                        : 'bg-white border-slate-100 text-slate-500 hover:border-emerald-300'
+                    "
                   >
-                    Our intelligent system will use these preferences to
-                    generate a fully customized experience, including:
-                    <span class="flex gap-4 mt-2 font-medium">
-                      <span>• Day-by-day itinerary</span>
-                      <span>• Personalized packing list</span>
-                    </span>
-                    <span class="flex gap-4 mt-1 font-medium">
-                      <span>• Budget estimation</span>
-                      <span>• Nearby points of interest</span>
-                    </span>
-                  </p>
+                    {{ act }}
+                  </button>
                 </div>
               </div>
-
-              <button
-                (click)="handleSubmit()"
-                [disabled]="isSubmitting"
-                class="w-full py-5 rounded-2xl bg-[var(--color-primary-900)] text-white text-lg font-black hover:bg-[var(--color-primary-800)] shadow-lg shadow-[var(--color-primary-200)] group relative overflow-hidden transition-all"
-              >
-                <div
-                  class="relative z-10 flex items-center justify-center gap-3"
-                >
-                  <lucide-icon
-                    [img]="CompassIcon"
-                    [size]="24"
-                    class="animate-pulse"
-                  ></lucide-icon>
-                  <span>{{
-                    isSubmitting
-                      ? "Generating Your Plan..."
-                      : "Generate My Trip Plan"
-                  }}</span>
-                </div>
-                <div
-                  class="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-400/20 to-emerald-500/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"
-                ></div>
-              </button>
             </div>
-          </app-card-content>
-        </app-card>
-
-        <!-- Navigation Buttons -->
-        <div class="mt-8 flex justify-between items-center px-4">
-          <button
-            *ngIf="currentStep > 1"
-            (click)="prevStep()"
-            class="flex items-center gap-2 text-[var(--color-text-secondary)] font-bold hover:text-[var(--color-primary-700)] transition-colors py-2"
-          >
-            ← Back to {{ getStepLabel(currentStep - 1) }}
-          </button>
-          <div *ngIf="currentStep === 1">
-            <button
-              (click)="goBack()"
-              class="flex items-center gap-2 text-[var(--color-text-tertiary)] font-bold hover:text-red-500 transition-colors py-2"
-            >
-              ← Cancel & Go Back
-            </button>
           </div>
 
-          <button
-            *ngIf="currentStep < 4"
-            (click)="nextStep()"
-            [disabled]="!isStepValid()"
-            class="flex items-center gap-3 px-8 py-3.5 bg-[var(--color-primary-900)] text-white rounded-2xl font-black hover:bg-[var(--color-primary-800)] hover:scale-105 transition-all shadow-md shadow-[var(--color-primary-100)] disabled:opacity-50 disabled:scale-100"
+          <!-- PHASE 3: LOGISTICS (TRANSPORT) -->
+          <div
+            *ngIf="currentStep === 3"
+            class="animate-in fade-in slide-in-from-right-8 duration-500 bg-white rounded-[40px] p-8 lg:p-16 border border-white shadow-xl"
           >
-            Next Step
-            <lucide-icon [img]="ArrowRightIcon" [size]="18"></lucide-icon>
-          </button>
+            <div class="mb-12">
+              <span
+                class="text-emerald-600 font-black text-xs uppercase tracking-widest mb-2 block"
+                >Configuration 03</span
+              >
+              <h2 class="text-4xl font-black text-slate-900 mb-8">
+                Fleet <span class="text-emerald-600">Selection</span>
+              </h2>
+            </div>
+
+            <div class="space-y-4">
+              <div
+                *ngFor="let opt of transportOptions"
+                (click)="tripModel.selectedTransportId = opt.id"
+                class="group relative flex items-center justify-between p-6 rounded-[32px] border-2 transition-all cursor-pointer overflow-hidden"
+                [ngClass]="
+                  tripModel.selectedTransportId === opt.id
+                    ? 'border-emerald-500 bg-emerald-50 shadow-lg'
+                    : 'border-slate-50 bg-slate-50/50 hover:border-slate-200 hover:bg-white'
+                "
+              >
+                <div class="flex items-center gap-6 relative z-10">
+                  <div class="w-20 h-20 rounded-2xl overflow-hidden shadow-md">
+                    <img
+                      [src]="
+                        opt.imageUrl ||
+                        'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80'
+                      "
+                      class="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h4
+                      class="text-lg font-black text-slate-900 group-hover:text-emerald-700 transition-colors uppercase tracking-tighter"
+                    >
+                      {{ opt.mode }}
+                    </h4>
+                    <p class="text-xs text-slate-500 font-medium">
+                      Provider: {{ opt.provider || "Hertz Global" }}
+                    </p>
+                  </div>
+                </div>
+                <div class="text-right relative z-10">
+                  <p
+                    class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1"
+                  >
+                    Estimated Cost
+                  </p>
+                  <p class="text-2xl font-black text-emerald-600">
+                    {{ opt.price }} TND
+                  </p>
+                </div>
+                <!-- Selected Glow -->
+                <div
+                  *ngIf="tripModel.selectedTransportId === opt.id"
+                  class="absolute inset-0 bg-emerald-500/5 animate-pulse"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PHASE 4: THE DOSSIER -->
+          <div
+            *ngIf="currentStep === 4"
+            class="animate-in fade-in slide-in-from-bottom-8 duration-700 px-4 md:px-0"
+          >
+            <div
+              class="bg-slate-900 rounded-[48px] overflow-hidden shadow-2xl shadow-indigo-900/40 relative"
+            >
+              <!-- Dossier Header -->
+              <div class="h-64 relative">
+                <img
+                  src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80"
+                  class="w-full h-full object-cover opacity-60"
+                />
+                <div
+                  class="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent"
+                ></div>
+                <div class="absolute bottom-8 left-12">
+                  <span
+                    class="px-4 py-1.5 rounded-full bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest mb-3 inline-block"
+                    >Manifest Finalized</span
+                  >
+                  <h2 class="text-5xl font-black text-white tracking-tighter">
+                    {{ tripModel.title }}
+                  </h2>
+                </div>
+              </div>
+
+              <div class="p-12 pt-0 grid grid-cols-1 lg:grid-cols-3 gap-12">
+                <!-- Main Stats -->
+                <div class="lg:col-span-2 space-y-10">
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div
+                      class="p-6 rounded-3xl bg-white/5 border border-white/10"
+                    >
+                      <p
+                        class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2"
+                      >
+                        Duration
+                      </p>
+                      <p class="text-xl font-bold text-white">
+                        {{ calculateDuration() }} Days
+                      </p>
+                    </div>
+                    <div
+                      *ngIf="getSelectedTransport() as t"
+                      class="p-6 rounded-3xl bg-white/5 border border-white/10"
+                    >
+                      <p
+                        class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2"
+                      >
+                        Transport
+                      </p>
+                      <p class="text-xl font-bold text-white">{{ t.mode }}</p>
+                    </div>
+                    <div
+                      class="p-6 rounded-3xl bg-white/5 border border-white/10 text-center"
+                    >
+                      <p
+                        class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2"
+                      >
+                        Squad
+                      </p>
+                      <lucide-icon
+                        [img]="UsersIcon"
+                        [size]="16"
+                        class="text-emerald-500 inline-block mb-1"
+                      ></lucide-icon>
+                      <p class="text-xl font-bold text-white">
+                        {{ tripModel.participants }}
+                      </p>
+                    </div>
+                    <div
+                      class="p-6 rounded-3xl bg-white/5 border border-white/10"
+                    >
+                      <p
+                        class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2"
+                      >
+                        Level
+                      </p>
+                      <p class="text-xl font-bold text-emerald-400 capitalize">
+                        {{ tripModel.adventureLevel }}
+                      </p>
+                    </div>
+                    <div
+                      class="p-6 rounded-3xl bg-white/5 border border-white/10"
+                    >
+                      <p
+                        class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2"
+                      >
+                        Comfort
+                      </p>
+                      <p class="text-xl font-bold text-teal-400 capitalize">
+                        {{ tripModel.comfortLevel }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="space-y-4">
+                    <h4
+                      class="text-xs font-black text-slate-400 uppercase tracking-widest"
+                    >
+                      Selected Directives
+                    </h4>
+                    <div class="flex flex-wrap gap-2">
+                      <span
+                        *ngFor="let act of tripModel.activities"
+                        class="px-6 py-2 rounded-2xl bg-slate-800 text-white text-sm font-bold border border-slate-700"
+                      >
+                        {{ act }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div
+                    class="p-8 rounded-3xl bg-emerald-500/10 border border-emerald-500/20 flex gap-6"
+                  >
+                    <div
+                      class="w-12 h-12 rounded-2xl bg-emerald-600 flex items-center justify-center flex-shrink-0 animate-pulse"
+                    >
+                      <lucide-icon
+                        [img]="CheckIcon"
+                        [size]="20"
+                        class="text-white"
+                      ></lucide-icon>
+                    </div>
+                    <p
+                      class="text-emerald-400 text-sm font-medium leading-relaxed italic"
+                    >
+                      "Our tactical AI will generate a terrain-specific
+                      itinerary based on your
+                      {{ tripModel.adventureLevel }} intensity levels. Prepare
+                      for deployment."
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Aside / Location -->
+                <div class="space-y-8">
+                  <div
+                    class="rounded-3xl overflow-hidden bg-slate-800 border border-slate-700 h-64 relative group"
+                  >
+                    <img
+                      src="https://images.unsplash.com/photo-1496545672447-f699b503d270?auto=format&fit=crop&q=80"
+                      class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                    />
+                    <div class="absolute inset-0 bg-slate-900/40"></div>
+                    <div
+                      class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center"
+                    >
+                      <lucide-icon
+                        [img]="MapPinIcon"
+                        [size]="32"
+                        class="text-emerald-500 mb-4"
+                      ></lucide-icon>
+                      <h5 class="text-white font-black text-lg leading-tight">
+                        {{ tripModel.destinationName }}
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interaction Console (Bottom Bar) -->
+          <div
+            class="mt-8 flex justify-between items-center bg-white/50 backdrop-blur-xl p-4 rounded-[32px] border border-white shadow-lg max-w-5xl mx-auto w-full"
+          >
+            <button
+              (click)="prevStep()"
+              [disabled]="currentStep === 1"
+              class="h-14 px-8 rounded-2xl font-black text-xs uppercase tracking-widest text-slate-400 hover:text-slate-900 hover:bg-white transition-all disabled:opacity-0"
+            >
+              Return
+            </button>
+
+            <button
+              *ngIf="currentStep < 4"
+              (click)="nextStep()"
+              [disabled]="!canContinue()"
+              class="h-14 px-10 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-600 shadow-xl shadow-slate-200 transition-all active:scale-95 flex items-center gap-3 disabled:opacity-30 disabled:grayscale"
+            >
+              Proceed Phase
+              <lucide-icon [img]="ArrowRightIcon" [size]="16"></lucide-icon>
+            </button>
+
+            <button
+              *ngIf="currentStep === 4"
+              (click)="generateTrip()"
+              [disabled]="isGenerating"
+              class="h-14 px-12 bg-emerald-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-500 shadow-2xl shadow-emerald-900/40 transition-all active:scale-95 flex items-center gap-3 overflow-hidden relative"
+            >
+              <span *ngIf="!isGenerating" class="relative z-10"
+                >Authorize Deployment</span
+              >
+              <span
+                *ngIf="isGenerating"
+                class="flex items-center gap-3 relative z-10 transition-all"
+              >
+                <div
+                  class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"
+                ></div>
+                Processing...
+              </span>
+              <div
+                *ngIf="isGenerating"
+                class="absolute inset-0 bg-white/20 animate-pulse"
+              ></div>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -897,6 +685,7 @@ export class PlanTripComponent implements OnInit {
 
   currentStep = 1;
   isSubmitting = false;
+  isGenerating = false; // Alias for template
   isLoadingTransports = false;
 
   tripModel = {
@@ -911,7 +700,12 @@ export class PlanTripComponent implements OnInit {
     budget: 0,
     activities: [] as string[],
     selectedTransportId: "",
+    template: false,
+    itineraryIds: [] as string[],
+    imageUrl: "",
+    userId: "",
   };
+  editingTripId: string | null = null;
 
   adventureLevels = [
     { label: "Easy", value: "EASY", desc: "Light hiking, accessible trails" },
@@ -950,7 +744,7 @@ export class PlanTripComponent implements OnInit {
     private authService: AuthService,
     private transportationService: TransportationService,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
   ) {}
 
   goBack(): void {
@@ -964,6 +758,7 @@ export class PlanTripComponent implements OnInit {
     this.route.queryParamMap.subscribe((params) => {
       const tripId = params.get("tripId");
       if (tripId) {
+        this.editingTripId = tripId;
         this.tripService.getTripById(tripId).subscribe({
           next: (data: any) => {
             this.tripModel.title = data.title || data.name || "";
@@ -984,6 +779,23 @@ export class PlanTripComponent implements OnInit {
             this.tripModel.comfortLevel =
               (data.comfortLevel || "").toUpperCase() || "";
             this.tripModel.activities = data.activities || [];
+            this.tripModel.itineraryIds = data.itineraryIds || [];
+            this.tripModel.imageUrl = data.imageUrl || "";
+            
+            const currentUserId = this.authService.currentUserValue?.id;
+            const tripOwnerId = data.userId || data.createdBy || data.creatorId;
+
+            // CRITICAL FIX: If user is customizing a template or someone else's trip
+            if (data.template === true || (tripOwnerId && tripOwnerId !== currentUserId)) {
+              console.log("[PlanTrip] Template customization detected - Forking trip to current user");
+              this.editingTripId = null; // Create new instead of updating source
+              this.tripModel.template = false; 
+              this.tripModel.userId = currentUserId || "";
+            } else {
+              this.tripModel.template = data.template || false;
+              this.tripModel.userId = tripOwnerId || "";
+            }
+
             if (data.transportIds && data.transportIds.length)
               this.tripModel.selectedTransportId = data.transportIds[0];
           },
@@ -1038,6 +850,15 @@ export class PlanTripComponent implements OnInit {
 
   getTodayString(): string {
     return new Date().toISOString().split("T")[0];
+  }
+
+  canContinue(): boolean {
+    return this.isStepValid();
+  }
+
+  generateTrip(): void {
+    this.isGenerating = true;
+    this.handleSubmit();
   }
 
   getStep1Errors(): string[] {
@@ -1186,31 +1007,41 @@ export class PlanTripComponent implements OnInit {
           this.tripModel.participants,
         status: "PLANNED",
         participants: this.tripModel.participants,
-        userId: userSnapshot.id,
+        userId: userSnapshot.id, // Always enforce current user as the owner for new/customized trips
         comfortLevel: this.tripModel.comfortLevel,
         activities: this.tripModel.activities,
         transportIds: [this.tripModel.selectedTransportId],
-        imageUrl:
-          "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&q=80",
+        itineraryIds: this.tripModel.itineraryIds,
+        template: false, // Ensure user-created trips are NEVER saved as templates
+        imageUrl: this.editingTripId && this.tripModel.imageUrl ? this.tripModel.imageUrl : "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&q=80",
       };
 
-      this.tripService.createTrip(tripDto).subscribe({
+      const save$ = this.editingTripId
+        ? this.tripService.updateTrip(this.editingTripId, tripDto)
+        : this.tripService.createTrip(
+            tripDto,
+            this.authService.currentUserValue?.id,
+          );
+
+      save$.subscribe({
         next: (response: any) => {
           this.isSubmitting = false;
-          console.log("Created trip:", response);
+          this.isGenerating = false;
+          console.log("Saved trip:", response);
           this.router.navigate(["/trips", response.id]);
         },
         error: (err: any) => {
           this.isSubmitting = false;
-          console.error("Failed to create trip", err);
+          this.isGenerating = false;
+          console.error("Failed to save trip", err);
           alert(
-            "Failed to create trip. " +
-              (err.error?.message || err.message || ""),
+            "Failed to save trip. " + (err.error?.message || err.message || ""),
           );
         },
       });
     } catch (e) {
       this.isSubmitting = false;
+      this.isGenerating = false;
       alert("An error occurred formatting the trip data.");
       console.error(e);
     }

@@ -109,4 +109,11 @@ export class TransportationService {
             }
         ];
     }
+
+    /**
+     * Obtenir les statistiques de popularité des transports (JPQL/Aggregation Analytics)
+     */
+    getPopularity(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/popularity-stats`);
+    }
 }

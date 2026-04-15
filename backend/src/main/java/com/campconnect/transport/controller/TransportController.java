@@ -48,4 +48,9 @@ public class TransportController {
     public void assignTrip(@PathVariable("transportId") String transportId, @PathVariable("tripId") String tripId) {
         service.assignToTrip(transportId, tripId);
     }
+
+    @GetMapping("/popularity-stats")
+    public List<java.util.Map<String, Object>> getPopularityStats() {
+        return service.getPopularityStats();
+    }
 }

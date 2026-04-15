@@ -1,8 +1,10 @@
 package com.campconnect.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import com.campconnect.enums.IncidentType;
+import com.campconnect.enums.IncidentSeverity;
 import java.time.LocalDateTime;
 
 @Data
@@ -12,15 +14,12 @@ public class IncidentDTO {
     private String id;
     private String title;
     private String description;
-    private String severity;
     private String level;
     private String regionName;
-    private Double latitude;
-    private Double longitude;
-    private String tripId;
+    private double latitude;
+    private double longitude;
     private String reporterId;
-    private String location;
-    private LocalDateTime createdAt;
     private LocalDateTime reportedAt;
     private String status;
+    private String tripId;
 }

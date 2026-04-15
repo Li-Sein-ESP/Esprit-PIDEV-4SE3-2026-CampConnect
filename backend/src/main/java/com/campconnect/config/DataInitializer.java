@@ -54,23 +54,15 @@ public class DataInitializer implements CommandLineRunner {
             roles.add(adminRole);
             admin.setRoles(roles);
             userRepository.save(admin);
-        } else {
-            User admin = userRepository.findByUsername("admin").get();
-            admin.setPassword(encoder.encode("admin123"));
-            userRepository.save(admin);
         }
 
         if (!userRepository.existsByUsername("camper")) {
             User camper = new User("camper", "camper@campconnect.com", encoder.encode("camper123"), "Happy Camper");
             Set<Role> roles = new HashSet<>();
-            Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+            Role camperRole = roleRepository.findByName(ERole.ROLE_CAMPER)
                     .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(userRole);
+            roles.add(camperRole);
             camper.setRoles(roles);
-            userRepository.save(camper);
-        } else {
-            User camper = userRepository.findByUsername("camper").get();
-            camper.setPassword(encoder.encode("camper123"));
             userRepository.save(camper);
         }
     }

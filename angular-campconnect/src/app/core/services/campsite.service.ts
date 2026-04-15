@@ -15,6 +15,9 @@ export interface Campsite {
     amenities: string[];
     capacity: number;
     available: boolean;
+    status: string;
+    latitude: number;
+    longitude: number;
 }
 
 @Injectable({

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GroupDetailDto {
+public class GroupDetailDTO {
     private String id;
     private String name;
     private String tripId;

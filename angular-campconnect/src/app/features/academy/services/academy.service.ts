@@ -1,9 +1,11 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, map } from 'rxjs';
-import { Course, Badge, Certification, UserCertification, Video } from '../models/academy.model';
+import { Course, Badge, Certification, UserCertification, Video, CertificationStats } from '../models/academy.model';
 
-const API_URL = 'http://localhost:8081/api/academy';
+import { environment } from '../../../../environments/environment';
+
+const API_URL = `${environment.apiUrl}/academy`;
 
 @Injectable({
     providedIn: 'root'
@@ -15,10 +17,10 @@ export class AcademyService {
     constructor(private http: HttpClient) { }
 
     // ─── FIle Uploads ───
-    uploadFile(file: File): Observable<{url: string}> {
+    uploadFile(file: File): Observable<{ url: string }> {
         const formData = new FormData();
         formData.append('file', file);
-        return this.http.post<{url: string}>(`http://localhost:8081/api/upload`, formData);
+        return this.http.post<{ url: string }>(`${environment.apiUrl}/upload`, formData);
     }
 
     // ─── Courses ───
@@ -93,6 +95,10 @@ export class AcademyService {
         return this.http.delete<void>(`${API_URL}/certifications/${id}`);
     }
 
+    getCertificationByCourseId(courseId: string): Observable<Certification> {
+        return this.http.get<Certification>(`${API_URL}/certifications/by-course/${courseId}`);
+    }
+
     // ─── User Certifications ───
     getUserCertifications(userId: string): Observable<UserCertification[]> {
         return this.http.get<UserCertification[]>(`${API_URL}/users/${userId}/certifications`);
@@ -102,12 +108,38 @@ export class AcademyService {
         return this.http.post<UserCertification>(`${API_URL}/users/certifications`, userCert);
     }
 
+    /**
+     * TÂCHE 2 – Complex aggregation (equivalent to JPQL JOIN with GROUP BY).
+     * Calls GET /api/academy/certifications/stats
+     * Returns statistics per certification: total issued, active count, expired count.
+     * Used by the Admin Analytics Dashboard.
+     */
+    getCertificationStats(): Observable<CertificationStats[]> {
+        return this.http.get<CertificationStats[]>(`${API_URL}/certifications/stats`);
+    }
+
+    /**
+     * TÂCHE 3 – Keyword query involving more than one entity (User + CertificationStatus).
+     * Calls GET /api/academy/users/{userId}/certifications/filter?status={status}
+     * Spring Data generates: { "user.$id": ObjectId(userId), "status": status }
+     * Traverses the User @DBRef AND filters on CertificationStatus simultaneously.
+     */
+    getUserCertificationsByStatus(userId: string, status: string): Observable<UserCertification[]> {
+        return this.http.get<UserCertification[]>(
+            `${API_URL}/users/${userId}/certifications/filter`,
+            { params: { status } }
+        );
+    }
+
     // ─── Videos ───
     private normalizeUrl(url: string | undefined): string {
         if (!url) return '';
-        
+
         const host = window.location.hostname;
-        const backendBase = `http://${host}:8081`;
+        // Assuming environment.apiUrl is like 'http://localhost:8089/api'
+        // we want to get the base without the /api part for static files if needed
+        const urlObj = new URL(environment.apiUrl);
+        const backendBase = `${urlObj.protocol}//${urlObj.host}`;
         const timestamp = new Date().getTime();
 
         // If it's a relative path OR it's an absolute path containing /uploads/
@@ -123,8 +155,8 @@ export class AcademyService {
 
     getVideos(): Observable<Video[]> {
         return this.http.get<Video[]>(`${API_URL}/videos`).pipe(
-            map(videos => videos.map(v => ({ 
-                ...v, 
+            map(videos => videos.map(v => ({
+                ...v,
                 id: (v as any)._id || v.id,
                 videoUrl: this.normalizeUrl(v.videoUrl),
                 thumbnailUrl: this.normalizeUrl(v.thumbnailUrl)
@@ -134,8 +166,8 @@ export class AcademyService {
 
     getVideoById(id: string): Observable<Video> {
         return this.http.get<Video>(`${API_URL}/videos/${id}`).pipe(
-            map(v => ({ 
-                ...v, 
+            map(v => ({
+                ...v,
                 id: (v as any)._id || v.id,
                 videoUrl: this.normalizeUrl(v.videoUrl),
                 thumbnailUrl: this.normalizeUrl(v.thumbnailUrl)

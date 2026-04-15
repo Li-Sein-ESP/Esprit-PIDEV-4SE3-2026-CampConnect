@@ -49,6 +49,7 @@ import { filter } from 'rxjs/operators';
             <div>
               <h4 class="font-semibold mb-4">Plan</h4>
               <ul class="space-y-2 text-sm text-gray-400">
+                <li><a routerLink="/trips" class="hover:text-white transition-colors">My Trips</a></li>
                 <li><a routerLink="/plan-trip" class="hover:text-white transition-colors">Trip Planner</a></li>
                 <li><a routerLink="/transportation" class="hover:text-white transition-colors">Transportation</a></li>
                 <li><a routerLink="/gear" class="hover:text-white transition-colors">Gear</a></li>

@@ -142,8 +142,8 @@ export class NavigationComponent implements OnInit {
       {
         label: "Plan",
         children: [
-          { label: "Trip Planner", link: "/plan-trip" },
           { label: "My Trips", link: "/trips" },
+          { label: "Trip Planner", link: "/plan-trip" },
           { label: "Transportation", link: "/transportation" },
           { label: "Gear", link: "/gear" },
           { label: "Companions", link: "/companions" },
@@ -162,6 +162,9 @@ export class NavigationComponent implements OnInit {
         children: [
           { label: "Feed", link: "/community/feed" },
           { label: "Forums", link: "/community/forums" },
+          { label: "My Groups", link: "/groups/my-groups" },
+          { label: "Create Group", link: "/groups/create" },
+          { label: "Group Invitations", link: "/groups/invitations" },
           { label: "Trip Stories", link: "/community/stories" },
           { label: "Leaderboard", link: "/community/leaderboard" },
           { label: "Events", link: "/community/events" },

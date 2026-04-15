@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import com.campconnect.transport.enums.TransportMode;
+import com.campconnect.transport.enums.TransportStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +22,7 @@ public class Transport {
     private int duration;
     private String provider;
     private String imageUrl;
+    private TransportStatus status = TransportStatus.AVAILABLE;
     // Rating summary fields (computed from transport reviews)
     private Double averageRating;
     private Integer reviewCount;

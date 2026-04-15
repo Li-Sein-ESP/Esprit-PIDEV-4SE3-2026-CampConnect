@@ -11,29 +11,14 @@ import com.campconnect.model.TripIntent;
 import com.campconnect.model.TripIntentStatus;
 import com.campconnect.repository.TripIntentRepository;
 
-import com.campconnect.trip.service.ITripService;
-import com.campconnect.trip.dto.TripDTO;
-import com.campconnect.trip.enums.DifficultyLevel;
-import com.campconnect.trip.enums.TripStatus;
-import org.springframework.beans.factory.annotation.Qualifier;
-import java.time.ZoneOffset;
-import java.math.BigDecimal;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class TripIntentServiceImpl implements ITripIntentService {
 
     private final TripIntentRepository tripIntentRepository;
     private final IGroupService groupService;
-    private final ITripService itineraryTripService;
-
-    public TripIntentServiceImpl(
-            TripIntentRepository tripIntentRepository,
-            IGroupService groupService,
-            @Qualifier("itineraryTripService") ITripService itineraryTripService) {
-        this.tripIntentRepository = tripIntentRepository;
-        this.groupService = groupService;
-        this.itineraryTripService = itineraryTripService;
-    }
 
     @Override
     public TripIntent createTripIntent(TripIntent tripIntent) {
@@ -54,44 +39,7 @@ public class TripIntentServiceImpl implements ITripIntentService {
         group.getMemberUserIds().add(savedTrip.getCreatorUserId());
         
         groupService.createGroup(group);
-        System.out.println("Auto-created group for trip intent: " + savedTrip.getId());
-        
-        // Ensure a Trip entity is created for "My Trips"
-        try {
-            TripDTO tripDto = new TripDTO();
-            tripDto.setId(savedTrip.getId()); // Use same ID as the intent/group
-            tripDto.setTitle(savedTrip.getTitle());
-            tripDto.setUserId(savedTrip.getCreatorUserId());
-            tripDto.setStartDate(savedTrip.getDateFrom().toInstant(ZoneOffset.UTC));
-            tripDto.setEndDate(savedTrip.getDateTo().toInstant(ZoneOffset.UTC));
-            tripDto.setTotalBudget(BigDecimal.valueOf(savedTrip.getBudgetMax() != null ? savedTrip.getBudgetMax() : 0));
-            tripDto.setStatus(TripStatus.PLANNED);
-            tripDto.setParticipants(1); // Default for creator
-            
-            // Map destination (TripIntent preferredZone -> LocationPoint address)
-            com.campconnect.model.common.LocationPoint location = new com.campconnect.model.common.LocationPoint();
-            location.setAddress(savedTrip.getPreferredZone() != null ? savedTrip.getPreferredZone() : "Unknown Destination");
-            location.setLatitude(0.0);
-            location.setLongitude(0.0);
-            tripDto.setDestination(location);
-            
-            // Map ExperienceLevel to DifficultyLevel
-            if (savedTrip.getExperienceLevel() != null) {
-                switch (savedTrip.getExperienceLevel()) {
-                    case "BEGINNER": tripDto.setDifficulty(DifficultyLevel.BEGINNER); break;
-                    case "ADVANCED": tripDto.setDifficulty(DifficultyLevel.HARD); break;
-                    case "EXPERT": tripDto.setDifficulty(DifficultyLevel.EXPERT); break;
-                    default: tripDto.setDifficulty(DifficultyLevel.MODERATE); break;
-                }
-            } else {
-                tripDto.setDifficulty(DifficultyLevel.MODERATE);
-            }
-            
-            itineraryTripService.save(tripDto);
-            System.out.println("Auto-created Trip entity for intent: " + savedTrip.getId());
-        } catch (Exception e) {
-            System.err.println("Failed to auto-create Trip entity: " + e.getMessage());
-        }
+        System.out.println("Auto-created group for trip: " + savedTrip.getId());
         
         return savedTrip;
     }

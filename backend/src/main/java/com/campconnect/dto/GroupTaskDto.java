@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GroupTaskDto {
+public class GroupTaskDTO {
     private String id;
     
     @NotBlank

@@ -174,7 +174,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.isSubmitting = false;
         console.error('Login failed', err);
-        this.errorMessage = 'Invalid username or password';
+        this.errorMessage = err.userMessage || 'Invalid username or password';
       }
     });
   }
@@ -208,7 +208,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.isSubmitting = false;
         console.error('Signup failed', err);
-        this.errorMessage = 'Signup failed. Please try again.';
+        this.errorMessage = err.userMessage || 'Signup failed. Please try again.';
       }
     });
   }

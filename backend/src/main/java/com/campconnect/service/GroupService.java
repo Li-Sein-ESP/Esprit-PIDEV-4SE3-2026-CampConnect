@@ -1,11 +1,11 @@
 package com.campconnect.service;
 
-import com.campconnect.dto.GroupDto;
+import com.campconnect.dto.GroupDTO;
 import java.util.List;
 
 public interface GroupService {
-    GroupDto createGroup(GroupDto groupDTO);
-    GroupDto getGroupById(String id);
-    List<GroupDto> getAllGroups();
+    GroupDTO createGroup(GroupDTO GroupDTO);
+    GroupDTO getGroupById(String id);
+    List<GroupDTO> getAllGroups();
     void deleteGroup(String id);
 }

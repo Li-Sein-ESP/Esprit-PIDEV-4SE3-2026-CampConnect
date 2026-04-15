@@ -1,8 +1,9 @@
 package com.campconnect.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -12,15 +13,18 @@ import java.time.LocalDateTime;
 public class TripDTO {
     private String id;
     private String name;
-    private String description;
     private String notes;
+    
+    @NotBlank(message = "Destination is required")
     private String destination;
-    private String location;
+    
+    @NotBlank(message = "Category is required")
+    private String categoryName;
+    
+    private String difficulty;
+    private String status;
     private LocalDate startDate;
     private LocalDate endDate;
-    private String difficulty;
-    private String groupId;
     private String creatorId;
-    private String status;
-    private LocalDateTime createdAt;
+    private String groupId;
 }

@@ -19,6 +19,8 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 import com.campconnect.academy.dto.UserCertificationDTO;
+import com.campconnect.dto.CertificationStatsDTO;
+import com.campconnect.dto.CommentDTO;
 
 @RestController
 @RequestMapping("/api/academy")
@@ -143,6 +145,32 @@ public class AcademyController {
         return certificationService.getUserCertifications(userId);
     }
 
+    @GetMapping("/certifications/by-course/{courseId}")
+    public ResponseEntity<CertificationDTO> getCertificationByCourseId(@PathVariable String courseId) {
+        CertificationDTO cert = certificationService.getCertificationByCourseId(courseId);
+        return cert != null ? ResponseEntity.ok(cert) : ResponseEntity.notFound().build();
+    }
+
+    /**
+     * TÂCHE 2 – Endpoint for complex MongoDB aggregation (equivalent to JPQL JOIN).
+     * Accessible to ADMIN only for dashboard analytics.
+     */
+    @GetMapping("/certifications/stats")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<CertificationStatsDTO>> getCertificationStats() {
+        return ResponseEntity.ok(certificationService.getCertificationStats());
+    }
+
+    /**
+     * TÂCHE 3 – Multi-entity keyword filter endpoint.
+     */
+    @GetMapping("/users/{userId}/certifications/filter")
+    public ResponseEntity<List<UserCertificationDTO>> getUserCertificationsByStatus(
+            @PathVariable String userId,
+            @RequestParam String status) {
+        return ResponseEntity.ok(certificationService.getUserCertificationsByStatus(userId, status));
+    }
+
     @PostMapping("/users/certifications")
     public ResponseEntity<UserCertificationDTO> earnCertification(@Valid @RequestBody UserCertificationDTO dto) {
         return ResponseEntity.ok(certificationService.earnCertification(dto));
@@ -183,5 +211,15 @@ public class AcademyController {
     @GetMapping("/videos/category/{category}")
     public List<VideoDTO> getVideosByCategory(@PathVariable String category) {
         return videoService.getVideosByCategory(category);
+    }
+
+    @PostMapping("/videos/{id}/comments")
+    public ResponseEntity<CommentDTO> addCommentToVideo(@PathVariable String id, @Valid @RequestBody CommentDTO commentDTO) {
+        return ResponseEntity.ok(videoService.addComment(id, commentDTO));
+    }
+
+    @PostMapping("/videos/{id}/helpful")
+    public ResponseEntity<VideoDTO> toggleVideoHelpful(@PathVariable String id) {
+        return ResponseEntity.ok(videoService.toggleHelpful(id));
     }
 }

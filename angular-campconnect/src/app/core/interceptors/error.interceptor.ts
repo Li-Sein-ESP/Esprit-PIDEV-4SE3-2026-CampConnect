@@ -45,7 +45,7 @@ export class ErrorInterceptor implements HttpInterceptor {
             case 401:
               errorMessage = 'Session expired. Please login again.';
               // Clear token and redirect to login
-              localStorage.removeItem('token');
+              localStorage.removeItem('cc_token');
               this.router.navigate(['/login']);
               break;
             case 403:

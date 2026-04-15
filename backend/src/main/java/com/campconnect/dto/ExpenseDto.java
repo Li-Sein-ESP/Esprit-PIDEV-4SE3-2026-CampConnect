@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ExpenseDto {
+public class ExpenseDTO {
     private String id;
     private String groupId;
     private String tripId;

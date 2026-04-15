@@ -5,6 +5,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LucideAngularModule, Car, Search, Plus, MapPin, Bus, Plane, Train, Trash2, Link, Edit2, Bike, X, ShieldCheck, AlertCircle, Clock, Wallet, Navigation } from 'lucide-angular';
 import { TransportationService } from '../../transportation/services/transportation.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-transports',
@@ -70,9 +71,28 @@ import { AuthService } from '../../../core/services/auth.service';
                     <span class="text-xs font-black text-slate-900">{{ stat.count }}</span>
                   </div>
                   <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div class="h-full bg-indigo-500 rounded-full transition-all duration-1000" [style.width.%]="(stat.count / transports().length) * 100"></div>
+                    <div class="h-full bg-indigo-500 rounded-full transition-all duration-1000" [style.width.%]="(stat.count / (transports().length || 1)) * 100"></div>
                   </div>
                </div>
+             </div>
+          </div>
+
+          <!-- Top Providers analytics -->
+          <div class="bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm">
+             <h3 class="font-black text-slate-800 text-xs uppercase tracking-widest mb-6">Top Transport Providers</h3>
+             <div class="space-y-4">
+                <div *ngFor="let p of topPopularity()" class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                   <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-[10px] font-bold">
+                         #{{ topPopularity().indexOf(p) + 1 }}
+                      </div>
+                      <span class="text-sm font-bold text-slate-700 truncate max-w-[80px]">{{ p._id }}</span>
+                   </div>
+                   <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-[10px] font-black">{{ p.usageCount }} Trips</span>
+                </div>
+                <div *ngIf="topPopularity().length === 0" class="text-center py-4 text-slate-400 text-xs italic">
+                    Analyzing historical usage...
+                </div>
              </div>
           </div>
         </div>
@@ -112,7 +132,11 @@ import { AuthService } from '../../../core/services/auth.service';
                       </div>
                       <div>
                         <p class="font-black text-slate-900 group-hover:text-indigo-700 transition-colors">{{ t.provider || 'Independent' }}</p>
-                        <p class="text-[10px] text-slate-400 font-mono mt-0.5">REF: {{ t.id.substring(0, 8) }}</p>
+                        <p class="text-[10px] text-slate-400 font-mono mt-0.5" *ngIf="t.id">REF: {{ t.id.substring(0, 8) }}</p>
+                        <div *ngIf="t.averageRating" class="flex items-center gap-1 mt-1">
+                           <span class="text-xs font-bold text-amber-500">★ {{ t.averageRating | number:'1.1-1' }}</span>
+                           <span class="text-[10px] text-slate-400">({{ t.reviewCount }} reviews)</span>
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -140,10 +164,6 @@ import { AuthService } from '../../../core/services/auth.service';
                            <p class="flex items-center gap-1.5 text-[10px] text-slate-500 font-bold uppercase tracking-wider">
                               <lucide-icon [img]="MapPinIcon" [size]="10"></lucide-icon>
                               {{ getTripDestination(t.tripId) }}
-                           </p>
-                           <p class="flex items-center gap-1.5 text-[10px] text-slate-400 font-medium">
-                              <lucide-icon [img]="ShieldCheckIcon" [size]="10" class="text-indigo-400"></lucide-icon>
-                              Assignment: {{ t.tripId.substring(0, 8) }}
                            </p>
                         </div>
                      </div>
@@ -202,7 +222,7 @@ import { AuthService } from '../../../core/services/auth.service';
             <select [(ngModel)]="formData.tripId" name="tripId" class="w-full px-5 py-4 bg-white border-2 border-slate-200/50 rounded-2xl text-sm font-bold text-slate-900 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all cursor-pointer appearance-none">
               <option value="">Global Fleet (Unassigned)</option>
               <option *ngFor="let trip of availableTrips()" [value]="trip.id">
-                {{ trip.title || trip.name }} | {{ trip.destination?.address || 'Anywhere' }} | {{ trip.participants }} Participants
+                {{ trip.title || trip.name }}
               </option>
             </select>
           </div>
@@ -220,7 +240,7 @@ import { AuthService } from '../../../core/services/auth.service';
              </div>
              <div>
                 <label class="block text-xs font-black text-slate-500 mb-2.5 uppercase tracking-widest">Provider Label</label>
-                <input type="text" [(ngModel)]="formData.provider" name="provider" required placeholder="e.g. SNTRI, Bolt" class="w-full px-5 py-3.5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all">
+                <input type="text" [(ngModel)]="formData.provider" name="provider" required placeholder="e.g. SNTRI" class="w-full px-5 py-3.5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all">
              </div>
 
              <div>
@@ -240,7 +260,7 @@ import { AuthService } from '../../../core/services/auth.service';
 
              <div class="col-span-2">
                 <label class="block text-xs font-black text-slate-500 mb-2.5 uppercase tracking-widest">Visual Representative (URL)</label>
-                <input type="text" [(ngModel)]="formData.imageUrl" name="imageUrl" placeholder="https://images.unsplash.com/fleet-item" class="w-full px-5 py-3.5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all">
+                <input type="text" [(ngModel)]="formData.imageUrl" name="imageUrl" placeholder="https://example.com/image.jpg" class="w-full px-5 py-3.5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all">
                 <div *ngIf="formData.imageUrl" class="mt-4 aspect-[21/9] rounded-3xl overflow-hidden ring-8 ring-slate-50 shadow-inner group relative">
                    <img [src]="formData.imageUrl" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
                 </div>
@@ -302,6 +322,7 @@ export class AdminTransportsComponent implements OnInit {
   searchQuery = '';
 
   modeStats = signal<{ mode: string, count: number }[]>([]);
+  topPopularity = signal<any[]>([]);
 
   formData = {
     tripId: '',
@@ -312,8 +333,6 @@ export class AdminTransportsComponent implements OnInit {
     imageUrl: ''
   };
 
-  private readonly API_URL = 'http://localhost:8081/api';
-
   constructor(
     private transportService: TransportationService,
     private authService: AuthService,
@@ -323,6 +342,21 @@ export class AdminTransportsComponent implements OnInit {
   ngOnInit(): void {
     this.loadAllTripsFromBackend();
     this.loadAllTransports();
+    this.loadPopularityAnalytics();
+  }
+
+  loadPopularityAnalytics() {
+    this.transportService.getPopularity().subscribe({
+      next: (data) => {
+        this.topPopularity.set(data);
+        console.log('Popularity Data loaded:', data);
+      },
+      error: (err) => {
+        console.error('Failed to load popularity analytics SERVER ERROR:', err);
+        // Fallback for demo so user doesn't stay stuck
+        this.topPopularity.set([{ _id: "DATABASE ERROR - Check Logs", usageCount: 0 }]);
+      }
+    });
   }
 
   private getHttpOptions() {
@@ -341,27 +375,12 @@ export class AdminTransportsComponent implements OnInit {
   }
 
   loadAllTripsFromBackend() {
-    console.log('[AdminTransports] Fetching trips from:', `${this.API_URL}/trips`);
-    this.http.get<any[]>(`${this.API_URL}/trips`, this.getHttpOptions()).subscribe({
+    this.http.get<any[]>(`${environment.apiUrl}/trips`, this.getHttpOptions()).subscribe({
       next: (trips) => {
-        console.log('[AdminTransports] Trips received:', trips?.length || 0, trips);
         this.availableTrips.set(trips || []);
-        
-        // If no trips found, specifically check for templates as a fallback/diagnostic
-        if (!trips || trips.length === 0) {
-          console.warn('[AdminTransports] No trips found. Checking /trips/templates...');
-          this.http.get<any[]>(`${this.API_URL}/trips/templates`, this.getHttpOptions()).subscribe({
-            next: (templates) => {
-              if (templates && templates.length > 0) {
-                console.log('[AdminTransports] Found templates as fallback:', templates.length);
-                this.availableTrips.set(templates);
-              }
-            }
-          });
-        }
       },
       error: (err) => {
-        console.error('[AdminTransports] Failed to load trips from backend', err);
+        console.error('Failed to load trips from backend', err);
         this.availableTrips.set([]);
       }
     });
@@ -414,17 +433,6 @@ export class AdminTransportsComponent implements OnInit {
       case 'SHARED_RIDE': return Car;
       case 'BIKE': return Bike;
       default: return Car;
-    }
-  }
-
-  getModeColor(mode: string) {
-    switch (mode?.toUpperCase()) {
-      case 'CAR': return 'bg-teal-50 text-teal-600';
-      case 'BUS': return 'bg-indigo-50 text-indigo-600';
-      case 'TRAIN': return 'bg-amber-50 text-amber-600';
-      case 'SHARED_RIDE': return 'bg-purple-50 text-purple-600';
-      case 'BIKE': return 'bg-lime-50 text-lime-600';
-      default: return 'bg-slate-50 text-slate-600';
     }
   }
 
@@ -516,6 +524,7 @@ export class AdminTransportsComponent implements OnInit {
         this.submitMessage.set(this.editingId() ? 'Transport configurations updated!' : 'New transport node deployed!');
         this.submitSuccess.set(true);
         this.loadAllTransports();
+        this.loadPopularityAnalytics();
         setTimeout(() => this.closeModal(), 1500);
       },
       error: (err) => {

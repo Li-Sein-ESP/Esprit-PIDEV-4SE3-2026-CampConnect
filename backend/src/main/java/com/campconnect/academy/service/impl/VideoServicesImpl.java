@@ -6,6 +6,9 @@ import com.campconnect.academy.dto.UserSummaryDTO;
 import com.campconnect.academy.entity.Video;
 import com.campconnect.academy.repository.VideoRepository;
 import com.campconnect.repository.UserRepository;
+import com.campconnect.repository.CommentRepository;
+import com.campconnect.model.Comment;
+import com.campconnect.dto.CommentDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +24,9 @@ public class VideoServicesImpl implements IVideoServices {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     @Override
     public List<VideoDTO> getAllVideos() {
@@ -59,6 +65,49 @@ public class VideoServicesImpl implements IVideoServices {
         return videoRepository.findByCategory(category).stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
+    @Override
+    public CommentDTO addComment(String videoId, CommentDTO commentDTO) {
+        Video video = videoRepository.findById(videoId)
+                .orElseThrow(() -> new RuntimeException("Video not found"));
+
+        Comment comment = new Comment();
+        comment.setContent(commentDTO.getContent());
+        comment.setCreatedAt(LocalDateTime.now());
+
+        // Resolve author from SecurityContext or DTO
+        org.springframework.security.core.Authentication auth =
+                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()
+                && auth.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails) {
+            String currentUsername = ((org.springframework.security.core.userdetails.UserDetails) auth.getPrincipal()).getUsername();
+            userRepository.findByUsername(currentUsername).ifPresent(u -> {
+                comment.setAuthorId(u.getId());
+                comment.setAuthorName(u.getName());
+                comment.setAuthorUsername(u.getUsername());
+            });
+        } else if (commentDTO.getAuthorId() != null) {
+            userRepository.findById(commentDTO.getAuthorId()).ifPresent(u -> {
+                comment.setAuthorId(u.getId());
+                comment.setAuthorName(u.getName());
+                comment.setAuthorUsername(u.getUsername());
+            });
+        }
+
+        Comment savedComment = commentRepository.save(comment);
+        video.getComments().add(savedComment);
+        videoRepository.save(video);
+
+        return convertCommentToDTO(savedComment);
+    }
+
+    @Override
+    public VideoDTO toggleHelpful(String videoId) {
+        Video video = videoRepository.findById(videoId)
+                .orElseThrow(() -> new RuntimeException("Video not found"));
+        video.setHelpfulCount(video.getHelpfulCount() + 1);
+        return convertToDTO(videoRepository.save(video));
+    }
+
     private VideoDTO convertToDTO(Video video) {
         VideoDTO dto = new VideoDTO();
         dto.setId(video.getId());
@@ -72,7 +121,7 @@ public class VideoServicesImpl implements IVideoServices {
         dto.setHelpfulCount(video.getHelpfulCount());
         dto.setCreatedAt(video.getCreatedAt());
         dto.setTakeaways(video.getTakeaways());
-        
+
         if (video.getCreator() != null) {
             UserSummaryDTO creatorDto = new UserSummaryDTO();
             creatorDto.setId(video.getCreator().getId());
@@ -81,7 +130,24 @@ public class VideoServicesImpl implements IVideoServices {
             creatorDto.setVerifiedExpert(video.getCreator().isVerifiedExpert());
             dto.setCreator(creatorDto);
         }
-        
+
+        if (video.getComments() != null) {
+            dto.setComments(video.getComments().stream()
+                    .map(this::convertCommentToDTO)
+                    .collect(Collectors.toList()));
+        }
+
+        return dto;
+    }
+
+    private CommentDTO convertCommentToDTO(Comment comment) {
+        CommentDTO dto = new CommentDTO();
+        dto.setId(comment.getId());
+        dto.setContent(comment.getContent());
+        dto.setCreatedAt(comment.getCreatedAt());
+        dto.setAuthorId(comment.getAuthorId());
+        // Use stored authorName; fall back to "Anonymous"
+        dto.setAuthorName(comment.getAuthorName() != null ? comment.getAuthorName() : "Anonymous");
         return dto;
     }
 
@@ -94,36 +160,33 @@ public class VideoServicesImpl implements IVideoServices {
         video.setCategory(dto.getCategory());
         video.setType(dto.getType());
         video.setTakeaways(dto.getTakeaways());
-        
+
         if (dto.getCreator() != null) {
             String creatorId = dto.getCreator().getId();
             String username = dto.getCreator().getUsername();
-            
-            // Try ID first, but ONLY if it's not the "admin" placeholder
+
             if (creatorId != null && !creatorId.equals("admin")) {
                 userRepository.findById(creatorId).ifPresent(video::setCreator);
             }
-            
-            // Fallback to username from DTO if creator still not found
             if (video.getCreator() == null && username != null) {
                 userRepository.findByUsername(username).ifPresent(video::setCreator);
             }
         }
-        
-        // Handle Traceability: assign creator safely from SecurityContext if still null
+
         if (video.getCreator() == null) {
-            org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null && auth.isAuthenticated() && auth.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails) {
-                String currentUsername = ((org.springframework.security.core.userdetails.UserDetails)auth.getPrincipal()).getUsername();
+            org.springframework.security.core.Authentication auth =
+                    org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated()
+                    && auth.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails) {
+                String currentUsername = ((org.springframework.security.core.userdetails.UserDetails) auth.getPrincipal()).getUsername();
                 userRepository.findByUsername(currentUsername).ifPresent(video::setCreator);
             }
         }
-        
-        // Fallback for admin if still not set
+
         if (video.getCreator() == null) {
             userRepository.findByUsername("admin").ifPresent(video::setCreator);
         }
-        
+
         return video;
     }
 }

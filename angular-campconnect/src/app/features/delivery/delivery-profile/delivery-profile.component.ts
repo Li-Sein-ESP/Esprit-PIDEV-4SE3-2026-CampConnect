@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { DeliveryApiService } from '../services/delivery-api.service';
 
 interface DeliveryVehicle {
     id: number;
@@ -60,14 +61,17 @@ export class DeliveryProfileComponent implements OnInit {
     verified = true;
 
     stats = {
-        totalDeliveries: 452,
-        activeJobs: 2,
-        totalEarnings: '$12.4k',
-        avgRating: 4.8,
-        onTimeRate: '98%',
-        repeatCustomers: '42%',
-        avgDistance: '14.5 miles'
+        totalDeliveries: 0,
+        activeJobs: 0,
+        totalEarnings: '$0',
+        avgRating: 0,
+        onTimeRate: '0%',
+        completionRate: '0%',
+        repeatCustomers: '0%',  // Not yet in backend API
+        avgDistance: '0 miles'  // Not yet in backend API
     };
+
+    loading = true;
 
     activeTab = 'overview';
 
@@ -100,12 +104,41 @@ export class DeliveryProfileComponent implements OnInit {
 
     starArray = [1, 2, 3, 4, 5];
 
-    constructor(private authService: AuthService) { }
+    constructor(
+        private authService: AuthService,
+        private deliveryApiService: DeliveryApiService
+    ) { }
 
     ngOnInit(): void {
         this.authService.getCurrentUser().subscribe(user => {
             if (user?.username) {
                 this.providerName = user.username;
+            }
+        });
+        
+        this.loadProfileStats();
+    }
+    
+    loadProfileStats(): void {
+        this.loading = true;
+        this.deliveryApiService.getProfileStats().subscribe({
+            next: (response) => {
+                this.stats = {
+                    totalDeliveries: response.totalDeliveries,
+                    activeJobs: response.activeJobs,
+                    totalEarnings: `$${(response.totalEarnings / 1000).toFixed(1)}k`,
+                    avgRating: response.rating,
+                    onTimeRate: `${response.onTimeRate}%`,
+                    completionRate: `${response.completionRate}%`,
+                    repeatCustomers: '0%',  // Not yet in backend API
+                    avgDistance: '0 miles'  // Not yet in backend API
+                };
+                this.rating = response.rating;
+                this.loading = false;
+            },
+            error: (error) => {
+                console.error('Error loading profile stats:', error);
+                this.loading = false;
             }
         });
     }

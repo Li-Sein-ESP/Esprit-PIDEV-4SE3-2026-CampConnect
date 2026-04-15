@@ -13,7 +13,7 @@
             <p class="page-subtitle">Lancez l'idée. Laissez la magie du matching réunir votre groupe.</p>
         </div>
 
-        <form *ngIf="intentForm" [formGroup]="intentForm" (ngSubmit)="onSubmit()" class="intent-form">
+        <form [formGroup]="intentForm" (ngSubmit)="onSubmit()" class="intent-form">
 
             <!-- General Info -->
             <div class="form-section">
@@ -24,9 +24,9 @@
                     <div class="input-wrapper">
                         <input type="text" id="title" formControlName="title"
                             placeholder="Ex: Week-end évasion à Akchour"
-                            [class.is-invalid]="intentForm.get('title')?.invalid && (intentForm.get('title')?.dirty || intentForm.get('title')?.touched)">
+                            [class.is-invalid]="intentForm.get('title')?.invalid && intentForm.get('title')?.touched">
                     </div>
-                    <div class="error-msg text-red-500 mt-1 text-sm font-medium" *ngIf="intentForm.get('title')?.invalid && (intentForm.get('title')?.dirty || intentForm.get('title')?.touched)">
+                    <div class="error-msg text-red-500 mt-1 text-sm font-medium" *ngIf="intentForm.get('title')?.invalid && intentForm.get('title')?.touched">
                         <span *ngIf="intentForm.get('title')?.errors?.['required']">Le nom du projet est obligatoire.</span>
                         <span *ngIf="intentForm.get('title')?.errors?.['minlength']">Donnez-lui un nom plus descriptif (minimum 5 caractères).</span>
                         <span *ngIf="intentForm.get('title')?.errors?.['maxlength']">Le nom ne peut pas dépasser 100 caractères.</span>
@@ -39,9 +39,9 @@
                         <div class="input-wrapper icon-input">
                             <lucide-icon [img]="Calendar" size="18" class="input-icon"></lucide-icon>
                             <input type="date" id="dateFrom" formControlName="dateFrom" [min]="today"
-                                [class.is-invalid]="intentForm.get('dateFrom')?.invalid && (intentForm.get('dateFrom')?.dirty || intentForm.get('dateFrom')?.touched)">
+                                [class.is-invalid]="intentForm.get('dateFrom')?.invalid && intentForm.get('dateFrom')?.touched">
                         </div>
-                        <div class="error-msg text-red-500 mt-1 text-sm font-medium" *ngIf="intentForm.get('dateFrom')?.invalid && (intentForm.get('dateFrom')?.dirty || intentForm.get('dateFrom')?.touched)">
+                        <div class="error-msg text-red-500 mt-1 text-sm font-medium" *ngIf="intentForm.get('dateFrom')?.invalid && intentForm.get('dateFrom')?.touched">
                             <span *ngIf="intentForm.get('dateFrom')?.errors?.['required']">Obligatoire.</span>
                         </div>
                     </div>
@@ -51,16 +51,16 @@
                         <div class="input-wrapper icon-input">
                             <lucide-icon [img]="Calendar" size="18" class="input-icon"></lucide-icon>
                             <input type="date" id="dateTo" formControlName="dateTo" [min]="intentForm.get('dateFrom')?.value || today"
-                                [class.is-invalid]="intentForm.get('dateTo')?.invalid && (intentForm.get('dateTo')?.dirty || intentForm.get('dateTo')?.touched)">
+                                [class.is-invalid]="intentForm.get('dateTo')?.invalid && intentForm.get('dateTo')?.touched">
                         </div>
-                        <div class="error-msg text-red-500 mt-1 text-sm font-medium" *ngIf="intentForm.get('dateTo')?.invalid && (intentForm.get('dateTo')?.dirty || intentForm.get('dateTo')?.touched)">
+                        <div class="error-msg text-red-500 mt-1 text-sm font-medium" *ngIf="intentForm.get('dateTo')?.invalid && intentForm.get('dateTo')?.touched">
                             <span *ngIf="intentForm.get('dateTo')?.errors?.['required']">Obligatoire.</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="error-msg text-red-500 mt-2 text-sm font-medium"
-                    *ngIf="intentForm.hasError('dateRangeInvalid') && (intentForm.get('dateTo')?.dirty || intentForm.get('dateTo')?.touched)">
+                    *ngIf="intentForm.hasError('dateRangeInvalid') && intentForm.get('dateTo')?.touched">
                     La date de fin doit être après la date de début.
                 </div>
 
@@ -71,9 +71,9 @@
                             <lucide-icon [img]="Map" size="18" class="input-icon"></lucide-icon>
                             <input type="text" id="preferredZone" formControlName="preferredZone"
                                 placeholder="Ex: Chefchaouen, Ifrane..."
-                                [class.is-invalid]="intentForm.get('preferredZone')?.invalid && (intentForm.get('preferredZone')?.dirty || intentForm.get('preferredZone')?.touched)">
+                                [class.is-invalid]="intentForm.get('preferredZone')?.invalid && intentForm.get('preferredZone')?.touched">
                         </div>
-                        <div class="error-msg text-red-500 mt-1 text-sm font-medium" *ngIf="intentForm.get('preferredZone')?.invalid && (intentForm.get('preferredZone')?.dirty || intentForm.get('preferredZone')?.touched)">
+                        <div class="error-msg text-red-500 mt-1 text-sm font-medium" *ngIf="intentForm.get('preferredZone')?.invalid && intentForm.get('preferredZone')?.touched">
                             <span *ngIf="intentForm.get('preferredZone')?.errors?.['required']">La région est obligatoire.</span>
                         </div>
                     </div>
@@ -83,10 +83,10 @@
                         <div class="input-wrapper icon-input">
                             <lucide-icon [img]="DollarSign" size="18" class="input-icon"></lucide-icon>
                             <input type="number" id="budgetMax" formControlName="budgetMax" placeholder="1000"
-                                [class.is-invalid]="intentForm.get('budgetMax')?.invalid && (intentForm.get('budgetMax')?.dirty || intentForm.get('budgetMax')?.touched)">
+                                [class.is-invalid]="intentForm.get('budgetMax')?.invalid && intentForm.get('budgetMax')?.touched">
                             <span class="currency">MAD</span>
                         </div>
-                        <div class="error-msg text-red-500 mt-1 text-sm font-medium" *ngIf="intentForm.get('budgetMax')?.invalid && (intentForm.get('budgetMax')?.dirty || intentForm.get('budgetMax')?.touched)">
+                        <div class="error-msg text-red-500 mt-1 text-sm font-medium" *ngIf="intentForm.get('budgetMax')?.invalid && intentForm.get('budgetMax')?.touched">
                             <span *ngIf="intentForm.get('budgetMax')?.errors?.['required']">Budget obligatoire.</span>
                             <span *ngIf="intentForm.get('budgetMax')?.errors?.['min']">Minimum 50 MAD.</span>
                         </div>

@@ -5,7 +5,8 @@ import { environment } from '../../../../environments/environment';
 import {
     UserProfileResponse,
     UpdateProfileRequest,
-    ChangePasswordRequest
+    ChangePasswordRequest,
+    UserStatsResponse
 } from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
@@ -16,6 +17,10 @@ export class UserApiService {
 
     getProfile(): Observable<UserProfileResponse> {
         return this.http.get<UserProfileResponse>(`${this.base}/me`);
+    }
+
+    getUserStats(): Observable<UserStatsResponse> {
+        return this.http.get<UserStatsResponse>(`${this.base}/me/stats`);
     }
 
     updateProfile(data: UpdateProfileRequest): Observable<UserProfileResponse> {

@@ -31,9 +31,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AuthRestController.class)
+@WebMvcTest(AuthController.class)
 @AutoConfigureMockMvc(addFilters = false)
-class AuthRestControllerTest {
+class AuthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -65,7 +65,6 @@ class AuthRestControllerTest {
 
         Authentication authentication = mock(Authentication.class);
         UserDetailsImpl userDetails = new UserDetailsImpl("1", "testuser", "test@test.com", "pass",
-                false,
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")),
                 null);
         
@@ -93,7 +92,7 @@ class AuthRestControllerTest {
 
         when(userRepository.existsByUsername("newuser")).thenReturn(false);
         when(userRepository.existsByEmail("new@test.com")).thenReturn(false);
-        when(roleRepository.findByName(ERole.ROLE_USER)).thenReturn(Optional.of(new Role(ERole.ROLE_USER)));
+        when(roleRepository.findByName(ERole.ROLE_CAMPER)).thenReturn(Optional.of(new Role(ERole.ROLE_CAMPER)));
         when(encoder.encode("password")).thenReturn("encodedPassword");
 
         // Act & Assert

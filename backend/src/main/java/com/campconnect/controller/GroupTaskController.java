@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.campconnect.dto.GroupTaskDto;
+import com.campconnect.dto.GroupTaskDTO;
 import com.campconnect.model.GroupTask;
 import com.campconnect.service.IGroupTaskService;
 
@@ -28,7 +28,7 @@ public class GroupTaskController {
     private final IGroupTaskService groupTaskService;
 
     @PostMapping
-    public ResponseEntity<GroupTask> createGroupTask(@Valid @RequestBody GroupTaskDto dto) {
+    public ResponseEntity<GroupTask> createGroupTask(@Valid @RequestBody GroupTaskDTO dto) {
         GroupTask task = mapDtoToEntity(dto);
         GroupTask created = groupTaskService.createGroupTask(task);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
@@ -40,7 +40,7 @@ public class GroupTaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GroupTask> updateGroupTask(@PathVariable("id") String id, @RequestBody GroupTaskDto dto) {
+    public ResponseEntity<GroupTask> updateGroupTask(@PathVariable("id") String id, @RequestBody GroupTaskDTO dto) {
         GroupTask task = mapDtoToEntity(dto);
         return ResponseEntity.ok(groupTaskService.updateGroupTask(id, task));
     }
@@ -51,7 +51,7 @@ public class GroupTaskController {
         return ResponseEntity.noContent().build();
     }
 
-    private GroupTask mapDtoToEntity(GroupTaskDto dto) {
+    private GroupTask mapDtoToEntity(GroupTaskDTO dto) {
         return GroupTask.builder()
                 .groupId(dto.getGroupId())
                 .title(dto.getTitle())

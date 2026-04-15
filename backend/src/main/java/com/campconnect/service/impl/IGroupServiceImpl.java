@@ -1,6 +1,6 @@
 package com.campconnect.service.impl;
 
-import com.campconnect.dto.GroupDetailDto;
+import com.campconnect.dto.GroupDetailDTO;
 import com.campconnect.model.Group;
 import com.campconnect.model.GroupStatus;
 import com.campconnect.model.User;
@@ -50,10 +50,10 @@ public class IGroupServiceImpl implements IGroupService {
     }
 
     @Override
-    public GroupDetailDto getGroupDetail(String id) {
+    public GroupDetailDTO getGroupDetail(String id) {
         Group group = getGroupById(id);
         List<User> members = (List<User>) userRepository.findAllById(group.getMemberUserIds());
-        return GroupDetailDto.builder()
+        return GroupDetailDTO.builder()
                 .id(group.getId())
                 .name(group.getName())
                 .tripId(group.getTripId())

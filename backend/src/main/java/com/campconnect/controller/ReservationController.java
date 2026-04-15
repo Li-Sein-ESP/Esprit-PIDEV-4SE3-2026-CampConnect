@@ -1,6 +1,6 @@
 package com.campconnect.controller;
 
-import com.campconnect.dto.ReservationDto;
+import com.campconnect.dto.ReservationRequest;
 import com.campconnect.model.Reservation;
 import com.campconnect.service.ReservationServiceImpl;
 import jakarta.validation.Valid;
@@ -20,7 +20,7 @@ public class ReservationController {
     private final ReservationServiceImpl reservationService;
 
     @PostMapping
-    public ResponseEntity<Reservation> createReservation(@Valid @RequestBody ReservationDto reservationDto) {
+    public ResponseEntity<Reservation> createReservation(@Valid @RequestBody ReservationRequest reservationDto) {
         Reservation reservation = new Reservation();
         reservation.setUserId(reservationDto.getUserId());
         reservation.setTargetId(reservationDto.getTargetId());
@@ -51,7 +51,7 @@ public class ReservationController {
     @PutMapping("/{id}")
     public ResponseEntity<Reservation> updateReservation(
             @PathVariable("id") String id,
-            @Valid @RequestBody ReservationDto reservationDto) {
+            @Valid @RequestBody ReservationRequest reservationDto) {
         Reservation reservation = new Reservation();
         reservation.setUserId(reservationDto.getUserId());
         reservation.setTargetId(reservationDto.getTargetId());

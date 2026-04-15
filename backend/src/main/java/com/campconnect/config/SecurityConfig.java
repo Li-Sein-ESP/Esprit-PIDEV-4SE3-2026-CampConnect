@@ -1,5 +1,7 @@
 package com.campconnect.config;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +16,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.Customizer;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.campconnect.service.CustomUserDetailsService;
 
@@ -52,6 +57,19 @@ public class SecurityConfig {
   }
 
   @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+      CorsConfiguration configuration = new CorsConfiguration();
+      configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://127.0.0.1:4200"));
+      configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+      configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
+      configuration.setExposedHeaders(Arrays.asList("x-auth-token"));
+      configuration.setAllowCredentials(true);
+      UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+      source.registerCorsConfiguration("/**", configuration);
+      return source;
+  }
+
+  @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.cors(Customizer.withDefaults())
         .csrf(csrf -> csrf.disable())
@@ -61,7 +79,6 @@ public class SecurityConfig {
             // Public
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/test/**").permitAll()
-            .requestMatchers("/api/debug/**").permitAll()
             // Swagger UI
             .requestMatchers("/swagger-ui/**", "/swagger-ui.html",
                 "/v3/api-docs/**", "/v3/api-docs")
@@ -70,14 +87,6 @@ public class SecurityConfig {
             .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/gear/**").permitAll()
             .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/categories/**").permitAll()
             .requestMatchers(org.springframework.http.HttpMethod.GET, "/uploads/**").permitAll()
-            // Public transport listing (needed by Plan Trip wizard for all users)
-            .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/transports").permitAll()
-            .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/transports/**").permitAll()
-            // Allow public access to transport reviews and prediction endpoints
-            .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/transports/*/reviews").permitAll()
-            .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/transports/*/reviews").permitAll()
-            .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/predict/**").permitAll()
-            .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/ai-trip/**").permitAll()
             // Admin
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             // Gear management — provider or admin (method security via @PreAuthorize)

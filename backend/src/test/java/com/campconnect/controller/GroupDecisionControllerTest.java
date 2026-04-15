@@ -1,6 +1,6 @@
 package com.campconnect.controller;
 
-import com.campconnect.dto.GroupDecisionDto;
+import com.campconnect.dto.GroupDecisionDTO;
 import com.campconnect.dto.VoteRequest;
 import com.campconnect.model.GroupDecision;
 import com.campconnect.service.IGroupDecisionService;
@@ -38,12 +38,12 @@ class GroupDecisionControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void createDecision_ShouldReturnCreated() throws Exception {
-        // Arrange
-        GroupDecisionDto dto = new GroupDecisionDto();
-        dto.setQuestion("Quoi manger ?");
+    void createDecision_Success() throws Exception {
+        GroupDecisionDTO dto = new GroupDecisionDTO();
         dto.setGroupId("group-1");
-
+        dto.setTitle("Lunch Place");
+        dto.setOptions(List.of("Pizza", "Burgers"));
+        dto.setType("CHOICE");
         GroupDecision created = GroupDecision.builder().id("dec-1").question("Quoi manger ?").build();
         when(groupDecisionService.createDecision(any(GroupDecision.class))).thenReturn(created);
 

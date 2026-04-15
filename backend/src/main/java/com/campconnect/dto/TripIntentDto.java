@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TripIntentDto {
+public class TripIntentDTO {
     private String id;
     private String creatorUserId;
     private String title;

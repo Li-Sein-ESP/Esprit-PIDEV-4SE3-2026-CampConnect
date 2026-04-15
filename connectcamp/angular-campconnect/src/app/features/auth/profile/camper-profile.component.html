@@ -1,0 +1,307 @@
+<div class="cc-profile">
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- 1️⃣  PROFILE HEADER SECTION                        -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <header class="cc-cover" role="banner">
+        <nav class="cc-cover__nav" aria-label="Profile navigation">
+            <div class="cc-cover__logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L2 22h20L12 2z" />
+                    <path d="M12 16v6" />
+                </svg>
+                CampConnect
+            </div>
+            <div class="cc-cover__actions">
+                <button aria-label="Notifications">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                        <path d="M13.73 21a2 2 0 01-3.46 0" />
+                    </svg>
+                </button>
+                <button aria-label="Settings">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3" />
+                        <path
+                            d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+                    </svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Profile Info -->
+    <section class="cc-info" aria-label="User profile information">
+        <div class="cc-info__wrapper">
+            <img class="cc-avatar"
+                src="https://images.unsplash.com/photo-1535930749574-1399327ce78f?w=300&h=300&fit=crop&crop=face"
+                alt="Profile photo">
+            <div class="cc-info__details">
+                <div class="cc-info__name-row">
+                    <h1 class="cc-info__name">{{ user.name }}</h1>
+                    <span class="cc-badge cc-badge--verified">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                        </svg>
+                        Verified Camper
+                    </span>
+                    <span class="cc-badge cc-badge--camper">Pro Camper</span>
+                </div>
+                <p class="cc-info__bio">{{ user.bio }}</p>
+                <div class="cc-info__location">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                        <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    Portland, Oregon · Member since Jan 2022
+                </div>
+            </div>
+            <div class="cc-info__cta">
+                <a routerLink="/profile/edit" class="cc-btn cc-btn--primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                    Edit Profile
+                </a>
+                <button class="cc-btn cc-btn--outline">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
+                        <polyline points="16 6 12 2 8 6" />
+                        <line x1="12" y1="2" x2="12" y2="15" />
+                    </svg>
+                    Share
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- 2️⃣  STATS ROW                                      -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <section class="cc-stats" aria-label="User statistics">
+        <div class="cc-stats__grid">
+            <article class="cc-stat-card">
+                <div class="cc-stat-card__icon cc-stat-card__icon--trips">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="cc-stat-card__value">{{ tripsCompletedAnimated }}</div>
+                    <div class="cc-stat-card__label">Trips Completed</div>
+                </div>
+            </article>
+
+            <article class="cc-stat-card">
+                <div class="cc-stat-card__icon cc-stat-card__icon--camps">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 21l9-18 9 18H3z" />
+                        <path d="M12 12v9" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="cc-stat-card__value">{{ campsitesVisitedAnimated }}</div>
+                    <div class="cc-stat-card__label">Campsites Visited</div>
+                </div>
+            </article>
+
+            <article class="cc-stat-card">
+                <div class="cc-stat-card__icon cc-stat-card__icon--reviews">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="cc-stat-card__value">{{ reviewsGivenAnimated }}</div>
+                    <div class="cc-stat-card__label">Reviews Given</div>
+                </div>
+            </article>
+
+            <article class="cc-stat-card">
+                <div class="cc-stat-card__icon cc-stat-card__icon--gear">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                        <path d="M16 7V5a4 4 0 00-8 0v2" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="cc-stat-card__value">{{ gearRentedAnimated }}</div>
+                    <div class="cc-stat-card__label">Gear Rented</div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- 3️⃣  TABS SECTION                                   -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <nav class="cc-tabs" aria-label="Profile content tabs">
+        <div class="cc-tabs__nav" role="tablist">
+            <button class="cc-tabs__btn" [class.cc-tabs__btn--active]="activeTab === 'overview'"
+                (click)="setActiveTab('overview')" role="tab">Overview</button>
+            <button class="cc-tabs__btn" [class.cc-tabs__btn--active]="activeTab === 'trips'"
+                (click)="setActiveTab('trips')" role="tab">My Trips</button>
+            <button class="cc-tabs__btn" [class.cc-tabs__btn--active]="activeTab === 'rentals'"
+                (click)="setActiveTab('rentals')" role="tab">My Rentals</button>
+            <button class="cc-tabs__btn" [class.cc-tabs__btn--active]="activeTab === 'saved'"
+                (click)="setActiveTab('saved')" role="tab">Saved Items</button>
+            <button class="cc-tabs__btn" [class.cc-tabs__btn--active]="activeTab === 'reviews'"
+                (click)="setActiveTab('reviews')" role="tab">Reviews</button>
+        </div>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- 4️⃣  TAB CONTENT                                    -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <main class="cc-content">
+
+        <!-- ── OVERVIEW TAB ── -->
+        <div *ngIf="activeTab === 'overview'" class="cc-tab-panel cc-tab-panel--active" role="tabpanel">
+            <!-- Recent Trip Activity -->
+            <h2 class="cc-section-title"><span class="cc-section-title__dot"></span> Recent Trip Activity</h2>
+            <div class="cc-trip-grid">
+                <article *ngFor="let trip of user.trips | slice:0:3" class="cc-trip-card">
+                    <img class="cc-trip-card__img" [src]="trip.image" [alt]="trip.title">
+                    <div class="cc-trip-card__body">
+                        <h3 class="cc-trip-card__title">{{ trip.title }}</h3>
+                        <div class="cc-trip-card__meta">
+                            <span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                    <line x1="16" y1="2" x2="16" y2="6" />
+                                    <line x1="8" y1="2" x2="8" y2="6" />
+                                    <line x1="3" y1="10" x2="21" y2="10" />
+                                </svg>
+                                {{ trip.dateRange }}
+                            </span>
+                            <span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                    <path *ngIf="trip.people > 2" d="M23 21v-2a4 4 0 00-3-3.87" />
+                                    <path *ngIf="trip.people > 2" d="M16 3.13a4 4 0 010 7.75" />
+                                </svg>
+                                {{ trip.people }} people
+                            </span>
+                        </div>
+                        <span class="cc-trip-card__tag"
+                            [ngClass]="trip.isUpcoming ? 'cc-trip-card__tag--upcoming' : 'cc-trip-card__tag--completed'">{{
+                            trip.status }}</span>
+                    </div>
+                </article>
+            </div>
+
+            <!-- Recent Rentals -->
+            <h2 class="cc-section-title"><span class="cc-section-title__dot"></span> Recent Rentals</h2>
+            <div class="cc-rental-grid">
+                <article *ngFor="let rental of user.rentals | slice:0:3" class="cc-rental-card">
+                    <div class="cc-rental-card__icon">{{ rental.icon }}</div>
+                    <div>
+                        <h3 class="cc-rental-card__title">{{ rental.title }}</h3>
+                        <p class="cc-rental-card__sub">{{ rental.dateRange }}</p>
+                    </div>
+                    <span class="cc-rental-card__status"
+                        [ngClass]="rental.isActive ? 'cc-rental-card__status--active' : 'cc-rental-card__status--returned'">{{
+                        rental.status }}</span>
+                </article>
+            </div>
+
+            <!-- 5️⃣ Achievements / Badges -->
+            <h2 class="cc-section-title"><span class="cc-section-title__dot"></span> Achievements & Badges</h2>
+            <div class="cc-badges-grid">
+                <article *ngFor="let badge of user.badges" class="cc-badge-card"
+                    [ngClass]="'cc-badge-card--' + badge.id">
+                    <div class="cc-badge-card__icon">{{ badge.icon }}</div>
+                    <h3 class="cc-badge-card__title">{{ badge.title }}</h3>
+                    <p class="cc-badge-card__desc">{{ badge.desc }}</p>
+                    <div class="cc-badge-card__date">{{ badge.date }}</div>
+                </article>
+            </div>
+        </div>
+
+        <!-- ── MY TRIPS TAB ── -->
+        <div *ngIf="activeTab === 'trips'" class="cc-tab-panel cc-tab-panel--active" role="tabpanel">
+            <h2 class="cc-section-title"><span class="cc-section-title__dot"></span> All Trips</h2>
+            <div class="cc-trip-grid">
+                <article *ngFor="let trip of user.trips" class="cc-trip-card">
+                    <img class="cc-trip-card__img" [src]="trip.image" [alt]="trip.title">
+                    <div class="cc-trip-card__body">
+                        <h3 class="cc-trip-card__title">{{ trip.title }}</h3>
+                        <div class="cc-trip-card__meta">
+                            <span>📅 {{ trip.dateRange }}</span>
+                            <span>👥 {{ trip.people }} people</span>
+                        </div>
+                        <span class="cc-trip-card__tag"
+                            [ngClass]="trip.isUpcoming ? 'cc-trip-card__tag--upcoming' : 'cc-trip-card__tag--completed'">{{
+                            trip.status }}</span>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+        <!-- ── MY RENTALS TAB ── -->
+        <div *ngIf="activeTab === 'rentals'" class="cc-tab-panel cc-tab-panel--active" role="tabpanel">
+            <h2 class="cc-section-title"><span class="cc-section-title__dot"></span> Rental History</h2>
+            <div class="cc-rental-grid">
+                <article *ngFor="let rental of user.rentals" class="cc-rental-card">
+                    <div class="cc-rental-card__icon">{{ rental.icon }}</div>
+                    <div>
+                        <h3 class="cc-rental-card__title">{{ rental.title }}</h3>
+                        <p class="cc-rental-card__sub">{{ rental.dateRange }}</p>
+                    </div>
+                    <span class="cc-rental-card__status"
+                        [ngClass]="rental.isActive ? 'cc-rental-card__status--active' : 'cc-rental-card__status--returned'">{{
+                        rental.status }}</span>
+                </article>
+            </div>
+        </div>
+
+        <!-- ── SAVED ITEMS TAB ── -->
+        <div *ngIf="activeTab === 'saved'" class="cc-tab-panel cc-tab-panel--active" role="tabpanel">
+            <h2 class="cc-section-title"><span class="cc-section-title__dot"></span> Saved Campsites & Gear</h2>
+            <div class="cc-saved-grid">
+                <article *ngFor="let item of user.savedItems" class="cc-saved-card">
+                    <img class="cc-saved-card__img" [src]="item.image" [alt]="item.title">
+                    <div class="cc-saved-card__body">
+                        <span class="cc-saved-card__heart">♥</span>
+                        <h3 class="cc-saved-card__title">{{ item.title }}</h3>
+                        <p class="cc-saved-card__sub">{{ item.location }} · ★ {{ item.rating }}</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+        <!-- ── REVIEWS TAB ── -->
+        <div *ngIf="activeTab === 'reviews'" class="cc-tab-panel cc-tab-panel--active" role="tabpanel">
+            <h2 class="cc-section-title"><span class="cc-section-title__dot"></span> My Reviews</h2>
+            <div class="cc-review-list">
+                <article *ngFor="let review of user.reviews" class="cc-review-card">
+                    <div class="cc-review-card__header">
+                        <span class="cc-review-card__place">{{ review.target }}</span>
+                        <span class="cc-review-card__stars">
+                            <ng-container *ngFor="let star of [1,2,3,4,5]">
+                                <span *ngIf="star <= review.rating">★</span>
+                                <span *ngIf="star > review.rating">☆</span>
+                            </ng-container>
+                        </span>
+                    </div>
+                    <p class="cc-review-card__text">{{ review.text }}</p>
+                    <div class="cc-review-card__date">{{ review.date }}</div>
+                </article>
+            </div>
+        </div>
+    </main>
+</div>

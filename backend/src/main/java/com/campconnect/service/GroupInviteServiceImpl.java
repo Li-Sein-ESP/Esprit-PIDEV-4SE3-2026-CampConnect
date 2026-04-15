@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.campconnect.dto.GroupInviteDetailDto;
+import com.campconnect.dto.GroupInviteDetailDTO;
 import com.campconnect.model.Group;
 import com.campconnect.model.GroupInvite;
 import com.campconnect.model.GroupInviteStatus;
@@ -51,19 +51,19 @@ public class GroupInviteServiceImpl implements IGroupInviteService {
     }
 
     @Override
-    public List<GroupInviteDetailDto> getInviteDetailsForUser(String userId) {
+    public List<GroupInviteDetailDTO> getInviteDetailsForUser(String userId) {
         List<GroupInvite> invites = getInvitesForUser(userId);
         return invites.stream().map(this::mapToDetailDto).toList();
     }
 
     @Override
-    public List<GroupInviteDetailDto> getInviteDetailsFromUser(String userId) {
+    public List<GroupInviteDetailDTO> getInviteDetailsFromUser(String userId) {
         List<GroupInvite> invites = getInvitesByFromUser(userId);
         return invites.stream().map(this::mapToDetailDto).toList();
     }
 
-    private GroupInviteDetailDto mapToDetailDto(GroupInvite invite) {
-        GroupInviteDetailDto dto = new GroupInviteDetailDto();
+    private GroupInviteDetailDTO mapToDetailDto(GroupInvite invite) {
+        GroupInviteDetailDTO dto = new GroupInviteDetailDTO();
         dto.setId(invite.getId());
         dto.setTripIntentId(invite.getTripIntentId());
         dto.setGroupId(invite.getGroupId());

@@ -145,7 +145,7 @@ export class ProviderEditProductComponent implements OnInit {
         }
 
         const formValue = this.productForm.value;
-        const backendStatus: GearStatus = formValue.status === 'active' ? 'AVAILABLE' : 'RETIRED';
+        const backendStatus: GearStatus = formValue.status === 'active' ? 'AVAILABLE' : 'OUT_OF_STOCK';
 
         this.saving = true;
         this.gearApi.updateGear(this.productId, {

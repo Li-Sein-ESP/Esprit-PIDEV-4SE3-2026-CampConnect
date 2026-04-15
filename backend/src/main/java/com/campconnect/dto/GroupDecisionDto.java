@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GroupDecisionDto {
+public class GroupDecisionDTO {
     private String id;
     private String groupId;
     private String tripId;

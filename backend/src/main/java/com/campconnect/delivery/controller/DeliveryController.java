@@ -3,8 +3,11 @@ package com.campconnect.delivery.controller;
 import com.campconnect.common.PagedResponse;
 import com.campconnect.delivery.dto.DeliveryRequest;
 import com.campconnect.delivery.dto.DeliveryResponse;
+import com.campconnect.delivery.dto.DriverProfileStatsResponse;
 import com.campconnect.delivery.dto.EarningsResponse;
+import com.campconnect.delivery.dto.RecentPaymentsResponse;
 import com.campconnect.delivery.dto.RouteDto;
+import com.campconnect.delivery.dto.VehicleEarningsBreakdownResponse;
 import com.campconnect.delivery.model.DeliveryPriority;
 import com.campconnect.delivery.model.DeliveryStatus;
 import com.campconnect.delivery.service.DeliveryService;
@@ -20,6 +23,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -58,7 +63,7 @@ public class DeliveryController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(deliveryService.findByDriver(
-                userDetails.getId(), PageRequest.of(page, size,
+                resolveUserId(userDetails), PageRequest.of(page, size,
                         Sort.by(Sort.Direction.DESC, "scheduledDate"))));
     }
 
@@ -79,7 +84,31 @@ public class DeliveryController {
     @Operation(summary = "Get earnings summary for current driver")
     public ResponseEntity<EarningsResponse> getEarnings(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(deliveryService.calculateEarnings(userDetails.getId()));
+        return ResponseEntity.ok(deliveryService.calculateEarnings(resolveUserId(userDetails)));
+    }
+
+    @GetMapping("/profile-stats")
+    @PreAuthorize("hasRole('DELIVERY_PROVIDER')")
+    @Operation(summary = "Get driver profile statistics")
+    public ResponseEntity<DriverProfileStatsResponse> getProfileStats(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(deliveryService.getDriverProfileStats(resolveUserId(userDetails)));
+    }
+
+    @GetMapping("/earnings/breakdown")
+    @PreAuthorize("hasRole('DELIVERY_PROVIDER') or hasRole('ADMIN')")
+    @Operation(summary = "Get vehicle earnings breakdown")
+    public ResponseEntity<VehicleEarningsBreakdownResponse> getEarningsBreakdown(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(deliveryService.getVehicleEarningsBreakdown(resolveUserId(userDetails)));
+    }
+
+    @GetMapping("/earnings/payments")
+    @PreAuthorize("hasRole('DELIVERY_PROVIDER') or hasRole('ADMIN')")
+    @Operation(summary = "Get recent payment history")
+    public ResponseEntity<RecentPaymentsResponse> getRecentPayments(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(deliveryService.getRecentPayments(resolveUserId(userDetails)));
     }
 
     @GetMapping("/{id}")
@@ -120,5 +149,16 @@ public class DeliveryController {
     public ResponseEntity<Void> delete(@PathVariable String id) {
         deliveryService.softDelete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private String resolveUserId(UserDetailsImpl userDetails) {
+        if (userDetails != null) {
+            return userDetails.getId();
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetailsImpl principal) {
+            return principal.getId();
+        }
+        throw new IllegalStateException("Authenticated user not found");
     }
 }

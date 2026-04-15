@@ -1,8 +1,8 @@
 export enum InviteStatus {
-  PENDING = 'PENDING',
-  ACCEPTED = 'ACCEPTED',
-  DECLINED = 'DECLINED',
-  CANCELLED = 'CANCELLED'
+  PENDING = "PENDING",
+  ACCEPTED = "ACCEPTED",
+  DECLINED = "DECLINED",
+  CANCELLED = "CANCELLED",
 }
 
 export interface GroupInvite {
@@ -15,11 +15,15 @@ export interface GroupInvite {
   status: InviteStatus;
   createdAt?: string;
   expiresAt?: string;
+  // Additional fields for display
+  groupName?: string;
+  description?: string;
+  invitedAt?: string;
 }
 
 export interface GroupInviteDetail extends GroupInvite {
   sender?: any;
   receiver?: any;
   trip?: any;
-  type?: 'sent' | 'received';
+  type?: "sent" | "received";
 }

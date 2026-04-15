@@ -1,6 +1,6 @@
 package com.campconnect.service;
 
-import com.campconnect.dto.GroupDetailDto;
+import com.campconnect.dto.GroupDetailDTO;
 import com.campconnect.model.Group;
 import com.campconnect.model.GroupStatus;
 import com.campconnect.model.User;
@@ -87,7 +87,7 @@ class GroupServiceImplTest {
     }
 
     @Test
-    void getGroupDetail_ShouldReturnConstructedDto() {
+    void getGroupDetail_ShouldReturnConstructedDTO() {
         // Arrange
         User user1 = new User();
         user1.setId("user-1");
@@ -97,7 +97,7 @@ class GroupServiceImplTest {
         when(userRepository.findAllById(any())).thenReturn(Arrays.asList(user1));
 
         // Act
-        GroupDetailDto detail = groupService.getGroupDetail("group-1");
+        GroupDetailDTO detail = groupService.getGroupDetail("group-1");
 
         // Assert
         assertEquals("group-1", detail.getId());

@@ -10,4 +10,6 @@ public interface IVideoServices {
     VideoDTO updateVideo(String id, VideoDTO videoDTO);
     void deleteVideo(String id);
     List<VideoDTO> getVideosByCategory(String category);
+    com.campconnect.dto.CommentDTO addComment(String videoId, com.campconnect.dto.CommentDTO commentDTO);
+    VideoDTO toggleHelpful(String videoId);
 }

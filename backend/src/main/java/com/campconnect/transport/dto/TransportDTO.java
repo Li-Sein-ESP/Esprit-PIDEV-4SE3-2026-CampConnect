@@ -29,4 +29,6 @@ public class TransportDTO {
     private String provider;
 
     private String imageUrl;
+    private Double averageRating;
+    private Integer reviewCount;
 }

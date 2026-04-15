@@ -1,0 +1,126 @@
+<div class="min-h-screen bg-[var(--color-background)] pb-12">
+    <!-- Header -->
+    <div class="border-b border-[var(--color-border-light)] bg-white">
+        <div class="container py-4">
+            <button (click)="navigate('/community')"
+                class="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
+                <lucide-icon [name]="ChevronLeft" class="w-5 h-5"></lucide-icon>
+                Back to Community
+            </button>
+        </div>
+    </div>
+
+    <div class="container py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Main Post -->
+            <app-card variant="elevated" customClass="mb-6">
+                <app-card-content customClass="p-8">
+                    <!-- Post Header -->
+                    <div class="flex items-start justify-between mb-6">
+                        <div class="flex items-start gap-4">
+                            <img [src]="post.author.avatar" [alt]="post.author.name"
+                                class="w-12 h-12 rounded-full object-cover" />
+                            <div>
+                                <h6 class="mb-1">{{ post.author.name }}</h6>
+                                <div class="flex items-center gap-3 text-sm text-[var(--color-text-tertiary)]">
+                                    <div class="flex items-center gap-1">
+                                        <lucide-icon [name]="Calendar" class="w-4 h-4"></lucide-icon>
+                                        <span>{{ post.createdAt | date:'medium' }}</span>
+                                    </div>
+                                    <span>•</span>
+                                    <span>{{ post.views }} views</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <app-button variant="ghost" size="sm">
+                                <lucide-icon [name]="Share2" class="w-5 h-5"></lucide-icon>
+                            </app-button>
+                            <app-button variant="ghost" size="sm">
+                                <lucide-icon [name]="Flag" class="w-5 h-5"></lucide-icon>
+                            </app-button>
+                        </div>
+                    </div>
+
+                    <!-- Category & Tags -->
+                    <div class="flex items-center gap-2 mb-4">
+                        <app-badge variant="primary">{{ post.category }}</app-badge>
+                        <app-badge *ngFor="let tag of post.tags" variant="outline" customClass="capitalize">
+                            #{{ tag }}
+                        </app-badge>
+                    </div>
+
+                    <!-- Post Title & Content -->
+                    <h2 class="mb-4">{{ post.title }}</h2>
+                    <p class="text-[var(--color-text-secondary)] leading-relaxed mb-6">
+                        {{ post.content }}
+                    </p>
+
+                    <!-- Post Actions -->
+                    <div class="flex items-center gap-6 pt-6 border-t border-[var(--color-border-light)]">
+                        <button
+                            class="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
+                            <lucide-icon [name]="ThumbsUp" class="w-5 h-5"></lucide-icon>
+                            <span class="font-medium">{{ post.likes }}</span>
+                        </button>
+                        <button
+                            class="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
+                            <lucide-icon [name]="MessageSquare" class="w-5 h-5"></lucide-icon>
+                            <span class="font-medium">{{ post.replies }} replies</span>
+                        </button>
+                    </div>
+                </app-card-content>
+            </app-card>
+
+            <!-- Replies Section -->
+            <div class="mb-6">
+                <h4 class="mb-4">{{ post.replies }} Replies</h4>
+
+                <div class="space-y-4">
+                    <app-card *ngFor="let reply of mockReplies" variant="bordered">
+                        <app-card-content customClass="p-6">
+                            <div class="flex items-start gap-4 mb-4">
+                                <img [src]="reply.author.avatar" [alt]="reply.author.name"
+                                    class="w-10 h-10 rounded-full object-cover" />
+                                <div class="flex-1">
+                                    <h6 class="mb-1">{{ reply.author.name }}</h6>
+                                    <span class="text-sm text-[var(--color-text-tertiary)]">
+                                        {{ reply.createdAt | date:'medium' }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <p class="text-[var(--color-text-secondary)] leading-relaxed mb-4">
+                                {{ reply.content }}
+                            </p>
+
+                            <div class="flex items-center gap-4">
+                                <button
+                                    class="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
+                                    <lucide-icon [name]="ThumbsUp" class="w-4 h-4"></lucide-icon>
+                                    <span>{{ reply.likes }}</span>
+                                </button>
+                                <button
+                                    class="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
+                                    Reply
+                                </button>
+                            </div>
+                        </app-card-content>
+                    </app-card>
+                </div>
+            </div>
+
+            <!-- Reply Form -->
+            <app-card variant="elevated">
+                <app-card-content customClass="p-6">
+                    <h5 class="mb-4">Add a Reply</h5>
+                    <textarea placeholder="Share your thoughts..." rows="4"
+                        class="w-full px-4 py-2.5 rounded-lg bg-white border-2 border-[var(--color-border-light)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:outline-none focus:border-[var(--color-primary-500)] focus:ring-2 focus:ring-[var(--color-primary-100)] transition-all duration-200 mb-4"></textarea>
+                    <div class="flex justify-end">
+                        <app-button>Post Reply</app-button>
+                    </div>
+                </app-card-content>
+            </app-card>
+        </div>
+    </div>
+</div>

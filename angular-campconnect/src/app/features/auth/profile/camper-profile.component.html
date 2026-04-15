@@ -180,14 +180,43 @@
 
         <!-- ── OVERVIEW TAB ── -->
         <div *ngIf="activeTab === 'overview'" class="cc-tab-panel cc-tab-panel--active" role="tabpanel">
+            <section class="cc-quick-actions" aria-label="Quick actions">
+                <h2 class="cc-section-title"><span class="cc-section-title__dot"></span> Quick Actions</h2>
+                <div class="cc-quick-actions__grid">
+                    <a routerLink="/plan-trip" class="cc-quick-action-card">
+                        <div class="cc-quick-action-card__emoji">🗺️</div>
+                        <div class="cc-quick-action-card__label">Plan Trip</div>
+                    </a>
+                    <a routerLink="/campsites" class="cc-quick-action-card">
+                        <div class="cc-quick-action-card__emoji">⛺</div>
+                        <div class="cc-quick-action-card__label">Find Sites</div>
+                    </a>
+                    <a routerLink="/gear" class="cc-quick-action-card">
+                        <div class="cc-quick-action-card__emoji">🎒</div>
+                        <div class="cc-quick-action-card__label">Rent Gear</div>
+                    </a>
+                    <a routerLink="/community" class="cc-quick-action-card">
+                        <div class="cc-quick-action-card__emoji">👥</div>
+                        <div class="cc-quick-action-card__label">Community</div>
+                    </a>
+                    <a routerLink="/invites" class="cc-quick-action-card cc-quick-action-card--invite">
+                        <div class="cc-quick-action-card__emoji">📩</div>
+                        <div class="cc-quick-action-card__label">Invitations</div>
+                        <span *ngIf="((pendingCount$ | async) || 0) > 0" class="cc-quick-action-card__count">
+                            {{ pendingCount$ | async }}
+                        </span>
+                    </a>
+                    <a routerLink="/profile/orders" class="cc-quick-action-card">
+                        <div class="cc-quick-action-card__emoji">🧾</div>
+                        <div class="cc-quick-action-card__label">My Orders</div>
+                    </a>
+                </div>
+            </section>
+
             <!-- Recent Trip Activity -->
             <h2 class="cc-section-title"><span class="cc-section-title__dot"></span> Recent Trip Activity</h2>
-            <div *ngIf="user.trips.length === 0" style="text-align:center; padding: 2rem 1rem; color: #6b7280;">
-                <p>No trips yet. <a routerLink="/plan-trip" style="color: var(--color-primary-600, #2d6a4f); font-weight: 600; text-decoration: underline;">Plan your first adventure!</a></p>
-            </div>
-            <div *ngIf="user.trips.length > 0" class="cc-trip-grid">
-                <article *ngFor="let trip of user.trips | slice:0:3" class="cc-trip-card" style="cursor:pointer;"
-                         [routerLink]="['/trips', trip.id]">
+            <div class="cc-trip-grid">
+                <article *ngFor="let trip of user.trips | slice:0:3" class="cc-trip-card">
                     <img class="cc-trip-card__img" [src]="trip.image" [alt]="trip.title">
                     <div class="cc-trip-card__body">
                         <h3 class="cc-trip-card__title">{{ trip.title }}</h3>
@@ -251,24 +280,8 @@
         <!-- ── MY TRIPS TAB ── -->
         <div *ngIf="activeTab === 'trips'" class="cc-tab-panel cc-tab-panel--active" role="tabpanel">
             <h2 class="cc-section-title"><span class="cc-section-title__dot"></span> All Trips</h2>
-            
-            <!-- Empty State -->
-            <div *ngIf="user.trips.length === 0" class="cc-empty-state" style="text-align:center; padding: 3rem 1rem;">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">🏕️</div>
-                <h3 style="margin-bottom: 0.5rem; color: var(--color-primary-900, #1a3a2a); font-size: 1.25rem;">No trips yet</h3>
-                <p style="color: #6b7280; margin-bottom: 1.5rem;">
-                    Start planning your first camping adventure!
-                </p>
-                <a routerLink="/plan-trip"
-                   style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.75rem 1.5rem;background:var(--color-primary-600, #2d6a4f);color:white;border-radius:12px;font-weight:700;text-decoration:none;transition:all 0.2s;">
-                    + Plan New Trip
-                </a>
-            </div>
-
-            <!-- Trips Grid -->
-            <div *ngIf="user.trips.length > 0" class="cc-trip-grid">
-                <article *ngFor="let trip of user.trips" class="cc-trip-card" style="cursor:pointer;" 
-                         [routerLink]="['/trips', trip.id]">
+            <div class="cc-trip-grid">
+                <article *ngFor="let trip of user.trips" class="cc-trip-card">
                     <img class="cc-trip-card__img" [src]="trip.image" [alt]="trip.title">
                     <div class="cc-trip-card__body">
                         <h3 class="cc-trip-card__title">{{ trip.title }}</h3>

@@ -18,3 +18,13 @@ export interface ChangePasswordRequest {
     currentPassword: string;
     newPassword: string;
 }
+
+export interface UserStatsResponse {
+    tripsCompleted: number;
+    campsitesVisited: number;
+    reviewsGiven: number;
+    gearRented: number;
+    gearPurchased: number;
+    activeReservations: number;
+    activeRentals: number;
+}

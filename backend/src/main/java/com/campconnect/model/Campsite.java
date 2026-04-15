@@ -25,6 +25,9 @@ public class Campsite {
     private Integer reviewCount;
     private Integer capacity;
     private Boolean available;
+    private String status;
+    private Double latitude;
+    private Double longitude;
     
     @Builder.Default
     private List<String> images = new ArrayList<>();

@@ -1,174 +1,353 @@
-import { Component, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Tent, Search, MoreVertical, MapPin, Calendar, Users, Eye, Trash2, Edit2, Filter, X, Plus, Clock, ShieldCheck, AlertCircle } from 'lucide-angular';
-import { TripService } from '../../trips/services/trip.service';
-import { Trip } from '../../trips/models/trip.model';
-import { AuthService } from '../../../core/services/auth.service';
+import { Component, OnInit, signal } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { RouterModule } from "@angular/router";
+import { FormsModule } from "@angular/forms";
+import {
+  LucideAngularModule,
+  Tent,
+  Search,
+  MoreVertical,
+  MapPin,
+  Calendar,
+  Users,
+  Eye,
+  Trash2,
+  Edit3,
+} from "lucide-angular";
+import { TripService } from "../../trips/services/trip.service";
+import { Trip } from "../../trips/models/trip.model";
 
 @Component({
-  selector: 'app-admin-trips',
+  selector: "app-admin-trips",
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule],
   template: `
-    <div class="space-y-8 p-6 lg:p-8 bg-slate-50/50 min-h-screen">
-      <!-- Header Section -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div class="space-y-6">
+      <!-- Header -->
+      <div
+        class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+      >
         <div>
-          <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
-            <div class="p-2 bg-emerald-600 rounded-xl shadow-lg shadow-emerald-200">
-               <lucide-icon [img]="TentIcon" [size]="28" class="text-white"></lucide-icon>
-            </div>
-            Trip Management
-          </h1>
-          <p class="text-slate-500 mt-2 font-medium">Create template trips for users and manage platform expeditions.</p>
+          <h1 class="text-2xl font-bold text-slate-900">Missions Hub</h1>
+          <p class="text-sm text-slate-500 mt-1">
+            Orchestrate platform templates and monitor community-driven
+            adventures.
+          </p>
         </div>
-        
-        <div class="flex flex-wrap items-center gap-3">
-          <div class="relative group">
-            <lucide-icon [img]="SearchIcon" [size]="18" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors"></lucide-icon>
-            <input type="text" 
-                   [(ngModel)]="searchQuery" 
-                   (input)="filterTrips()"
-                   placeholder="Search destinations..." 
-                   class="pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm w-full md:w-64 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all shadow-sm">
-          </div>
-          
-          <button (click)="openCreateModal()" class="px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-700 shadow-lg shadow-emerald-200 transition-all active:scale-95 flex items-center gap-2">
-            <lucide-icon [img]="PlusIcon" [size]="18"></lucide-icon>
-            Add Trip Template
+
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <button
+            (click)="openCreateModal()"
+            class="px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-700 shadow-md shadow-emerald-200 transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap"
+          >
+            <lucide-icon [img]="TentIcon" [size]="18"></lucide-icon>
+            Create Platform Template
           </button>
         </div>
       </div>
 
-      <!-- Quick Stats -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-          <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+      <!-- Discovery & Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div
+          (click)="activeTab.set('users')"
+          class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4 cursor-pointer hover:border-indigo-500 hover:shadow-md transition-all active:scale-95 translate-y-0 hover:-translate-y-1"
+        >
+          <div
+            class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600"
+          >
+            <lucide-icon [img]="UsersIcon" [size]="24"></lucide-icon>
+          </div>
+          <div>
+            <p
+              class="text-[11px] font-bold text-slate-400 uppercase tracking-widest"
+            >
+              User Adventures
+            </p>
+            <p class="text-xl font-black text-slate-900">
+              {{ getUserTrips().length }}
+            </p>
+          </div>
+        </div>
+        <div
+          (click)="activeTab.set('templates')"
+          class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4 cursor-pointer hover:border-emerald-500 hover:shadow-md transition-all active:scale-95 translate-y-0 hover:-translate-y-1"
+        >
+          <div
+            class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600"
+          >
             <lucide-icon [img]="TentIcon" [size]="24"></lucide-icon>
           </div>
           <div>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Trips</p>
-            <p class="text-2xl font-black text-slate-900">{{ trips().length }}</p>
+            <p
+              class="text-[11px] font-bold text-slate-400 uppercase tracking-widest"
+            >
+              Global Templates
+            </p>
+            <p class="text-xl font-black text-slate-900">
+              {{ getAdminTemplates().length }}
+            </p>
           </div>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-          <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
-            <lucide-icon [img]="ShieldCheckIcon" [size]="24"></lucide-icon>
+        <div
+          class="bg-gradient-to-br from-slate-900 to-slate-800 p-4 rounded-2xl shadow-sm flex items-center gap-4 text-white"
+        >
+          <div
+            class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white"
+          >
+            <lucide-icon [img]="SearchIcon" [size]="24"></lucide-icon>
           </div>
-          <div>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Template Trips</p>
-            <p class="text-2xl font-black text-slate-900">{{ getTemplateCount() }}</p>
-          </div>
-        </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-          <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
-            <lucide-icon [img]="ClockIcon" [size]="24"></lucide-icon>
-          </div>
-          <div>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Upcoming</p>
-            <p class="text-2xl font-black text-slate-900">{{ getUpcomingCount() }}</p>
-          </div>
-        </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-          <div class="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600">
-             <lucide-icon [img]="UsersIcon" [size]="24"></lucide-icon>
-          </div>
-          <div>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Avg Group</p>
-            <p class="text-2xl font-black text-slate-900">{{ getAvgParticipants() }}</p>
+          <div class="flex-1 text-white">
+            <input
+              type="text"
+              placeholder="Omni-search..."
+              class="w-full bg-transparent border-none focus:ring-0 text-sm placeholder:text-slate-400 text-white"
+              (input)="onSearch($event)"
+            />
           </div>
         </div>
       </div>
 
-      <!-- Main Content Table -->
-      <div class="bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden">
+      <!-- Navigation Tabs & Timeline Filter -->
+      <div
+        class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4"
+      >
+        <div
+          class="flex items-center gap-2 p-1 bg-slate-100/50 rounded-xl w-fit"
+        >
+          <button
+            (click)="activeTab.set('templates')"
+            [class]="
+              activeTab() === 'templates'
+                ? 'bg-white shadow-sm text-emerald-700'
+                : 'text-slate-500 hover:text-slate-700'
+            "
+            class="px-6 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2"
+          >
+            <lucide-icon [img]="TentIcon" [size]="16"></lucide-icon>
+            Master Templates
+          </button>
+          <button
+            (click)="activeTab.set('users')"
+            [class]="
+              activeTab() === 'users'
+                ? 'bg-white shadow-sm text-indigo-700'
+                : 'text-slate-500 hover:text-slate-700'
+            "
+            class="px-6 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2"
+          >
+            <lucide-icon [img]="UsersIcon" [size]="16"></lucide-icon>
+            User Missions
+          </button>
+        </div>
+
+        <!-- Timeline Filter -->
+        <div
+          class="flex items-center gap-2 p-1 bg-slate-100/50 rounded-xl w-fit self-end"
+        >
+          <button
+            (click)="timelineFilter.set('active')"
+            [class]="
+              timelineFilter() === 'active'
+                ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200'
+                : 'text-slate-500 hover:text-slate-700'
+            "
+            class="px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all"
+          >
+            Active Missions
+          </button>
+          <button
+            (click)="timelineFilter.set('past')"
+            [class]="
+              timelineFilter() === 'past'
+                ? 'bg-slate-700 text-white shadow-md'
+                : 'text-slate-500 hover:text-slate-700'
+            "
+            class="px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all"
+          >
+            Mission Archives
+          </button>
+        </div>
+      </div>
+
+      <!-- Data Section -->
+      <div
+        class="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden"
+      >
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-slate-50/50 border-b border-slate-100">
-                <th class="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">General Info</th>
-                <th class="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Location & Logistics</th>
-                <th class="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Participants</th>
-                <th class="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
-                <th class="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
+              <tr
+                class="bg-slate-50/50 border-b border-slate-100 text-[10px] uppercase tracking-[0.2em] text-slate-400"
+              >
+                <th class="px-8 py-5 font-black">Identity</th>
+                <th class="px-6 py-5 font-black">Landing Zone</th>
+                <th class="px-6 py-5 font-black">Timeline</th>
+                <th class="px-6 py-5 font-black">Team Size</th>
+                <th class="px-6 py-5 font-black">Status</th>
+                <th class="px-8 py-5 font-black text-right">Operations</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-50">
               <tr *ngIf="isLoading()">
-                 <td colspan="5" class="px-8 py-12 text-center">
-                    <div class="flex flex-col items-center gap-3">
-                       <div class="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                       <p class="text-slate-500 font-medium animate-pulse">Syncing trip registry...</p>
-                    </div>
-                 </td>
+                <td colspan="6" class="px-8 py-20 text-center">
+                  <div class="flex flex-col items-center gap-3">
+                    <div
+                      class="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"
+                    ></div>
+                    <p class="text-sm font-medium text-slate-400">
+                      Synchronizing database...
+                    </p>
+                  </div>
+                </td>
               </tr>
-              <tr *ngIf="!isLoading() && filteredTrips().length === 0">
-                 <td colspan="5" class="px-8 py-16 text-center text-slate-400">
-                    <div class="flex flex-col items-center gap-4 grayscale opacity-60">
-                       <lucide-icon [img]="SearchIcon" [size]="48"></lucide-icon>
-                       <div>
-                          <p class="text-lg font-bold text-slate-600">No matching trips found</p>
-                          <p class="text-sm">Try adjusting your search criteria</p>
-                       </div>
-                    </div>
-                 </td>
+
+              <tr *ngIf="!isLoading() && getActiveTrips().length === 0">
+                <td colspan="6" class="px-8 py-20 text-center">
+                  <div
+                    class="flex flex-col items-center gap-3 grayscale opacity-40"
+                  >
+                    <lucide-icon [img]="SearchIcon" [size]="48"></lucide-icon>
+                    <p
+                      class="text-sm font-bold text-slate-900 uppercase tracking-widest"
+                    >
+                      No Records Found
+                    </p>
+                    <p class="text-xs text-slate-400">
+                      Your search criteria matched no missions in this sector.
+                    </p>
+                  </div>
+                </td>
               </tr>
-              <tr *ngFor="let trip of filteredTrips()" class="hover:bg-emerald-50/30 transition-all group">
-                <td class="px-8 py-5 text-sm">
+
+              <tr
+                *ngFor="let trip of getActiveTrips()"
+                class="hover:bg-slate-50/80 transition-all group border-l-4 border-transparent hover:border-emerald-500"
+              >
+                <td class="px-8 py-5">
                   <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 rounded-2xl overflow-hidden ring-4 ring-slate-100 group-hover:ring-emerald-100 transition-all shadow-sm">
-                      <img [src]="trip.imageUrl || 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&q=80'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    <div
+                      class="w-12 h-12 rounded-2xl bg-slate-100 overflow-hidden group-hover:scale-110 transition-transform shadow-inner"
+                    >
+                      <img
+                        [src]="
+                          trip.imageUrl ||
+                          'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&q=80'
+                        "
+                        class="w-full h-full object-cover"
+                      />
                     </div>
                     <div>
-                      <p class="font-black text-slate-900 group-hover:text-emerald-700 transition-colors">{{ trip.name }}</p>
+                      <p
+                        class="text-sm font-black text-slate-900 group-hover:text-emerald-600 transition-colors"
+                      >
+                        {{ trip.name }}
+                      </p>
                       <div class="flex items-center gap-2 mt-1">
-                        <span class="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded uppercase tracking-tighter" [class.bg-emerald-100]="trip.template" [class.text-emerald-700]="trip.template">
-                          {{ trip.template ? 'Template' : 'User Trip' }}
-                        </span>
-                        <span class="text-[10px] text-slate-400 font-mono">#{{ trip.id.substring(0, 8) }}</span>
+                        <span
+                          *ngIf="trip.template"
+                          class="text-[9px] font-black bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded uppercase tracking-tighter"
+                          >System Template</span
+                        >
+                        <span
+                          *ngIf="!trip.template"
+                          class="text-[9px] font-black bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded uppercase tracking-tighter"
+                          >User Venture</span
+                        >
+                        <span class="text-[10px] text-slate-400 font-mono"
+                          >#{{ trip.id.substring(0, 6) }}</span
+                        >
                       </div>
                     </div>
                   </div>
                 </td>
-                <td class="px-8 py-5">
-                  <div class="space-y-1.5">
-                    <div class="flex items-center gap-2 text-sm font-bold text-slate-700">
-                      <lucide-icon [img]="MapPinIcon" [size]="14" class="text-emerald-500"></lucide-icon>
-                      {{ trip.destination }}
+                <td class="px-6 py-5">
+                  <div
+                    class="flex items-center gap-2 text-xs font-bold text-slate-600"
+                  >
+                    <lucide-icon
+                      [img]="MapPinIcon"
+                      [size]="14"
+                      class="text-emerald-500"
+                    ></lucide-icon>
+                    {{ trip.destination }}
+                  </div>
+                </td>
+                <td class="px-6 py-5">
+                  <div class="flex flex-col">
+                    <span
+                      class="text-xs font-bold text-slate-700 flex items-center gap-1.5"
+                      ><lucide-icon
+                        [img]="CalendarIcon"
+                        [size]="12"
+                        class="text-slate-400"
+                      ></lucide-icon>
+                      {{ trip.startDate | date: "MMM d, y" }}</span
+                    >
+                    <span
+                      class="text-[10px] text-slate-400 mt-0.5 uppercase tracking-wide"
+                      >Deployment Duration: {{ trip.duration }} Days</span
+                    >
+                  </div>
+                </td>
+                <td class="px-6 py-5">
+                  <div class="flex -space-x-2">
+                    <div
+                      *ngFor="let i of [1, 2, 3]"
+                      class="w-6 h-6 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center"
+                    >
+                      <lucide-icon
+                        [img]="UsersIcon"
+                        [size]="10"
+                        class="text-slate-400"
+                      ></lucide-icon>
                     </div>
-                    <div class="flex items-center gap-2 text-xs text-slate-400 font-medium">
-                      <lucide-icon [img]="CalendarIcon" [size]="14"></lucide-icon>
-                      {{ trip.startDate | date:'MMM d, y' }} — {{ trip.endDate | date:'MMM d, y' }}
+                    <div
+                      class="w-6 h-6 rounded-full border-2 border-white bg-emerald-500 flex items-center justify-center text-[8px] font-bold text-white"
+                    >
+                      +{{ trip.participants }}
                     </div>
                   </div>
                 </td>
-                <td class="px-8 py-5">
-                   <div class="flex items-center gap-3">
-                      <div class="flex -space-x-2">
-                        <div *ngFor="let i of [1,2,3]" class="w-7 h-7 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-500 overflow-hidden">
-                           <img [src]="'https://i.pravatar.cc/100?u=' + trip.id + i" />
-                        </div>
-                        <div class="w-7 h-7 rounded-full bg-emerald-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-emerald-600">
-                           +{{ trip.participants - 3 > 0 ? trip.participants - 3 : 0 }}
-                        </div>
-                      </div>
-                      <span class="text-xs font-bold text-slate-600">{{ trip.participants }} members</span>
-                   </div>
-                </td>
-                <td class="px-8 py-5 text-center">
-                   <span class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm border"
-                         [ngClass]="getStatusStyles(trip.status)">
-                     {{ trip.status }}
-                   </span>
+                <td class="px-6 py-5">
+                  <span
+                    class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border"
+                    [ngClass]="{
+                      'bg-emerald-50 text-emerald-700 border-emerald-100':
+                        isUpcoming(trip.startDate),
+                      'bg-slate-50 text-slate-600 border-slate-100':
+                        !isUpcoming(trip.startDate),
+                    }"
+                  >
+                    {{
+                      isUpcoming(trip.startDate) ? "Active Ready" : "Archived"
+                    }}
+                  </span>
                 </td>
                 <td class="px-8 py-5 text-right">
-                  <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
-                    <button (click)="openEditModal(trip)" class="p-2.5 bg-white text-slate-400 hover:text-emerald-600 border border-slate-200 hover:border-emerald-200 rounded-xl transition-all hover:shadow-lg hover:shadow-emerald-500/10 active:scale-95" title="Edit Trip">
+                  <div
+                    class="flex justify-end gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0"
+                  >
+                    <a
+                      [routerLink]="['/trips', trip.id]"
+                      target="_blank"
+                      class="p-2.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all shadow-sm"
+                      title="Inspect Mission"
+                    >
+                      <lucide-icon [img]="EyeIcon" [size]="18"></lucide-icon>
+                    </a>
+                    <button
+                      *ngIf="trip.template"
+                      (click)="openEditModal(trip)"
+                      class="p-2.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all"
+                      title="Edit template"
+                    >
                       <lucide-icon [img]="EditIcon" [size]="18"></lucide-icon>
                     </button>
-                    <button (click)="deleteTrip(trip.id)" class="p-2.5 bg-white text-slate-400 hover:text-rose-600 border border-slate-200 hover:border-rose-200 rounded-xl transition-all hover:shadow-lg hover:shadow-rose-500/10 active:scale-95" title="Delete Trip">
+                    <button
+                      (click)="deleteTrip(trip.id)"
+                      class="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                      title="Terminate Data"
+                    >
                       <lucide-icon [img]="Trash2Icon" [size]="18"></lucide-icon>
                     </button>
                   </div>
@@ -180,114 +359,163 @@ import { AuthService } from '../../../core/services/auth.service';
       </div>
     </div>
 
-    <!-- Triple-layered Modal Overlay -->
-    <div *ngIf="isModalOpen()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-300">
-        <!-- Modal Header -->
-        <div class="px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-gradient-to-r from-emerald-600 to-emerald-500 text-white">
-          <div class="flex items-center gap-4">
-             <div class="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                <lucide-icon [img]="isEditMode() ? EditIcon : TentIcon" [size]="24"></lucide-icon>
-             </div>
-             <div>
-                <h2 class="text-xl font-black tracking-tight">{{ isEditMode() ? 'Edit Trip Template' : 'New Trip Template' }}</h2>
-                <p class="text-emerald-100 text-xs font-medium">{{ isEditMode() ? 'Updating existing itinerary configuration' : 'Create a curated experience for campers' }}</p>
-             </div>
-          </div>
-          <button (click)="closeModal()" class="p-2 hover:bg-white/10 rounded-xl transition-colors text-white/80 hover:text-white">
-            <lucide-icon [img]="XIcon" [size]="24"></lucide-icon>
+    <!-- Create/Edit Template Trip Modal -->
+    <div
+      *ngIf="isModalOpen()"
+      class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-xl w-full max-w-lg border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200"
+      >
+        <div
+          class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between"
+        >
+          <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <lucide-icon
+              [img]="TentIcon"
+              [size]="20"
+              class="text-emerald-600"
+            ></lucide-icon>
+            {{
+              isEditing() ? "Edit Mission Template" : "Add New Template Trip"
+            }}
+          </h2>
+          <button
+            (click)="closeModal()"
+            class="p-1 hover:bg-slate-200 rounded-md transition-colors text-slate-400 hover:text-slate-600"
+          >
+            &times;
           </button>
         </div>
 
-        <form (ngSubmit)="submitForm()" class="px-8 py-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
-          <!-- Main Grid -->
-          <div class="grid grid-cols-2 gap-6">
-             <div class="col-span-2">
-                <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-widest">Trip Designation</label>
-                <input type="text" [(ngModel)]="formData.name" name="name" required minlength="3" 
-                       placeholder="e.g. Atlas Range Midnight Trek" 
-                       class="w-full px-5 py-3.5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all placeholder:text-slate-300">
-             </div>
-
-             <div class="col-span-2">
-                <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-widest">Destination Hub</label>
-                <div class="relative">
-                  <lucide-icon [img]="MapPinIcon" [size]="18" class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500"></lucide-icon>
-                  <input type="text" [(ngModel)]="formData.destination" name="destination" required 
-                         placeholder="e.g. Matmata, Ouaraa" 
-                         class="w-full pl-12 pr-5 py-3.5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all placeholder:text-slate-300">
-                </div>
-             </div>
-
-             <div>
-                <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-widest">Difficulty</label>
-                <select [(ngModel)]="formData.difficulty" name="difficulty" required 
-                        class="w-full px-5 py-3.5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all">
-                   <option value="EASY">Easy Walk</option>
-                   <option value="MODERATE">Moderate Trail</option>
-                   <option value="HARD">Expert Expedition</option>
-                </select>
-             </div>
-
-             <div>
-                <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-widest">Budget (TND)</label>
-                <input type="number" [(ngModel)]="formData.totalBudget" name="totalBudget" required min="0" 
-                       class="w-full px-5 py-3.5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all">
-             </div>
-
-             <div>
-                <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-widest">Start Date</label>
-                <input type="date" [(ngModel)]="formData.startDate" name="startDate" required 
-                       class="w-full px-5 py-3.5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all">
-             </div>
-
-             <div>
-                <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-widest">End Date</label>
-                <input type="date" [(ngModel)]="formData.endDate" name="endDate" required 
-                       class="w-full px-5 py-3.5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all">
-             </div>
-
-             <div class="col-span-2">
-                <label class="block text-xs font-black text-slate-500 mb-2 uppercase tracking-widest">Hero Image URL</label>
-                <input type="text" [(ngModel)]="formData.imageUrl" name="imageUrl" 
-                       placeholder="https://images.unsplash.com/..." 
-                       class="w-full px-5 py-3.5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all placeholder:text-slate-300">
-                <div *ngIf="formData.imageUrl" class="mt-4 aspect-video rounded-2xl overflow-hidden ring-4 ring-slate-50 shadow-inner group">
-                   <img [src]="formData.imageUrl" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                </div>
-             </div>
+        <form (ngSubmit)="submitTemplateTrip()" class="p-6 space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-2">
+              <label
+                class="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider"
+                >Trip Title <span class="text-rose-500">*</span></label
+              >
+              <input
+                type="text"
+                [(ngModel)]="formData.name"
+                name="name"
+                required
+                placeholder="e.g. Sahara Desert Expedition"
+                class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+              />
+            </div>
+            <div class="col-span-2">
+              <label
+                class="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider"
+                >Destination <span class="text-rose-500">*</span></label
+              >
+              <input
+                type="text"
+                [(ngModel)]="formData.destination"
+                name="destination"
+                required
+                placeholder="e.g. Douz, Kebili"
+                class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+              />
+            </div>
           </div>
 
-          <div *ngIf="submitMessage()" 
-               class="p-4 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300" 
-               [ngClass]="submitSuccess() ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-rose-50 text-rose-700 border border-rose-100'">
-            <lucide-icon [img]="submitSuccess() ? ShieldCheckIcon : AlertCircleIcon" [size]="20"></lucide-icon>
-            <span class="text-sm font-bold">{{ submitMessage() }}</span>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label
+                class="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider"
+                >Difficulty <span class="text-rose-500">*</span></label
+              >
+              <select
+                [(ngModel)]="formData.adventureLevel"
+                name="adventureLevel"
+                required
+                class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+              >
+                <option value="easy">Easy</option>
+                <option value="moderate">Moderate</option>
+                <option value="hard">Hard / Advanced</option>
+              </select>
+            </div>
+            <div>
+              <label
+                class="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider"
+                >Est. Budget (TND) <span class="text-rose-500">*</span></label
+              >
+              <input
+                type="number"
+                [(ngModel)]="formData.estimatedBudget"
+                name="estimatedBudget"
+                required
+                min="0"
+                class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+              />
+            </div>
           </div>
-          
-          <div class="pt-6 flex gap-4">
-            <button type="button" (click)="closeModal()" class="flex-1 px-6 py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl text-sm font-black transition-all active:scale-95">
-              Discard Changes
+
+          <div class="col-span-2">
+            <label
+              class="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wider"
+              >Cover Image URL</label
+            >
+            <input
+              type="text"
+              [(ngModel)]="formData.imageUrl"
+              name="imageUrl"
+              placeholder="https://images.unsplash.com/..."
+              class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+            />
+            <div
+              *ngIf="formData.imageUrl"
+              class="mt-2 w-full h-24 rounded-lg overflow-hidden border border-slate-200 shadow-inner bg-slate-100 flex items-center justify-center"
+            >
+              <img
+                [src]="formData.imageUrl"
+                class="h-full w-full object-cover"
+              />
+            </div>
+            <p class="text-[10px] text-slate-400 mt-1">
+              Leave empty for a default image based on destination.
+            </p>
+          </div>
+
+          <div
+            *ngIf="submitMessage()"
+            class="p-3 rounded-lg text-sm"
+            [ngClass]="
+              submitSuccess()
+                ? 'bg-green-50 text-green-700 border border-green-200'
+                : 'bg-red-50 text-red-700 border border-red-200'
+            "
+          >
+            {{ submitMessage() }}
+          </div>
+
+          <div
+            class="pt-4 border-t border-slate-100 flex justify-end gap-3 mt-4"
+          >
+            <button
+              type="button"
+              (click)="closeModal()"
+              class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-bold transition-colors"
+            >
+              Cancel
             </button>
-            <button type="submit" 
-                    [disabled]="!formData.name || !formData.destination" 
-                    class="flex-[2] px-6 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-sm font-black shadow-xl shadow-emerald-200 transition-all active:scale-95 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed">
-              {{ isEditMode() ? 'Overwrite Template' : 'Initialize Template' }}
+            <button
+              type="submit"
+              [disabled]="!formData.name || !formData.destination"
+              class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold shadow-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {{ isEditing() ? "Update Mission" : "Create Template" }}
             </button>
           </div>
         </form>
       </div>
     </div>
   `,
-  styles: [`
-    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
-  `]
+  styles: [],
 })
 export class AdminTripsComponent implements OnInit {
-  // Lucide Icons
   TentIcon = Tent;
   SearchIcon = Search;
   MoreVerticalIcon = MoreVertical;
@@ -296,37 +524,28 @@ export class AdminTripsComponent implements OnInit {
   UsersIcon = Users;
   EyeIcon = Eye;
   Trash2Icon = Trash2;
-  EditIcon = Edit2;
-  FilterIcon = Filter;
-  XIcon = X;
-  PlusIcon = Plus;
-  ClockIcon = Clock;
-  ShieldCheckIcon = ShieldCheck;
-  AlertCircleIcon = AlertCircle;
+  EditIcon = Edit3;
 
-  trips = signal<any[]>([]);
-  filteredTrips = signal<any[]>([]);
+  trips = signal<Trip[]>([]);
   isLoading = signal<boolean>(true);
-  searchQuery = '';
+  activeTab = signal<"templates" | "users">("templates");
+  timelineFilter = signal<"active" | "past">("active");
+  searchQuery = signal<string>("");
 
   isModalOpen = signal(false);
-  isEditMode = signal(false);
-  editingId = signal<string | null>(null);
-  submitMessage = signal('');
+  isEditing = signal(false);
+  selectedTripId = signal<string | null>(null);
+  submitMessage = signal("");
   submitSuccess = signal(false);
-
   formData = {
-    name: '',
-    destination: '',
-    difficulty: 'MODERATE',
-    totalBudget: 150,
-    startDate: '',
-    endDate: '',
-    imageUrl: '',
-    participants: 4
+    name: "",
+    destination: "",
+    adventureLevel: "moderate",
+    estimatedBudget: 0,
+    imageUrl: "",
   };
 
-  constructor(private tripService: TripService, private authService: AuthService) { }
+  constructor(private tripService: TripService) {}
 
   ngOnInit(): void {
     this.loadTrips();
@@ -334,102 +553,176 @@ export class AdminTripsComponent implements OnInit {
 
   loadTrips() {
     this.isLoading.set(true);
-    this.tripService.getAllTripsAdmin().subscribe({
-      next: (data) => {
-        // Map backend data to frontend trip model if needed
-        const mappedData = data.map(t => ({
-          ...t,
-          name: t.title || t.name,
-          destination: typeof t.destination === 'string' ? t.destination : (t.destination?.address || 'Tunisia'),
+    let allTrips: Trip[] = [];
+    let templateCount = 0;
+    let userTripsCount = 0;
+
+    // SYNC FIX: Load templates from consistent endpoint (matches user Discover Adventures)
+    this.tripService.getAllTemplates().subscribe({
+      next: (templates) => {
+        // Map templates
+        const mappedTemplates: Trip[] = (templates || []).map((t) => ({
+          id: t.id || t._id,
+          name: t.title || t.name || "Untitled Trip",
+          description: t.description || "",
+          destination:
+            typeof t.destination === "string"
+              ? t.destination
+              : t.destination?.address || "Destination inconnue",
+          startDate: t.startDate,
+          endDate: t.endDate,
+          duration: 0,
+          status: this.mapStatus(t.status),
+          participants: t.participants || 1,
+          createdBy: t.userId || t.creatorId,
+          createdAt: t.createdAt,
+          updatedAt: t.updatedAt,
+          imageUrl: t.imageUrl,
+          template: true,
         }));
-        this.trips.set(mappedData);
-        this.filterTrips();
-        this.isLoading.set(false);
+
+        allTrips = [...allTrips, ...mappedTemplates];
+        templateCount = mappedTemplates.length;
+
+        // Also load user trips for the "User Missions" tab
+        this.tripService.getAllTripsAdmin().subscribe({
+          next: (allData) => {
+            // Filter only non-templates (user trips)
+            const userTrips = (allData || [])
+              .filter((t) => !t.template)
+              .map((t) => ({
+                ...t,
+                template: false,
+              }));
+
+            allTrips = [...mappedTemplates, ...userTrips];
+            this.trips.set(allTrips);
+            this.isLoading.set(false);
+
+            userTripsCount = userTrips.length;
+
+            // UX: If no templates but user trips exist, show user missions tab
+            if (templateCount === 0 && userTripsCount > 0) {
+              this.activeTab.set("users");
+            }
+          },
+          error: (err) => {
+            console.error("Error fetching user trips for admin", err);
+            this.trips.set(mappedTemplates);
+            this.isLoading.set(false);
+          },
+        });
       },
       error: (err) => {
-        console.error('Error fetching trips for admin', err);
+        console.error("Error fetching templates for admin", err);
         this.isLoading.set(false);
-      }
+      },
     });
   }
 
-  filterTrips() {
-    if (!this.searchQuery.trim()) {
-      this.filteredTrips.set(this.trips());
-      return;
+  private mapStatus(
+    status: any,
+  ): "planning" | "upcoming" | "active" | "completed" | "cancelled" {
+    if (!status) return "planning";
+    const s = status.toString().toLowerCase();
+    if (s === "planned" || s === "planning") return "planning";
+    if (s === "ongoing" || s === "active") return "active";
+    if (s === "confirmed" || s === "upcoming") return "upcoming";
+    if (s === "completed" || s === "finished") return "completed";
+    if (s === "cancelled" || s === "inactive") return "cancelled";
+    return "planning";
+  }
+
+  getAdminTemplates() {
+    // SYNC FIX: Filter only templates (still filters, but source is now consistent with Discover Adventures)
+    return this.trips().filter((t) => t.template === true);
+  }
+
+  getUserTrips() {
+    return this.trips().filter((t) => !t.template);
+  }
+
+  getActiveTrips() {
+    let sourceList =
+      this.activeTab() === "templates"
+        ? this.getAdminTemplates()
+        : this.getUserTrips();
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (this.timelineFilter() === "past") {
+      // Archives: only trips whose start date has already passed
+      sourceList = sourceList.filter((t) => {
+        if (!t.startDate) return false;
+        const start = new Date(t.startDate);
+        return !isNaN(start.getTime()) && start < today;
+      });
+    } else {
+      // Active: trips whose start date is today or future, OR have no date
+      sourceList = sourceList.filter((t) => {
+        if (!t.startDate) return true;
+        const start = new Date(t.startDate);
+        if (isNaN(start.getTime())) return true;
+        return start >= today;
+      });
     }
-    const query = this.searchQuery.toLowerCase();
-    this.filteredTrips.set(
-      this.trips().filter(t => 
-        t.name.toLowerCase().includes(query) || 
-        t.destination.toLowerCase().includes(query)
-      )
+
+    const query = this.searchQuery().toLowerCase().trim();
+    if (!query) return sourceList;
+
+    return sourceList.filter(
+      (t) =>
+        t.name.toLowerCase().includes(query) ||
+        t.destination.toLowerCase().includes(query) ||
+        t.id.toLowerCase().includes(query),
     );
   }
 
+  onSearch(event: any) {
+    this.searchQuery.set(event.target.value);
+  }
+
   deleteTrip(tripId: string) {
-    if (confirm('Critical Action: Delete this trip? Data cannot be recovered.')) {
+    if (
+      confirm(
+        "Are you sure you want to delete this trip missions record? Data recovery is impossible.",
+      )
+    ) {
       this.tripService.deleteTrip(tripId).subscribe({
         next: () => {
-          this.trips.update(current => current.filter(t => t.id !== tripId));
-          this.filterTrips();
+          this.trips.update((current) =>
+            current.filter((t) => t.id !== tripId),
+          );
         },
-        error: (err) => console.error('Error deleting trip', err)
+        error: (err) => console.error("Error deleting trip", err),
       });
     }
   }
 
-  getStatusStyles(status: string) {
-    const s = (status || '').toUpperCase();
-    if (s === 'PLANNED' || s === 'PLANNING') return 'bg-blue-100 text-blue-700 border-blue-200';
-    if (s === 'ACTIVE' || s === 'ONGOING') return 'bg-emerald-100 text-emerald-700 border-emerald-200';
-    if (s === 'COMPLETED') return 'bg-slate-100 text-slate-700 border-slate-200';
-    if (s === 'CANCELLED') return 'bg-rose-100 text-rose-700 border-rose-200';
-    return 'bg-amber-100 text-amber-700 border-amber-200';
-  }
-
-  getTemplateCount() {
-    return this.trips().filter(t => t.template).length;
-  }
-
-  getUpcomingCount() {
-    const now = new Date();
-    return this.trips().filter(t => new Date(t.startDate) > now).length;
-  }
-
-  getAvgParticipants() {
-    if (this.trips().length === 0) return 0;
-    const total = this.trips().reduce((sum, t) => sum + (t.participants || 0), 0);
-    return Math.round(total / this.trips().length);
+  isUpcoming(dateStr: string): boolean {
+    return new Date(dateStr) > new Date();
   }
 
   openCreateModal() {
-    this.isEditMode.set(false);
-    this.editingId.set(null);
+    this.isEditing.set(false);
+    this.selectedTripId.set(null);
     this.resetForm();
-    this.submitMessage.set('');
+    this.submitMessage.set("");
     this.isModalOpen.set(true);
   }
 
-  openEditModal(trip: any) {
-    this.isEditMode.set(true);
-    this.editingId.set(trip.id);
-    
-    // Format dates for input[type="date"] (YYYY-MM-DD)
-    const startDate = trip.startDate ? new Date(trip.startDate).toISOString().split('T')[0] : '';
-    const endDate = trip.endDate ? new Date(trip.endDate).toISOString().split('T')[0] : '';
-    
+  openEditModal(trip: Trip) {
+    this.isEditing.set(true);
+    this.selectedTripId.set(trip.id);
     this.formData = {
       name: trip.name,
       destination: trip.destination,
-      difficulty: trip.difficulty || 'MODERATE',
-      totalBudget: trip.totalBudget || trip.estimatedBudget || 0,
-      startDate: startDate,
-      endDate: endDate,
-      imageUrl: trip.imageUrl || '',
-      participants: trip.participants || 4
+      adventureLevel: (trip as any).difficulty?.toLowerCase() || "moderate",
+      estimatedBudget: (trip as any).totalBudget || 0,
+      imageUrl: (trip as any).imageUrl || "",
     };
-    this.submitMessage.set('');
+    this.submitMessage.set("");
     this.isModalOpen.set(true);
   }
 
@@ -439,68 +732,90 @@ export class AdminTripsComponent implements OnInit {
   }
 
   resetForm() {
-    const now = new Date();
-    const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    
     this.formData = {
-      name: '',
-      destination: '',
-      difficulty: 'MODERATE',
-      totalBudget: 150,
-      startDate: now.toISOString().split('T')[0],
-      endDate: nextWeek.toISOString().split('T')[0],
-      imageUrl: '',
-      participants: 4
+      name: "",
+      destination: "",
+      adventureLevel: "moderate",
+      estimatedBudget: 0,
+      imageUrl: "",
     };
   }
 
-  submitForm() {
-    const adminId = this.authService.currentUserValue?.id || 'admin-user-id';
-    
-    // Find the original trip status if editing, otherwise default to PLANNED
-    let currentStatus = 'PLANNED';
-    if (this.isEditMode() && this.editingId()) {
-      const originalTrip = this.trips().find(t => t.id === this.editingId());
-      if (originalTrip && originalTrip.status) {
-        currentStatus = originalTrip.status;
-      }
+  submitTemplateTrip() {
+    if (this.isEditing()) {
+      this.updateTemplateTrip();
+    } else {
+      this.createTemplateTrip();
     }
+  }
 
-    const tripData = {
+  createTemplateTrip() {
+    const dummyDate = new Date();
+    const dummyEndDate = new Date();
+    dummyEndDate.setDate(dummyEndDate.getDate() + 7);
+
+    const newTrip = {
       title: this.formData.name,
       destination: {
+        name: this.formData.destination,
         address: this.formData.destination,
-        latitude: 0,
-        longitude: 0
+        coordinates: { lat: 0, lng: 0 },
       },
-      startDate: new Date(this.formData.startDate).toISOString(),
-      endDate: new Date(this.formData.endDate).toISOString(),
-      difficulty: this.formData.difficulty,
-      totalBudget: this.formData.totalBudget,
-      status: currentStatus, // Ensure status is never null/undefined
-      participants: this.formData.participants,
-      userId: adminId,
-      imageUrl: this.formData.imageUrl || 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&q=80',
-      template: true
+      difficulty: this.formData.adventureLevel.toUpperCase(),
+      totalBudget: this.formData.estimatedBudget || 0,
+      imageUrl:
+        this.formData.imageUrl ||
+        "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&q=80",
+      template: true,
+      startDate: dummyDate.toISOString(),
+      endDate: dummyEndDate.toISOString(),
+      status: "PLANNED",
+      participants: 1,
+      userId: "admin",
     };
 
-    const action = this.isEditMode() 
-      ? this.tripService.updateTrip(this.editingId()!, tripData)
-      : this.tripService.createTrip(tripData);
-
-    action.subscribe({
-      next: (result) => {
+    this.tripService.createTrip(newTrip).subscribe({
+      next: () => {
         this.submitSuccess.set(true);
-        this.submitMessage.set(this.isEditMode() ? 'Trip Template updated successfully!' : 'Trip Template initialized successfully!');
+        this.submitMessage.set("Template Trip created successfully!");
         this.loadTrips();
         setTimeout(() => this.closeModal(), 1500);
       },
       error: (err) => {
         this.submitSuccess.set(false);
-        this.submitMessage.set('Sync failed: Could not persist trip data.');
+        this.submitMessage.set("Failed to create template trip.");
         console.error(err);
-      }
+      },
+    });
+  }
+
+  updateTemplateTrip() {
+    const tripId = this.selectedTripId();
+    if (!tripId) return;
+
+    const updatedTrip = {
+      title: this.formData.name,
+      destination: {
+        address: this.formData.destination,
+      },
+      difficulty: this.formData.adventureLevel.toUpperCase(),
+      totalBudget: this.formData.estimatedBudget,
+      imageUrl: this.formData.imageUrl,
+      template: true,
+    };
+
+    this.tripService.updateTrip(tripId, updatedTrip).subscribe({
+      next: () => {
+        this.submitSuccess.set(true);
+        this.submitMessage.set("Template updated successfully!");
+        this.loadTrips();
+        setTimeout(() => this.closeModal(), 1500);
+      },
+      error: (err) => {
+        this.submitSuccess.set(false);
+        this.submitMessage.set("Update failed.");
+        console.error(err);
+      },
     });
   }
 }
-

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.campconnect.dto.GroupInviteDetailDto;
+import com.campconnect.dto.GroupInviteDetailDTO;
 import com.campconnect.model.GroupInvite;
 import com.campconnect.service.IGroupInviteService;
 
@@ -48,12 +48,12 @@ public class GroupInviteController {
     }
 
     @GetMapping("/user/{userId}/details")
-    public ResponseEntity<List<GroupInviteDetailDto>> getInviteDetailsForUser(@PathVariable("userId") String userId) {
+    public ResponseEntity<List<GroupInviteDetailDTO>> getInviteDetailsForUser(@PathVariable("userId") String userId) {
         return ResponseEntity.ok(groupInviteService.getInviteDetailsForUser(userId));
     }
 
-    @GetMapping("/from-user/{userId}/details")
-    public ResponseEntity<List<GroupInviteDetailDto>> getInviteDetailsFromUser(@PathVariable("userId") String userId) {
+    @GetMapping("/from/{userId}/detail")
+    public ResponseEntity<List<GroupInviteDetailDTO>> getInviteDetailsFromUser(@PathVariable("userId") String userId) {
         return ResponseEntity.ok(groupInviteService.getInviteDetailsFromUser(userId));
     }
 

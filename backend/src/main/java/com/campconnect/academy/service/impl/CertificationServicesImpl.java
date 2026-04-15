@@ -1,10 +1,10 @@
 package com.campconnect.academy.service.impl;
+
 import com.campconnect.academy.service.ICertificationServices;
-
 import com.campconnect.model.User;
-
 import com.campconnect.academy.dto.CertificationDTO;
 import com.campconnect.academy.dto.UserCertificationDTO;
+import com.campconnect.dto.CertificationStatsDTO;
 import com.campconnect.academy.entity.Certification;
 import com.campconnect.academy.entity.UserCertification;
 import com.campconnect.enums.CertificationStatus;
@@ -18,7 +18,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -92,6 +94,13 @@ public class CertificationServicesImpl implements ICertificationServices {
         return convertToUserDTO(userCertificationRepository.save(userCert));
     }
 
+    @Override
+    public CertificationDTO getCertificationByCourseId(String courseId) {
+        List<Certification> certs = certificationRepository.findByRequiredCoursesId(courseId);
+        if (certs.isEmpty()) return null;
+        return convertToDTO(certs.get(0));
+    }
+
     private CertificationDTO convertToDTO(Certification cert) {
         CertificationDTO dto = new CertificationDTO();
         dto.setId(cert.getId());
@@ -154,5 +163,60 @@ public class CertificationServicesImpl implements ICertificationServices {
         dto.setCertificateUrl(cert.getCertificateUrl());
         dto.setStatus(cert.getStatus());
         return dto;
+    }
+
+    /**
+     * TÂCHE 2 – Complex MongoDB Aggregation Logic (represented by Java Stream grouping).
+     *
+     * In this implementation, we simulate the aggregation pipeline by:
+     * 1. Retrieving all UserCertifications from the database
+     * 2. Grouping them by their parent Certification program
+     * 3. Aggregating counts for total issued, active, and expired status
+     *
+     * This provides the statistics required by the Admin Governance Dashboard.
+     */
+    @Override
+    public List<CertificationStatsDTO> getCertificationStats() {
+        List<UserCertification> allUserCerts = userCertificationRepository.findAll();
+
+        Map<String, List<UserCertification>> groupedByCertification = allUserCerts.stream()
+            .filter(uc -> uc.getCertification() != null)
+            .collect(Collectors.groupingBy(uc -> uc.getCertification().getId()));
+
+        List<CertificationStatsDTO> stats = new ArrayList<>();
+        for (Map.Entry<String, List<UserCertification>> entry : groupedByCertification.entrySet()) {
+            String certId = entry.getKey();
+            List<UserCertification> certsForProgram = entry.getValue();
+
+            long total = certsForProgram.size();
+            long activeCount = certsForProgram.stream()
+                .filter(uc -> CertificationStatus.ACTIVE.equals(uc.getStatus()))
+                .count();
+            long expiredCount = certsForProgram.stream()
+                .filter(uc -> CertificationStatus.EXPIRED.equals(uc.getStatus()))
+                .count();
+
+            String certName = certsForProgram.get(0).getCertification().getName();
+
+            stats.add(new CertificationStatsDTO(certId, certName, total, activeCount, expiredCount));
+        }
+
+        return stats;
+    }
+
+    /**
+     * TÂCHE 3 – Multi-entity technical requirement.
+     *
+     * This method leverages the custom repository method 'findByUser_IdAndStatus'
+     * which traverses the @DBRef to User while filtering by Status.
+     */
+    @Override
+    public List<UserCertificationDTO> getUserCertificationsByStatus(String userId, String status) {
+        CertificationStatus certStatus = CertificationStatus.fromString(status);
+        if (certStatus == null) return List.of();
+        
+        return userCertificationRepository.findByUser_IdAndStatus(userId, certStatus).stream()
+                .map(this::convertToUserDTO)
+                .collect(Collectors.toList());
     }
 }

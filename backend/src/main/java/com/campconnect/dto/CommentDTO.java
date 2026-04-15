@@ -1,8 +1,9 @@
 package com.campconnect.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 @Data
@@ -10,12 +11,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CommentDTO {
     private String id;
+    
+    @NotBlank(message = "Comment content is required")
+    private String content;
+    
+    private int upvotes;
+    private LocalDateTime createdAt;
     private String postId;
     private String authorId;
     private String authorName;
     private String authorUsername;
-    private String content;
-    private int likes;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.campconnect.dto.TripIntentDto;
+import com.campconnect.dto.TripIntentDTO;
 import com.campconnect.model.TripIntent;
 import com.campconnect.service.ITripIntentService;
 
@@ -30,7 +30,7 @@ public class TripIntentController {
     private final ITripIntentService tripIntentService;
 
     @PostMapping
-    public ResponseEntity<TripIntent> createTripIntent(@Valid @RequestBody TripIntentDto dto) {
+    public ResponseEntity<TripIntent> createTripIntent(@Valid @RequestBody TripIntentDTO dto) {
         TripIntent tripIntent = mapDtoToEntity(dto);
         TripIntent created = tripIntentService.createTripIntent(tripIntent);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
@@ -53,7 +53,7 @@ public class TripIntentController {
 
     @PutMapping("/{id}")
     public ResponseEntity<TripIntent> updateTripIntent(@PathVariable("id") String id,
-            @Valid @RequestBody TripIntentDto dto) {
+            @Valid @RequestBody TripIntentDTO dto) {
         TripIntent tripIntent = mapDtoToEntity(dto);
         return ResponseEntity.ok(tripIntentService.updateTripIntent(id, tripIntent));
     }
@@ -64,7 +64,7 @@ public class TripIntentController {
         return ResponseEntity.noContent().build();
     }
 
-    private TripIntent mapDtoToEntity(TripIntentDto dto) {
+    private TripIntent mapDtoToEntity(TripIntentDTO dto) {
         return TripIntent.builder()
                 .creatorUserId(dto.getCreatorUserId())
                 .title(dto.getTitle())

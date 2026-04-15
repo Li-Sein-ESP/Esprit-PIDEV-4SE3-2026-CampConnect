@@ -3,7 +3,7 @@ package com.campconnect.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public class ConnectionDto {
+public class ConnectionDTO {
 
     @NotBlank(message = "Sender ID is required")
     private String fromUserId;
@@ -21,10 +21,10 @@ public class ConnectionDto {
     private Double matchScore;
     private String message;
 
-    public ConnectionDto() {
+    public ConnectionDTO() {
     }
 
-    public ConnectionDto(String fromUserId, String fromUserName, String fromUserAvatar, String toUserId,
+    public ConnectionDTO(String fromUserId, String fromUserName, String fromUserAvatar, String toUserId,
             String toUserName, String toUserAvatar, String campingStyle, String experienceLevel, Double matchScore,
             String message) {
         this.fromUserId = fromUserId;

@@ -1,67 +1,86 @@
-import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { TripService, Trip } from './trip.service';
-import { environment } from '../../../environments/environment';
 
 describe('TripService', () => {
-    let service: TripService;
-    let httpMock: HttpTestingController;
+  let service: TripService;
 
-    const mockTrips: Trip[] = [
-        { id: 'trip-1', title: 'Yosemite Valley Adventure', destination: { address: 'Yosemite' }, startDate: '2026-06-01', endDate: '2026-06-07', status: 'planned', participants: 4, userId: 'user-1' },
-        { id: 'trip-2', title: 'Alpine Trekking', destination: { address: 'Alps' }, startDate: '2026-07-15', endDate: '2026-07-22', status: 'planned', participants: 2, userId: 'user-1' }
-    ];
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [TripService]
+    });
+    service = TestBed.inject(TripService);
+  });
 
-    beforeEach(() => {
-        TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule],
-            providers: [TripService]
-        });
-        service = TestBed.inject(TripService);
-        httpMock = TestBed.inject(HttpTestingController);
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+
+  it('should format and return mock trips initially', (done) => {
+    service.getTrips().subscribe(trips => {
+      expect(trips.length).toBe(3); // Based on getMockTrips()
+      expect(trips[0].name).toBe('Yosemite Valley Adventure');
+      done();
+    });
+  });
+
+  it('should return a trip by id', fakeAsync(() => {
+    let result: Trip | undefined;
+    service.getTripById('trip-1').subscribe(trip => {
+      result = trip;
+    });
+    
+    // Simulate the 300ms delay in the service
+    tick(300);
+    
+    expect(result).toBeDefined();
+    expect(result?.id).toBe('trip-1');
+  }));
+
+  it('should create a new trip', fakeAsync(() => {
+    const newTrip = {
+      name: 'New Test Trip',
+      destination: 'Test City',
+      startDate: '2026-01-01',
+      endDate: '2026-01-05',
+      status: 'draft' as const,
+      image: '',
+      groupSize: 2,
+      activities: [],
+      packingProgress: 0,
+      budgetSpent: 0,
+      budgetTotal: 100
+    };
+
+    let createdTrip: Trip | undefined;
+    service.createTrip(newTrip).subscribe(trip => {
+      createdTrip = trip;
     });
 
-    afterEach(() => {
-        httpMock.verify();
+    // Simulate 500ms delay
+    tick(500);
+
+    expect(createdTrip).toBeDefined();
+    expect(createdTrip?.name).toBe('New Test Trip');
+    expect(createdTrip?.id).toMatch(/^trip-\d+$/);
+    
+    // Verify it was added to the state
+    service.getTrips().subscribe(trips => {
+      expect(trips.length).toBe(4);
+    });
+  }));
+
+  it('should delete a trip', fakeAsync(() => {
+    let success = false;
+    service.deleteTrip('trip-1').subscribe(res => {
+      success = res;
     });
 
-    it('should be created', () => {
-        expect(service).toBeTruthy();
+    tick(500);
+
+    expect(success).toBeTrue();
+    service.getTrips().subscribe(trips => {
+      expect(trips.length).toBe(2);
+      expect(trips.find(t => t.id === 'trip-1')).toBeUndefined();
     });
-
-    it('should fetch trips from API', () => {
-        service.getTrips().subscribe(trips => {
-            expect(trips.length).toBe(2);
-            expect(trips[0].title).toBe('Yosemite Valley Adventure');
-        });
-
-        const req = httpMock.expectOne(`${environment.apiUrl}/trips`);
-        expect(req.request.method).toBe('GET');
-        req.flush(mockTrips);
-    });
-
-    it('should get trip by id', () => {
-        service.getTripById('trip-1').subscribe(trip => {
-            expect(trip.id).toBe('trip-1');
-            expect(trip.title).toBe('Yosemite Valley Adventure');
-        });
-
-        const req = httpMock.expectOne(`${environment.apiUrl}/trips/trip-1`);
-        expect(req.request.method).toBe('GET');
-        req.flush(mockTrips[0]);
-    });
-
-    it('should create a new trip', () => {
-        const newTripData = { title: 'New Test Trip' };
-        const createdResponse = { id: 'trip-999', title: 'New Test Trip' } as Trip;
-
-        service.createTrip(newTripData).subscribe(trip => {
-            expect(trip.title).toBe('New Test Trip');
-            expect(trip.id).toBe('trip-999');
-        });
-
-        const req = httpMock.expectOne(`${environment.apiUrl}/trips`);
-        expect(req.request.method).toBe('POST');
-        req.flush(createdResponse);
-    });
+  }));
 });

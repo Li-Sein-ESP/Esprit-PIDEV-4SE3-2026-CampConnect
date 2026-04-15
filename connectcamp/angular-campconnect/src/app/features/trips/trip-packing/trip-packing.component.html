@@ -1,0 +1,49 @@
+<div class="min-h-screen bg-[var(--color-background)] py-12">
+  <div class="container max-w-4xl">
+    <div class="flex items-center justify-between mb-8">
+      <h2>Packing List</h2>
+      <div class="text-sm text-[var(--color-text-secondary)]">
+        {{ packedCount() }}/{{ totalCount() }} items packed
+      </div>
+    </div>
+
+    @if (packingList(); as list) {
+    <div class="space-y-6">
+      @for (category of list.categories; track category.name) {
+      <app-card variant="elevated">
+        <app-card-header>
+          <app-card-title>{{ category.name }}</app-card-title>
+        </app-card-header>
+        <app-card-content>
+          <div class="space-y-2">
+            @for (item of category.items; track item.id) {
+            <label
+              class="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--color-background)] cursor-pointer transition-colors">
+              <input type="checkbox" [checked]="item.packed" (change)="togglePacked(item.id)"
+                class="w-5 h-5 rounded border-2 text-[var(--color-primary-600)]" />
+              <div class="flex-1">
+                <div class="flex items-center gap-2">
+                  <span [class.line-through]="item.packed" [class.text-[var(--color-text-tertiary)]]="item.packed">
+                    {{ item.name }}
+                  </span>
+                  @if (item.essential) {
+                  <app-badge variant="warning" size="sm">Essential</app-badge>
+                  }
+                </div>
+                @if (item.quantity > 1) {
+                <span class="text-sm text-[var(--color-text-secondary)]">Qty: {{ item.quantity }}</span>
+                }
+              </div>
+              <lucide-icon [img]="item.packed ? CheckCircle : Circle"
+                [class]="item.packed ? 'w-5 h-5 text-green-600' : 'w-5 h-5 text-[var(--color-text-tertiary)]'">
+              </lucide-icon>
+            </label>
+            }
+          </div>
+        </app-card-content>
+      </app-card>
+      }
+    </div>
+    }
+  </div>
+</div>

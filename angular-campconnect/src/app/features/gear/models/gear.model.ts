@@ -1,6 +1,6 @@
 // ─── Backend DTO Models ──────────────────────────────────────────────────────
 
-export type GearStatus = 'AVAILABLE' | 'RENTED' | 'MAINTENANCE' | 'RETIRED';
+export type GearStatus = 'AVAILABLE' | 'RENTED' | 'MAINTENANCE' | 'OUT_OF_STOCK';
 export type ListingType = 'FOR_SALE' | 'FOR_RENT' | 'BOTH';
 
 /** Matches GearImageDto from the Spring Boot backend. */

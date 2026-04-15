@@ -41,48 +41,20 @@ public class TransportServiceImpl implements ITransportService {
             transport.setId(UUID.randomUUID().toString());
         }
         mapDtoToEntity(dto, transport);
-        Transport saved = repository.save(transport);
-
-        // Synchronize with Trip if a tripId is provided
-        if (saved.getTripId() != null) {
-            linkTransportToTrip(saved.getId(), saved.getTripId());
-        }
-
-        return saved;
+        return repository.save(transport);
     }
 
     @Override
     public Transport update(String id, TransportDTO dto) {
-        Transport transport = findById(id);
-        String oldTripId = transport.getTripId();
+        Transport transport = findById(id); // throws 404 if not found
         mapDtoToEntity(dto, transport);
-        Transport updated = repository.save(transport);
-
-        // If trip assignment changed, update links
-        if (updated.getTripId() != null && !updated.getTripId().equals(oldTripId)) {
-            linkTransportToTrip(updated.getId(), updated.getTripId());
-        }
-
-        return updated;
-    }
-
-    private void linkTransportToTrip(String transportId, String tripId) {
-        tripRepository.findById(tripId).ifPresent(trip -> {
-            if (!trip.getTransportIds().contains(transportId)) {
-                trip.getTransportIds().add(transportId);
-                tripRepository.save(trip);
-            }
-        });
+        return repository.save(transport);
     }
 
     @Override
     public void delete(String id) {
-        Transport transport = repository.findById(id).orElse(null);
-        if (transport != null && transport.getTripId() != null) {
-            tripRepository.findById(transport.getTripId()).ifPresent(trip -> {
-                trip.getTransportIds().remove(id);
-                tripRepository.save(trip);
-            });
+        if (!repository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transport not found with id: " + id);
         }
         repository.deleteById(id);
     }
@@ -107,6 +79,11 @@ public class TransportServiceImpl implements ITransportService {
             trip.getTransportIds().add(transportId);
             tripRepository.save(trip);
         }
+    }
+
+    @Override
+    public java.util.List<java.util.Map<String, Object>> getPopularityStats() {
+        return repository.getTransportPopularityStats();
     }
 
     private void mapDtoToEntity(TransportDTO dto, Transport transport) {

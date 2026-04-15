@@ -1,19 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
-import { TripIntentEditComponent } from './trip-intent-edit';
 
-describe('TripIntentEditComponent', () => {
-  let component: TripIntentEditComponent;
-  let fixture: ComponentFixture<TripIntentEditComponent>;
+import { TripIntentEdit } from './trip-intent-edit';
+
+describe('TripIntentEdit', () => {
+  let component: TripIntentEdit;
+  let fixture: ComponentFixture<TripIntentEdit>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TripIntentEditComponent],
-      providers: [provideRouter([])]
+      imports: [TripIntentEdit]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(TripIntentEditComponent);
+    fixture = TestBed.createComponent(TripIntentEdit);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

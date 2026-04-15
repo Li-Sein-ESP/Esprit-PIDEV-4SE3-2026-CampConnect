@@ -2,7 +2,7 @@ package com.campconnect.service;
 
 import java.util.List;
 
-import com.campconnect.dto.GroupInviteDetailDto;
+import com.campconnect.dto.GroupInviteDetailDTO;
 import com.campconnect.model.GroupInvite;
 
 public interface IGroupInviteService {
@@ -15,6 +15,6 @@ public interface IGroupInviteService {
     GroupInvite getInviteById(String id);
     
     // Aggregation methods
-    List<GroupInviteDetailDto> getInviteDetailsForUser(String userId);
-    List<GroupInviteDetailDto> getInviteDetailsFromUser(String userId);
+    List<GroupInviteDetailDTO> getInviteDetailsForUser(String userId);
+    List<GroupInviteDetailDTO> getInviteDetailsFromUser(String userId);
 }

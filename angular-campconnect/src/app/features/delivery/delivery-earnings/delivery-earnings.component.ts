@@ -111,6 +111,51 @@ export class DeliveryEarningsComponent implements OnInit, AfterViewInit {
                 this.loadMockData(); // fallback
             }
         });
+        
+        // Load vehicle earnings breakdown
+        this.deliveryApi.getEarningsBreakdown().subscribe({
+            next: (data) => {
+                this.earnings.vehicleBreakdown = data.vehicleEarnings.map((v, i) => {
+                    const colors = ['#8B7355', '#2B6FA0', '#38855F'];
+                    const emojis = ['🚐', '🏍️', '🚙'];
+                    return {
+                        label: v.vehicleName,
+                        value: v.earnings,
+                        count: v.deliveryCount,
+                        color: colors[i % colors.length],
+                        emoji: emojis[i % emojis.length]
+                    };
+                });
+                setTimeout(() => this.drawDonutChart(), 100);
+            },
+            error: (err) => {
+                console.error('Failed to load vehicle earnings breakdown:', err);
+                // Keep mock data
+            }
+        });
+        
+        // Load recent payments
+        this.deliveryApi.getRecentPayments().subscribe({
+            next: (data) => {
+                this.earnings.recentPayments = data.payments.map(p => ({
+                    id: p.deliveryId,
+                    date: p.paymentDate,
+                    zone: 'Zone',
+                    vehicle: 'van' as any,  // We don't have vehicle info in the API response
+                    distance: 0,
+                    duration: '—',
+                    amount: p.amount,
+                    status: p.status.toLowerCase() as any,
+                    rating: null,
+                    customer: p.customerName
+                }));
+                this.filteredPayments = [...this.earnings.recentPayments];
+            },
+            error: (err) => {
+                console.error('Failed to load recent payments:', err);
+                // Keep mock data
+            }
+        });
     }
 
     loadMockData(): void {
