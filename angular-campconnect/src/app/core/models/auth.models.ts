@@ -8,6 +8,7 @@ export interface User {
     email: string;
     roles: string[];
     token?: string;
+    profileDetails?: Record<string, any>;
 }
 
 export interface LoginRequest {

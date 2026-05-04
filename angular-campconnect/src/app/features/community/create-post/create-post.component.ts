@@ -6,8 +6,9 @@ import {
   ReactiveFormsModule, FormsModule, AbstractControl
 } from '@angular/forms';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { CommunityService } from '../../../core/services/community.service';
+import { CommunityService, StoryGenerationResponse } from '../../../core/services/community.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { firstValueFrom } from 'rxjs';
 
 export interface MediaPreview {
   id: number;
@@ -87,6 +88,9 @@ export class CreatePostComponent implements OnInit {
   toastIcon = '';
   toastVisible = false;
   private toastTimer: any;
+  isGeneratingStory = false;
+  generatedStory = '';
+  generatedStoryMeta: StoryGenerationResponse | null = null;
 
   /* ── Current user ───────────────────── */
   currentUser: any = null;
@@ -264,7 +268,7 @@ export class CreatePostComponent implements OnInit {
   }
 
   /* ── Submit ──────────────────────────────── */
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (!this.canSubmit || this.isPosting) return;
 
     const content = (this.postForm.value.content || '').trim();
@@ -272,9 +276,17 @@ export class CreatePostComponent implements OnInit {
     const location = (this.postForm.value.location || '').trim();
     const authorName = this.currentUser?.name || this.authService.currentUserValue?.username || 'Explorer';
     const authorUsername = String(authorName).toLowerCase().replace(/\s+/g, '');
-    const imageUrls = this.uploadedFiles
-      .filter(media => media.type === 'image' && !!media.rawUrl)
-      .map(media => media.rawUrl);
+    let imageUrls: string[] = [];
+
+    this.isPosting = true;
+    try {
+      imageUrls = await this.uploadSelectedImages();
+    } catch (err) {
+      console.error('Error uploading post images', err);
+      this.isPosting = false;
+      this.showToast('❌', 'Image upload failed. Please retry.');
+      return;
+    }
 
     const payload = {
       title,
@@ -293,12 +305,18 @@ export class CreatePostComponent implements OnInit {
 
     console.log('Sending Post to Backend:', payload);
 
-    this.isPosting = true;
     this.communityService.createPost(payload as any).subscribe({
-      next: () => {
+      next: (savedPost: any) => {
         this.isPosting = false;
         this.showSuccess = true;
-        this.showToast('🎉', 'Your adventure has been shared with the community!');
+        const status = (savedPost?.moderationStatus || '').toUpperCase();
+        if (status === 'PENDING_REVIEW') {
+          this.showToast('🛡️', 'Post sent to safety review before publication.');
+        } else if (status === 'REJECTED') {
+          this.showToast('⛔', 'Post blocked by safety policy.');
+        } else {
+          this.showToast('🎉', 'Your adventure has been shared with the community!');
+        }
         setTimeout(() => this.router.navigate(['/community/feed']), 2000);
       },
       error: (err) => {
@@ -307,6 +325,73 @@ export class CreatePostComponent implements OnInit {
         this.showToast('❌', 'Failed to share adventure. Please try again.');
       }
     });
+  }
+
+  private async uploadSelectedImages(): Promise<string[]> {
+    const imageFiles = this.uploadedFiles
+      .filter(media => media.type === 'image' && !!media.file)
+      .map(media => media.file);
+
+    if (!imageFiles.length) {
+      return [];
+    }
+
+    const uploadedUrls: string[] = [];
+    for (const file of imageFiles) {
+      const response = await firstValueFrom(this.communityService.uploadPostImage(file));
+      if (response?.url) {
+        uploadedUrls.push(response.url);
+      }
+    }
+    return uploadedUrls;
+  }
+
+  onGenerateStory(): void {
+    const content = (this.postForm.value.content || '').trim();
+    if (content.length < 5) {
+      this.showToast('⚠️', 'Write at least 5 characters before generating a story.');
+      return;
+    }
+
+    this.isGeneratingStory = true;
+    this.generatedStory = '';
+    this.generatedStoryMeta = null;
+
+    this.communityService.generateStory({
+      content,
+      location: (this.postForm.value.location || '').trim() || undefined,
+      tone: 'immersive',
+      length: 'medium',
+      language: 'fr'
+    }).subscribe({
+      next: (result) => {
+        this.generatedStory = (result.story || '').trim();
+        this.generatedStoryMeta = result;
+        this.isGeneratingStory = false;
+        this.showToast('✨', 'Story generated successfully.');
+      },
+      error: (err) => {
+        console.error('Error generating story', err);
+        this.isGeneratingStory = false;
+        const isTimeout = err?.name === 'TimeoutError';
+        this.showToast('❌', isTimeout
+          ? 'Story generation timed out. Check backend/key and retry.'
+          : 'Failed to generate story. Please try again.');
+      }
+    });
+  }
+
+  useGeneratedStory(): void {
+    if (!this.generatedStory) {
+      return;
+    }
+    this.postForm.patchValue({ content: this.generatedStory });
+    this.showToast('✅', 'Generated story applied to your post.');
+  }
+
+  discardGeneratedStory(): void {
+    this.generatedStory = '';
+    this.generatedStoryMeta = null;
   }
 
   onCancel(): void {

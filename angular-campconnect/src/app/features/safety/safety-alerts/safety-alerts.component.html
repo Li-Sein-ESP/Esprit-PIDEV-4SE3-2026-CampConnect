@@ -222,7 +222,7 @@
                 <td class="px-6 py-4">
                   <div class="flex flex-col gap-1">
                     <span class="font-bold text-[var(--color-text-heading)]">{{ incident.type }}</span>
-                    <app-badge [variant]="incident.level === 'High' ? 'error' : (incident.level === 'Medium' ? 'warning' : 'info')" size="sm">
+                    <app-badge [variant]="getIncidentLevelBadgeVariant(incident.level)" size="sm">
                       {{ incident.level }}
                     </app-badge>
                   </div>
@@ -241,6 +241,9 @@
                 </td>
                 <td class="px-6 py-4 text-right">
                   <div class="flex justify-end gap-2">
+                    <button (click)="focusIncidentOnMap($event, incident)" class="p-2 hover:bg-blue-50 rounded-lg border border-transparent hover:border-blue-100 text-blue-600 transition-all shadow-sm cursor-pointer" title="Focus on map">
+                      <lucide-icon [img]="MapIcon" [size]="16"></lucide-icon>
+                    </button>
                     <button (click)="onEditIncident($event, incident)" class="p-2 hover:bg-white rounded-lg border border-transparent hover:border-gray-200 text-gray-600 transition-all shadow-sm cursor-pointer" title="Edit Report">
                       <lucide-icon [img]="EditIcon" [size]="16"></lucide-icon>
                     </button>
@@ -350,8 +353,7 @@
 
         <div>
           <label class="block text-sm font-bold text-[var(--color-text-primary)] mb-2">Risk Level</label>
-          <select [(ngModel)]="editingIncident.level" 
-            class="w-full px-4 py-2 border border-[var(--color-border-medium)] rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+          <select [(ngModel)]="editingIncident.level" [class]="getIncidentLevelSelectClasses(editingIncident.level)">
             <option value="Low">Low</option>
             <option value="Medium">Medium</option>
             <option value="High">High</option>

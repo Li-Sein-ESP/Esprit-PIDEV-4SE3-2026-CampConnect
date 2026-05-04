@@ -9,6 +9,7 @@ import com.campconnect.service.IncidentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +23,7 @@ public class IncidentServiceImpl implements IncidentService {
     @Override
     public IncidentDTO createIncident(IncidentDTO incidentDTO) {
         Incident incident = new Incident();
+        LocalDateTime now = LocalDateTime.now();
         incident.setTitle(incidentDTO.getTitle());
         incident.setDescription(incidentDTO.getDescription());
         incident.setLevel(incidentDTO.getLevel());
@@ -29,7 +31,14 @@ public class IncidentServiceImpl implements IncidentService {
         incident.setLatitude(incidentDTO.getLatitude());
         incident.setLongitude(incidentDTO.getLongitude());
         incident.setReporterId(incidentDTO.getReporterId());
-        incident.setStatus(incidentDTO.getStatus() != null ? incidentDTO.getStatus() : "pending");
+        incident.setStatus(incidentDTO.getStatus() != null && !incidentDTO.getStatus().isBlank() ? incidentDTO.getStatus() : "pending");
+        incident.setCreatedAt(now);
+        incident.setUpdatedAt(now);
+        if (incidentDTO.getReportedAt() != null) {
+            incident.setReportedAt(incidentDTO.getReportedAt());
+        } else {
+            incident.setReportedAt(now);
+        }
 
         if (incidentDTO.getTripId() != null && !incidentDTO.getTripId().isEmpty()) {
             tripRepository.findById(incidentDTO.getTripId()).ifPresent(trip -> {
@@ -92,6 +101,8 @@ public class IncidentServiceImpl implements IncidentService {
             incident.setStatus(incidentDTO.getStatus());
         }
 
+        incident.setUpdatedAt(LocalDateTime.now());
+
         if (incidentDTO.getTripId() != null && !incidentDTO.getTripId().isEmpty() && !incidentDTO.getTripId().equals("default-trip")) {
             tripRepository.findById(incidentDTO.getTripId()).ifPresent(trip -> {
                 incident.setTrip(trip);
@@ -113,6 +124,8 @@ public class IncidentServiceImpl implements IncidentService {
         dto.setLatitude(incident.getLatitude());
         dto.setLongitude(incident.getLongitude());
         dto.setReporterId(incident.getReporterId());
+        dto.setCreatedAt(incident.getCreatedAt());
+        dto.setUpdatedAt(incident.getUpdatedAt());
         dto.setReportedAt(incident.getReportedAt());
         dto.setStatus(incident.getStatus());
         if (incident.getTrip() != null) {

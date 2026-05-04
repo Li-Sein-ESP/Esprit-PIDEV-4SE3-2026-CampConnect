@@ -23,6 +23,7 @@ ConnectCamp is a comprehensive camping and outdoor adventure platform that conne
 - **📚 Camping Academy** - Educational content, expert videos, and certification programs
 - **🛒 Gear Marketplace** - Buy, rent, and review camping equipment
 - **👥 Community Hub** - Connect with fellow campers, share stories, and get help
+- **🛡️ CampGuard AI** - Detect churn risk and trigger anti-spam re-engagement actions
 - **🚨 Safety & Compliance** - Emergency check-ins, safety alerts, and environmental regulations
 - **🚗 Transportation** - Integrated route planning and transport options
 - **🎉 Events** - Discover and join camping events and gatherings
@@ -176,6 +177,13 @@ server.port=8080
 - `POST /api/auth/login` - Login user
 - `POST /api/auth/logout` - Logout user
 - `GET /api/auth/me` - Get current user
+
+### CampGuard Endpoints (Admin)
+- `GET /api/churn/at-risk-users` - List scored users with risk filtering/search
+- `POST /api/churn/trigger-actions` - Trigger campaign actions with anti-spam rule
+- `GET /api/churn/kpis` - Retrieve CampGuard KPI snapshot
+
+See `backend/CAMPGUARD_SETUP.md` for full setup and Postman testing.
 
 ### Campsite Endpoints
 - `GET /api/campsites` - List all campsites

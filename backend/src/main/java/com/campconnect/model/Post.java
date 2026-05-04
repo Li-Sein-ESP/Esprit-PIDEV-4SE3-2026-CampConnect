@@ -2,7 +2,6 @@ package com.campconnect.model;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -30,8 +29,15 @@ public class Post {
     private List<String> tags = new ArrayList<>();
     private List<String> imageUrls = new ArrayList<>();
     private String location;
+    private String moderationStatus = "PENDING_REVIEW";
+    private String moderationDecision = "REVIEW";
+    private Double moderationScore = 1.0;
+    private List<String> moderationReasons = new ArrayList<>();
 
     private LocalDateTime createdAt = LocalDateTime.now();
+    
+    private int likes = 0;
+    private List<String> likedByUsers = new ArrayList<>();
 
     private List<Comment> comments = new ArrayList<>();
 

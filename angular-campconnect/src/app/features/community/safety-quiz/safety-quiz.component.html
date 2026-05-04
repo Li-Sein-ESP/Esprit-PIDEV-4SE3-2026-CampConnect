@@ -1,0 +1,105 @@
+<div class="quiz-container">
+  <!-- 🏁 Écran de départ -->
+  <div *ngIf="currentStep === 0" class="text-center bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+    <div class="text-5xl mb-6">🌱</div>
+    <h2 class="text-2xl font-bold text-slate-900 mb-4">Parcours de Réhabilitation</h2>
+    <p class="text-slate-600 mb-8 leading-relaxed">
+      Nous croyons aux secondes chances ! Pour retrouver l'accès complet à la communauté CampConnect, 
+      vous devez prouver que vous avez compris nos règles de sécurité en réussissant ce petit quiz.
+    </p>
+    <app-button (click)="startQuiz()" customClass="w-full">Commencer le Quiz</app-button>
+  </div>
+
+  <!-- ❓ Écran des Questions -->
+  <div *ngIf="currentStep === 1" class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+    <div class="flex justify-between items-center mb-6">
+      <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Question {{currentQuestionIndex + 1}} / {{questions.length}}</span>
+      <div class="h-2 w-24 bg-slate-100 rounded-full overflow-hidden">
+        <div class="h-full bg-emerald-500 transition-all duration-300" [style.width.%]="((currentQuestionIndex + 1) / questions.length) * 100"></div>
+      </div>
+    </div>
+
+    <h3 class="text-xl font-bold text-slate-900 mb-8">{{questions[currentQuestionIndex].text}}</h3>
+
+    <div class="space-y-3">
+      <button 
+        *ngFor="let option of questions[currentQuestionIndex].options; let i = index"
+        (click)="selectOption(i)"
+        [disabled]="isCorrect !== null"
+        [class.selected]="selectedOption === i"
+        [class.border-emerald-500]="isCorrect !== null && i === questions[currentQuestionIndex].correctAnswer"
+        [class.bg-emerald-50]="isCorrect !== null && i === questions[currentQuestionIndex].correctAnswer"
+        [class.border-red-500]="isCorrect === false && selectedOption === i"
+        [class.bg-red-50]="isCorrect === false && selectedOption === i"
+        class="option-btn"
+      >
+        <div class="flex items-center justify-between">
+          <span>{{option}}</span>
+          <span *ngIf="isCorrect !== null && i === questions[currentQuestionIndex].correctAnswer" class="text-emerald-600">✅</span>
+          <span *ngIf="isCorrect === false && selectedOption === i" class="text-red-600">❌</span>
+        </div>
+      </button>
+    </div>
+
+    <div *ngIf="isCorrect !== null" class="explanation animate-in fade-in slide-in-from-top-4 duration-300">
+      <p class="text-sm text-emerald-800">
+        <span class="font-bold">Note : </span> {{questions[currentQuestionIndex].explanation}}
+      </p>
+    </div>
+
+    <div class="mt-8 flex gap-3">
+      <app-button 
+        *ngIf="isCorrect === null" 
+        [disabled]="selectedOption === null" 
+        (click)="checkAnswer()" 
+        customClass="w-full"
+      >
+        Vérifier la réponse
+      </app-button>
+      <app-button 
+        *ngIf="isCorrect !== null" 
+        (click)="nextQuestion()" 
+        variant="outline" 
+        customClass="w-full"
+      >
+        {{ currentQuestionIndex < questions.length - 1 ? 'Question suivante' : 'Voir les résultats' }}
+      </app-button>
+    </div>
+  </div>
+
+  <!-- 🏆 Écran de Résultat -->
+  <div *ngIf="currentStep === 2" class="text-center bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+    <div class="text-6xl mb-6">{{ score === questions.length ? '🎉' : '📚' }}</div>
+    
+    <div *ngIf="score === questions.length">
+      <h2 class="text-2xl font-bold text-slate-900 mb-2">Quiz Réussi !</h2>
+      <p class="text-slate-600 mb-8">Vous avez répondu correctement à toutes les questions. Vous êtes prêt à rejoindre la communauté.</p>
+      <app-button [isLoading]="loading" (click)="submitRehabilitation()" customClass="w-full">Réactiver mon compte</app-button>
+    </div>
+
+    <div *ngIf="score < questions.length">
+      <h2 class="text-2xl font-bold text-slate-900 mb-2">Presque !</h2>
+      <p class="text-slate-600 mb-8">Vous avez obtenu {{score}}/{{questions.length}}. Vous devez obtenir 100% pour être réhabilité.</p>
+      <app-button (click)="currentStep = 0; currentQuestionIndex = 0; score = 0; selectedOption = null; isCorrect = null;" variant="outline" customClass="w-full">Réessayer</app-button>
+    </div>
+  </div>
+
+  <!-- 🚫 Écran BAN DÉFINITIF (Step 3) -->
+  <div *ngIf="currentStep === 3" class="text-center p-8 rounded-2xl shadow-lg"
+       style="background: linear-gradient(135deg, #0f0f0f, #1a0000); border: 2px solid #ff4444;">
+    <div class="text-6xl mb-6">🚫</div>
+    <h2 class="text-2xl font-bold mb-4" style="color: #ff4444;">Compte Supprimé Définitivement</h2>
+    <p class="mb-4" style="color: #ccc; line-height: 1.8;">
+      Suite à <strong style="color: #ff6666;">plusieurs récidives</strong> de contenu inapproprié,
+      votre compte a été <strong style="color: #ff6666;">banni définitivement</strong> de CampConnect.
+    </p>
+    <p class="mb-8" style="color: #999; font-size: 0.9rem;">
+      Conformément à notre politique de modération, aucune réactivation n'est possible.
+      Toutes vos données seront supprimées. Un email de confirmation vous a été envoyé.
+    </p>
+    <div style="background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 20px; margin-top: 16px;">
+      <p style="color: #ff4444; font-weight: 700; font-size: 1.1rem;">❌ Accès au Quiz de Récupération : REFUSÉ</p>
+      <p style="color: #666; font-size: 0.8rem; margin-top: 8px;">Vous avez déjà utilisé votre unique chance de réhabilitation.</p>
+    </div>
+  </div>
+</div>

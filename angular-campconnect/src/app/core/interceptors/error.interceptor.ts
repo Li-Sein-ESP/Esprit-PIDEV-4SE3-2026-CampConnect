@@ -17,7 +17,7 @@ export class ErrorInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
       retry({
-        count: 2,
+        count: 0,
         delay: (error: HttpErrorResponse, retryCount: number) => {
           // Don't retry on client errors (4xx) except 408 (timeout) and 429 (rate limit)
           if (error.status >= 400 && error.status < 500 && 

@@ -1,0 +1,4 @@
+customer_id,churn_score,risk_level,action,pred_churn,priority,priority_rank,last_action_date,days_since_last_action,eligible_to_contact,status
+C1001,0.9132,High,monitoring,1,P1,1,2026-04-20,0,false,skipped_antispam
+C1002,0.8775,High,monitoring,1,P1,1,2026-04-20,0,false,skipped_antispam
+C1003,0.5441,Medium,monitoring,1,P2,2,2026-04-20,0,false,skipped_antispam

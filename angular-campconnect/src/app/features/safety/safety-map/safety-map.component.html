@@ -82,7 +82,17 @@
                             [class.safety-map__alert-badge--low]="alert.severity === 'info'">
                             {{ getRiskLabel(alert.severity) }}
                         </span>
-                        <time class="safety-map__alert-time">{{ formatTime(alert.updatedAt) }}</time>
+                        <div class="safety-map__alert-top-right">
+                            <time class="safety-map__alert-time">{{ formatTime(alert.updatedAt) }}</time>
+                            <button
+                                type="button"
+                                class="safety-map__alert-focus-link"
+                                (click)="focusOnMap(alert)"
+                                [disabled]="!alert.location.coordinates"
+                                [title]="alert.location.coordinates ? 'Center map on this alert' : 'No coordinates available'">
+                                Focus on
+                            </button>
+                        </div>
                     </div>
 
                     <div class="safety-map__alert-content">
@@ -99,14 +109,6 @@
                         </div>
                     </div>
 
-                    <div class="safety-map__alert-actions">
-                        <button class="safety-map__focus-btn" (click)="focusOnMap(alert)"
-                            [disabled]="!alert.location.coordinates"
-                            [title]="alert.location.coordinates ? 'Center map on this alert' : 'No coordinates available'">
-                            <span class="safety-map__focus-icon">◎</span>
-                            Focus on Map
-                        </button>
-                    </div>
                 </article>
 
                 <!-- Empty state -->

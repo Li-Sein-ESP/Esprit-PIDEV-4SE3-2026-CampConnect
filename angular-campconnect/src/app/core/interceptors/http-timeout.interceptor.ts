@@ -5,7 +5,7 @@ import { timeout, catchError } from 'rxjs/operators';
 
 @Injectable()
 export class HttpTimeoutInterceptor implements HttpInterceptor {
-  private readonly DEFAULT_TIMEOUT = 30000; // 30 seconds
+  private readonly DEFAULT_TIMEOUT = 10000; // 10 seconds
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const timeoutValue = req.headers.get('timeout') || this.DEFAULT_TIMEOUT;

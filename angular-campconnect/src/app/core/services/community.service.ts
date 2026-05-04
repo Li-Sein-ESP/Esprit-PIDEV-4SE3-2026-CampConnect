@@ -1,7 +1,22 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, map, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
+
+export interface StoryGenerationRequest {
+    content: string;
+    location?: string;
+    tone?: 'immersive' | 'default';
+    length?: 'short' | 'medium' | 'long';
+    language?: 'fr' | 'en';
+}
+
+export interface StoryGenerationResponse {
+    story: string;
+    sourceContent: string;
+    mocked: boolean;
+    provider: string;
+}
 
 export interface Post {
     id: string;
@@ -30,6 +45,10 @@ export interface Post {
     isLiked?: boolean;
     saved?: boolean;
     comments?: any[];
+    moderationStatus?: string;
+    moderationDecision?: string;
+    moderationScore?: number;
+    moderationReasons?: string[];
 }
 
 export interface Reply {
@@ -49,8 +68,10 @@ export interface Reply {
     providedIn: 'root'
 })
 export class CommunityService {
+    private readonly storyRequestTimeoutMs = 30000;
     private apiUrl = `${environment.apiUrl}/posts`;
     private commentsUrl = `${environment.apiUrl}/comments`;
+    private storyGeneratorUrl = `${environment.apiUrl}/posts/story-generator`;
 
     constructor(private http: HttpClient) {}
 
@@ -72,6 +93,16 @@ export class CommunityService {
                 }
 
                 // Sort newest first
+                return mapped.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            })
+        );
+    }
+
+    getFollowingPosts(): Observable<Post[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/following`).pipe(
+            map(posts => {
+                let mapped = posts.map(p => this.mapBackendToFrontendPost(p));
+                // Sort newest first (though backend already sorts, it's good practice for frontend state)
                 return mapped.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
             })
         );
@@ -115,6 +146,12 @@ export class CommunityService {
         );
     }
 
+    uploadPostImage(file: File): Observable<{ url: string }> {
+        const formData = new FormData();
+        formData.append('file', file);
+        return this.http.post<{ url: string }>(`${environment.apiUrl}/upload`, formData);
+    }
+
     createReply(reply: Omit<Reply, 'id' | 'createdAt' | 'likes'>): Observable<Reply> {
         const payload = {
             postId: reply.postId,
@@ -128,6 +165,18 @@ export class CommunityService {
         );
     }
 
+    generateStory(payload: StoryGenerationRequest): Observable<StoryGenerationResponse> {
+        return this.http.post<any>(this.storyGeneratorUrl, payload).pipe(
+            timeout(this.storyRequestTimeoutMs),
+            map((response) => ({
+                story: response?.story || '',
+                sourceContent: response?.sourceContent || payload.content,
+                mocked: !!response?.mocked,
+                provider: response?.provider || 'unknown'
+            }))
+        );
+    }
+
     updateReply(commentId: string, content: string): Observable<Reply> {
         const payload = { content };
         return this.http.put<any>(`${this.commentsUrl}/${commentId}`, payload).pipe(
@@ -137,6 +186,22 @@ export class CommunityService {
 
     deleteReply(commentId: string): Observable<void> {
         return this.http.delete<void>(`${this.commentsUrl}/${commentId}`);
+    }
+
+    toggleLikePost(postId: string): Observable<Post> {
+        return this.http.put<any>(`${this.apiUrl}/${postId}/like`, {}).pipe(
+            map(p => this.mapBackendToFrontendPost(p))
+        );
+    }
+
+    updatePost(postId: string, post: Partial<Post>): Observable<Post> {
+        return this.http.put<any>(`${this.apiUrl}/${postId}`, post).pipe(
+            map(p => this.mapBackendToFrontendPost(p))
+        );
+    }
+
+    deletePost(postId: string): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/${postId}`);
     }
 
     private mapBackendToFrontendPost(dto: any): Post {
@@ -153,8 +218,13 @@ export class CommunityService {
         let mediaToUse: string[] | undefined = undefined;
         
         if (hasBackendMedia) {
-            // Use the images from the backend
-            mediaToUse = backendMedia;
+            // Use the images from the backend, ensuring they have the full URL
+            const baseUrl = environment.apiUrl.replace(/\/api$/, '');
+            mediaToUse = backendMedia.map((url: string) => {
+                if (url.startsWith('http')) return url;
+                if (url.startsWith('/')) return `${baseUrl}${url}`;
+                return `${baseUrl}/${url}`;
+            });
         }
         // Don't add sample images - only show actual post images
         
@@ -185,6 +255,11 @@ export class CommunityService {
             isLiked: dto.isLiked || false,
             saved: dto.saved || false,
             comments: dto.comments || []
+            ,
+            moderationStatus: dto.moderationStatus,
+            moderationDecision: dto.moderationDecision,
+            moderationScore: dto.moderationScore,
+            moderationReasons: dto.moderationReasons || []
         };
     }
     

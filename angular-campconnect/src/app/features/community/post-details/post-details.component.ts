@@ -94,6 +94,7 @@ export class PostDetailsComponent implements OnInit {
             next: (realPost) => {
                 if (realPost) {
                     this.post = realPost as any;
+                    this.isLiked = !!realPost.isLiked;
                     this.loadComments(id);
                 }
             },
@@ -138,13 +139,20 @@ export class PostDetailsComponent implements OnInit {
     }
 
     toggleLike() {
-        this.isLiked = !this.isLiked;
-        if (this.isLiked) {
-            this.post.likes++;
-            this.showToast('❤️ You liked this post');
-        } else {
-            this.post.likes--;
-        }
+        if (!this.post.id || this.post.id === '0') return;
+        
+        this.communityService.toggleLikePost(this.post.id).subscribe({
+            next: (updatedPost) => {
+                this.post.likes = updatedPost.likes;
+                this.post.isLiked = !!updatedPost.isLiked;
+                this.isLiked = !!updatedPost.isLiked;
+                this.showToast(this.isLiked ? '❤️ You liked this post' : 'Removed like');
+            },
+            error: (err) => {
+                console.error('Error toggling like', err);
+                this.showToast('❌ Error updating like');
+            }
+        });
     }
 
     toggleSave() {

@@ -32,6 +32,8 @@ public class User {
 	private boolean verifiedExpert = false;
 
 	private Map<String, Object> profileDetails;
+	
+	private int banCount = 0;
 
 	private java.time.LocalDateTime createdAt;
 

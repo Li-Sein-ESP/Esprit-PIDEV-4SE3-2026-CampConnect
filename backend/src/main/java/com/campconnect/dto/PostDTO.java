@@ -25,9 +25,15 @@ public class PostDTO {
     private List<String> imageUrls;
     private String location;
     private int likes;
+    @com.fasterxml.jackson.annotation.JsonProperty("isLiked")
+    private boolean isLiked;
     private int commentCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String moderationStatus;
+    private String moderationDecision;
+    private Double moderationScore;
+    private List<String> moderationReasons;
 
     // Fallback setters for alternative field names from frontend (for incoming requests)
     @JsonSetter("media")

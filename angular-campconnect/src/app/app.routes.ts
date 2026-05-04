@@ -611,6 +611,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: "community/safety-quiz",
+        loadComponent: () =>
+          import("./features/community/safety-quiz/safety-quiz.component").then(
+            (m) => m.SafetyQuizComponent,
+          ),
+      },
+      {
         path: "community/:id",
         loadComponent: () =>
           import("./features/community/post-detail/post-detail.component").then(

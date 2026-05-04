@@ -290,6 +290,18 @@
   filter: brightness(1.05);
 }
 
+.cc-quick-links__create-btn--disabled {
+  background: #9ca3af !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  opacity: 0.8;
+}
+
+.cc-quick-links__create-btn--disabled:hover {
+  transform: none !important;
+  filter: none !important;
+}
+
 /* --- Trending --- */
 .cc-trending {
   background: var(--cc-card);
@@ -371,6 +383,18 @@
   align-items: center;
   gap: 14px;
   transition: all var(--cc-transition);
+
+  &.is-banned {
+    opacity: 0.75;
+    background: rgba(0, 0, 0, 0.05);
+    cursor: not-allowed;
+    
+    .cc-create-post__input {
+      background: rgba(0, 0, 0, 0.02);
+      color: var(--cc-text-3);
+      cursor: not-allowed;
+    }
+  }
 }
 
 .cc-create-post:focus-within {
@@ -649,6 +673,41 @@
   background: #fef2f2;
 }
 
+.cc-post__follow-header-btn {
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(30, 77, 43, 0.08);
+  color: var(--cc-forest);
+  border: 1px solid rgba(30, 77, 43, 0.15);
+  transition: all var(--cc-transition);
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.cc-post__follow-header-btn:hover {
+  background: var(--cc-forest);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.cc-post__follow-header-btn.is-following {
+  background: transparent;
+  color: var(--cc-text-3);
+  border-color: var(--cc-border);
+}
+
+.cc-post__follow-header-btn.is-following:hover {
+  background: rgba(224, 82, 82, 0.1);
+  color: var(--cc-rose);
+  border-color: rgba(224, 82, 82, 0.2);
+}
+
+.cc-post__follow-header-btn.is-following:hover::after {
+  content: 'Unfollow';
+}
+
 .cc-post__location {
   font-size: 11.5px;
   color: var(--cc-amber);
@@ -765,11 +824,77 @@
   cursor: pointer;
 }
 
+.cc-post__media-container {
+  display: grid !important;
+  gap: 4px !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 250px;
+}
+
+/* 1 Image */
+.cc-post__media[data-count="1"] .cc-post__media-container {
+  grid-template-columns: 1fr !important;
+}
+.cc-post__media[data-count="1"] .cc-post__image {
+  height: 400px !important;
+}
+
+/* 2 Images */
+.cc-post__media[data-count="2"] .cc-post__media-container {
+  grid-template-columns: 1fr 1fr !important;
+}
+.cc-post__media[data-count="2"] .cc-post__image {
+  height: 300px !important;
+}
+
+/* 3 Images */
+.cc-post__media[data-count="3"] .cc-post__media-container {
+  grid-template-columns: 1fr 1fr !important;
+  grid-template-rows: 150px 150px !important;
+}
+.cc-post__media[data-count="3"] .cc-post__image:first-child {
+  grid-row: span 2 !important;
+  height: 304px !important; /* 150+150+4gap */
+}
+.cc-post__media[data-count="3"] .cc-post__image:not(:first-child) {
+  height: 150px !important;
+}
+
+/* 4+ Images */
+.cc-post__media[data-count="4"],
+.cc-post__media[data-count="5"],
+.cc-post__media[data-count="6"] .cc-post__media-container {
+  grid-template-columns: 1fr 1fr !important;
+  grid-template-rows: 150px 150px !important;
+}
+.cc-post__media[data-count="4"] .cc-post__image,
+.cc-post__media[data-count="5"] .cc-post__image,
+.cc-post__media[data-count="6"] .cc-post__image {
+  height: 150px !important;
+}
+
 .cc-post__image {
-  width: 100%;
-  height: 360px;
-  object-fit: cover;
-  transition: transform 0.5s ease;
+  width: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+  border-radius: 4px;
+}
+
+.cc-post__media-more-overlay {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 50%;
+  height: 180px; /* matches row height for 4+ images */
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  font-weight: 800;
+  pointer-events: none;
 }
 
 .cc-post__media:hover .cc-post__image { transform: scale(1.03); }
@@ -1221,6 +1346,18 @@
   border-color: transparent;
   box-shadow: var(--cc-shadow-forest);
   transform: translateY(-1px);
+}
+
+.cc-suggested-user__follow-btn.is-following {
+  background: rgba(0,0,0,0.05);
+  color: var(--cc-text-3);
+  border-color: var(--cc-border);
+}
+
+.cc-suggested-user__follow-btn.is-following:hover {
+  background: rgba(224, 82, 82, 0.1);
+  color: var(--cc-rose);
+  border-color: rgba(224, 82, 82, 0.2);
 }
 
 /* --- Community Stats --- */

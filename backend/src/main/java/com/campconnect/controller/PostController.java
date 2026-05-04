@@ -1,7 +1,10 @@
 package com.campconnect.controller;
 
 import com.campconnect.dto.PostDTO;
+import com.campconnect.dto.StoryGeneratorRequestDTO;
+import com.campconnect.dto.StoryGeneratorResponseDTO;
 import com.campconnect.service.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +29,16 @@ public class PostController {
         return ResponseEntity.ok(postService.createPost(postDTO));
     }
 
+    @GetMapping("/following")
+    public ResponseEntity<List<PostDTO>> getFollowingPosts(org.springframework.security.core.Authentication auth) {
+        return ResponseEntity.ok(postService.getFollowingPosts(auth.getName()));
+    }
+
+    @PostMapping("/story-generator")
+    public ResponseEntity<StoryGeneratorResponseDTO> generateStory(@Valid @RequestBody StoryGeneratorRequestDTO request) {
+        return ResponseEntity.ok(postService.generateAdventureStory(request));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PostDTO> getPostById(@PathVariable String id) {
         return ResponseEntity.ok(postService.getPostById(id));
@@ -45,5 +58,10 @@ public class PostController {
     public ResponseEntity<Void> deletePost(@PathVariable String id) {
         postService.deletePost(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/like")
+    public ResponseEntity<PostDTO> toggleLike(@PathVariable String id, org.springframework.security.core.Authentication auth) {
+        return ResponseEntity.ok(postService.toggleLike(id, auth.getName()));
     }
 }

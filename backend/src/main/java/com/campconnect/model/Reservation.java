@@ -39,6 +39,7 @@ public class Reservation {
     @Future(message = "End date must be in the future")
     private LocalDateTime endDate;
 
+    @Builder.Default
     private ReservationStatus status = ReservationStatus.PENDING;
 
     @CreatedDate

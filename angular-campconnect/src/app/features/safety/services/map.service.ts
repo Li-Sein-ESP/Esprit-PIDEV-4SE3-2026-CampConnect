@@ -10,11 +10,11 @@ export class MapService {
     /** Maps alert severity → Leaflet marker color */
     getRiskColor(severity: string): string {
         switch (severity) {
-            case 'info': return 'green';
-            case 'warning': return 'orange';
-            case 'danger': return 'red';
-            case 'critical': return 'darkred';
-            default: return 'blue';
+            case 'info': return '#2e7d32';
+            case 'warning': return '#f9a825';
+            case 'danger': return '#ef6c00';
+            case 'critical': return '#c62828';
+            default: return '#546e7a';
         }
     }
 
@@ -32,8 +32,8 @@ export class MapService {
     /** Initialize a Leaflet map inside the given HTML element id */
     initMap(elementId: string): L.Map {
         const map = L.map(elementId, {
-            center: [38.5, -98.35],
-            zoom: 4,
+            center: [34.0, 9.0],
+            zoom: 6,
             zoomControl: true
         });
 
@@ -45,7 +45,7 @@ export class MapService {
         // Force Leaflet to recalculate the container size, then refresh the view
         setTimeout(() => {
             map.invalidateSize(true);
-            map.setView([38.5, -98.35], 4);
+            map.setView([34.0, 9.0], 6);
         }, 400);
 
         return map;

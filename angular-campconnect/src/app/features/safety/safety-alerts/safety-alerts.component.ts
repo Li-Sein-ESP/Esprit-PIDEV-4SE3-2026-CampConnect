@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, AlertTriangle, ShieldCheck, Search, Filter, Info, CloudRain, Flame, AlertCircle, MapPin, Calendar, Clock, ChevronRight, Map as LucideMap, Edit3, Trash2 } from 'lucide-angular';
 import { ButtonComponent } from '../../../shared/components/button.component';
 import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
-import { BadgeComponent } from '../../../shared/components/badge.component';
+import { BadgeComponent, BadgeVariant } from '../../../shared/components/badge.component';
 import { IncidentReport, SafetyAlert } from '../models/safety.model';
 import { SafetyService } from '../services/safety.service';
 import { ModalComponent } from '../../../shared/components/modal/modal.component';
@@ -151,6 +151,33 @@ export class SafetyAlertsComponent implements OnInit {
     }
   }
 
+  getIncidentLevelBadgeVariant(level: string): BadgeVariant {
+    switch ((level || '').toLowerCase()) {
+      case 'high':
+        return 'error';
+      case 'medium':
+        return 'warning';
+      case 'low':
+        return 'success';
+      default:
+        return 'default';
+    }
+  }
+
+  getIncidentLevelSelectClasses(level: string): string {
+    const baseClasses = 'w-full px-4 py-2 border rounded-xl outline-none focus:ring-2 transition-colors';
+    switch ((level || '').toLowerCase()) {
+      case 'high':
+        return `${baseClasses} border-red-300 bg-red-50 text-red-700 focus:ring-red-500`;
+      case 'medium':
+        return `${baseClasses} border-amber-300 bg-amber-50 text-amber-700 focus:ring-amber-500`;
+      case 'low':
+        return `${baseClasses} border-emerald-300 bg-emerald-50 text-emerald-700 focus:ring-emerald-500`;
+      default:
+        return `${baseClasses} border-[var(--color-border-medium)] text-[var(--color-text-primary)] focus:ring-blue-500`;
+    }
+  }
+
   getTypeIcon(type: string): any {
     switch (type) {
       case 'weather': return this.CloudRain;
@@ -177,6 +204,25 @@ export class SafetyAlertsComponent implements OnInit {
     this.router.navigateByUrl('/safety/report-incident').then((ok) => {
       if (!ok) {
         window.location.href = '/safety/report-incident';
+      }
+    });
+  }
+
+  focusIncidentOnMap(event: Event, incident: IncidentReport): void {
+    event.stopPropagation();
+
+    const lat = Number(incident.latitude);
+    const lng = Number(incident.longitude);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      this.openSafetyMap();
+      return;
+    }
+
+    this.router.navigate(['/safety/map'], {
+      queryParams: {
+        lat,
+        lng,
+        title: incident.type || 'Incident'
       }
     });
   }

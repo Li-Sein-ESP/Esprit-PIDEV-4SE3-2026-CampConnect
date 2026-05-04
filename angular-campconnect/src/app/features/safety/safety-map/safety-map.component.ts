@@ -7,7 +7,9 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import * as L from 'leaflet';
+import { Subscription } from 'rxjs';
 import { MapService } from '../services/map.service';
 import { SafetyAlert } from '../models/safety.model';
 
@@ -22,6 +24,10 @@ export class SafetyMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     private map!: L.Map;
     private markers: L.Marker[] = [];
+    private routeSub?: Subscription;
+    private focusCoordinates: { lat: number; lng: number } | null = null;
+    private focusTitle = 'Selected incident';
+    private routeFocusMarker: L.CircleMarker | null = null;
 
     selectedAlert: SafetyAlert | null = null;
     activeFilter = 'all';
@@ -33,12 +39,12 @@ export class SafetyMapComponent implements OnInit, AfterViewInit, OnDestroy {
             id: 'SA-001',
             type: 'weather',
             severity: 'danger',
-            title: 'Flash Flood Warning - Zion National Park',
-            description: 'The National Weather Service has issued a Flash Flood Warning for Zion National Park. Slot canyons are extremely dangerous.',
-            location: { name: 'The Narrows & Subway', region: 'Southern Utah', coordinates: { lat: 37.2982, lng: -113.0263 } },
-            affectedAreas: ['North Fork Virgin River', 'Hidden Canyon', 'Echo Canyon'],
+            title: 'Alerte Inondations - Aïn Draham',
+            description: 'Fortes pluies attendues dans les hauteurs de Jendouba. Risque de crues subites dans les oueds environnants.',
+            location: { name: 'Aïn Draham', region: 'Jendouba', coordinates: { lat: 36.7788, lng: 8.6877 } },
+            affectedAreas: ['Oued El Kebir', 'Forêts de Kroumirie'],
             startDate: '2026-03-01T08:00:00Z',
-            source: 'National Weather Service (NWS)',
+            source: 'INM (Institut National de la Météorologie)',
             updatedAt: '2026-03-01T10:15:00Z',
             active: true
         },
@@ -46,12 +52,12 @@ export class SafetyMapComponent implements OnInit, AfterViewInit, OnDestroy {
             id: 'SA-002',
             type: 'wildlife',
             severity: 'warning',
-            title: 'Active Grizzly Activity - Lamar Valley',
-            description: 'Multiple sightings of a sow grizzly with cubs near the main trailhead. Carry bear spray and maintain 100-yard distance.',
-            location: { name: 'Lamar Valley', region: 'Yellowstone NP', coordinates: { lat: 44.8027, lng: -110.2104 } },
-            affectedAreas: ['Lamar River Trail', 'Specimen Ridge'],
+            title: 'Activité Sangliers - Parc Ichkeul',
+            description: 'Augmentation des rencontres avec des sangliers près des zones de campement. Gardez vos distances et sécurisez la nourriture.',
+            location: { name: 'Parc National de l\'Ichkeul', region: 'Bizerte', coordinates: { lat: 37.1500, lng: 9.6667 } },
+            affectedAreas: ['Sentier de la Montagne', 'Zones de Pique-nique'],
             startDate: '2026-02-28T14:00:00Z',
-            source: 'National Park Service (NPS)',
+            source: 'Direction Générale des Forêts',
             updatedAt: '2026-03-01T07:30:00Z',
             active: true
         },
@@ -59,80 +65,40 @@ export class SafetyMapComponent implements OnInit, AfterViewInit, OnDestroy {
             id: 'SA-003',
             type: 'fire',
             severity: 'critical',
-            title: 'Wildfire Outbreak - Gila National Forest',
-            description: 'A lightning-caused wildfire is rapidly spreading. Immediate evacuation required for all campers in Whitewater Creek drainage.',
-            location: { name: 'Mogollon Mountains', region: 'Catron County, NM', coordinates: { lat: 33.3687, lng: -108.6789 } },
-            affectedAreas: ['Whitewater Creek', 'Catwalk Recreation Area'],
+            title: 'Risque Incendie Élevé - Zaghouan',
+            description: 'Canicule intense et vents forts. Interdiction totale d\'allumer des feux de camp dans toute la zone forestière de Jebel Zaghouan.',
+            location: { name: 'Jebel Zaghouan', region: 'Zaghouan', coordinates: { lat: 36.4025, lng: 10.1433 } },
+            affectedAreas: ['Temple des Eaux', 'Sidi Medien'],
             startDate: '2026-03-01T11:45:00Z',
-            source: 'US Forest Service (USFS)',
+            source: 'Protection Civile Tunisienne',
             updatedAt: '2026-03-01T12:00:00Z',
             active: true
         },
         {
             id: 'SA-004',
-            type: 'advisory',
-            severity: 'info',
-            title: 'Planned Trail Maintenance - Grand Canyon',
-            description: 'Minor delays expected on the Bright Angel Trail due to mule train logistics and water pipeline repairs.',
-            location: { name: 'Bright Angel Trail', region: 'Grand Canyon NP', coordinates: { lat: 36.0544, lng: -112.1401 } },
-            affectedAreas: ['Indian Garden', 'Three-Mile Resthouse'],
-            startDate: '2026-03-05T07:00:00Z',
-            endDate: '2026-03-10T17:00:00Z',
-            source: 'Grand Canyon Conservancy',
-            updatedAt: '2026-02-28T16:00:00Z',
+            type: 'closure',
+            severity: 'warning',
+            title: 'Sentier Fermé - Boukornine',
+            description: 'Maintenance des sentiers suite à des éboulements. Accès interdit au sommet jusqu\'à nouvel ordre.',
+            location: { name: 'Parc National de Boukornine', region: 'Ben Arous', coordinates: { lat: 36.7050, lng: 10.3390 } },
+            affectedAreas: ['Sommet 576m', 'Sentier des Eucalyptus'],
+            startDate: '2026-02-25T08:00:00Z',
+            endDate: '2026-03-15T18:00:00Z',
+            source: 'Municipalité de Hammam Lif',
+            updatedAt: '2026-02-28T12:00:00Z',
             active: true
         },
         {
             id: 'SA-005',
             type: 'weather',
-            severity: 'danger',
-            title: 'Severe Thunderstorm & High Winds - Olympic Coast',
-            description: 'Gale force winds up to 60mph and heavy rain expected. High risk of falling trees and hazardous beach conditions.',
-            location: { name: 'Rialto & Ruby Beach', region: 'Washington Coast', coordinates: { lat: 47.9010, lng: -124.6387 } },
-            affectedAreas: ['Second Beach', 'Kalaloch', 'Shi Shi Beach'],
-            startDate: '2026-03-01T18:00:00Z',
-            source: 'NOAA Weather Radio',
-            updatedAt: '2026-03-01T09:00:00Z',
-            active: true
-        },
-        {
-            id: 'SA-006',
-            type: 'closure',
-            severity: 'warning',
-            title: 'Bridge Closure - Great Smoky Mountains',
-            description: 'The suspension bridge over Hazel Creek is undergoing emergency repairs following heavy rains.',
-            location: { name: 'Hazel Creek', region: 'Great Smoky Mountains', coordinates: { lat: 35.5951, lng: -83.5085 } },
-            affectedAreas: ['Benton MacKaye Trail', 'Hazel Creek Trail'],
-            startDate: '2026-02-25T08:00:00Z',
-            endDate: '2026-03-15T18:00:00Z',
-            source: 'NPS Maintenance Division',
-            updatedAt: '2026-02-28T12:00:00Z',
-            active: true
-        },
-        {
-            id: 'SA-007',
-            type: 'weather',
-            severity: 'warning',
-            title: 'Heat Advisory - Joshua Tree South',
-            description: 'Temperatures expected to exceed 105°F. Finish hikes before 10 AM and carry at least 1 gallon of water per person.',
-            location: { name: 'Cottonwood Spring', region: 'Joshua Tree NP', coordinates: { lat: 33.7416, lng: -115.8138 } },
-            affectedAreas: ['Lost Palms Oasis', 'Mastodon Peak'],
-            startDate: '2026-03-01T06:00:00Z',
-            source: 'National Weather Service',
-            updatedAt: '2026-03-01T05:00:00Z',
-            active: true
-        },
-        {
-            id: 'SA-008',
-            type: 'advisory',
             severity: 'info',
-            title: 'Blue-Green Algae Detected - Shasta Lake',
-            description: 'Harmful algal blooms confirmed in several coves. Keep pets and children away from stagnant water.',
-            location: { name: 'Lake Shasta', region: 'Shasta-Trinity NF', coordinates: { lat: 40.7198, lng: -122.4194 } },
-            affectedAreas: ['Antlers Boat Ramp', 'Sugarloaf Marina'],
-            startDate: '2026-02-20T08:00:00Z',
-            source: 'California Water Quality Control',
-            updatedAt: '2026-03-01T08:30:00Z',
+            title: 'Brouillard Dense - Col de Tabarka',
+            description: 'Visibilité réduite sur la route vers Tabarka. Prudence conseillée pour les campeurs arrivant de nuit.',
+            location: { name: 'Tabarka', region: 'Jendouba', coordinates: { lat: 36.9544, lng: 8.7514 } },
+            affectedAreas: ['Route GP7', 'Les Aiguilles'],
+            startDate: '2026-03-01T18:00:00Z',
+            source: 'Garde Nationale',
+            updatedAt: '2026-03-01T09:00:00Z',
             active: true
         }
     ];
@@ -149,11 +115,22 @@ export class SafetyMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     constructor(
         private mapService: MapService,
+        private route: ActivatedRoute,
         private cdr: ChangeDetectorRef
     ) { }
 
     ngOnInit(): void {
         this.applyFilter('all');
+        this.routeSub = this.route.queryParams.subscribe(params => {
+            const lat = Number(params['lat']);
+            const lng = Number(params['lng']);
+
+            if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                this.focusCoordinates = { lat, lng };
+                this.focusTitle = (params['title'] || 'Selected incident').toString();
+                this.applyRouteFocus();
+            }
+        });
     }
 
     ngAfterViewInit(): void {
@@ -161,6 +138,7 @@ export class SafetyMapComponent implements OnInit, AfterViewInit, OnDestroy {
         setTimeout(() => {
             this.map = this.mapService.initMap('safety-map-container');
             this.renderMarkers();
+            this.applyRouteFocus();
         }, 300);
 
         // Use ResizeObserver to call invalidateSize whenever the container's size changes
@@ -177,6 +155,7 @@ export class SafetyMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnDestroy(): void {
         // Clean up Leaflet instance to prevent memory leaks
+        this.routeSub?.unsubscribe();
         if (this.map) {
             this.map.remove();
         }
@@ -247,6 +226,34 @@ export class SafetyMapComponent implements OnInit, AfterViewInit, OnDestroy {
             this.map,
             this.alerts,
             (alert) => this.onMarkerClick(alert)
+        );
+    }
+
+    private applyRouteFocus(): void {
+        if (!this.map || !this.focusCoordinates) {
+            return;
+        }
+
+        if (this.routeFocusMarker) {
+            this.routeFocusMarker.removeFrom(this.map);
+        }
+
+        this.routeFocusMarker = L.circleMarker(
+            [this.focusCoordinates.lat, this.focusCoordinates.lng],
+            {
+                radius: 9,
+                color: '#1d4ed8',
+                fillColor: '#3b82f6',
+                fillOpacity: 0.85,
+                weight: 2
+            }
+        ).addTo(this.map);
+
+        this.routeFocusMarker.bindPopup(this.focusTitle).openPopup();
+        this.map.flyTo(
+            [this.focusCoordinates.lat, this.focusCoordinates.lng],
+            11,
+            { animate: true, duration: 0.8 }
         );
     }
 }

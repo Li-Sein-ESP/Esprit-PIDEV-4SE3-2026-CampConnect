@@ -1,0 +1,11 @@
+customer_id,date_action,action,risk_level,status
+C9999,2026-04-10,message_personnalise + offre + recommandation,High,queued
+C1001,2026-04-20,message_personnalise + offre + recommandation,High,queued
+C1002,2026-04-20,message_personnalise + offre + recommandation,High,queued
+C1003,2026-04-20,notification_soft + recommandation_contenu,Medium,queued
+C1001,2026-04-20,monitoring,High,skipped_antispam
+C1002,2026-04-20,monitoring,High,skipped_antispam
+C1003,2026-04-20,monitoring,Medium,skipped_antispam
+C1001,2026-04-20,monitoring,High,skipped_antispam
+C1002,2026-04-20,monitoring,High,skipped_antispam
+C1003,2026-04-20,monitoring,Medium,skipped_antispam

@@ -109,7 +109,8 @@ export class AuthService {
                     username: data.username,
                     email: data.email,
                     roles: data.roles,
-                    token
+                    token,
+                    profileDetails: (data as any).profileDetails
                 };
                 this.setSession(user, token);
             })
@@ -122,6 +123,12 @@ export class AuthService {
 
     logout(): void {
         this.clearSession();
+    }
+
+    /** Updates the locally stored user and notifies observers. */
+    updateCurrentUser(user: User): void {
+        localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+        this.currentUser$.next(user);
     }
 
     // ─── Private Helpers ───────────────────────────────────────────

@@ -34,7 +34,7 @@ public class SafetyIncidentScheduler {
         this.tripRepository = tripRepository;
     }
 
-    @Scheduled(cron = "0 */30 * * * *")
+    @Scheduled(cron = "${app.safety.scheduler.incidents.cron:0 */1 * * * *}")
     public void reviewStalePendingIncidents() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime cutoff = now.minusHours(24);

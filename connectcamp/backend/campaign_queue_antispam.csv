@@ -1,0 +1,4 @@
+customer_id,churn_score,risk_level,action,pred_churn,priority,priority_rank
+C1001,0.9132,High,message_personnalise + offre + recommandation,1,P1,1
+C1002,0.8775,High,message_personnalise + offre + recommandation,1,P1,1
+C1003,0.5441,Medium,notification_soft + recommandation_contenu,1,P2,2

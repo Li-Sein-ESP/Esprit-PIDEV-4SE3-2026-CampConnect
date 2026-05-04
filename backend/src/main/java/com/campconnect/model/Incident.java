@@ -1,7 +1,9 @@
 package com.campconnect.model;
 
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
@@ -24,8 +26,12 @@ public class Incident {
     private Trip trip;
     private String reporterId;
     private String location;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    @CreatedDate
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
+    @LastModifiedDate
+    @Builder.Default
+    private LocalDateTime updatedAt = LocalDateTime.now();
     private LocalDateTime reportedAt;
     private String status;
 }

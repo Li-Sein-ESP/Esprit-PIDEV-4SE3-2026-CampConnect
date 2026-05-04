@@ -44,6 +44,11 @@ public class UserStats {
     
     // Rank change (+/- from previous period)
     private int rankChange;
+
+    // ── Champs pour le Scheduler "Comptes Suspects" ─────────────────────
+    // Flag mis à jour par le SuspectAccountScheduler chaque dimanche
+    private boolean suspectFlag = false;
+    private LocalDateTime flaggedAt;
     
     // Timestamps
     private LocalDateTime joinedAt;

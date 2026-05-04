@@ -18,6 +18,21 @@ export class ReportIncidentComponent {
     isSubmitting = false;
     showSuccess = false;
     referenceId = '';
+    
+    tunisianRegions = [
+        'Zaghouan (Jebel Zaghouan)',
+        'Jendouba (Aïn Draham)',
+        'Jendouba (Tabarka)',
+        'Bizerte (Parc Ichkeul)',
+        'Bizerte (Raf Raf)',
+        'Nabeul (Hammam Ghezaz)',
+        'Nabeul (Kelibia)',
+        'Siliana (Kesra)',
+        'Kasserine (Chambi)',
+        'Ben Arous (Boukornine)',
+        'Beja (Oued Ziatine)',
+        'Kef (Jugurtha Tableland)'
+    ];
 
     constructor(
         private fb: FormBuilder,

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { catchError, finalize, forkJoin, of } from 'rxjs';
@@ -48,7 +49,8 @@ interface OpenIncidentSummary {
     RouterModule,
     ButtonComponent,
     CardComponent,
-    CardContentComponent
+    CardContentComponent,
+    FormsModule
   ],
   templateUrl: './admin-incident-management.component.html',
   styles: []
@@ -70,6 +72,11 @@ export class AdminIncidentManagementComponent implements OnInit {
     stalePendingIncidents: 0
   };
   openSummary: OpenIncidentSummary[] = [];
+
+  creatorIdSearch: string = '';
+  creatorIncidents: AdminIncident[] = [];
+  isSearchingCreator = false;
+  searchCreatorError: string | null = null;
 
   constructor(private http: HttpClient) {}
 
@@ -154,6 +161,28 @@ export class AdminIncidentManagementComponent implements OnInit {
     this.http.put<AdminIncident>(`${this.baseUrl}/incidents/${id}/status?status=${status}`, {}).subscribe({
       next: () => {
         this.pendingIncidents = this.pendingIncidents.filter(i => i.id !== id);
+      }
+    });
+  }
+
+  searchIncidentsByCreator(): void {
+    if (!this.creatorIdSearch.trim()) return;
+
+    this.isSearchingCreator = true;
+    this.searchCreatorError = null;
+
+    const url = `${this.analyticsUrl}/incidents/by-creator?creatorId=${this.creatorIdSearch}&status=pending&severities=HIGH&severities=CRITICAL`;
+
+    this.http.get<AdminIncident[]>(url).subscribe({
+      next: (data) => {
+        this.creatorIncidents = Array.isArray(data) ? data : [];
+        this.isSearchingCreator = false;
+      },
+      error: (err) => {
+        console.error("Search failed:", err);
+        this.searchCreatorError = 'Failed to load incidents. Please check console (F12).';
+        this.creatorIncidents = [];
+        this.isSearchingCreator = false;
       }
     });
   }

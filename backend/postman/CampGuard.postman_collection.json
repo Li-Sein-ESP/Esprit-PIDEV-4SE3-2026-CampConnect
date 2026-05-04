@@ -1,0 +1,70 @@
+{
+  "info": {
+    "name": "CampGuard API",
+    "_postman_id": "88f50356-ec95-4d5c-b6b8-4a9ce22ca4d6",
+    "description": "CampGuard admin endpoints (at-risk users, trigger actions, KPIs).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8090" },
+    { "key": "jwtToken", "value": "" },
+    { "key": "level", "value": "High" },
+    { "key": "search", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "CampGuard - Get At Risk Users",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/churn/at-risk-users?level={{level}}&search={{search}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "churn", "at-risk-users"],
+          "query": [
+            { "key": "level", "value": "{{level}}" },
+            { "key": "search", "value": "{{search}}" }
+          ]
+        },
+        "description": "Get at-risk users filtered by risk level and search text."
+      }
+    },
+    {
+      "name": "CampGuard - Trigger Actions",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/churn/trigger-actions",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "churn", "trigger-actions"]
+        },
+        "description": "Run CampGuard action trigger with anti-spam and history append."
+      }
+    },
+    {
+      "name": "CampGuard - Get KPIs",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwtToken}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/churn/kpis",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "churn", "kpis"]
+        },
+        "description": "Get CampGuard KPI snapshot for admin dashboard."
+      }
+    }
+  ]
+}

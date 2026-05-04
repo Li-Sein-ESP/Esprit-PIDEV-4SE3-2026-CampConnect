@@ -1,0 +1,2 @@
+customer_id,date_action,action,risk_level,status
+C9999,2026-04-10,message_personnalise + offre + recommandation,High,queued
