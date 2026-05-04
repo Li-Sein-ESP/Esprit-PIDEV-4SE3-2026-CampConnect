@@ -1,0 +1,35 @@
+<div class="p-6 space-y-6 bg-[#fafaf9] min-h-full">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-stone-900">Warehouses</h1>
+            <p class="text-stone-500">Manage fulfillment locations and pickup points</p>
+        </div>
+        <button class="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium" (click)="openCreate()">Add Warehouse</button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <article *ngFor="let w of warehouses" class="bg-white border border-stone-200 rounded-xl p-4">
+            <h3 class="font-semibold text-stone-800">{{ w.name }}</h3>
+            <p class="text-sm text-stone-500 mt-1">{{ w.address }}</p>
+            <p class="text-xs text-stone-400 mt-1">{{ w.latitude }}, {{ w.longitude }}</p>
+            <p class="text-xs text-emerald-700 mt-2">Inventory entries: {{ inventoryCountByWarehouse[w.id] || 0 }}</p>
+            <div class="flex gap-2 mt-3">
+                <button class="px-3 py-1.5 text-xs rounded-lg border border-stone-200" (click)="openEdit(w)">Edit</button>
+                <button class="px-3 py-1.5 text-xs rounded-lg border border-rose-200 text-rose-700" (click)="remove(w.id)">Delete</button>
+            </div>
+        </article>
+    </div>
+
+    <div *ngIf="showModal" class="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl border border-stone-200 w-full max-w-xl p-4 space-y-3">
+            <h2 class="text-lg font-semibold text-stone-900">{{ editingId ? 'Edit Warehouse' : 'Create Warehouse' }}</h2>
+            <input [(ngModel)]="form.name" class="w-full border border-stone-200 rounded-lg p-2 text-sm" placeholder="Warehouse name" />
+            <input [(ngModel)]="form.address" class="w-full border border-stone-200 rounded-lg p-2 text-sm" placeholder="Address" />
+            <app-map-picker [initialLat]="form.latitude" [initialLng]="form.longitude" (locationSelected)="onMapPicked($event)"></app-map-picker>
+            <div class="flex justify-end gap-2">
+                <button class="px-3 py-2 rounded-lg border border-stone-200 text-sm" (click)="showModal=false">Cancel</button>
+                <button class="px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm" (click)="save()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>

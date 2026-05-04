@@ -1,0 +1,139 @@
+<div class="receipt-page">
+
+  <!-- Loading state -->
+  <div *ngIf="loading" class="state-box">
+    <div class="spinner"></div>
+    <p>Generating your receipt...</p>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="!loading && error" class="state-box error">
+    <p>{{ error }}</p>
+    <button class="btn ghost" (click)="retry()">Retry</button>
+  </div>
+
+  <!-- Receipt -->
+  <div class="receipt-shell" *ngIf="!loading && !error && receipt as r">
+
+    <!-- Header -->
+    <header class="receipt-header no-print-header">
+      <div class="header-left">
+        <div class="brand">🏕️ CampConnect</div>
+        <h1>Payment Receipt</h1>
+        <p class="muted">Your order has been confirmed. Thank you!</p>
+      </div>
+      <span class="badge" [class.badge-info]="r.status === 'ALREADY_PROCESSED'">
+        {{ r.status === 'ALREADY_PROCESSED' ? 'Already Confirmed' : '✔ Paid' }}
+      </span>
+    </header>
+
+    <!-- Main receipt card -->
+    <section class="receipt-card" id="receipt-print-area">
+
+      <!-- Brand + title for print -->
+      <div class="print-only print-brand">
+        <strong>🏕️ CampConnect</strong> &nbsp;|&nbsp; Official Payment Receipt
+      </div>
+
+      <!-- Buyer info -->
+      <div class="buyer-section">
+        <div class="buyer-avatar">{{ (r.buyerName || 'U').charAt(0).toUpperCase() }}</div>
+        <div>
+          <div class="buyer-name">{{ r.buyerName || 'Unknown Buyer' }}</div>
+          <div class="buyer-label">Customer</div>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Meta info -->
+      <div class="meta-grid">
+        <div class="meta-item">
+          <span class="meta-label">Receipt ID</span>
+          <span class="meta-value mono">{{ r.sessionId }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Date</span>
+          <span class="meta-value">{{ r.createdAt ? (r.createdAt | date:'mediumDate') : '-' }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Payment Status</span>
+          <span class="meta-value status-paid">{{ r.paymentStatus || 'paid' }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Payment Intent</span>
+          <span class="meta-value mono small">{{ r.paymentIntentId || '-' }}</span>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Cart items -->
+      <div *ngIf="r.referenceType === 'CART' && r.gearItems && r.gearItems.length > 0">
+        <h3 class="section-title">Items Ordered</h3>
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>Gear</th>
+              <th class="text-center">Type</th>
+              <th class="text-center">Qty</th>
+              <th class="text-right">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of r.gearItems">
+              <td class="gear-name">{{ item.gearName }}</td>
+              <td class="text-center">
+                <span class="type-badge" [class.rent]="item.type === 'RENT'" [class.buy]="item.type === 'BUY'">
+                  {{ item.type === 'RENT' ? 'Rental' : 'Purchase' }}
+                </span>
+              </td>
+              <td class="text-center">{{ item.quantity }}</td>
+              <td class="text-right">{{ (item.lineTotal ?? 0) | currency:(r.currency || 'USD'):'symbol':'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Single-purchase item (non-cart flow) -->
+      <div *ngIf="r.referenceType === 'PURCHASE'" class="purchase-detail">
+        <h3 class="section-title">Item Ordered</h3>
+        <div class="purchase-row">
+          <span>{{ r.gearName || '-' }}</span>
+          <span class="qty-badge">× {{ r.quantity ?? 1 }}</span>
+        </div>
+        <div class="purchase-buyer">Buyer: <strong>{{ r.buyerName || '-' }}</strong></div>
+      </div>
+
+      <!-- Fallback when cart is already processed (no items) -->
+      <div *ngIf="r.referenceType === 'CART' && (!r.gearItems || r.gearItems.length === 0)" class="details-box">
+        <p>{{ r.processedItems ?? 0 }} item(s) processed.</p>
+        <p *ngIf="r.fulfillmentDelayed" class="warning-text">⚠️ Fulfillment is being processed. Your gear will be reserved shortly.</p>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Total -->
+      <div class="total-row">
+        <span class="total-label">Total Paid</span>
+        <span class="total-amount">{{ totalAmount | currency:(r.currency || 'USD'):'symbol':'1.2-2' }}</span>
+      </div>
+
+      <div *ngIf="r.fulfillmentDelayed" class="info-banner">
+        ℹ️ {{ r.message }}
+      </div>
+
+    </section>
+
+    <!-- Actions (hidden on print) -->
+    <div class="actions no-print">
+      <button class="btn primary" (click)="printOrSavePdf()">
+        🖨️ Save as PDF
+      </button>
+      <button class="btn ghost" (click)="goBack()">
+        ← Back to Shop
+      </button>
+    </div>
+
+  </div>
+</div>

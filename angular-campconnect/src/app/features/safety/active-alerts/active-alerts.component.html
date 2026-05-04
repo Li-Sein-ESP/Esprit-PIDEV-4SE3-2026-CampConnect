@@ -1,0 +1,567 @@
+<div class="min-h-screen bg-[#f4f3ef]">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-[#e65100] to-[#bf360c] p-6">
+        <div class="mx-auto max-w-6xl">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <svg class="mr-3 h-8 w-8 text-white/90" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
+                    </svg>
+                    <div>
+                        <h1 class="text-3xl font-bold text-white">Active Safety Alerts</h1>
+                        <p class="mt-1 text-sm text-white/70">Current alerts, warnings, and closures affecting outdoor
+                            recreation</p>
+                    </div>
+                </div>
+                <button (click)="openReportModal()"
+                    class="flex items-center rounded-lg bg-white px-4 py-2 text-sm font-medium text-[#bf360c] hover:bg-white/90">
+                    <svg class="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                    </svg>
+                    Report Incident
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="mx-auto max-w-6xl p-6">
+        <!-- Severity Summary Cards -->
+        <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="rounded-lg border border-[#ffe5e5] bg-white p-6 text-center">
+                <div class="text-3xl font-bold text-[#c62828]">1</div>
+                <div class="mt-1 text-sm font-medium text-[#c62828]">Critical</div>
+            </div>
+            <div class="rounded-lg border border-[#fff3e0] bg-white p-6 text-center">
+                <div class="text-3xl font-bold text-[#e65100]">2</div>
+                <div class="mt-1 text-sm font-medium text-[#e65100]">High</div>
+            </div>
+            <div class="rounded-lg border border-[#fff8e1] bg-white p-6 text-center">
+                <div class="text-3xl font-bold text-[#f9a825]">1</div>
+                <div class="mt-1 text-sm font-medium text-[#f9a825]">Medium</div>
+            </div>
+            <div class="rounded-lg border border-[#e8f5e9] bg-white p-6 text-center">
+                <div class="text-3xl font-bold text-[#2e7d32]">1</div>
+                <div class="mt-1 text-sm font-medium text-[#2e7d32]">Low</div>
+            </div>
+        </div>
+
+        <!-- Active Safety Alerts -->
+        <div class="space-y-4">
+
+            <!-- Alert 1 - Critical -->
+            <div class="rounded-lg border-l-4 border-[#c62828] bg-white p-6 shadow">
+                <div class="mb-4 flex items-start justify-between">
+                    <div class="flex items-start">
+                        <div class="mr-4 rounded-full bg-[#ffebee] p-3">
+                            <svg class="h-6 w-6 text-[#c62828]" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-3">
+                                <h3 class="text-xl font-bold text-[#3d5c4a]">Winter Storm Warning - Grand Teton</h3>
+                                <span
+                                    class="rounded-full bg-[#ffebee] px-3 py-1 text-xs font-medium text-[#c62828]">Critical</span>
+                            </div>
+                            <div class="mt-2 flex items-center gap-4 text-sm text-[#5c6b5f]">
+                                <span class="flex items-center">
+                                    <svg class="mr-1.5 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                    </svg>
+                                    Grand Teton NP, WY
+                                </span>
+                                <span class="flex items-center">
+                                    <svg class="mr-1.5 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
+                                    </svg>
+                                    Valid until February 5, 2026
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="mb-4 text-[#5c6b5f]">Major winter storm expected to bring 18-24 inches of snow and winds up to
+                    60 mph. Whiteout conditions likely. Travel not recommended.</p>
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div>
+                        <h4 class="mb-2 font-semibold text-[#3d5c4a]">Affected Areas</h4>
+                        <ul class="space-y-1.5 text-sm text-[#5c6b5f]">
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#5c6b5f]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>All roads and trails</li>
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#5c6b5f]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>Backcountry areas</li>
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#5c6b5f]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>Campgrounds</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="mb-2 font-semibold text-[#3d5c4a]">Recommendations</h4>
+                        <ul class="space-y-1.5 text-sm text-[#5c6b5f]">
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#2e7d32]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                </svg>Postpone all travel plans</li>
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#2e7d32]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                </svg>Shelter in place if already in area</li>
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#2e7d32]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                </svg>Carry emergency supplies if travel is unavoidable</li>
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#2e7d32]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                </svg>Monitor weather forecasts continuously</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mt-4 border-t border-[#e8e7e3] pt-4 text-xs text-[#5c6b5f]">
+                    <span class="flex items-center">
+                        <svg class="mr-1.5 h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
+                        </svg>
+                        Issued: February 2, 2026
+                    </span>
+                </div>
+            </div>
+
+            <!-- Alert 2 - High -->
+            <div class="rounded-lg border-l-4 border-[#e65100] bg-white p-6 shadow">
+                <div class="mb-4 flex items-start justify-between">
+                    <div class="flex items-start">
+                        <div class="mr-4 rounded-full bg-[#fff3e0] p-3">
+                            <svg class="h-6 w-6 text-[#e65100]" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-3">
+                                <h3 class="text-xl font-bold text-[#3d5c4a]">Stage 2 Fire Restrictions - Rocky Mountain
+                                    National Park</h3>
+                                <span
+                                    class="rounded-full bg-[#fff3e0] px-3 py-1 text-xs font-medium text-[#e65100]">High</span>
+                            </div>
+                            <div class="mt-2 flex items-center gap-4 text-sm text-[#5c6b5f]">
+                                <span class="flex items-center">
+                                    <svg class="mr-1.5 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                    </svg>
+                                    Rocky Mountain NP, CO
+                                </span>
+                                <span class="flex items-center">
+                                    <svg class="mr-1.5 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
+                                    </svg>
+                                    Valid until March 15, 2026
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="mb-4 text-[#5c6b5f]">Elevated fire danger due to dry conditions and high winds. Stage 2
+                    restrictions are in effect for all areas of Rocky Mountain National Park and surrounding National
+                    Forest lands.</p>
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div>
+                        <h4 class="mb-2 font-semibold text-[#3d5c4a]">Affected Areas</h4>
+                        <ul class="space-y-1.5 text-sm text-[#5c6b5f]">
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#5c6b5f]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>All backcountry camping areas</li>
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#5c6b5f]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>Designated campgrounds</li>
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#5c6b5f]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>Day use areas</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="mb-2 font-semibold text-[#3d5c4a]">Recommendations</h4>
+                        <ul class="space-y-1.5 text-sm text-[#5c6b5f]">
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#2e7d32]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                </svg>Use only camp stoves with shut-off valves</li>
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#2e7d32]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                </svg>Never leave stoves unattended</li>
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#2e7d32]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                </svg>Report any smoke or fire immediately to 911</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mt-4 border-t border-[#e8e7e3] pt-4 text-xs text-[#5c6b5f]">
+                    <span class="flex items-center">
+                        <svg class="mr-1.5 h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
+                        </svg>
+                        Issued: February 1, 2026
+                    </span>
+                </div>
+            </div>
+
+            <!-- Alert 3 - High -->
+            <div class="rounded-lg border-l-4 border-[#e65100] bg-white p-6 shadow">
+                <div class="mb-4 flex items-start">
+                    <div class="mr-4 rounded-full bg-[#fff3e0] p-3">
+                        <svg class="h-6 w-6 text-[#e65100]" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <h3 class="text-xl font-bold text-[#3d5c4a]">Trail Closure - Avalanche Danger</h3>
+                            <span
+                                class="rounded-full bg-[#fff3e0] px-3 py-1 text-xs font-medium text-[#e65100]">High</span>
+                        </div>
+                        <div class="mt-2 flex items-center gap-4 text-sm text-[#5c6b5f]">
+                            <span class="flex items-center">
+                                <svg class="mr-1.5 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>
+                                Rocky Mountain NP - Longs Peak Trail
+                            </span>
+                            <span class="flex items-center">
+                                <svg class="mr-1.5 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
+                                </svg>
+                                Valid until April 1, 2026
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <p class="mb-4 text-[#5c6b5f]">Longs Peak Trail closed due to extreme avalanche danger. Several
+                    avalanche paths cross the trail above treeline. Violators will be cited.</p>
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div>
+                        <h4 class="mb-2 font-semibold text-[#3d5c4a]">Affected Areas</h4>
+                        <ul class="space-y-1.5 text-sm text-[#5c6b5f]">
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#5c6b5f]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>Longs Peak Trail above treeline</li>
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#5c6b5f]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>Boulder Field area</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="mb-2 font-semibold text-[#3d5c4a]">Recommendations</h4>
+                        <ul class="space-y-1.5 text-sm text-[#5c6b5f]">
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#2e7d32]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                </svg>Choose alternative lower elevation trails</li>
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#2e7d32]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                </svg>Never enter closed areas</li>
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#2e7d32]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                </svg>Wait for official all-clear announcement</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mt-4 border-t border-[#e8e7e3] pt-4 text-xs text-[#5c6b5f]">
+                    <span class="flex items-center">
+                        <svg class="mr-1.5 h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
+                        </svg>
+                        Issued: January 15, 2026
+                    </span>
+                </div>
+            </div>
+
+            <!-- Alert 4 - Medium -->
+            <div class="rounded-lg border-l-4 border-[#f9a825] bg-white p-6 shadow">
+                <div class="mb-4 flex items-start">
+                    <div class="mr-4 rounded-full bg-[#fff8e1] p-3">
+                        <svg class="h-6 w-6 text-[#f9a825]" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <h3 class="text-xl font-bold text-[#3d5c4a]">Increased Bear Activity - Yosemite Valley</h3>
+                            <span
+                                class="rounded-full bg-[#fff8e1] px-3 py-1 text-xs font-medium text-[#f9a825]">Medium</span>
+                        </div>
+                        <div class="mt-2 flex items-center gap-4 text-sm text-[#5c6b5f]">
+                            <span class="flex items-center">
+                                <svg class="mr-1.5 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>
+                                Yosemite Valley, CA
+                            </span>
+                            <span class="flex items-center">
+                                <svg class="mr-1.5 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
+                                </svg>
+                                Valid until April 30, 2026
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <p class="mb-4 text-[#5c6b5f]">Multiple bear sightings reported in campground areas. Bears are actively
+                    seeking food as they emerge from winter dens. Proper food storage is mandatory.</p>
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div>
+                        <h4 class="mb-2 font-semibold text-[#3d5c4a]">Affected Areas</h4>
+                        <ul class="space-y-1.5 text-sm text-[#5c6b5f]">
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#5c6b5f]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>Upper Pines Campground</li>
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#5c6b5f]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>Valley trails</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="mb-2 font-semibold text-[#3d5c4a]">Recommendations</h4>
+                        <ul class="space-y-1.5 text-sm text-[#5c6b5f]">
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#2e7d32]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                </svg>Use bear-proof food lockers at all times</li>
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#2e7d32]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                </svg>Carry bear spray on trails</li>
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#2e7d32]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                </svg>Report all bear sightings to rangers</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mt-4 border-t border-[#e8e7e3] pt-4 text-xs text-[#5c6b5f]">
+                    <span class="flex items-center">
+                        <svg class="mr-1.5 h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
+                        </svg>
+                        Issued: January 28, 2026
+                    </span>
+                </div>
+            </div>
+
+            <!-- Alert 5 - Low -->
+            <div class="rounded-lg border-l-4 border-[#2e7d32] bg-white p-6 shadow">
+                <div class="mb-4 flex items-start">
+                    <div class="mr-4 rounded-full bg-[#e8f5e9] p-3">
+                        <svg class="h-6 w-6 text-[#2e7d32]" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2L1 21h22L12 2zm0 3.5l8.5 14.5h-17L12 5.5zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <h3 class="text-xl font-bold text-[#3d5c4a]">Water Quality Advisory - Lake Camping</h3>
+                            <span
+                                class="rounded-full bg-[#e8f5e9] px-3 py-1 text-xs font-medium text-[#2e7d32]">Low</span>
+                        </div>
+                        <div class="mt-2 flex items-center gap-4 text-sm text-[#5c6b5f]">
+                            <span class="flex items-center">
+                                <svg class="mr-1.5 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>
+                                Multiple Colorado Wilderness Areas
+                            </span>
+                            <span class="flex items-center">
+                                <svg class="mr-1.5 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
+                                </svg>
+                                Valid until Ongoing
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <p class="mb-4 text-[#5c6b5f]">Giardia detected in several alpine lakes. Always treat or filter water
+                    before drinking.</p>
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div>
+                        <h4 class="mb-2 font-semibold text-[#3d5c4a]">Affected Areas</h4>
+                        <ul class="space-y-1.5 text-sm text-[#5c6b5f]">
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#5c6b5f]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>All backcountry water sources</li>
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#5c6b5f]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>Alpine lakes</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="mb-2 font-semibold text-[#3d5c4a]">Recommendations</h4>
+                        <ul class="space-y-1.5 text-sm text-[#5c6b5f]">
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#2e7d32]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                </svg>Boil water for 1 minute minimum</li>
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#2e7d32]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                </svg>Use certified water filter (0.2 micron or smaller)</li>
+                            <li class="flex items-start"><svg
+                                    class="mr-2 mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#2e7d32]" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                </svg>Never drink untreated water</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mt-4 border-t border-[#e8e7e3] pt-4 text-xs text-[#5c6b5f]">
+                    <span class="flex items-center">
+                        <svg class="mr-1.5 h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
+                        </svg>
+                        Issued: January 20, 2026
+                    </span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Report Incident Modal -->
+<div *ngIf="showReportModal"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+    (click)="closeReportModal()">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden" (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="flex items-start justify-between p-6 border-b border-gray-100">
+            <div>
+                <h2 class="text-xl font-bold text-gray-900">Report Safety Incident</h2>
+                <p class="text-sm text-gray-500 mt-1">Report hazards, wildlife encounters, or safety concerns to park
+                    authorities</p>
+            </div>
+            <button (click)="closeReportModal()"
+                class="ml-4 p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors flex-shrink-0">
+                <lucide-icon [img]="XIcon" size="20"></lucide-icon>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 space-y-5">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1.5">Location <span
+                        class="text-red-500">*</span></label>
+                <input type="text" [(ngModel)]="reportForm.location"
+                    placeholder="e.g., Bear Lake Trailhead, Rocky Mountain NP"
+                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#2E4035] focus:ring-2 focus:ring-[#2E4035]/20 transition-all" />
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1.5">Incident Type <span
+                        class="text-red-500">*</span></label>
+                <select [(ngModel)]="reportForm.incidentType"
+                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#2E4035] focus:ring-2 focus:ring-[#2E4035]/20 transition-all appearance-none bg-white">
+                    <option value="" disabled selected>Select type...</option>
+                    <option *ngFor="let type of incidentTypes" [value]="type">{{ type }}</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1.5">Description <span
+                        class="text-red-500">*</span></label>
+                <textarea [(ngModel)]="reportForm.description" rows="4"
+                    placeholder="Provide detailed information about the incident, including time, specific location, and any immediate dangers..."
+                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#2E4035] focus:ring-2 focus:ring-[#2E4035]/20 transition-all resize-none"></textarea>
+            </div>
+            <div class="flex items-start gap-3 bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                <lucide-icon [img]="AlertCircleIcon" size="18"
+                    class="text-orange-500 flex-shrink-0 mt-0.5"></lucide-icon>
+                <div>
+                    <p class="text-sm font-semibold text-gray-800">For Immediate Emergencies</p>
+                    <p class="text-xs text-gray-600 mt-0.5">Call 911 or contact park rangers directly. This form is for
+                        non-emergency reporting only.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex gap-3 px-6 pb-6">
+            <button (click)="submitReport()"
+                class="flex-1 flex items-center justify-center gap-2 py-3 bg-[#2E4035] text-white rounded-xl text-sm font-semibold hover:bg-[#1d2e24] transition-colors">
+                <lucide-icon [img]="SendIcon" size="16"></lucide-icon>
+                Submit Report
+            </button>
+            <button (click)="closeReportModal()"
+                class="px-6 py-3 border border-gray-200 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors">Cancel</button>
+        </div>
+    </div>
+</div>

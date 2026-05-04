@@ -1,0 +1,62 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: campconnect-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - campconnect-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: campconnect-backend
+    ports:
+      - "${SERVER_PORT:-8090}:8090"
+    environment:
+      - SERVER_PORT=8090
+      - MONGODB_URI=mongodb://mongodb:27017/campconnectdb
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION_MS=${JWT_EXPIRATION_MS:-86400000}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ORS_API_KEY=${ORS_API_KEY}
+      - ML_DEMAND_URL=http://ml-demand:5000
+      - ML_GEAR_URL=http://ml-gear:5001
+      - DELIVERY_PROVIDER_EMAIL=${DELIVERY_PROVIDER_EMAIL:-delivery@mail.com}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - campconnect-network
+    volumes:
+      - uploads-data:/app/uploads
+
+  frontend:
+    build:
+      context: ./angular-campconnect
+      dockerfile: Dockerfile
+    container_name: campconnect-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - campconnect-network
+
+networks:
+  campconnect-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+  uploads-data:

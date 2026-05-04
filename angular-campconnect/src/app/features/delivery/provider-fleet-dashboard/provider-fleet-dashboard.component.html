@@ -1,0 +1,106 @@
+<div class="cc-fleet">
+
+  <!-- Header -->
+  <div class="cc-fleet__header">
+    <div>
+      <h1 class="cc-fleet__title">Fleet Schedule</h1>
+      <p class="cc-fleet__subtitle">Weekly capacity utilization across your delivery fleet</p>
+    </div>
+    <div class="cc-fleet__controls">
+      <input type="date" class="cc-fleet__date-input" [(ngModel)]="fromDate" />
+      <span>to</span>
+      <input type="date" class="cc-fleet__date-input" [(ngModel)]="toDate" />
+      <button class="cc-btn cc-btn--primary" (click)="loadSchedule()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l5 5M1 6H6V1"/><path d="M23 23l-5-5M23 18h-5v5"/></svg>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Live Alerts Panel -->
+  <div class="cc-fleet__alerts" *ngIf="alerts.length > 0">
+    <div class="cc-fleet__alerts-title">
+      <span class="cc-alert-pulse"></span>
+      {{ alerts.length }} Unassigned Delivery Alert{{ alerts.length > 1 ? 's' : '' }}
+    </div>
+    <div class="cc-fleet-alert" *ngFor="let alert of alerts; let i = index">
+      <div class="cc-fleet-alert__body">
+        <strong>⚠ {{ alert.deliveryId }}</strong>
+        <span>{{ alert.message }}</span>
+        <span class="cc-fleet-alert__zone" *ngIf="alert.zone">Zone: {{ alert.zone }}</span>
+        <span class="cc-fleet-alert__time">{{ alert.timestamp | date:'HH:mm' }}</span>
+      </div>
+      <button class="cc-fleet-alert__dismiss" (click)="dismissAlert(i)" title="Dismiss">✕</button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="cc-fleet__loading" *ngIf="loading">
+    <div class="cc-spinner"></div>
+    <p>Loading fleet schedule…</p>
+  </div>
+
+  <!-- Error -->
+  <div class="cc-fleet__error" *ngIf="!loading && error">
+    <p>{{ error }}</p>
+    <button class="cc-btn cc-btn--secondary" (click)="loadSchedule()">Retry</button>
+  </div>
+
+  <!-- Heatmap Grid -->
+  <div class="cc-fleet__grid-wrapper" *ngIf="!loading && !error && fleet.length > 0">
+    <table class="cc-fleet__grid">
+      <thead>
+        <tr>
+          <th class="cc-fleet__grid-vh">Vehicle</th>
+          <th class="cc-fleet__grid-dh" *ngFor="let date of getDates()">
+            {{ date | date:'EEE, MMM d' }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let vehicle of fleet">
+          <td class="cc-fleet__vehicle-cell">
+            <div class="cc-fleet__vehicle-plate">{{ vehicle.plateNumber }}</div>
+            <div class="cc-fleet__vehicle-type">
+              {{ vehicle.vehicleType || '—' }}
+              <span class="cc-fleet__vehicle-status" [style.background]="getStatusColor(vehicle.status)">{{ vehicle.status }}</span>
+            </div>
+            <div class="cc-fleet__vehicle-cap">Max {{ vehicle.maxCapacityKg }} kg</div>
+          </td>
+          <td class="cc-fleet__day-cell" *ngFor="let date of getDates()">
+            <ng-container *ngIf="getSlot(vehicle, date) as slot; else emptySlot">
+              <div class="cc-fleet__capacity-bar">
+                <div class="cc-fleet__capacity-fill"
+                     [style.width.%]="slot.capacityPercent"
+                     [style.background]="getCapacityColor(slot.capacityPercent)"></div>
+              </div>
+              <div class="cc-fleet__day-info">
+                <span class="cc-fleet__order-count">{{ slot.orderCount }} orders</span>
+                <span class="cc-fleet__kg">{{ slot.usedCapacityKg | number:'1.0-1' }} kg</span>
+              </div>
+              <div class="cc-fleet__pct" [style.color]="getCapacityColor(slot.capacityPercent)">
+                {{ slot.capacityPercent | number:'1.0-0' }}%
+              </div>
+            </ng-container>
+            <ng-template #emptySlot>
+              <div class="cc-fleet__day-empty">—</div>
+            </ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty state -->
+  <div class="cc-fleet__empty" *ngIf="!loading && !error && fleet.length === 0">
+    <p>No vehicles found for this provider. Register your fleet to start tracking.</p>
+  </div>
+
+  <!-- Legend -->
+  <div class="cc-fleet__legend" *ngIf="!loading && fleet.length > 0">
+    <div class="cc-legend-item"><span class="cc-legend-dot" style="background:#22c55e"></span> &lt;40% capacity</div>
+    <div class="cc-legend-item"><span class="cc-legend-dot" style="background:#eab308"></span> 40–70%</div>
+    <div class="cc-legend-item"><span class="cc-legend-dot" style="background:#f97316"></span> 70–90%</div>
+    <div class="cc-legend-item"><span class="cc-legend-dot" style="background:#ef4444"></span> &gt;90% (near full)</div>
+  </div>
+</div>

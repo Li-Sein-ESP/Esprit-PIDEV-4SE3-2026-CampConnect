@@ -1,0 +1,107 @@
+<aside [class.-translate-x-full]="!(isSidebarOpen$ | async)" [class.translate-x-0]="(isSidebarOpen$ | async)"
+    class="w-64 flex-shrink-0 flex flex-col absolute lg:relative z-50 h-full min-h-screen transition-transform duration-300 ease-in-out lg:translate-x-0"
+    style="background-color: var(--sidebar-bg); background: #1f2937">
+    <!-- Mobile Close Button -->
+    <button (click)="toggleSidebar()"
+        class="lg:hidden absolute top-4 right-4 text-gray-400 hover:text-white border-none bg-transparent">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+    </button>
+
+    <!-- Logo Area -->
+    <div class="h-16 flex items-center px-6 border-b border-gray-700">
+        <div class="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center mr-3">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z">
+                </path>
+            </svg>
+        </div>
+        <span class="text-white font-bold text-lg tracking-tight">CampConnect</span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto w-full">
+
+        <a routerLink="/delivery/dashboard" routerLinkActive="bg-gray-700 text-white"
+            [routerLinkActiveOptions]="{exact: true}"
+            class="flex items-center px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-700 rounded-xl transition-colors group">
+            <svg class="w-5 h-5 mr-3 group-hover:text-emerald-400 transition-colors" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                </path>
+            </svg>
+            <span class="font-medium">Dashboard</span>
+        </a>
+
+        <!-- Active Deliveries link defaults to dashboard for now, or you can add anchor link handling -->
+        <a routerLink="/delivery/dashboard" fragment="active-deliveries"
+            class="flex items-center px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-700 rounded-xl transition-colors group hidden">
+            <svg class="w-5 h-5 mr-3 group-hover:text-emerald-400 transition-colors" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
+            <span class="font-medium">Active Deliveries</span>
+            <span class="ml-auto bg-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">2</span>
+        </a>
+
+        <a routerLink="/delivery/history" routerLinkActive="bg-gray-700 text-white"
+            class="flex items-center px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-700 rounded-xl transition-colors group">
+            <svg class="w-5 h-5 mr-3 group-hover:text-emerald-400 transition-colors" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span class="font-medium">History</span>
+        </a>
+
+        <a routerLink="/delivery/vehicles" routerLinkActive="bg-gray-700 text-white"
+            class="flex items-center px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-700 rounded-xl transition-colors group">
+            <svg class="w-5 h-5 mr-3 group-hover:text-emerald-400 transition-colors" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0">
+                </path>
+            </svg>
+            <span class="font-medium">Vehicles</span>
+        </a>
+
+        <a routerLink="/delivery/fleet" routerLinkActive="bg-gray-700 text-white"
+            class="flex items-center px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-700 rounded-xl transition-colors group">
+            <svg class="w-5 h-5 mr-3 group-hover:text-emerald-400 transition-colors" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2">
+                </path>
+            </svg>
+            <span class="font-medium">Fleet Schedule</span>
+        </a>
+
+        <a routerLink="/delivery/earnings" routerLinkActive="bg-gray-700 text-white"
+            class="flex items-center px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-700 rounded-xl transition-colors group">
+            <svg class="w-5 h-5 mr-3 group-hover:text-emerald-400 transition-colors" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                </path>
+            </svg>
+            <span class="font-medium">Earnings</span>
+        </a>
+    </nav>
+
+    <!-- User Profile -->
+    <div class="p-4 border-t border-gray-700">
+        <a routerLink="/delivery/profile"
+            class="flex items-center cursor-pointer hover:bg-gray-700 p-2 -mx-2 rounded-xl transition-colors no-underline">
+            <img class="h-10 w-10 rounded-full object-cover border-2 border-gray-600"
+                src="assets/images/placeholder-user.jpg"
+                onerror="this.src='https://ui-avatars.com/api/?name=Alex+Morgan&background=random'" alt="User avatar">
+            <div class="ml-3">
+                <p class="text-sm font-medium text-white m-0">{{ providerName }}</p>
+                <p class="text-xs text-gray-400 m-0">Pro Driver</p>
+            </div>
+        </a>
+    </div>
+</aside>

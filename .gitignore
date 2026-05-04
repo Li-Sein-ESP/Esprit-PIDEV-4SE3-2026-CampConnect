@@ -1,0 +1,113 @@
+# ========================
+# CampConnect - Root .gitignore
+# ========================
+
+# ---------- IDE & Editors ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.factorypath
+.settings/
+.springBeans
+.sts4-cache
+
+# ---------- OS Files ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- Environment & Secrets ----------
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# ---------- Node / Angular ----------
+node_modules/
+angular-campconnect/node_modules/
+angular-campconnect/.angular/
+angular-campconnect/dist/
+angular-campconnect/.sass-cache/
+angular-campconnect/coverage/
+angular-campconnect/tmp/
+angular-campconnect/out-tsc/
+
+# ---------- Java / Maven ----------
+backend/target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+backend/.classpath
+backend/.factorypath
+backend/.project
+backend/.settings/
+backend/.apt_generated/
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+
+# ---------- ML Model Files ----------
+*.pkl
+
+# ---------- Logs ----------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ---------- Temporary & Generated Files ----------
+*.tmp
+*.temp
+build_*.txt
+nul
+stat.txt
+compare_result.txt
+implementation_plan.md
+
+# ---------- User Uploads (runtime data) ----------
+backend/uploads/*
+!backend/uploads/.gitkeep
+uploads/
+
+# ---------- Junk / Internal Docs ----------
+INTEGRATION_STATUS.md
+MARKETPLACE_DELIVERY_STATUS.md
+PROJECT_AUDIT.md
+VALIDATION_PREPARATION.txt
+PROJECT_OVERVIEW.txt
+PROJECT_STATE.md
+CONSTITUTION.md
+PATTERNS.md
+
+# ---------- Test / Debug Artifacts ----------
+test-delete*.js
+final_check.txt
+backend/backend_logs.txt
+backend/compile_errors.txt
+angular-campconnect/final_check.txt
+
+# ---------- Docker ----------
+*.pid
+
+# ---------- Devin / Tool Configs ----------
+.devin/

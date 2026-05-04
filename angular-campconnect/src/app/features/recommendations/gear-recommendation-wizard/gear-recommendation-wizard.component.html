@@ -1,0 +1,196 @@
+<div class="wizard-overlay" (click)="close()">
+  <div class="wizard-modal" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="close()">&times;</button>
+
+    <!-- STEP 1: Plan Your Trip -->
+    <div *ngIf="currentStep === 1" class="step step-1">
+      <h2 class="step-title">Plan Your Trip</h2>
+      <p class="step-subtitle">Tell us about your adventure and we'll tell you what gear you need.</p>
+
+      <div *ngIf="errorMessage" class="error-banner">{{ errorMessage }}</div>
+
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label for="destination">Destination</label>
+          <input id="destination" type="text" list="destinationList" [(ngModel)]="destination"
+                 placeholder="Search Tunisian destinations..." class="form-input" />
+          <datalist id="destinationList">
+            <option *ngFor="let d of destinations" [value]="d"></option>
+          </datalist>
+        </div>
+
+        <div class="form-group">
+          <label for="startDate">Start Date</label>
+          <input id="startDate" type="date" [(ngModel)]="startDate" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label for="endDate">End Date</label>
+          <input id="endDate" type="date" [(ngModel)]="endDate" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label for="groupSize">Group Size</label>
+          <input id="groupSize" type="number" min="1" max="20" [(ngModel)]="groupSize" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label for="budget">Budget (TND) <span class="optional">(optional)</span></label>
+          <input id="budget" type="number" min="0" [(ngModel)]="budget" placeholder="e.g. 300" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label for="activity">Activity</label>
+          <select id="activity" [(ngModel)]="activity" class="form-input">
+            <option *ngFor="let a of activities" [value]="a">{{ a.replace('_', ' ') }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="experienceLevel">Experience Level</label>
+          <select id="experienceLevel" [(ngModel)]="experienceLevel" class="form-input">
+            <option *ngFor="let l of experienceLevels" [value]="l">{{ l }}</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="primary-btn" (click)="submitForm()">Find my gear kit</button>
+    </div>
+
+    <!-- STEP 2: Loading -->
+    <div *ngIf="currentStep === 2" class="step step-2">
+      <div class="loading-container">
+        <svg class="compass-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="45" fill="none" stroke="#059669" stroke-width="3"/>
+          <polygon points="50,10 55,45 50,50 45,45" fill="#059669"/>
+          <polygon points="50,90 55,55 50,50 45,55" fill="#d97706"/>
+          <circle cx="50" cy="50" r="4" fill="#1f2937"/>
+        </svg>
+        <p class="loading-text">Analyzing the best gear for <strong>{{ destination }}</strong>...</p>
+      </div>
+    </div>
+
+    <!-- STEP 3: Category Checklist ("Here's what you need") -->
+    <div *ngIf="currentStep === 3 && categoryResult" class="step step-3">
+      <h2 class="step-title">Here's What You Need</h2>
+      <div class="trip-meta">
+        <span class="meta-badge terrain">{{ terrainIcons[categoryResult.terrain] || '' }} {{ categoryResult.terrain }}</span>
+        <span class="meta-badge season">{{ categoryResult.season }}</span>
+        <span class="meta-badge destination">{{ categoryResult.destination }}</span>
+      </div>
+
+      <p class="checklist-intro">Based on your trip details, here's the gear we recommend:</p>
+
+      <!-- Essential -->
+      <div *ngIf="essentials.length" class="category-section">
+        <h3><span class="priority-badge essential">Essential</span></h3>
+        <div class="category-list">
+          <div *ngFor="let rec of essentials" class="category-item">
+            <span class="cat-icon">{{ getCategoryIcon(rec.category) }}</span>
+            <span class="cat-name">{{ formatCategory(rec.category) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommended -->
+      <div *ngIf="recommended.length" class="category-section">
+        <h3><span class="priority-badge recommended">Recommended</span></h3>
+        <div class="category-list">
+          <div *ngFor="let rec of recommended" class="category-item">
+            <span class="cat-icon">{{ getCategoryIcon(rec.category) }}</span>
+            <span class="cat-name">{{ formatCategory(rec.category) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Optional -->
+      <div *ngIf="optional.length" class="category-section">
+        <h3><span class="priority-badge optional">Optional</span></h3>
+        <div class="category-list">
+          <div *ngFor="let rec of optional" class="category-item">
+            <span class="cat-icon">{{ getCategoryIcon(rec.category) }}</span>
+            <span class="cat-name">{{ formatCategory(rec.category) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="step3-actions">
+        <button class="primary-btn" (click)="browseItems()">Browse matching gear on our marketplace</button>
+        <button class="secondary-btn" (click)="startOver()">Start over</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Marketplace Items -->
+    <div *ngIf="currentStep === 4" class="step step-4">
+      <!-- Loading items -->
+      <div *ngIf="itemsLoading" class="loading-container">
+        <svg class="compass-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="45" fill="none" stroke="#059669" stroke-width="3"/>
+          <polygon points="50,10 55,45 50,50 45,45" fill="#059669"/>
+          <polygon points="50,90 55,55 50,50 45,55" fill="#d97706"/>
+          <circle cx="50" cy="50" r="4" fill="#1f2937"/>
+        </svg>
+        <p class="loading-text">Finding available items in the marketplace...</p>
+      </div>
+
+      <!-- Items loaded -->
+      <div *ngIf="!itemsLoading && itemsResult">
+        <div class="step4-header">
+          <h2 class="step-title">Available Gear</h2>
+          <button class="back-link" (click)="backToChecklist()">&larr; Back to checklist</button>
+        </div>
+
+        <div *ngIf="errorMessage" class="error-banner">{{ errorMessage }}</div>
+
+        <div *ngIf="budget != null" class="budget-tracker">
+          Budget remaining: <strong>{{ budgetRemaining }} TND</strong>
+        </div>
+
+        <div *ngIf="itemsResult.groups.length === 0" class="no-results">
+          <p>No matching gear found in our inventory right now. You can still use the checklist above to prepare your own kit!</p>
+          <button class="secondary-btn" (click)="backToChecklist()">Back to checklist</button>
+        </div>
+
+        <div *ngFor="let group of itemsResult.groups" class="gear-group">
+          <h3 class="group-title">
+            <span class="priority-badge" [ngClass]="group.priority">{{ group.priority }}</span>
+          </h3>
+          <div class="gear-cards">
+            <div *ngFor="let item of group.items" class="gear-card">
+              <div class="card-image">
+                <img *ngIf="item.imageUrl" [src]="item.imageUrl" [alt]="item.gearName" loading="lazy" />
+                <span *ngIf="!item.imageUrl" class="category-icon">{{ getCategoryIcon(item.category) }}</span>
+              </div>
+              <div class="card-body">
+                <h4 class="gear-name">{{ item.gearName }}</h4>
+                <span class="category-tag">{{ item.category }}</span>
+                <div class="card-meta">
+                  <span class="price">{{ item.pricePerDay | number:'1.1-1' }} TND/day</span>
+                  <span class="rating">
+                    <span class="star">&#9733;</span> {{ item.averageRating | number:'1.1-1' }}
+                  </span>
+                </div>
+                <span class="availability-badge" [ngClass]="item.availableForDates ? 'available' : 'unavailable'">
+                  {{ item.availableForDates ? 'Available' : 'Check availability' }}
+                </span>
+                <button class="add-cart-btn"
+                        [disabled]="addedToCart.has(item.gearId)"
+                        (click)="addToCart(item)">
+                  {{ addedToCart.has(item.gearId) ? 'Added' : 'Add to cart' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-bar" *ngIf="itemsResult.groups.length > 0">
+          <button *ngIf="essentialGroup" class="action-btn essential-btn" (click)="addAllEssential()">
+            Add all essential items
+          </button>
+          <button class="action-btn full-kit-btn" (click)="addFullKit()">Add full kit</button>
+          <button class="action-btn start-over-btn" (click)="startOver()">Start over</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

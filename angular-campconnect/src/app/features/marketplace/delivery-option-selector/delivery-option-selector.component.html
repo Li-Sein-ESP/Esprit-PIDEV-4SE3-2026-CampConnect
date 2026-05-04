@@ -1,0 +1,45 @@
+<section class="rounded-xl border border-stone-200 bg-white p-4 mb-4">
+    <h3 class="text-sm font-semibold text-stone-800 mb-3">Delivery Choice</h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-3">
+        <button type="button" class="px-3 py-2 rounded-lg border text-sm"
+            [class.border-emerald-500]="method === 'PICKUP'"
+            [class.bg-emerald-50]="method === 'PICKUP'"
+            (click)="method='PICKUP'; emit()">
+            Pickup
+        </button>
+        <button type="button" class="px-3 py-2 rounded-lg border text-sm"
+            [class.border-emerald-500]="method === 'DELIVERY' && type === 'EXPRESS'"
+            [class.bg-emerald-50]="method === 'DELIVERY' && type === 'EXPRESS'"
+            (click)="method='DELIVERY'; type='EXPRESS'; emit()">
+            Delivery - Express
+        </button>
+        <button type="button" class="px-3 py-2 rounded-lg border text-sm"
+            [class.border-emerald-500]="method === 'DELIVERY' && type === 'NORMAL'"
+            [class.bg-emerald-50]="method === 'DELIVERY' && type === 'NORMAL'"
+            (click)="method='DELIVERY'; type='NORMAL'; emit()">
+            Delivery - Normal
+        </button>
+    </div>
+
+    <div *ngIf="method === 'DELIVERY'" class="space-y-2">
+        <input
+            [(ngModel)]="deliveryAddress"
+            (ngModelChange)="emit()"
+            class="w-full rounded-lg border border-stone-200 p-2 text-sm"
+            placeholder="Delivery address"
+        />
+        <p class="text-xs text-stone-500" *ngIf="type === 'EXPRESS'">ETA prioritized. Higher delivery cost.</p>
+        <p class="text-xs text-stone-500" *ngIf="type === 'NORMAL'">Delivery window: 24-48h.</p>
+    </div>
+
+    <div *ngIf="method === 'PICKUP'">
+        <app-warehouse-picker
+            [gearId]="gearIdForPickup"
+            [quantity]="quantityForPickup"
+            [customerLat]="customerLat"
+            [customerLng]="customerLng"
+            (selectedWarehouseId)="onWarehouseSelected($event)">
+        </app-warehouse-picker>
+    </div>
+</section>

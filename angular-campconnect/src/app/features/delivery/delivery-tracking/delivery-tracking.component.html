@@ -1,0 +1,146 @@
+<div class="cc-tracking">
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 1. TOP STATUS SECTION                       -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="cc-tracking__status-section glass-panel">
+        <div class="cc-tracking__status-inner">
+            <div class="cc-tracking__status-label">
+                <span class="cc-tracking__pulse-dot"></span>
+                <span class="cc-tracking__status-badge">Live Tracking</span>
+            </div>
+            <h1 class="cc-tracking__status-title">
+                {{ delivery.status === 'DELIVERED' ? 'Your gear has arrived' : 'Your gear is on the way' }}
+            </h1>
+            <p class="cc-tracking__status-subtitle" *ngIf="delivery.status !== 'DELIVERED'">Arriving in approximately</p>
+            <p class="cc-tracking__status-subtitle" *ngIf="delivery.status === 'DELIVERED'">Successfully delivered</p>
+            <div class="cc-tracking__eta">
+                <div class="cc-tracking__eta-block">
+                    <span class="cc-tracking__eta-number">{{ etaHours }}</span>
+                    <span class="cc-tracking__eta-unit">hrs</span>
+                </div>
+                <span class="cc-tracking__eta-sep">:</span>
+                <div class="cc-tracking__eta-block">
+                    <span class="cc-tracking__eta-number">{{ padZero(etaMinutes) }}</span>
+                    <span class="cc-tracking__eta-unit">min</span>
+                </div>
+                <span class="cc-tracking__eta-sep">:</span>
+                <div class="cc-tracking__eta-block">
+                    <span class="cc-tracking__eta-number cc-tracking__eta-seconds">{{ padZero(etaSeconds) }}</span>
+                    <span class="cc-tracking__eta-unit">sec</span>
+                </div>
+            </div>
+            <p class="cc-tracking__status-eta-time" *ngIf="delivery.status !== 'DELIVERED'">
+                Estimated arrival — <strong>{{ delivery.estimatedArrival }}</strong>
+            </p>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 2. LIVE PROGRESS TIMELINE                   -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="cc-tracking__progress-section glass-panel">
+        <div class="cc-tracking__progress-inner">
+            <div class="cc-tracking__timeline">
+                <div class="cc-tracking__timeline-track">
+                    <div class="cc-tracking__timeline-fill" [style.width]="progressWidth"></div>
+                </div>
+                <div class="cc-tracking__timeline-steps">
+                    <ng-container *ngFor="let step of delivery.timeline; let i = index">
+                        <div class="cc-tracking__step" [ngClass]="{
+                     'cc-tracking__step--completed': step.completed,
+                     'cc-tracking__step--active': !step.completed && (i === 0 || delivery.timeline[i-1].completed),
+                     'cc-tracking__step--pending': !step.completed && (i > 0 && !delivery.timeline[i-1].completed)
+                   }">
+                            <div class="cc-tracking__step-dot">
+                                <svg *ngIf="step.completed" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                                <div *ngIf="!step.completed && (i === 0 || delivery.timeline[i-1].completed)"
+                                    class="cc-tracking__step-dot-pulse"></div>
+                            </div>
+                            <span class="cc-tracking__step-label">{{ step.label }}</span>
+                            <span class="cc-tracking__step-time">{{ step.time }}</span>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 3. MAP SECTION                              -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="cc-tracking__map-section glass-panel">
+        <div class="cc-tracking__map-inner">
+            <div class="cc-tracking__map-header">
+                <h2 class="cc-tracking__section-title">Live Location</h2>
+                <button class="cc-tracking__map-toggle" (click)="toggleMap()">
+                    <svg class="cc-tracking__map-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    <span>{{ isMapHidden ? 'Show Map' : 'Hide Map' }}</span>
+                </button>
+            </div>
+            <div class="cc-tracking__map-container" [class.cc-tracking__map-container--hidden]="isMapHidden">
+                <div id="tracking-leaflet-map" class="cc-live-map" style="width: 100%; height: 400px; border-radius: 20px; z-index: 1;"></div>
+                
+                <!-- Map overlay info -->
+                <div class="cc-tracking__map-overlay" style="z-index: 1000;">
+                    <div class="cc-tracking__map-overlay-pill">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        <span>{{ delivery.estimatedArrival }} · {{ delivery.distance }} km remaining</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 4. DELIVERY INFO CARD                       -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="cc-tracking__delivery-section glass-panel">
+        <div class="cc-tracking__delivery-inner">
+            <h2 class="cc-tracking__section-title">Delivery Details</h2>
+            <div class="cc-tracking__delivery-card">
+                <div class="cc-tracking__delivery-card-main">
+                    <div class="cc-driver-info">
+                        <div class="cc-driver-avatar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                        </div>
+                        <div class="cc-driver-details">
+                            <h3 class="cc-driver-name">{{ delivery.provider.name }}</h3>
+                            <div class="cc-tracking__driver-rating">
+                                <span class="cc-tracking__rating-number">{{ delivery.provider.rating }} ★</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cc-tracking__delivery-meta mt-4">
+                        <div class="cc-info-item">
+                            <span class="cc-info-item__label">Vehicle</span>
+                            <span class="cc-info-item__value">{{ delivery.vehicleType }}</span>
+                        </div>
+                        <div class="cc-info-item">
+                            <span class="cc-info-item__label">Distance</span>
+                            <span class="cc-info-item__value">{{ delivery.distance }} km</span>
+                        </div>
+                        <div class="cc-info-item">
+                            <span class="cc-info-item__label">Package</span>
+                            <span class="cc-info-item__value">{{ delivery.weight }} kg</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

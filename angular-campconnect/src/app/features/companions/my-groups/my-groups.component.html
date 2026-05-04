@@ -1,0 +1,76 @@
+<div class="groups-container animate-fade-in">
+  <!-- Header -->
+  <div class="header-section">
+    <h1 class="page-title text-emerald-800">Mes Groupes de Voyage</h1>
+    <p class="page-subtitle text-emerald-600/80">Retrouvez tous les groupes auxquels vous participez.</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="state-container">
+    <div class="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
+    <p class="mt-4 text-emerald-800 font-medium">Recherche de vos groupes...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="state-container">
+    <div class="p-4 bg-red-100 text-red-700 rounded-xl max-w-md text-center">
+      <p>{{ error }}</p>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !error && groups.length === 0" class="state-container empty-state">
+    <div class="p-6 bg-emerald-50 text-emerald-600 rounded-full mb-4">
+      <lucide-icon [img]="Users" size="48"></lucide-icon>
+    </div>
+    <h3 class="text-xl font-bold text-gray-800 mb-2">Aucun groupe trouvé</h3>
+    <p class="text-gray-500 mb-6 text-center max-w-md">Vous ne faites partie d'aucun groupe de voyage pour le moment.
+      Rejoignez un projet ou créez le vôtre !</p>
+
+    <div class="flex gap-4">
+      <button class="btn btn-outline" routerLink="/trip-intents">Explorer les projets</button>
+      <button class="btn btn-primary" routerLink="/trip-intents/create">Créer un projet</button>
+    </div>
+  </div>
+
+  <!-- Groups Grid -->
+  <div *ngIf="!loading && !error && groups.length > 0" class="groups-grid">
+    <div *ngFor="let group of groups"
+      class="group-card shadow-sm border border-emerald-100/50 hover:shadow-md transition-shadow relative overflow-hidden bg-white"
+      [routerLink]="['/groups', group.id]">
+
+      <!-- Top color bar -->
+      <div class="h-2 w-full bg-emerald-500 absolute top-0 left-0"></div>
+
+      <div class="p-6">
+        <div class="flex justify-between items-start mb-4">
+          <h3 class="text-xl font-bold text-gray-800 line-clamp-1 truncate pr-4">{{ group.name }}</h3>
+          <!-- Quick badge for role if defined, default member for now -->
+          <span class="px-2 py-1 text-xs font-bold rounded-md bg-emerald-100 text-emerald-700">Membre</span>
+        </div>
+
+        <p class="text-gray-500 text-sm mb-6 line-clamp-2 min-h-[40px]">
+          {{ group.description || 'Groupe de voyage organisé sur CampConnect.' }}
+        </p>
+
+        <div class="mt-auto space-y-3">
+          <div class="flex items-center text-sm text-gray-600">
+            <lucide-icon [img]="Users" size="16" class="mr-2 text-emerald-500"></lucide-icon>
+            <span>{{ group.members?.length || 0 }} participants</span>
+          </div>
+
+          <div class="flex items-center text-sm text-gray-600">
+            <lucide-icon [img]="Calendar" size="16" class="mr-2 text-emerald-500"></lucide-icon>
+            <span>Créé le {{ formatDate(group.createdAt) }}</span>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-gray-100 flex justify-end">
+          <button class="text-emerald-600 font-semibold hover:text-emerald-700 text-sm flex items-center">
+            Voir le tableau de bord <span class="ml-1">→</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,214 @@
+<section class="cc-create-post">
+
+  <!-- Background texture -->
+  <div class="cc-create-post__bg" aria-hidden="true"></div>
+
+  <!-- Page content -->
+  <main class="cc-page" role="main">
+
+    <!-- Header -->
+    <header class="cc-header">
+      <div class="cc-header__icon" aria-hidden="true">🏕️</div>
+      <h1 class="cc-header__title">Share Your Adventure</h1>
+      <p class="cc-header__subtitle">Inspire the community with your experience</p>
+    </header>
+
+    <!-- Post card -->
+    <article class="cc-card">
+      <form [formGroup]="postForm" (ngSubmit)="onSubmit()" novalidate>
+
+        <div class="cc-card__body">
+
+          <!-- User row -->
+          <div class="cc-user">
+            <div class="cc-user__avatar">
+              <img [src]="currentUser.avatar" [alt]="currentUser.name"
+                onerror="this.style.display='none'; this.parentElement.querySelector('.cc-user__initials').style.display='flex'">
+              <span class="cc-user__initials">JR</span>
+            </div>
+            <div class="cc-user__info">
+              <span class="cc-user__name">{{ currentUser.name }}</span>
+              <span class="cc-user__handle">{{ currentUser.handle }} · Just now</span>
+            </div>
+          </div>
+
+          <!-- Toolbar -->
+          <div class="cc-toolbar" role="toolbar" aria-label="Shortcuts">
+            <button type="button" class="cc-toolbar__btn" title="Add photo" (click)="openFilePicker()"
+              aria-label="Add photo">📷</button>
+            <button type="button" class="cc-toolbar__btn" title="Add video" (click)="openFilePicker()"
+              aria-label="Add video">🎥</button>
+            <div class="cc-toolbar__divider"></div>
+            <button type="button" class="cc-toolbar__btn" title="Add emoji" (click)="insertEmoji()"
+              aria-label="Insert emoji">😊</button>
+          </div>
+
+          <!-- Title input -->
+          <div class="cc-field">
+            <label class="cc-field__label" for="postTitle">
+              <span class="cc-field__label-icon">✏️</span>
+              Title
+            </label>
+            <input id="postTitle" type="text" class="cc-input" formControlName="title"
+              placeholder="Give your adventure a catchy title..." aria-label="Post title">
+          </div>
+
+          <!-- Content textarea -->
+          <div class="cc-textarea-wrap">
+            <textarea #contentRef id="postContent" class="cc-textarea" formControlName="content"
+              placeholder="Where did you explore today? Share the trail, the sunset, the campfire stories..." rows="5"
+              (input)="onContentInput($event)" aria-label="Post content"
+              aria-describedby="charCounterEl contentError"></textarea>
+            <span id="charCounterEl" class="cc-char-counter" [class]="charClass" aria-live="polite">
+              {{ charCount }} / {{ MAX_CHARS }}
+            </span>
+          </div>
+
+          <!-- Validation message -->
+          <p id="contentError" class="cc-field__error"
+            *ngIf="postForm.get('content')?.errors?.['maxLength'] && postForm.get('content')?.touched">
+            Content exceeds {{ MAX_CHARS }} characters ({{ charCount }}/{{ MAX_CHARS }})
+          </p>
+
+          <!-- Media upload -->
+          <div class="cc-upload">
+            <div class="cc-upload__dropzone" [class.cc-upload__dropzone--active]="isDragging"
+              (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)"
+              (click)="openFilePicker()" role="button" tabindex="0" (keydown.enter)="openFilePicker()"
+              aria-label="Upload photos or videos">
+              <div class="cc-upload__icon">🏔️</div>
+              <div class="cc-upload__text">
+                <p class="cc-upload__title">Drag photos or videos here</p>
+                <p class="cc-upload__hint">JPG, PNG, MP4, HEIC · Max 50MB per file · Up to 10 files</p>
+              </div>
+              <button type="button" class="cc-upload__btn" (click)="$event.stopPropagation(); openFilePicker()">
+                📎 Browse Files
+              </button>
+            </div>
+
+            <!-- Hidden file input -->
+            <input #fileInputRef type="file" class="cc-upload__input" multiple accept="image/*,video/*"
+              (change)="onFileSelected($event)" aria-label="Choose files">
+
+            <!-- Previews -->
+            <div class="cc-upload__previews" *ngIf="uploadedFiles.length > 0" role="list">
+              <div *ngFor="let f of uploadedFiles" class="cc-upload__preview-item" role="listitem">
+                <img *ngIf="f.type === 'image'" [src]="f.url" [alt]="f.file.name">
+                <video *ngIf="f.type === 'video'" [src]="f.url" muted></video>
+                <button type="button" class="cc-upload__preview-remove" (click)="removeMedia(f.id)"
+                  aria-label="Remove file">✕</button>
+              </div>
+            </div>
+          </div>
+
+          <hr class="cc-divider">
+
+          <!-- Location -->
+          <div class="cc-field cc-location-wrap">
+            <label class="cc-field__label" for="locationInput">
+              <span class="cc-field__label-icon">📍</span>
+              Location
+              <span class="cc-field__label-optional">— optional</span>
+            </label>
+            <select id="locationInput" class="cc-input cc-select" formControlName="location" aria-label="Location">
+              <option value="">Choisir un gouvernorat</option>
+              <option *ngFor="let loc of locationSuggestions" [value]="loc.name">
+                {{ loc.name }} — {{ loc.region }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Tags -->
+          <div class="cc-field cc-tags">
+            <label class="cc-field__label">
+              <span class="cc-field__label-icon">🏷️</span>
+              Tags
+            </label>
+            <div class="cc-tags__container" [class.cc-tags__container--focused]="tagsContainerFocused"
+              (click)="tagInputEl.focus()">
+              <span *ngFor="let tag of tags" class="cc-tag">
+                #{{ tag }}
+                <button type="button" class="cc-tag__remove" (click)="removeTag(tag)"
+                  [attr.aria-label]="'Remove tag ' + tag">✕</button>
+              </span>
+              <input #tagInputEl type="text" class="cc-tags__input" [(ngModel)]="tagInput"
+                [ngModelOptions]="{standalone: true}"
+                placeholder="{{ tags.length === 0 ? 'Type a tag and press Enter' : '' }}"
+                (focus)="tagsContainerFocused = true" (blur)="onTagBlur()" (keydown)="onTagKeyDown($event)"
+                aria-label="Add tags">
+            </div>
+            <!-- Suggestions -->
+            <div class="cc-tags__suggestions">
+              <button type="button" *ngFor="let s of suggestedTags" class="cc-tags__suggestion"
+                [class.cc-tags__suggestion--used]="tags.includes(s)" (click)="addSuggestedTag(s)"
+                [disabled]="tags.includes(s)">
+                #{{ s }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Visibility -->
+          <div class="cc-field cc-visibility">
+            <label class="cc-field__label">
+              <span class="cc-field__label-icon">👁️</span>
+              Visibility
+            </label>
+            <div class="cc-visibility__options" role="radiogroup" aria-label="Post visibility">
+              <div class="cc-visibility__option">
+                <input type="radio" class="cc-visibility__radio" id="visPublic" formControlName="visibility"
+                  value="public">
+                <label class="cc-visibility__label" for="visPublic">
+                  <span class="cc-visibility__icon">🌍</span> Public
+                </label>
+              </div>
+              <div class="cc-visibility__option">
+                <input type="radio" class="cc-visibility__radio" id="visFollowers" formControlName="visibility"
+                  value="followers">
+                <label class="cc-visibility__label" for="visFollowers">
+                  <span class="cc-visibility__icon">👥</span> Followers
+                </label>
+              </div>
+              <div class="cc-visibility__option">
+                <input type="radio" class="cc-visibility__radio" id="visPrivate" formControlName="visibility"
+                  value="private">
+                <label class="cc-visibility__label" for="visPrivate">
+                  <span class="cc-visibility__icon">🔒</span> Only Me
+                </label>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /card body -->
+
+        <!-- Footer actions -->
+        <footer class="cc-card__footer">
+          <div class="cc-card__footer-info">
+            <span>💾</span>
+            <span>{{ tags.length }} tag{{ tags.length !== 1 ? 's' : '' }} · {{ uploadedFiles.length }} file{{
+              uploadedFiles.length !== 1 ? 's' : '' }}</span>
+          </div>
+          <div class="cc-card__footer-actions">
+            <button type="button" class="cc-btn cc-btn--ghost" (click)="onCancel()">
+              Cancel
+            </button>
+            <button type="submit" class="cc-btn cc-btn--primary" [disabled]="!canSubmit || isPosting || showSuccess">
+              <span *ngIf="isPosting" class="cc-btn__spinner"></span>
+              <span *ngIf="!isPosting && !showSuccess">🚀 Publish</span>
+              <span *ngIf="isPosting">Publishing...</span>
+              <span *ngIf="showSuccess">✅ Published!</span>
+            </button>
+          </div>
+        </footer>
+
+      </form>
+    </article>
+
+  </main>
+
+  <!-- Toast -->
+  <div class="cc-toast" [class.cc-toast--visible]="toastVisible" role="alert" aria-live="assertive">
+    <span>{{ toastIcon }}</span>
+    <span>{{ toastMessage }}</span>
+  </div>
+
+</section>

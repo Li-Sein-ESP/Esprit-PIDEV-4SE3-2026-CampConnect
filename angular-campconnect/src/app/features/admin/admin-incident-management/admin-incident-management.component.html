@@ -1,0 +1,144 @@
+<div class="min-h-screen bg-[var(--color-background)] py-12">
+  <div class="container max-w-6xl">
+    <div class="mb-8 flex items-center justify-between gap-4">
+      <div>
+        <h2 class="mb-2">Safety Moderation Dashboard</h2>
+        <p class="text-[var(--color-text-secondary)]">Review pending safety alerts and incident reports</p>
+      </div>
+      <app-button variant="outline" (click)="loadModerationQueues()">Refresh</app-button>
+    </div>
+
+    <div *ngIf="error" class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      {{ error }}
+    </div>
+
+    <div *ngIf="analyticsAccessDenied" class="mb-6 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-700">
+      Acces administrateur requis
+    </div>
+
+    <div *ngIf="analyticsError && !analyticsAccessDenied" class="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+      {{ analyticsError }}
+    </div>
+
+    <div class="mb-6 grid gap-4 md:grid-cols-3">
+      <app-card variant="elevated">
+        <app-card-content customClass="p-5">
+          <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">Reviewed incidents (24h)</p>
+          <p class="text-3xl font-bold text-slate-900">{{ schedulerImpact.reviewedIncidentsLast24h }}</p>
+        </app-card-content>
+      </app-card>
+
+      <app-card variant="elevated">
+        <app-card-content customClass="p-5">
+          <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">Auto alerts (24h)</p>
+          <p class="text-3xl font-bold text-slate-900">{{ schedulerImpact.autoAlertsCreatedLast24h }}</p>
+        </app-card-content>
+      </app-card>
+
+      <app-card variant="elevated">
+        <app-card-content customClass="p-5">
+          <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">Pending older than 24h</p>
+          <p class="text-3xl font-bold text-slate-900">{{ schedulerImpact.stalePendingIncidents }}</p>
+        </app-card-content>
+      </app-card>
+    </div>
+
+    <app-card variant="elevated" class="mb-6">
+      <app-card-content customClass="p-6">
+        <div class="mb-3 flex items-center justify-between gap-3">
+          <h3>Top Regions (Open Incidents)</h3>
+          <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ openSummary.length }} rows</span>
+        </div>
+
+        <div *ngIf="openSummary.length === 0" class="text-sm text-[var(--color-text-secondary)]">
+          No open incident summary data.
+        </div>
+
+        <div class="overflow-x-auto" *ngIf="openSummary.length > 0">
+          <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead>
+              <tr class="text-left text-xs uppercase tracking-wide text-slate-500">
+                <th class="px-3 py-2">Region</th>
+                <th class="px-3 py-2">Trip</th>
+                <th class="px-3 py-2">Reporter</th>
+                <th class="px-3 py-2">Open Incidents</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr *ngFor="let row of openSummary | slice:0:5">
+                <td class="px-3 py-2 font-medium text-slate-900">{{ row.region || 'Unknown' }}</td>
+                <td class="px-3 py-2 text-slate-600">{{ row.tripId || '-' }}</td>
+                <td class="px-3 py-2 text-slate-600">{{ row.reporterId || '-' }}</td>
+                <td class="px-3 py-2 text-slate-900">{{ row.openIncidentCount }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </app-card-content>
+    </app-card>
+
+    <div class="grid gap-6 lg:grid-cols-2">
+      <app-card variant="elevated">
+        <app-card-content customClass="p-6">
+          <h3 class="mb-4">Pending Alerts ({{ pendingAlerts.length }})</h3>
+
+          <div *ngIf="loading" class="text-sm text-[var(--color-text-secondary)]">Loading alerts...</div>
+
+          <div *ngIf="!loading && pendingAlerts.length === 0" class="text-sm text-[var(--color-text-secondary)]">
+            No pending alerts.
+          </div>
+
+          <div class="space-y-4" *ngIf="pendingAlerts.length > 0">
+            <div *ngFor="let alert of pendingAlerts" class="rounded-xl border border-slate-200 p-4">
+              <div class="mb-2 flex items-start justify-between gap-3">
+                <h4 class="font-semibold text-slate-900">{{ alert.title }}</h4>
+                <span class="rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800">
+                  {{ alert.severity || 'N/A' }}
+                </span>
+              </div>
+              <p class="mb-2 text-sm text-slate-600">{{ alert.description }}</p>
+              <p class="mb-4 text-xs text-slate-500">
+                {{ alert.locationName || 'Unknown location' }} - {{ alert.regionName || 'Unknown region' }}
+              </p>
+              <div class="flex gap-2">
+                <app-button size="sm" (click)="approveAlert(alert.id)">Approve</app-button>
+                <app-button size="sm" variant="outline" (click)="rejectAlert(alert.id)">Reject</app-button>
+              </div>
+            </div>
+          </div>
+        </app-card-content>
+      </app-card>
+
+      <app-card variant="elevated">
+        <app-card-content customClass="p-6">
+          <h3 class="mb-4">Pending Incidents ({{ pendingIncidents.length }})</h3>
+
+          <div *ngIf="loading" class="text-sm text-[var(--color-text-secondary)]">Loading incidents...</div>
+
+          <div *ngIf="!loading && pendingIncidents.length === 0" class="text-sm text-[var(--color-text-secondary)]">
+            No pending incidents.
+          </div>
+
+          <div class="space-y-4" *ngIf="pendingIncidents.length > 0">
+            <div *ngFor="let incident of pendingIncidents" class="rounded-xl border border-slate-200 p-4">
+              <div class="mb-2 flex items-start justify-between gap-3">
+                <h4 class="font-semibold text-slate-900">{{ incident.title }}</h4>
+                <span class="rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800">
+                  {{ incident.status }}
+                </span>
+              </div>
+              <p class="mb-2 text-sm text-slate-600">{{ incident.description }}</p>
+              <p class="mb-4 text-xs text-slate-500">
+                Severity: {{ incident.severity || 'N/A' }} - Region: {{ incident.regionName || 'Unknown' }}
+              </p>
+              <div class="flex gap-2">
+                <app-button size="sm" (click)="updateIncidentStatus(incident.id, 'reviewed')">Mark Reviewed</app-button>
+                <app-button size="sm" variant="outline" (click)="updateIncidentStatus(incident.id, 'resolved')">Mark Resolved</app-button>
+              </div>
+            </div>
+          </div>
+        </app-card-content>
+      </app-card>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,693 @@
+/* ========================================
+   CampConnect Product Analytics — Scoped Styles
+   Prefix: cc-analytics
+   ======================================== */
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.cc-analytics-page {
+  --cc-bg: #f6f5f1;
+  --cc-surface: #ffffff;
+  --cc-surface-alt: #faf9f6;
+  --cc-border: #e8e5df;
+  --cc-border-light: #f0ede8;
+  --cc-text-primary: #1a1a1a;
+  --cc-text-secondary: #6b6560;
+  --cc-text-tertiary: #9b9590;
+  --cc-accent: #5a7247;
+  --cc-accent-light: #e8efe4;
+  --cc-accent-hover: #4a6039;
+  --cc-amber: #b8860b;
+  --cc-amber-light: #fdf6e3;
+  --cc-red: #c0392b;
+  --cc-red-light: #fdecea;
+  --cc-blue: #2e6b8a;
+  --cc-blue-light: #e8f1f6;
+  --cc-radius: 16px;
+  --cc-radius-sm: 10px;
+  --cc-radius-xs: 6px;
+  --cc-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --cc-shadow: 0 2px 8px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --cc-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.04);
+  --cc-font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --cc-transition: 0.2s ease;
+
+  font-family: var(--cc-font);
+  background-color: transparent;
+  /* Changed from var(--cc-bg) since provider layout handles this */
+  color: var(--cc-text-primary);
+  min-height: 100%;
+  padding: 32px 40px 64px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.cc-analytics-page .cc-container {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ── Back Button ── */
+.cc-analytics-page .cc-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--cc-surface);
+  border: 1px solid var(--cc-border);
+  border-radius: var(--cc-radius-sm);
+  color: var(--cc-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--cc-font);
+  cursor: pointer;
+  transition: all var(--cc-transition);
+  text-decoration: none;
+  box-shadow: var(--cc-shadow-sm);
+}
+
+.cc-analytics-page .cc-back-btn:hover {
+  background: var(--cc-surface-alt);
+  color: var(--cc-text-primary);
+  border-color: var(--cc-border);
+  box-shadow: var(--cc-shadow);
+}
+
+.cc-analytics-page .cc-back-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+}
+
+/* ── Header Section ── */
+.cc-analytics-page .cc-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 24px;
+  margin-bottom: 36px;
+}
+
+.cc-analytics-page .cc-product-thumb {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--cc-radius);
+  overflow: hidden;
+  background: var(--cc-accent-light);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--cc-shadow);
+  border: 2px solid var(--cc-border-light);
+}
+
+.cc-analytics-page .cc-product-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cc-analytics-page .cc-product-thumb-placeholder {
+  color: var(--cc-accent);
+  opacity: 0.7;
+}
+
+.cc-analytics-page .cc-header-info {
+  flex: 1;
+}
+
+.cc-analytics-page .cc-header-info h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--cc-text-primary);
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.cc-analytics-page .cc-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.cc-analytics-page .cc-category-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  background: var(--cc-accent-light);
+  color: var(--cc-accent);
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 20px;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+}
+
+.cc-analytics-page .cc-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 20px;
+  letter-spacing: 0.2px;
+}
+
+.cc-analytics-page .cc-status-badge--active {
+  background: #e6f4ea;
+  color: #1e7e34;
+}
+
+.cc-analytics-page .cc-status-badge--active::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #1e7e34;
+  animation: cc-pulse 2s ease-in-out infinite;
+}
+
+@keyframes cc-pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.cc-analytics-page .cc-header-period {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cc-analytics-page .cc-period-select {
+  padding: 8px 14px;
+  border: 1px solid var(--cc-border);
+  border-radius: var(--cc-radius-sm);
+  background: var(--cc-surface);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cc-text-secondary);
+  font-family: var(--cc-font);
+  cursor: pointer;
+  box-shadow: var(--cc-shadow-sm);
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6560' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+
+/* ── KPI Cards ── */
+.cc-analytics-page .cc-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.cc-analytics-page .cc-kpi-card {
+  background: var(--cc-surface);
+  border-radius: var(--cc-radius);
+  padding: 24px 26px;
+  box-shadow: var(--cc-shadow);
+  border: 1px solid var(--cc-border-light);
+  transition: all var(--cc-transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.cc-analytics-page .cc-kpi-card:hover {
+  box-shadow: var(--cc-shadow-md);
+  transform: translateY(-1px);
+}
+
+.cc-analytics-page .cc-kpi-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: var(--cc-radius) var(--cc-radius) 0 0;
+}
+
+.cc-analytics-page .cc-kpi-card--rentals::after {
+  background: var(--cc-accent);
+}
+
+.cc-analytics-page .cc-kpi-card--revenue::after {
+  background: var(--cc-blue);
+}
+
+.cc-analytics-page .cc-kpi-card--rating::after {
+  background: var(--cc-amber);
+}
+
+.cc-analytics-page .cc-kpi-card--cancel::after {
+  background: var(--cc-red);
+}
+
+.cc-analytics-page .cc-kpi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.cc-analytics-page .cc-kpi-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cc-text-tertiary);
+  letter-spacing: 0.2px;
+}
+
+.cc-analytics-page .cc-kpi-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--cc-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cc-analytics-page .cc-kpi-icon--rentals {
+  background: var(--cc-accent-light);
+  color: var(--cc-accent);
+}
+
+.cc-analytics-page .cc-kpi-icon--revenue {
+  background: var(--cc-blue-light);
+  color: var(--cc-blue);
+}
+
+.cc-analytics-page .cc-kpi-icon--rating {
+  background: var(--cc-amber-light);
+  color: var(--cc-amber);
+}
+
+.cc-analytics-page .cc-kpi-icon--cancel {
+  background: var(--cc-red-light);
+  color: var(--cc-red);
+}
+
+.cc-analytics-page .cc-kpi-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.cc-analytics-page .cc-kpi-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--cc-text-primary);
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.cc-analytics-page .cc-kpi-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.cc-analytics-page .cc-kpi-change--up {
+  color: #1e7e34;
+  background: #e6f4ea;
+}
+
+.cc-analytics-page .cc-kpi-change--down {
+  color: var(--cc-red);
+  background: var(--cc-red-light);
+}
+
+.cc-analytics-page .cc-kpi-change svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* ── Charts Grid ── */
+.cc-analytics-page .cc-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.cc-analytics-page .cc-card {
+  background: var(--cc-surface);
+  border-radius: var(--cc-radius);
+  padding: 28px;
+  box-shadow: var(--cc-shadow);
+  border: 1px solid var(--cc-border-light);
+}
+
+.cc-analytics-page .cc-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.cc-analytics-page .cc-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cc-text-primary);
+  letter-spacing: -0.3px;
+}
+
+.cc-analytics-page .cc-card-subtitle {
+  font-size: 12px;
+  color: var(--cc-text-tertiary);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.cc-analytics-page .cc-chart-wrapper {
+  position: relative;
+  height: 260px;
+}
+
+/* Native CSS Bar Chart Implementation */
+.cc-bar-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 10px;
+  border-bottom: 1px dashed var(--cc-border);
+}
+
+.cc-bar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  flex: 1;
+}
+
+.cc-bar-fill-wrap {
+  width: 100%;
+  height: calc(100% - 30px);
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.cc-bar-fill {
+  width: 45%;
+  background: linear-gradient(0deg, rgba(46, 107, 138, 0.6) 0%, var(--cc-blue) 100%);
+  border-radius: 6px 6px 0 0;
+  transition: height 1s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+}
+
+.cc-bar-fill:hover {
+  background: var(--cc-blue);
+}
+
+.cc-bar-tooltip {
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a1a;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.cc-bar-fill:hover .cc-bar-tooltip {
+  opacity: 1;
+}
+
+.cc-bar-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--cc-text-tertiary);
+  margin-top: 10px;
+}
+
+.cc-chart-svg-wrapper {
+  border-left: 1px dashed var(--cc-border);
+  border-bottom: 1px dashed var(--cc-border);
+}
+
+/* ── Bottom Grid ── */
+.cc-analytics-page .cc-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* ── Rating Breakdown ── */
+.cc-analytics-page .cc-rating-summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--cc-border-light);
+}
+
+.cc-analytics-page .cc-rating-big {
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--cc-text-primary);
+  letter-spacing: -2px;
+  line-height: 1;
+}
+
+.cc-analytics-page .cc-rating-stars {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 4px;
+}
+
+.cc-analytics-page .cc-rating-stars svg {
+  width: 16px;
+  height: 16px;
+}
+
+.cc-analytics-page .cc-rating-count {
+  font-size: 13px;
+  color: var(--cc-text-tertiary);
+  font-weight: 500;
+}
+
+.cc-analytics-page .cc-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.cc-analytics-page .cc-rating-row:last-child {
+  margin-bottom: 0;
+}
+
+.cc-analytics-page .cc-rating-row-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cc-text-secondary);
+  min-width: 30px;
+  justify-content: flex-end;
+}
+
+.cc-analytics-page .cc-rating-row-label svg {
+  width: 13px;
+  height: 13px;
+  color: var(--cc-amber);
+}
+
+.cc-analytics-page .cc-rating-bar-track {
+  flex: 1;
+  height: 10px;
+  background: var(--cc-border-light);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.cc-analytics-page .cc-rating-bar-fill {
+  height: 100%;
+  border-radius: 20px;
+  background: linear-gradient(90deg, var(--cc-amber), #d4a017);
+  transition: width 1s ease;
+}
+
+.cc-analytics-page .cc-rating-row-count {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cc-text-secondary);
+  min-width: 36px;
+  text-align: right;
+}
+
+/* ── Insights Section ── */
+.cc-analytics-page .cc-insight-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cc-analytics-page .cc-insight-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: var(--cc-radius-sm);
+  border: 1px solid var(--cc-border-light);
+  background: var(--cc-surface-alt);
+  transition: all var(--cc-transition);
+}
+
+.cc-analytics-page .cc-insight-item:hover {
+  border-color: var(--cc-border);
+  box-shadow: var(--cc-shadow-sm);
+}
+
+.cc-analytics-page .cc-insight-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--cc-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cc-analytics-page .cc-insight-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.cc-analytics-page .cc-insight-icon--weekend {
+  background: var(--cc-accent-light);
+  color: var(--cc-accent);
+}
+
+.cc-analytics-page .cc-insight-icon--summer {
+  background: var(--cc-amber-light);
+  color: var(--cc-amber);
+}
+
+.cc-analytics-page .cc-insight-icon--stock {
+  background: var(--cc-red-light);
+  color: var(--cc-red);
+}
+
+.cc-analytics-page .cc-insight-icon--growth {
+  background: var(--cc-blue-light);
+  color: var(--cc-blue);
+}
+
+.cc-analytics-page .cc-insight-content {
+  flex: 1;
+}
+
+.cc-analytics-page .cc-insight-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cc-text-primary);
+  margin-bottom: 3px;
+}
+
+.cc-analytics-page .cc-insight-desc {
+  font-size: 12px;
+  color: var(--cc-text-tertiary);
+  font-weight: 450;
+  line-height: 1.5;
+}
+
+.cc-analytics-page .cc-insight-badge {
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 20px;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.cc-analytics-page .cc-insight-badge--info {
+  background: var(--cc-accent-light);
+  color: var(--cc-accent);
+}
+
+.cc-analytics-page .cc-insight-badge--warning {
+  background: var(--cc-amber-light);
+  color: var(--cc-amber);
+}
+
+.cc-analytics-page .cc-insight-badge--alert {
+  background: var(--cc-red-light);
+  color: var(--cc-red);
+}
+
+.cc-analytics-page .cc-insight-badge--trend {
+  background: var(--cc-blue-light);
+  color: var(--cc-blue);
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .cc-analytics-page {
+    padding: 24px 20px 48px;
+  }
+
+  .cc-analytics-page .cc-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .cc-analytics-page .cc-charts-grid,
+  .cc-analytics-page .cc-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .cc-analytics-page .cc-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cc-analytics-page .cc-header {
+    flex-wrap: wrap;
+  }
+
+  .cc-analytics-page .cc-header-period {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 12px;
+  }
+
+  .cc-analytics-page .cc-kpi-value {
+    font-size: 28px;
+  }
+}

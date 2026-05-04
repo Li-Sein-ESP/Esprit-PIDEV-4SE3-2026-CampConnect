@@ -1,0 +1,168 @@
+<div class="create-container animate-fade-in" *ngIf="!isLoading">
+
+    <!-- Header -->
+    <div class="header-section">
+        <button class="btn btn-icon btn-ghost mb-4" [routerLink]="['/trip-intents', intentId]">
+            <lucide-icon [img]="ArrowLeft" size="20"></lucide-icon>
+            Annuler
+        </button>
+        <h1 class="page-title text-emerald-800">Modifier le projet de voyage</h1>
+        <p class="page-subtitle text-emerald-600/80">Mettez à jour les détails de votre aventure.</p>
+    </div>
+
+    <form [formGroup]="intentForm" (ngSubmit)="onSubmit()" class="form-content space-y-8">
+
+        <!-- Basics Section -->
+        <section class="form-section bg-white p-6 rounded-2xl shadow-sm border border-emerald-100">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="p-2 bg-emerald-100 text-emerald-600 rounded-lg">
+                    <lucide-icon [img]="Target" size="20"></lucide-icon>
+                </div>
+                <h2 class="text-xl font-bold text-gray-800">L'Essentiel</h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Title -->
+                <div class="form-group md:col-span-2">
+                    <label>Nom du projet</label>
+                    <input type="text" class="input" formControlName="title"
+                        placeholder="Ex: Expédition dans le Haut Atlas"
+                        [class.border-red-500]="intentForm.get('title')?.touched && intentForm.get('title')?.invalid">
+                    <span class="error-msg text-red-500 mt-1 block text-sm font-medium"
+                        *ngIf="intentForm.get('title')?.touched && intentForm.get('title')?.invalid">
+                        <span *ngIf="intentForm.get('title')?.errors?.['required']">Veuillez donner un nom à votre projet.</span>
+                        <span *ngIf="intentForm.get('title')?.errors?.['minlength']">Minimum 5 caractères.</span>
+                        <span *ngIf="intentForm.get('title')?.errors?.['maxlength']">Maximum 100 caractères.</span>
+                    </span>
+                </div>
+
+                <!-- Zone -->
+                <div class="form-group md:col-span-2">
+                    <label>Zone / Région Préférée</label>
+                    <div class="input-with-icon">
+                        <lucide-icon [img]="Map" size="18" class="icon-left text-gray-400"></lucide-icon>
+                        <input type="text" class="input pl-10" formControlName="preferredZone"
+                            placeholder="Ex: Ifrane, Toubkal, M'Hamid El Ghizlane"
+                            [class.border-red-500]="intentForm.get('preferredZone')?.touched && intentForm.get('preferredZone')?.invalid">
+                    </div>
+                    <span class="error-msg text-red-500 mt-1 block text-sm font-medium"
+                        *ngIf="intentForm.get('preferredZone')?.touched && intentForm.get('preferredZone')?.invalid">
+                        <span *ngIf="intentForm.get('preferredZone')?.errors?.['required']">La zone/région est obligatoire.</span>
+                    </span>
+                </div>
+
+                <!-- Dates -->
+                <div class="form-group">
+                    <label>Date de départ prévue</label>
+                    <input type="date" class="input" formControlName="dateFrom" [min]="today"
+                        [class.border-red-500]="intentForm.get('dateFrom')?.touched && intentForm.get('dateFrom')?.invalid">
+                    <span class="error-msg text-red-500 mt-1 block text-sm font-medium"
+                        *ngIf="intentForm.get('dateFrom')?.touched && intentForm.get('dateFrom')?.invalid">
+                        <span *ngIf="intentForm.get('dateFrom')?.errors?.['required']">Obligatoire.</span>
+                    </span>
+                </div>
+                <div class="form-group">
+                    <label>Date de retour prévue</label>
+                    <input type="date" class="input" formControlName="dateTo" [min]="intentForm.get('dateFrom')?.value || today"
+                        [class.border-red-500]="intentForm.get('dateTo')?.touched && intentForm.get('dateTo')?.invalid">
+                    <span class="error-msg text-red-500 mt-1 block text-sm font-medium"
+                        *ngIf="intentForm.get('dateTo')?.touched && intentForm.get('dateTo')?.invalid">
+                        <span *ngIf="intentForm.get('dateTo')?.errors?.['required']">Obligatoire.</span>
+                    </span>
+                    <span class="error-msg text-red-500 block mt-1 text-sm font-medium"
+                        *ngIf="intentForm.hasError('dateRangeInvalid') && intentForm.get('dateTo')?.touched">
+                        La date de retour doit être après la date de départ.
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Style Section -->
+        <section class="form-section bg-white p-6 rounded-2xl shadow-sm border border-emerald-100">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="p-2 bg-amber-100 text-amber-600 rounded-lg">
+                    <lucide-icon [img]="Tent" size="20"></lucide-icon>
+                </div>
+                <h2 class="text-xl font-bold text-gray-800">Style & Budget</h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Camping Style (Custom Radio Selection) -->
+                <div class="form-group md:col-span-2">
+                    <label class="mb-3 block">Style de camping recherché</label>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <div *ngFor="let style of campingStyles" class="style-card transition-all"
+                            [class.selected]="intentForm.get('campingStyle')?.value === style.value"
+                            (click)="setCampingStyle(style.value)">
+                            <lucide-icon [img]="style.icon" size="24" class="mb-2"></lucide-icon>
+                            <span class="font-semibold">{{ style.label }}</span>
+                            <span class="text-xs text-center mt-1 opacity-80">{{ style.desc }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Budget -->
+                <div class="form-group">
+                    <label>Budget Maximum par pers.</label>
+                    <div class="input-with-icon">
+                        <lucide-icon [img]="DollarSign" size="18" class="icon-left text-gray-400"></lucide-icon>
+                        <input type="number" class="input pl-10" formControlName="budgetMax" placeholder="Max (MAD)"
+                            [class.border-red-500]="intentForm.get('budgetMax')?.touched && intentForm.get('budgetMax')?.invalid">
+                    </div>
+                    <span class="error-msg text-red-500 mt-1 block text-sm font-medium"
+                        *ngIf="intentForm.get('budgetMax')?.touched && intentForm.get('budgetMax')?.invalid">
+                        <span *ngIf="intentForm.get('budgetMax')?.errors?.['required']">Budget obligatoire.</span>
+                        <span *ngIf="intentForm.get('budgetMax')?.errors?.['min']">Minimum 50 MAD.</span>
+                    </span>
+                </div>
+
+                <!-- Experience -->
+                <div class="form-group">
+                    <label>Niveau d'expérience visé</label>
+                    <select class="input" formControlName="experienceLevel">
+                        <option *ngFor="let lvl of experienceLevels" [value]="lvl">
+                            Niveau : {{ getStyleLabel(lvl) }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Details & Status Section -->
+        <section class="form-section bg-white p-6 rounded-2xl shadow-sm border border-emerald-100">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="p-2 bg-blue-100 text-blue-600 rounded-lg">
+                    <lucide-icon [img]="Key" size="20"></lucide-icon>
+                </div>
+                <h2 class="text-xl font-bold text-gray-800">Statut du Projet</h2>
+            </div>
+
+            <!-- Status -->
+            <div class="form-group">
+                <label>Visibilité et Statut</label>
+                <select class="input" formControlName="status">
+                    <option value="DRAFT">Brouillon (Privé)</option>
+                    <option value="OPEN">Ouvert (Recherche de compagnons)</option>
+                    <option value="CLOSED">Fermé (Complet ou annulé)</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- Submit -->
+        <div class="sticky bottom-4 z-10 flex justify-end">
+            <button type="submit"
+                class="btn btn-primary px-8 py-4 shadow-xl hover:scale-[1.02] transition-transform text-lg"
+                [disabled]="isSubmitting || intentForm.invalid">
+                <lucide-icon *ngIf="isSubmitting" [img]="Map" size="20" class="animate-spin mr-2"></lucide-icon>
+                {{ isSubmitting ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<!-- Loading state -->
+<div *ngIf="isLoading" class="min-h-[60vh] flex flex-col items-center justify-center">
+    <div class="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
+    <p class="mt-4 text-emerald-800 font-medium">Chargement du projet...</p>
+</div>

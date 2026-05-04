@@ -1,0 +1,18 @@
+/* CampConnect Camper Profile — minimal custom CSS, all visual work done in Tailwind */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:host {
+  display: block;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Tab switch fade-in */
+.cc-tab-enter {
+  animation: ccTabIn 0.28s ease both;
+}
+
+@keyframes ccTabIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
