@@ -1,6 +1,11 @@
 package com.campconnect.controller;
 
+<<<<<<< HEAD
 import com.campconnect.dto.GroupInviteDetailDto;
+=======
+import com.campconnect.dto.GroupInviteDTO;
+import com.campconnect.dto.GroupInviteDetailDTO;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import com.campconnect.model.GroupInvite;
 import com.campconnect.model.GroupInviteStatus;
 import com.campconnect.service.IGroupInviteService;
@@ -71,7 +76,11 @@ class GroupInviteControllerTest {
     @Test
     void getInviteDetailsForUser_ShouldReturnList() throws Exception {
         // Arrange
+<<<<<<< HEAD
         GroupInviteDetailDto detail = new GroupInviteDetailDto();
+=======
+        GroupInviteDetailDTO detail = new GroupInviteDetailDTO();
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         detail.setId("invite-1");
         
         when(groupInviteService.getInviteDetailsForUser("user-1")).thenReturn(Collections.singletonList(detail));

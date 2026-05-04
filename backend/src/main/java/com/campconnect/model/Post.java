@@ -25,6 +25,15 @@ public class Post {
     private String authorName;
     private String authorUsername;
 
+<<<<<<< HEAD
+=======
+    private String title;
+    private String category;
+    private List<String> tags = new ArrayList<>();
+    private List<String> imageUrls = new ArrayList<>();
+    private String location;
+
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     private List<Comment> comments = new ArrayList<>();

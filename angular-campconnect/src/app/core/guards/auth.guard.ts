@@ -21,8 +21,12 @@ export const authGuard: CanActivateFn = (
             return true;
         }
 
+<<<<<<< HEAD
         const userRoles = authService.getRoles();
         const hasRequiredRole = requiredRoles.some(role => userRoles.includes(role));
+=======
+        const hasRequiredRole = requiredRoles.some(role => authService.hasRole(role));
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
         if (hasRequiredRole) {
             return true;

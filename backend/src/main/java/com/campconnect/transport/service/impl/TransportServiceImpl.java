@@ -81,6 +81,14 @@ public class TransportServiceImpl implements ITransportService {
         }
     }
 
+<<<<<<< HEAD
+=======
+    @Override
+    public java.util.List<java.util.Map<String, Object>> getPopularityStats() {
+        return repository.getTransportPopularityStats();
+    }
+
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     private void mapDtoToEntity(TransportDTO dto, Transport transport) {
         if (dto.getTripId() != null)
             transport.setTripId(dto.getTripId());

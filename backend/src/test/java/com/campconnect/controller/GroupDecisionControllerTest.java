@@ -1,6 +1,10 @@
 package com.campconnect.controller;
 
+<<<<<<< HEAD
 import com.campconnect.dto.GroupDecisionDto;
+=======
+import com.campconnect.dto.GroupDecisionDTO;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import com.campconnect.dto.VoteRequest;
 import com.campconnect.model.GroupDecision;
 import com.campconnect.service.IGroupDecisionService;
@@ -38,12 +42,21 @@ class GroupDecisionControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
+<<<<<<< HEAD
     void createDecision_ShouldReturnCreated() throws Exception {
         // Arrange
         GroupDecisionDto dto = new GroupDecisionDto();
         dto.setQuestion("Quoi manger ?");
         dto.setGroupId("group-1");
 
+=======
+    void createDecision_Success() throws Exception {
+        GroupDecisionDTO dto = new GroupDecisionDTO();
+        dto.setGroupId("group-1");
+        dto.setQuestion("Lunch Place");
+        dto.setOptions(java.util.List.of("Pizza", "Burgers"));
+        dto.setType(com.campconnect.model.GroupDecisionType.ACTIVITY);
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         GroupDecision created = GroupDecision.builder().id("dec-1").question("Quoi manger ?").build();
         when(groupDecisionService.createDecision(any(GroupDecision.class))).thenReturn(created);
 

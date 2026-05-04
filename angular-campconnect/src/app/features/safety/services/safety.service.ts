@@ -3,12 +3,22 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, map } from 'rxjs';
 import { IncidentReport, SafetyAlert } from '../models/safety.model';
 
+<<<<<<< HEAD
+=======
+import { environment } from '../../../../environments/environment';
+
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 @Injectable({
     providedIn: 'root'
 })
 export class SafetyService {
+<<<<<<< HEAD
     private apiUrl = 'http://localhost:8080/api/incidents';
     private apiUrlAlerts = 'http://localhost:8080/api/alerts';
+=======
+    private apiUrl = `${environment.apiUrl}/incidents`;
+    private apiUrlAlerts = `${environment.apiUrl}/alerts`;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
     constructor(private http: HttpClient) { }
 

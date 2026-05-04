@@ -5,6 +5,10 @@ import java.util.UUID;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import com.campconnect.transport.enums.TransportMode;
+<<<<<<< HEAD
+=======
+import com.campconnect.transport.enums.TransportStatus;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +25,13 @@ public class Transport {
     private int duration;
     private String provider;
     private String imageUrl;
+<<<<<<< HEAD
+=======
+    private TransportStatus status = TransportStatus.AVAILABLE;
+    // Rating summary fields (computed from transport reviews)
+    private Double averageRating;
+    private Integer reviewCount;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
     public Transport(String tripId, String routeSegmentId, TransportMode mode, BigDecimal cost, int duration, String provider) {
         this.id = UUID.randomUUID().toString();

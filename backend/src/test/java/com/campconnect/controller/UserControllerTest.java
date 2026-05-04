@@ -50,7 +50,11 @@ class UserControllerTest {
 
     @Test
     void getMe_ShouldReturnProfile() throws Exception {
+<<<<<<< HEAD
         UserDetailsImpl principal = new UserDetailsImpl("user-1", "camper", "camper@test.com", "pass", false,
+=======
+        UserDetailsImpl principal = new UserDetailsImpl("user-1", "camper", "camper@test.com", "pass",
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 List.of(), null);
         UserProfileResponse profile = new UserProfileResponse();
         ReflectionTestUtils.setField(profile, "id", "user-1");
@@ -67,7 +71,11 @@ class UserControllerTest {
 
     @Test
     void updateMe_ShouldReturnUpdatedProfile() throws Exception {
+<<<<<<< HEAD
         UserDetailsImpl principal = new UserDetailsImpl("user-1", "camper", "camper@test.com", "pass", false,
+=======
+        UserDetailsImpl principal = new UserDetailsImpl("user-1", "camper", "camper@test.com", "pass",
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 List.of(), null);
         UpdateProfileRequest request = new UpdateProfileRequest();
         ReflectionTestUtils.setField(request, "name", "Updated Camper");
@@ -89,7 +97,11 @@ class UserControllerTest {
 
     @Test
     void changePassword_ShouldReturnSuccessMessage() throws Exception {
+<<<<<<< HEAD
         UserDetailsImpl principal = new UserDetailsImpl("user-1", "camper", "camper@test.com", "pass", false,
+=======
+        UserDetailsImpl principal = new UserDetailsImpl("user-1", "camper", "camper@test.com", "pass",
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 List.of(), null);
         ChangePasswordRequest request = new ChangePasswordRequest();
         ReflectionTestUtils.setField(request, "currentPassword", "old-pass");
@@ -105,7 +117,11 @@ class UserControllerTest {
 
     @Test
     void getMyStats_ShouldReturnUserStats() throws Exception {
+<<<<<<< HEAD
         UserDetailsImpl principal = new UserDetailsImpl("user-1", "camper", "camper@test.com", "pass", false,
+=======
+        UserDetailsImpl principal = new UserDetailsImpl("user-1", "camper", "camper@test.com", "pass",
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 List.of(), null);
         UserStatsResponse stats = new UserStatsResponse();
         ReflectionTestUtils.setField(stats, "campsitesVisited", 5L);

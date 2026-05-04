@@ -1,0 +1,93 @@
+<div class="min-h-screen bg-[var(--color-background)] py-12">
+  <div class="container max-w-6xl">
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h2 class="mb-2 text-3xl font-bold text-[var(--color-text-heading)]">Community Moderation</h2>
+        <p class="text-[var(--color-text-secondary)]">Manage forum threads, posts, and community discussions.</p>
+      </div>
+      <app-button (click)="openAddForm()">
+        <lucide-icon [img]="MessageSquareIcon" [size]="18" class="mr-2"></lucide-icon>
+        New Thread
+      </app-button>
+    </div>
+
+    <!-- Thread Form (Conditional) -->
+    <app-card *ngIf="showForm" variant="elevated" customClass="mb-10">
+      <app-card-header>
+        <app-card-title>{{ editingThread ? 'Edit Thread' : 'Create New Thread' }}</app-card-title>
+      </app-card-header>
+      <app-card-content>
+        <form (ngSubmit)="saveThread()" class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium mb-1">Thread Title</label>
+            <input type="text" [(ngModel)]="threadForm.title" name="title"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-primary-500)] focus:outline-none"
+              required>
+          </div>
+          <div class="flex justify-end gap-3 mt-4">
+            <app-button variant="outline" type="button" (click)="closeForm()">Cancel</app-button>
+            <app-button variant="primary" type="submit">
+              {{ editingThread ? 'Update Thread' : 'Create Thread' }}
+            </app-button>
+          </div>
+        </form>
+      </app-card-content>
+    </app-card>
+
+    <!-- Threads List -->
+    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+      <table class="w-full text-left">
+        <thead class="bg-gray-50 border-b">
+          <tr>
+            <th class="px-6 py-4 text-sm font-semibold text-gray-600">Thread Title</th>
+            <th class="px-6 py-4 text-sm font-semibold text-gray-600">Status</th>
+            <th class="px-6 py-4 text-sm font-semibold text-gray-600">Created At</th>
+            <th class="px-6 py-4 text-sm font-semibold text-gray-600 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y">
+          <tr *ngFor="let thread of threads()" class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4">
+              <div class="font-medium text-gray-900">{{ thread.title }}</div>
+            </td>
+            <td class="px-6 py-4">
+              <span [class]="'px-2 py-1 text-xs font-medium rounded-full ' + 
+                (thread.status === 'OPEN' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700')">
+                {{ thread.status }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500">
+              {{ thread.createdAt | date:'short' }}
+            </td>
+            <td class="px-6 py-4 text-right">
+              <div class="flex justify-end gap-2">
+                <app-button *ngIf="thread.status === 'OPEN'" variant="ghost" size="sm"
+                  customClass="text-gray-500 h-8 w-8 p-0" (click)="updateStatus(thread, 'LOCKED')">
+                  <lucide-icon [img]="ShieldIcon" [size]="16"></lucide-icon>
+                </app-button>
+                <app-button *ngIf="thread.status !== 'OPEN'" variant="ghost" size="sm"
+                  customClass="text-green-500 h-8 w-8 p-0" (click)="updateStatus(thread, 'OPEN')">
+                  <lucide-icon [img]="CheckIcon" [size]="16"></lucide-icon>
+                </app-button>
+                <app-button variant="ghost" size="sm" customClass="text-blue-500 h-8 w-8 p-0"
+                  (click)="openEditForm(thread)">
+                  <lucide-icon [img]="PencilIcon" [size]="16"></lucide-icon>
+                </app-button>
+                <app-button variant="ghost" size="sm" customClass="text-red-500 h-8 w-8 p-0 hover:bg-red-50"
+                  (click)="deleteThread(thread.id)">
+                  <lucide-icon [img]="TrashIcon" [size]="16"></lucide-icon>
+                </app-button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Empty State -->
+      <div *ngIf="threads().length === 0" class="text-center py-20">
+        <lucide-icon [img]="MessageSquareIcon" [size]="48" class="mx-auto text-gray-300 mb-4"></lucide-icon>
+        <p class="text-gray-500 text-lg">No threads found. Start a new discussion!</p>
+      </div>
+    </div>
+  </div>
+</div>

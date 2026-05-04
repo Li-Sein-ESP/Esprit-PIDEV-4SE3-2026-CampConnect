@@ -18,4 +18,9 @@ public interface ITransportService {
     List<Transport> findByTripId(String tripId);
 
     void assignToTrip(String transportId, String tripId);
+<<<<<<< HEAD
+=======
+
+    List<java.util.Map<String, Object>> getPopularityStats();
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

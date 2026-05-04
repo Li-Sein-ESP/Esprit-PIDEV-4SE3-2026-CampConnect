@@ -59,7 +59,11 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
       CorsConfiguration configuration = new CorsConfiguration();
+<<<<<<< HEAD
       configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://127.0.0.1:4200"));
+=======
+      configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://127.0.0.1:4200", "http://localhost", "http://localhost:80"));
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
       configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
       configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
       configuration.setExposedHeaders(Arrays.asList("x-auth-token"));
@@ -83,10 +87,22 @@ public class SecurityConfig {
             .requestMatchers("/swagger-ui/**", "/swagger-ui.html",
                 "/v3/api-docs/**", "/v3/api-docs")
             .permitAll()
+<<<<<<< HEAD
             // Public marketplace browsing
             .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/gear/**").permitAll()
             .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/categories/**").permitAll()
             .requestMatchers(org.springframework.http.HttpMethod.GET, "/uploads/**").permitAll()
+=======
+            // Public marketplace and campsites browsing
+            .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/gear/**").permitAll()
+            .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/categories/**").permitAll()
+            .requestMatchers(org.springframework.http.HttpMethod.GET, "/uploads/**").permitAll()
+            .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/campsites/**").permitAll()
+            .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/environmental-rules/**").permitAll()
+            .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/pricing/**").permitAll()
+            .requestMatchers("/api/upload/**").permitAll()
+            .requestMatchers("/api/compliance-chat/**").permitAll()
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
             // Admin
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             // Gear management — provider or admin (method security via @PreAuthorize)

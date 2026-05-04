@@ -1,0 +1,225 @@
+<div class="min-h-screen bg-[var(--color-background)] pb-12">
+  <!-- Back Navigation -->
+  <div class="border-b border-[var(--color-border-light)] bg-white">
+    <div class="container py-4">
+      <button routerLink="/community"
+        class="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
+        <lucide-icon [img]="ChevronLeftIcon" [size]="20"></lucide-icon>
+        Back to Community
+      </button>
+    </div>
+  </div>
+
+  <div class="container py-8">
+    <div class="max-w-4xl mx-auto">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-[var(--color-text-heading)] mb-2">Create New Post</h1>
+        <p class="text-[var(--color-text-secondary)]">
+          Share your experiences, ask questions, or contribute to the community
+        </p>
+      </div>
+
+      <!-- Success Message -->
+      <div *ngIf="showSuccess" class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+        <div class="flex items-center gap-3">
+          <lucide-icon [img]="CheckCircleIcon" [size]="24" class="text-green-600"></lucide-icon>
+          <div>
+            <h6 class="text-lg font-semibold text-green-900 mb-1">Post Published!</h6>
+            <p class="text-sm text-green-700">
+              Your post is now live. Redirecting to community...
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <!-- Category Selection -->
+        <app-card variant="elevated">
+          <app-card-header>
+            <app-card-title>Select Category</app-card-title>
+            <app-card-description>Choose the most relevant category for your post</app-card-description>
+          </app-card-header>
+          <app-card-content>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <button *ngFor="let cat of categories" (click)="selectedCategory = cat.id"
+                class="p-4 rounded-lg border-2 text-left transition-all"
+                [class.border-[var(--color-primary-600)]]="selectedCategory === cat.id"
+                [class.bg-[var(--color-primary-50)]]="selectedCategory === cat.id"
+                [class.border-[var(--color-border-light)]]="selectedCategory !== cat.id"
+                [class.hover:border-[var(--color-primary-300)]]="selectedCategory !== cat.id">
+                <div class="flex items-start gap-3">
+                  <lucide-icon [img]="cat.icon" [size]="24" class="flex-shrink-0"
+                    [class.text-[var(--color-primary-600)]]="selectedCategory === cat.id"
+                    [class.text-[var(--color-text-tertiary)]]="selectedCategory !== cat.id"></lucide-icon>
+                  <div>
+                    <h6 class="font-semibold mb-1 text-[var(--color-text-primary)]">
+                      {{ cat.name }}
+                    </h6>
+                    <p class="text-sm text-[var(--color-text-secondary)]">
+                      {{ cat.description }}
+                    </p>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </app-card-content>
+        </app-card>
+
+        <!-- Title -->
+        <app-card variant="elevated">
+          <app-card-header>
+            <app-card-title>Post Title</app-card-title>
+            <app-card-description>Write a clear and descriptive title (minimum 10 characters)</app-card-description>
+          </app-card-header>
+          <app-card-content>
+            <input type="text" [(ngModel)]="title" placeholder="e.g., My first solo backpacking trip - What I learned"
+              class="w-full px-4 py-3 rounded-lg bg-white border-2 border-[var(--color-border-light)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:outline-none focus:border-[var(--color-primary-500)] focus:ring-2 focus:ring-[var(--color-primary-100)] transition-all"
+              maxlength="150" />
+            <div class="flex justify-between mt-2">
+              <div class="text-sm text-[var(--color-text-tertiary)]">
+                <span *ngIf="title.length >= 10" class="text-green-600 flex items-center gap-1">
+                  <lucide-icon [img]="CheckCircleIcon" [size]="16"></lucide-icon>
+                  Good title length
+                </span>
+                <span *ngIf="title.length < 10">At least 10 characters recommended</span>
+              </div>
+              <div class="text-sm text-[var(--color-text-tertiary)]">
+                {{ title.length }}/150
+              </div>
+            </div>
+          </app-card-content>
+        </app-card>
+
+        <!-- Content -->
+        <app-card variant="elevated">
+          <app-card-header>
+            <app-card-title>Post Content</app-card-title>
+            <app-card-description>Share details, experiences, or your question (minimum 50
+              characters)</app-card-description>
+          </app-card-header>
+          <app-card-content>
+            <!-- Simple Formatting Toolbar -->
+            <div class="flex items-center gap-2 mb-3 p-2 bg-[var(--color-neutral-50)] rounded-lg">
+              <button class="p-2 hover:bg-white rounded transition-colors" title="Bold">
+                <lucide-icon [img]="BoldIcon" [size]="16" class="text-[var(--color-text-secondary)]"></lucide-icon>
+              </button>
+              <button class="p-2 hover:bg-white rounded transition-colors" title="Italic">
+                <lucide-icon [img]="ItalicIcon" [size]="16" class="text-[var(--color-text-secondary)]"></lucide-icon>
+              </button>
+              <button class="p-2 hover:bg-white rounded transition-colors" title="List">
+                <lucide-icon [img]="ListIcon" [size]="16" class="text-[var(--color-text-secondary)]"></lucide-icon>
+              </button>
+              <div class="w-px h-6 bg-[var(--color-border-light)]"></div>
+              <button class="p-2 hover:bg-white rounded transition-colors" title="Add Link">
+                <lucide-icon [img]="LinkIcon" [size]="16" class="text-[var(--color-text-secondary)]"></lucide-icon>
+              </button>
+              <button class="p-2 hover:bg-white rounded transition-colors" title="Add Image">
+                <lucide-icon [img]="ImageIcon" [size]="16" class="text-[var(--color-text-secondary)]"></lucide-icon>
+              </button>
+            </div>
+
+            <textarea [(ngModel)]="content"
+              placeholder="Share your story, provide details, or ask your question. Be specific and helpful to get the best responses from the community..."
+              class="w-full px-4 py-3 rounded-lg bg-white border-2 border-[var(--color-border-light)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:outline-none focus:border-[var(--color-primary-500)] focus:ring-2 focus:ring-[var(--color-primary-100)] resize-none transition-all"
+              rows="12"></textarea>
+            <div class="flex justify-between mt-2">
+              <div class="text-sm text-[var(--color-text-tertiary)]">
+                <span *ngIf="content.length >= 50" class="text-green-600 flex items-center gap-1">
+                  <lucide-icon [img]="CheckCircleIcon" [size]="16"></lucide-icon>
+                  Good content length
+                </span>
+                <span *ngIf="content.length < 50">At least 50 characters required</span>
+              </div>
+              <div class="text-sm text-[var(--color-text-tertiary)]">
+                {{ content.length }} characters
+              </div>
+            </div>
+          </app-card-content>
+        </app-card>
+
+        <!-- Tags -->
+        <app-card variant="elevated">
+          <app-card-header>
+            <app-card-title>Tags (Optional)</app-card-title>
+            <app-card-description>Add up to 5 tags to help others find your post</app-card-description>
+          </app-card-header>
+          <app-card-content>
+            <div *ngIf="tags.length > 0" class="flex flex-wrap gap-2 mb-4">
+              <app-badge *ngFor="let tag of tags" variant="primary"
+                customClass="cursor-pointer hover:bg-red-100 hover:text-red-600 transition-colors"
+                (click)="handleRemoveTag(tag)">
+                {{ tag }} &times;
+              </app-badge>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium mb-2 text-[var(--color-text-primary)]">Suggested Tags</label>
+              <div class="flex flex-wrap gap-2">
+                <button *ngFor="let tag of suggestedTags" (click)="handleAddTag(tag)"
+                  [disabled]="tags.includes(tag) || tags.length >= 5"
+                  class="px-3 py-1.5 rounded-full text-sm border-2 transition-all"
+                  [class.border-[var(--color-primary-600)]]="tags.includes(tag)"
+                  [class.bg-[var(--color-primary-50)]]="tags.includes(tag)"
+                  [class.text-[var(--color-primary-600)]]="tags.includes(tag)"
+                  [class.cursor-not-allowed]="tags.includes(tag) || tags.length >= 5"
+                  [class.border-[var(--color-border-light)]]="!tags.includes(tag)"
+                  [class.text-[var(--color-text-tertiary)]]="tags.length >= 5 && !tags.includes(tag)"
+                  [class.hover:border-[var(--color-primary-600)]]="!tags.includes(tag) && tags.length < 5"
+                  [class.hover:bg-[var(--color-primary-50)]]="!tags.includes(tag) && tags.length < 5">
+                  {{ tag }}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium mb-2 text-[var(--color-text-primary)]">Add Custom Tag</label>
+              <div class="flex gap-2">
+                <input type="text" [(ngModel)]="customTag" (keyup.enter)="handleAddCustomTag()"
+                  placeholder="Type a tag and press Enter" [disabled]="tags.length >= 5"
+                  class="flex-1 px-4 py-2 rounded-lg bg-white border-2 border-[var(--color-border-light)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:outline-none focus:border-[var(--color-primary-500)] focus:ring-2 focus:ring-[var(--color-primary-100)] disabled:bg-[var(--color-neutral-100)] disabled:cursor-not-allowed transition-all" />
+                <app-button (click)="handleAddCustomTag()" [disabled]="!customTag.trim() || tags.length >= 5">
+                  Add
+                </app-button>
+              </div>
+              <p *ngIf="tags.length >= 5" class="text-sm text-amber-600 mt-2">Maximum 5 tags reached</p>
+            </div>
+          </app-card-content>
+        </app-card>
+
+        <!-- Guidelines -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div class="flex gap-3">
+            <lucide-icon [img]="AlertCircleIcon" [size]="20" class="text-blue-600 flex-shrink-0"></lucide-icon>
+            <div>
+              <h6 class="mb-2 font-semibold text-blue-900">Before You Post</h6>
+              <ul class="text-sm text-blue-700 space-y-1">
+                <li>• Search if your question has already been answered</li>
+                <li>• Be respectful and constructive</li>
+                <li>• Provide enough context and details</li>
+                <li>• No spam, self-promotion, or offensive content</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-4">
+          <app-button size="lg" [fullWidth]="false" customClass="flex-1" (click)="handlePost()"
+            [disabled]="!canPost || isPosting">
+            {{ isPosting ? 'Posting...' : 'Publish Post' }}
+          </app-button>
+          <app-button size="lg" variant="outline" (click)="navigate('/community')" [disabled]="isPosting">
+            Cancel
+          </app-button>
+        </div>
+
+        <div *ngIf="!canPost" class="text-sm text-amber-600 flex items-center gap-2">
+          <lucide-icon [img]="AlertCircleIcon" [size]="16"></lucide-icon>
+          <span>
+            Please select a category, add a title (10+ chars), and write content (50+ chars)
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -110,6 +110,7 @@
               Location
               <span class="cc-field__label-optional">— optional</span>
             </label>
+<<<<<<< HEAD
             <input id="locationInput" type="text" class="cc-input" formControlName="location"
               placeholder="e.g. Yosemite Valley, California" autocomplete="off" (focus)="onLocationFocus()"
               aria-autocomplete="list">
@@ -124,6 +125,14 @@
                 </span>
               </button>
             </div>
+=======
+            <select id="locationInput" class="cc-input cc-select" formControlName="location" aria-label="Location">
+              <option value="">Choisir un gouvernorat</option>
+              <option *ngFor="let loc of locationSuggestions" [value]="loc.name">
+                {{ loc.name }} — {{ loc.region }}
+              </option>
+            </select>
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
           </div>
 
           <!-- Tags -->

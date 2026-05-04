@@ -1,6 +1,10 @@
 package com.campconnect.service.impl;
 
+<<<<<<< HEAD
 import com.campconnect.dto.GroupDetailDto;
+=======
+import com.campconnect.dto.GroupDetailDTO;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import com.campconnect.model.Group;
 import com.campconnect.model.GroupStatus;
 import com.campconnect.model.User;
@@ -50,10 +54,17 @@ public class IGroupServiceImpl implements IGroupService {
     }
 
     @Override
+<<<<<<< HEAD
     public GroupDetailDto getGroupDetail(String id) {
         Group group = getGroupById(id);
         List<User> members = (List<User>) userRepository.findAllById(group.getMemberUserIds());
         return GroupDetailDto.builder()
+=======
+    public GroupDetailDTO getGroupDetail(String id) {
+        Group group = getGroupById(id);
+        List<User> members = (List<User>) userRepository.findAllById(group.getMemberUserIds());
+        return GroupDetailDTO.builder()
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 .id(group.getId())
                 .name(group.getName())
                 .tripId(group.getTripId())

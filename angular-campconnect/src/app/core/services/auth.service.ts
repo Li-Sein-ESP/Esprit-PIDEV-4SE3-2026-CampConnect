@@ -72,9 +72,28 @@ export class AuthService {
     }
 
     hasRole(role: string): boolean {
+<<<<<<< HEAD
         const roles = this.getRoles().map(r => r.toUpperCase());
         const normalized = role.toUpperCase().startsWith('ROLE_') ? role.toUpperCase() : `ROLE_${role.toUpperCase()}`;
         return roles.includes(normalized) || roles.includes('ROLE_ADMIN');
+=======
+        const normalized = role.toUpperCase().startsWith('ROLE_') ? role.toUpperCase() : `ROLE_${role.toUpperCase()}`;
+        const expandedRoles = new Set(this.getRoles().map(r => r.toUpperCase()));
+
+        if (expandedRoles.has('ROLE_ADMIN')) {
+            return true;
+        }
+
+        if (expandedRoles.has('ROLE_USER')) {
+            expandedRoles.add('ROLE_CAMPER');
+        }
+
+        if (expandedRoles.has('ROLE_CAMPER')) {
+            expandedRoles.add('ROLE_USER');
+        }
+
+        return expandedRoles.has(normalized);
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     }
 
     // Public method for interceptor to check current token

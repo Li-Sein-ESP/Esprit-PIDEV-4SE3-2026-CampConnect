@@ -30,3 +30,9 @@ CONSTITUTION.md
 PATTERNS.md
 PROJECT_OVERVIEW.txt
 PROJECT_STATE.md
+<<<<<<< HEAD
+=======
+
+# Database
+data/
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)

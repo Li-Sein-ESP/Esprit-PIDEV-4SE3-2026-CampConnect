@@ -7,4 +7,8 @@ import java.util.List;
 
 @Repository
 public interface CertificationRepository extends MongoRepository<Certification, String> {
+<<<<<<< HEAD
+=======
+    List<Certification> findByRequiredCoursesId(String courseId);
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

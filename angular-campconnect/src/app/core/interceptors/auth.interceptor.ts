@@ -46,7 +46,13 @@ export class AuthInterceptor implements HttpInterceptor {
 
         return next.handle(request).pipe(
             catchError((error: HttpErrorResponse) => {
+<<<<<<< HEAD
                 if (!isAuthEndpoint && error.status === 401) {
+=======
+                const hasAuthHeader = request.headers.keys().some(key => key.toLowerCase() === 'authorization');
+
+                if (!isAuthEndpoint && error.status === 401 && hasAuthHeader) {
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                     console.warn('Auth error (401) detected, clearing session');
                     this.authService.logout();
                     this.router.navigate(['/login']);

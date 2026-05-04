@@ -14,7 +14,11 @@
             the trail network.
           </p>
           <div class="flex gap-4">
+<<<<<<< HEAD
             <button routerLink="/safety/map"
+=======
+            <button type="button" (click)="openSafetyMap()"
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
               class="flex items-center gap-2 bg-white text-red-800 px-6 py-3 rounded-xl font-bold hover:bg-red-50 transition-colors shadow-lg cursor-pointer">
               <lucide-icon [img]="MapIcon" [size]="20"></lucide-icon>
               View Safety Map
@@ -24,7 +28,11 @@
               <lucide-icon [img]="EditIcon" [size]="20"></lucide-icon>
               Create Alert
             </button>
+<<<<<<< HEAD
             <button routerLink="/safety/report"
+=======
+            <button type="button" (click)="openReportIncident()"
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
               class="flex items-center gap-2 bg-white/20 border border-white/40 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/30 backdrop-blur-md transition-colors shadow-lg cursor-pointer">
               <lucide-icon [img]="AlertTriangle" [size]="20"></lucide-icon>
               Report Incident
@@ -283,37 +291,67 @@
       <div class="grid grid-cols-1 gap-6">
         <div>
           <label class="block text-sm font-bold text-[var(--color-text-primary)] mb-2">Alert Title</label>
+<<<<<<< HEAD
           <input type="text" [(ngModel)]="editingAlert.title" 
             class="w-full px-4 py-2 border border-[var(--color-border-medium)] rounded-xl focus:ring-2 focus:ring-red-500 outline-none">
+=======
+          <input type="text" [(ngModel)]="editingAlert.title" maxlength="120"
+            [class]="'w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-red-500 outline-none ' + (hasAlertFieldError('title') ? 'border-red-400 bg-red-50' : 'border-[var(--color-border-medium)]')">
+          <p *ngIf="hasAlertFieldError('title')" class="mt-2 text-xs text-red-600 font-medium">{{ alertFormErrors['title'] }}</p>
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         </div>
         
         <div>
           <label class="block text-sm font-bold text-[var(--color-text-primary)] mb-2">Description</label>
+<<<<<<< HEAD
           <textarea [(ngModel)]="editingAlert.description" rows="4"
             class="w-full px-4 py-2 border border-[var(--color-border-medium)] rounded-xl focus:ring-2 focus:ring-red-500 outline-none"></textarea>
+=======
+          <textarea [(ngModel)]="editingAlert.description" rows="4" maxlength="500"
+            [class]="'w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-red-500 outline-none ' + (hasAlertFieldError('description') ? 'border-red-400 bg-red-50' : 'border-[var(--color-border-medium)]')"></textarea>
+          <p *ngIf="hasAlertFieldError('description')" class="mt-2 text-xs text-red-600 font-medium">{{ alertFormErrors['description'] }}</p>
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-bold text-[var(--color-text-primary)] mb-2">Severity</label>
+<<<<<<< HEAD
             <select [(ngModel)]="editingAlert.severity" 
               class="w-full px-4 py-2 border border-[var(--color-border-medium)] rounded-xl focus:ring-2 focus:ring-red-500 outline-none">
+=======
+            <select [(ngModel)]="editingAlert.severity"
+              [class]="'w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-red-500 outline-none ' + (hasAlertFieldError('severity') ? 'border-red-400 bg-red-50' : 'border-[var(--color-border-medium)]')">
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
               <option value="critical">Critical</option>
               <option value="danger">Danger</option>
               <option value="warning">Warning</option>
               <option value="info">Information</option>
             </select>
+<<<<<<< HEAD
           </div>
           <div>
             <label class="block text-sm font-bold text-[var(--color-text-primary)] mb-2">Category</label>
             <select [(ngModel)]="editingAlert.type" 
               class="w-full px-4 py-2 border border-[var(--color-border-medium)] rounded-xl focus:ring-2 focus:ring-red-500 outline-none">
+=======
+            <p *ngIf="hasAlertFieldError('severity')" class="mt-2 text-xs text-red-600 font-medium">{{ alertFormErrors['severity'] }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-[var(--color-text-primary)] mb-2">Category</label>
+            <select [(ngModel)]="editingAlert.type"
+              [class]="'w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-red-500 outline-none ' + (hasAlertFieldError('type') ? 'border-red-400 bg-red-50' : 'border-[var(--color-border-medium)]')">
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
               <option value="weather">Weather</option>
               <option value="fire">Wildfire</option>
               <option value="wildlife">Wildlife</option>
               <option value="closure">Closure</option>
               <option value="advisory">Advisory</option>
             </select>
+<<<<<<< HEAD
+=======
+            <p *ngIf="hasAlertFieldError('type')" class="mt-2 text-xs text-red-600 font-medium">{{ alertFormErrors['type'] }}</p>
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
           </div>
         </div>
 
@@ -364,4 +402,8 @@
       </div>
     </div>
   </app-modal>
+<<<<<<< HEAD
 </div>
+=======
+</div>
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)

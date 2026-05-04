@@ -136,7 +136,11 @@ class DeliveryControllerTest {
 
     @Test
     void getEarnings_ShouldReturnEarnings() throws Exception {
+<<<<<<< HEAD
         UserDetailsImpl principal = new UserDetailsImpl("driver-1", "driver", "d@test.com", "pass", false,
+=======
+        UserDetailsImpl principal = new UserDetailsImpl("driver-1", "driver", "d@test.com", "pass",
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 List.of(), null);
         EarningsResponse response = new EarningsResponse();
         ReflectionTestUtils.setField(response, "totalEarnings", new BigDecimal("45.00"));
@@ -151,7 +155,11 @@ class DeliveryControllerTest {
 
     @Test
     void getProfileStats_ShouldReturnDriverStats() throws Exception {
+<<<<<<< HEAD
         UserDetailsImpl principal = new UserDetailsImpl("driver-1", "driver", "d@test.com", "pass", false,
+=======
+        UserDetailsImpl principal = new UserDetailsImpl("driver-1", "driver", "d@test.com", "pass",
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 List.of(), null);
         DriverProfileStatsResponse response = new DriverProfileStatsResponse();
         ReflectionTestUtils.setField(response, "totalDeliveries", 20L);

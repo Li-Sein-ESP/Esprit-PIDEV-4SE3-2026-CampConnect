@@ -1,7 +1,16 @@
+<<<<<<< HEAD
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+=======
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../../core/services/auth.service';
+import { LeaderboardService, LeaderboardResponseDTO } from '../../../core/services/leaderboard.service';
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 export interface CamperBadge {
     title: string;
@@ -31,7 +40,12 @@ export interface Camper {
     standalone: true,
     imports: [CommonModule, RouterModule, FormsModule],
     templateUrl: './leaderboard.component.html',
+<<<<<<< HEAD
     styleUrls: ['./leaderboard.component.scss']
+=======
+    styleUrls: ['./leaderboard.component.scss'],
+    encapsulation: ViewEncapsulation.None
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 })
 export class LeaderboardComponent implements OnInit {
 
@@ -49,6 +63,7 @@ export class LeaderboardComponent implements OnInit {
         { key: 'all', label: 'All Time' }
     ] as const;
 
+<<<<<<< HEAD
     campers: Camper[] = [
         {
             id: 1,
@@ -242,6 +257,17 @@ export class LeaderboardComponent implements OnInit {
             joinedDate: 'Sep 2023'
         }
     ];
+=======
+    campers: Camper[] = [];
+    stats = {
+        activeCampers: 0,
+        totalBadges: 0,
+        totalTrips: 0,
+        avgTrustScore: 0
+    };
+
+    loading = false;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
     get podiumCampers(): Camper[] {
         // Return rank 1 (index 0), rank 2 (index 1), rank 3 (index 2)
@@ -249,7 +275,11 @@ export class LeaderboardComponent implements OnInit {
     }
 
     get tableCampers(): Camper[] {
+<<<<<<< HEAD
         const rest = this.campers.slice(3);
+=======
+        const rest = this.campers.filter(c => (c.id || 0) > 3);
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         if (!this.searchQuery.trim()) return rest;
         const q = this.searchQuery.toLowerCase();
         return rest.filter(c =>
@@ -284,7 +314,17 @@ export class LeaderboardComponent implements OnInit {
         return username.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
     }
 
+<<<<<<< HEAD
     ngOnInit(): void {
+=======
+    constructor(
+        private leaderboardService: LeaderboardService,
+        private authService: AuthService
+    ) { }
+
+    ngOnInit(): void {
+        this.fetchLeaderboard();
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         setTimeout(() => { this.statsVisible = true; }, 100);
         setTimeout(() => { this.podiumVisible = true; }, 200);
         setTimeout(() => { this.tableVisible = true; }, 400);
@@ -293,5 +333,45 @@ export class LeaderboardComponent implements OnInit {
 
     selectPeriod(period: 'week' | 'month' | 'year' | 'all'): void {
         this.selectedPeriod = period;
+<<<<<<< HEAD
+=======
+        this.fetchLeaderboard();
+    }
+
+    private fetchLeaderboard(): void {
+        const currentUserId = this.authService.currentUserValue?.id;
+        this.loading = true;
+        this.leaderboardService.getLeaderboard(this.selectedPeriod, currentUserId).subscribe({
+            next: (res: LeaderboardResponseDTO) => {
+                this.campers = (res.entries || []).map((e, index) => ({
+                    id: e.rank || Number(index + 1),
+                    username: e.username,
+                    handle: e.handle,
+                    avatar: e.avatar,
+                    initials: e.initials,
+                    avatarBg: e.avatarBg,
+                    avatarColor: e.avatarColor,
+                    trustScore: e.trustScore,
+                    points: e.points,
+                    badges: e.badges || [],
+                    rankChange: e.rankChange,
+                    trips: e.trips,
+                    joinedDate: e.joinedDate,
+                    isSelf: e.self
+                }));
+                this.stats = {
+                    activeCampers: res.activeCampers || 0,
+                    totalBadges: res.totalBadges || 0,
+                    totalTrips: res.totalTrips || 0,
+                    avgTrustScore: res.avgTrustScore || 0
+                };
+                this.loading = false;
+            },
+            error: (err) => {
+                console.error('Failed to load leaderboard', err);
+                this.loading = false;
+            }
+        });
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     }
 }

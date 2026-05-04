@@ -21,6 +21,10 @@ public class IncidentDTO {
     private String reporterId;
     private String location;
     private LocalDateTime createdAt;
+<<<<<<< HEAD
+=======
+    private LocalDateTime updatedAt;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     private LocalDateTime reportedAt;
     private String status;
 }

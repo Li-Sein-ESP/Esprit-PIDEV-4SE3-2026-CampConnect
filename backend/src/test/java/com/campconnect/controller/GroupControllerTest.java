@@ -1,6 +1,10 @@
 package com.campconnect.controller;
 
+<<<<<<< HEAD
 import com.campconnect.dto.GroupDetailDto;
+=======
+import com.campconnect.dto.GroupDetailDTO;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import com.campconnect.dto.GroupDTO;
 import com.campconnect.model.Group;
 import com.campconnect.service.IGroupService;
@@ -70,7 +74,11 @@ class GroupControllerTest {
     @Test
     void getGroupDetail_ShouldReturnDetail() throws Exception {
         // Arrange
+<<<<<<< HEAD
         GroupDetailDto detail = new GroupDetailDto();
+=======
+        GroupDetailDTO detail = new GroupDetailDTO();
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         detail.setId("group-1");
         detail.setMembers(Collections.emptyList());
         

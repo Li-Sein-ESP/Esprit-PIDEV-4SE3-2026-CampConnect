@@ -42,7 +42,10 @@ public class TripDTO {
 
     private java.util.List<String> activities = new java.util.ArrayList<>();
 
+<<<<<<< HEAD
     @jakarta.validation.constraints.NotBlank(message = "User ID is required")
+=======
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     private String userId;
     private String routeOptimizationId;
     private java.util.List<String> itineraryIds = new java.util.ArrayList<>();

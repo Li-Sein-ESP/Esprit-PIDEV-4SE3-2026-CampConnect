@@ -367,22 +367,41 @@
                     </button>
                 </div>
 
+<<<<<<< HEAD
                 <form (ngSubmit)="submitVideo()" class="space-y-8">
+=======
+                <form #videoF="ngForm" (ngSubmit)="videoF.form.valid && submitVideo()" class="space-y-8">
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <!-- Title -->
                         <div class="space-y-2">
                             <label
                                 class="text-[9px] font-black uppercase tracking-widest text-white/40 ml-4">Title</label>
                             <input type="text" name="title" [(ngModel)]="videoForm.title"
+<<<<<<< HEAD
                                 placeholder="e.g., Desert Navigation Guide"
                                 class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-[#2d6a4f] transition-all font-medium">
+=======
+                                #title="ngModel" required minlength="5"
+                                placeholder="e.g., Desert Navigation Guide"
+                                [class.border-red-500]="title.invalid && title.touched"
+                                class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-[#2d6a4f] transition-all font-medium">
+                            <div *ngIf="title.invalid && title.touched" class="text-[8px] text-red-400 font-bold ml-4 uppercase tracking-wider">
+                                <span *ngIf="title.errors?.['required']">Title is required</span>
+                                <span *ngIf="title.errors?.['minlength']">Title must be at least 5 characters</span>
+                            </div>
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                         </div>
 
                         <!-- Category -->
                         <div class="space-y-2">
                             <label
                                 class="text-[9px] font-black uppercase tracking-widest text-white/40 ml-4">Category</label>
+<<<<<<< HEAD
                             <select name="category" [(ngModel)]="videoForm.category"
+=======
+                            <select name="category" [(ngModel)]="videoForm.category" required
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                                 class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-[#2d6a4f] transition-all font-medium appearance-none text-white">
                                 <option value="Experience" class="bg-[#0A1F1C] text-white">Experience</option>
                                 <option value="Tutorial" class="bg-[#0A1F1C] text-white">Tutorial</option>
@@ -434,12 +453,19 @@
                                 </div>
                             </div>
                         </div>
+<<<<<<< HEAD
+=======
+                        <div *ngIf="!selectedFile && !videoForm.videoUrl" class="text-[8px] text-orange-400 font-bold ml-4 uppercase tracking-wider">
+                            Please select a file or provide a URL
+                        </div>
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                     </div>
 
                     <!-- Description -->
                     <div class="space-y-2">
                         <label class="text-[9px] font-black uppercase tracking-widest text-white/40 ml-4">Insights &
                             Description</label>
+<<<<<<< HEAD
                         <textarea name="description" [(ngModel)]="videoForm.description" rows="3"
                             placeholder="What will other explorers learn from this?"
                             class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-[#2d6a4f] transition-all font-medium resize-none"></textarea>
@@ -448,6 +474,21 @@
                     <!-- Submit -->
                     <button type="submit" [disabled]="isSubmittingVideo"
                         class="w-full py-5 bg-[#2d6a4f] text-white rounded-full font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl disabled:opacity-50 disabled:scale-100 flex items-center justify-center gap-3">
+=======
+                        <textarea name="description" [(ngModel)]="videoForm.description" #desc="ngModel" required minlength="10" rows="3"
+                            placeholder="What will other explorers learn from this?"
+                            [class.border-red-500]="desc.invalid && desc.touched"
+                            class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-[#2d6a4f] transition-all font-medium resize-none"></textarea>
+                        <div *ngIf="desc.invalid && desc.touched" class="text-[8px] text-red-400 font-bold ml-4 uppercase tracking-wider">
+                            <span *ngIf="desc.errors?.['required']">Description is required</span>
+                            <span *ngIf="desc.errors?.['minlength']">Description must be at least 10 characters</span>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" [disabled]="!!videoF.invalid || isSubmittingVideo || (!selectedFile && !videoForm.videoUrl)"
+                        class="w-full py-5 bg-[#2d6a4f] text-white rounded-full font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl disabled:opacity-30 disabled:scale-100 flex items-center justify-center gap-3">
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                         <lucide-icon *ngIf="isSubmittingVideo" [img]="Clock" class="w-5 h-5 animate-spin"></lucide-icon>
                         {{ isSubmittingVideo ? (isEditingVideo ? 'Updating...' : 'Broadcasting...') : (isEditingVideo ? 'Update Broadcast' : 'Broadcast to Academy') }}
                     </button>
@@ -456,4 +497,8 @@
         </div>
     </div>
 
+<<<<<<< HEAD
 </div>
+=======
+</div>
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)

@@ -12,6 +12,11 @@ export interface Trip {
     createdBy: string;
     createdAt: string;
     updatedAt: string;
+<<<<<<< HEAD
+=======
+    imageUrl?: string;
+    template?: boolean;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }
 
 export interface TripItinerary {

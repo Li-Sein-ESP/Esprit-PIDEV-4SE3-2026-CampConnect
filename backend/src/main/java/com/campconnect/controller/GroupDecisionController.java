@@ -14,7 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+<<<<<<< HEAD
 import com.campconnect.dto.GroupDecisionDto;
+=======
+import com.campconnect.dto.GroupDecisionDTO;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import com.campconnect.dto.VoteRequest;
 import com.campconnect.model.GroupDecision;
 import com.campconnect.service.IGroupDecisionService;
@@ -31,7 +35,11 @@ public class GroupDecisionController {
     private final IGroupDecisionService groupDecisionService;
 
     @PostMapping
+<<<<<<< HEAD
     public ResponseEntity<GroupDecision> createDecision(@Valid @RequestBody GroupDecisionDto dto) {
+=======
+    public ResponseEntity<GroupDecision> createDecision(@Valid @RequestBody GroupDecisionDTO dto) {
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         GroupDecision decision = GroupDecision.builder()
                 .groupId(dto.getGroupId())
                 .tripId(dto.getTripId())

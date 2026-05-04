@@ -50,7 +50,11 @@ public class GroupController {
     }
 
     @GetMapping("/{id}/detail")
+<<<<<<< HEAD
     public ResponseEntity<com.campconnect.dto.GroupDetailDto> getGroupDetail(@PathVariable("id") String id) {
+=======
+    public ResponseEntity<com.campconnect.dto.GroupDetailDTO> getGroupDetail(@PathVariable("id") String id) {
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         return ResponseEntity.ok(groupService.getGroupDetail(id));
     }
 

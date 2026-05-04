@@ -1,8 +1,16 @@
 import { Injectable } from '@angular/core';
+<<<<<<< HEAD
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 
 const API_URL = 'http://localhost:8080/api/pointofinterests';
+=======
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
+import { environment } from '../../../../environments/environment';
+
+const API_URL = `${environment.apiUrl}/pointofinterests`;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 export interface PointOfInterest {
     id: string;
@@ -29,6 +37,7 @@ export interface PointOfInterest {
 export class PoiService {
     constructor(private http: HttpClient) { }
 
+<<<<<<< HEAD
     private getHttpOptions() {
         const token = localStorage.getItem('token');
         return {
@@ -41,18 +50,30 @@ export class PoiService {
 
     getAll(): Observable<PointOfInterest[]> {
         return this.http.get<any[]>(API_URL, this.getHttpOptions()).pipe(
+=======
+    getAll(): Observable<PointOfInterest[]> {
+        return this.http.get<any[]>(API_URL).pipe(
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
             map(items => items.map(item => this.mapToFrontend(item)))
         );
     }
 
     getByItineraryId(itineraryId: string): Observable<PointOfInterest[]> {
+<<<<<<< HEAD
         return this.http.get<any[]>(`${API_URL}/itinerary/${itineraryId}`, this.getHttpOptions()).pipe(
+=======
+        return this.http.get<any[]>(`${API_URL}/itinerary/${itineraryId}`).pipe(
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
             map(items => items.map(item => this.mapToFrontend(item)))
         );
     }
 
     create(poi: any): Observable<PointOfInterest> {
+<<<<<<< HEAD
         return this.http.post<any>(API_URL, poi, this.getHttpOptions()).pipe(
+=======
+        return this.http.post<any>(API_URL, poi).pipe(
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
             map(item => this.mapToFrontend(item))
         );
     }

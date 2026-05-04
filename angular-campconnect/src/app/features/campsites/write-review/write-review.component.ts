@@ -1,9 +1,17 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+<<<<<<< HEAD
 import { LucideAngularModule, Star, Upload, X, CheckCircle, Loader2, Image as ImageIcon } from 'lucide-angular';
 import { ModalComponent } from '../../../shared/components/modal/modal.component';
 import { ButtonComponent } from '../../../shared/components/button.component';
+=======
+import { LucideAngularModule, Star, Upload, X, CheckCircle, Loader2, Image as ImageIcon, MapPin } from 'lucide-angular';
+import { ModalComponent } from '../../../shared/components/modal/modal.component';
+import { ButtonComponent } from '../../../shared/components/button.component';
+import { CampsiteService, CampsiteReview } from '../../../core/services/campsite.service';
+import { AuthService } from '../../../core/services/auth.service';
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @Component({
     selector: 'app-write-review',
@@ -25,6 +33,15 @@ import { ButtonComponent } from '../../../shared/components/button.component';
 export class WriteReviewComponent {
     @Input() campsiteId: string = '';
     @Output() close = new EventEmitter<void>();
+<<<<<<< HEAD
+=======
+    @Output() reviewSubmitted = new EventEmitter<CampsiteReview>();
+
+    constructor(
+        private campsiteService: CampsiteService,
+        private authService: AuthService
+    ) {}
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
     readonly Star = Star;
     readonly Upload = Upload;
@@ -32,8 +49,15 @@ export class WriteReviewComponent {
     readonly CheckCircle = CheckCircle;
     readonly Loader2 = Loader2;
     readonly ImageIcon = ImageIcon;
+<<<<<<< HEAD
 
     step: 'rating' | 'details' | 'submitting' | 'success' = 'rating';
+=======
+    readonly MapPin = MapPin;
+
+    isSubmitting = false;
+    isSuccess = false;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
     ratings = {
         cleanliness: 0,
@@ -61,6 +85,7 @@ export class WriteReviewComponent {
     ];
 
     get overallRating(): number {
+<<<<<<< HEAD
         return Math.round(
             (this.ratings.cleanliness + this.ratings.location + this.ratings.value + this.ratings.amenities) / 4
         );
@@ -75,6 +100,17 @@ export class WriteReviewComponent {
 
     get canSubmit(): boolean {
         return this.canContinueToDetails &&
+=======
+        const total = this.ratings.cleanliness + this.ratings.location + this.ratings.value + this.ratings.amenities;
+        return total > 0 ? Math.round(total / 4) : 0;
+    }
+
+    get canSubmit(): boolean {
+        return this.ratings.cleanliness > 0 &&
+            this.ratings.location > 0 &&
+            this.ratings.value > 0 &&
+            this.ratings.amenities > 0 &&
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
             this.title.trim().length > 0 &&
             this.content.trim().length > 0;
     }
@@ -95,6 +131,7 @@ export class WriteReviewComponent {
     }
 
     handleSubmit() {
+<<<<<<< HEAD
         this.step = 'submitting';
 
         // Simulate API call
@@ -104,6 +141,44 @@ export class WriteReviewComponent {
                 this.close.emit();
             }, 2000);
         }, 1500);
+=======
+        this.isSubmitting = true;
+
+        const user = this.authService.currentUserValue;
+        if (!user) {
+            alert('Please login to post a review');
+            this.isSubmitting = false;
+            return;
+        }
+
+        const reviewData: CampsiteReview = {
+            campsiteId: this.campsiteId,
+            userId: user.id,
+            userName: user.username || user.email?.split('@')[0] || 'Camper',
+            userAvatar: `https://api.dicebear.com/7.x/initials/svg?seed=${user.username || 'User'}`,
+            rating: this.overallRating,
+            title: this.title,
+            content: this.content,
+            photos: this.photos,
+            verifiedStay: true // mock verified stay for demo
+        };
+
+        this.campsiteService.addReview(this.campsiteId, reviewData).subscribe({
+            next: (savedReview) => {
+                this.isSubmitting = false;
+                this.isSuccess = true;
+                this.reviewSubmitted.emit(savedReview);
+                setTimeout(() => {
+                    this.close.emit();
+                }, 2000);
+            },
+            error: (err) => {
+                console.error('Error submitting review:', err);
+                alert('An error occurred while submitting your review.');
+                this.isSubmitting = false;
+            }
+        });
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     }
 
     setRating(key: string, value: number) {

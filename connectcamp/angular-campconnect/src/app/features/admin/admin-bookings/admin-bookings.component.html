@@ -1,0 +1,133 @@
+<div class="min-h-screen bg-[var(--color-background)] py-12">
+  <div class="container max-w-6xl">
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h2 class="mb-2 text-3xl font-bold text-[var(--color-text-heading)]">Events Management</h2>
+        <p class="text-[var(--color-text-secondary)]">Create and manage outdoor expeditions, workshops, and camps.</p>
+      </div>
+      <app-button (click)="openAddForm()">
+        <lucide-icon [img]="PlusIcon" [size]="18" class="mr-2"></lucide-icon>
+        Create New Event
+      </app-button>
+    </div>
+
+    <!-- Event Form (Conditional) -->
+    <app-card *ngIf="showForm" variant="elevated" customClass="mb-10">
+      <app-card-header>
+        <app-card-title>{{ editingEvent ? 'Edit Event' : 'Create New Event' }}</app-card-title>
+      </app-card-header>
+      <app-card-content>
+        <form (ngSubmit)="saveEvent()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium mb-1">Title <span class="text-red-500">*</span></label>
+              <input type="text" [(ngModel)]="eventForm.title" name="title"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-primary-500)] focus:outline-none"
+                [class.border-red-500]="formErrors['title']" required>
+              <p *ngIf="formErrors['title']" class="text-red-500 text-xs mt-1">{{ formErrors['title'] }}</p>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium mb-1">Type</label>
+                <select [(ngModel)]="eventForm.type" name="type"
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-primary-500)] focus:outline-none">
+                  <option value="expedition">Expedition</option>
+                  <option value="workshop">Workshop</option>
+                  <option value="camp">Camp</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Difficulty</label>
+                <select [(ngModel)]="eventForm.difficulty" name="difficulty"
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-primary-500)] focus:outline-none">
+                  <option value="easy">Easy</option>
+                  <option value="moderate">Moderate</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium mb-1">Price ($)</label>
+                <input type="number" [(ngModel)]="eventForm.price" name="price"
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-primary-500)] focus:outline-none"
+                  [class.border-red-500]="formErrors['price']">
+                <p *ngIf="formErrors['price']" class="text-red-500 text-xs mt-1">{{ formErrors['price'] }}</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Capacity <span class="text-red-500">*</span></label>
+                <input type="number" [(ngModel)]="eventForm.capacity" name="capacity"
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-primary-500)] focus:outline-none"
+                  [class.border-red-500]="formErrors['capacity']">
+                <p *ngIf="formErrors['capacity']" class="text-red-500 text-xs mt-1">{{ formErrors['capacity'] }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium mb-1">Description</label>
+              <textarea [(ngModel)]="eventForm.description" name="description" rows="3"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-primary-500)] focus:outline-none"></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Location Name <span class="text-red-500">*</span></label>
+              <input type="text" [(ngModel)]="eventForm.location!.name" name="locationName"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-primary-500)] focus:outline-none"
+                [class.border-red-500]="formErrors['location']">
+              <p *ngIf="formErrors['location']" class="text-red-500 text-xs mt-1">{{ formErrors['location'] }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Image URL</label>
+              <input type="text" [(ngModel)]="eventForm.imageUrl" name="imageUrl"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--color-primary-500)] focus:outline-none">
+            </div>
+          </div>
+          <div class="md:col-span-2 flex justify-end gap-3 mt-4">
+            <app-button variant="outline" type="button" (click)="closeForm()">Cancel</app-button>
+            <app-button variant="primary" type="submit">
+              {{ editingEvent ? 'Update Event' : 'Create Event' }}
+            </app-button>
+          </div>
+        </form>
+      </app-card-content>
+    </app-card>
+
+    <!-- Events List -->
+    <div class="grid grid-cols-1 gap-4">
+      <app-card *ngFor="let event of events()" variant="default" padding="sm" customClass="hover:shadow-sm">
+        <div class="flex items-center gap-4">
+          <img [src]="event.imageUrl" class="w-20 h-20 rounded object-cover bg-gray-100" [alt]="event.title">
+          <div class="flex-1">
+            <h4 class="font-bold text-[var(--color-text-heading)] mb-1">{{ event.title }}</h4>
+            <div class="flex flex-wrap items-center gap-3 text-sm text-[var(--color-text-secondary)]">
+              <span class="flex items-center gap-1">
+                <lucide-icon [img]="MapPinIcon" [size]="14"></lucide-icon>
+                {{ event.location.name }}
+              </span>
+              <span>•</span>
+              <span class="capitalize">{{ event.type }}</span>
+              <span>•</span>
+              <span>${{ event.price }}</span>
+              <span>•</span>
+              <span>{{ event.registered }}/{{ event.capacity }} participants</span>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <app-button variant="ghost" size="sm" (click)="openEditForm(event)">
+              <lucide-icon [img]="PencilIcon" [size]="16"></lucide-icon>
+            </app-button>
+            <app-button variant="ghost" size="sm" customClass="text-red-500 hover:text-red-600 hover:bg-red-50"
+              (click)="deleteEvent(event.id!)">
+              <lucide-icon [img]="TrashIcon" [size]="16"></lucide-icon>
+            </app-button>
+          </div>
+        </div>
+      </app-card>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="events().length === 0" class="text-center py-20 bg-gray-50 rounded-xl border-2 border-dashed">
+      <p class="text-[var(--color-text-secondary)]">No events found. Add your first expedition or workshop!</p>
+    </div>
+  </div>
+</div>

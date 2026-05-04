@@ -1,6 +1,10 @@
 package com.campconnect.service;
 
+<<<<<<< HEAD
 import com.campconnect.dto.GroupDetailDto;
+=======
+import com.campconnect.dto.GroupDetailDTO;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import com.campconnect.model.Group;
 import com.campconnect.model.GroupStatus;
 import com.campconnect.model.User;
@@ -87,7 +91,11 @@ class GroupServiceImplTest {
     }
 
     @Test
+<<<<<<< HEAD
     void getGroupDetail_ShouldReturnConstructedDto() {
+=======
+    void getGroupDetail_ShouldReturnConstructedDTO() {
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         // Arrange
         User user1 = new User();
         user1.setId("user-1");
@@ -97,7 +105,11 @@ class GroupServiceImplTest {
         when(userRepository.findAllById(any())).thenReturn(Arrays.asList(user1));
 
         // Act
+<<<<<<< HEAD
         GroupDetailDto detail = groupService.getGroupDetail("group-1");
+=======
+        GroupDetailDTO detail = groupService.getGroupDetail("group-1");
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
         // Assert
         assertEquals("group-1", detail.getId());

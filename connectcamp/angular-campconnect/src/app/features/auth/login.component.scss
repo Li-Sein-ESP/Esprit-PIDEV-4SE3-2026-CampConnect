@@ -1,0 +1,132 @@
+/* --- Design Tokens --- */
+:root {
+    --bg-dark: #1c1917;
+    /* Stone 900 */
+    --glass-surface: rgba(28, 25, 23, 0.7);
+    /* Stone 900 with opacity */
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --accent-primary: #059669;
+    /* Emerald 600 */
+    --accent-glow: rgba(5, 150, 105, 0.3);
+    --text-main: #fafaf9;
+    /* Stone 50 */
+    --text-muted: #a8a29e;
+    /* Stone 400 */
+}
+
+.font-serif {
+    font-family: 'Playfair Display', serif;
+}
+
+/* --- Glassmorphism Card (if needed, mostly using utility classes now) --- */
+.glass-card {
+    background: var(--glass-surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+}
+
+/* --- Form Elements --- */
+.input-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.modern-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid #44403c;
+    /* Stone 700 */
+    border-radius: 0.75rem;
+    /* 12px */
+    padding: 1rem 1rem 1rem 2.5rem;
+    color: white;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.modern-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+.input-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #78716c;
+    /* Stone 500 */
+    transition: 0.3s;
+}
+
+.modern-input:focus~.input-icon {
+    color: var(--accent-primary);
+}
+
+/* --- Video Section Styles --- */
+.video-panel {
+    position: relative;
+    overflow: hidden;
+}
+
+.video-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.6;
+    /* Darker video for better text contrast */
+    transition: transform 10s ease;
+}
+
+/* Subtle Zoom effect on load */
+.video-panel:hover .video-bg {
+    transform: scale(1.05);
+}
+
+.video-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, #1c1917 0%, rgba(28, 25, 23, 0.4) 40%, transparent 100%);
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* --- Transitions --- */
+.fade-enter {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.fade-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.hidden {
+    display: none;
+}
+
+/* --- Custom Scrollbar --- */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}

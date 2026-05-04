@@ -13,7 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+<<<<<<< HEAD
 import com.campconnect.dto.ExpenseDto;
+=======
+import com.campconnect.dto.ExpenseDTO;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import com.campconnect.dto.GroupBalances;
 import com.campconnect.model.Expense;
 import com.campconnect.service.IExpenseService;
@@ -30,7 +34,11 @@ public class ExpenseController {
     private final IExpenseService expenseService;
 
     @PostMapping
+<<<<<<< HEAD
     public ResponseEntity<Expense> addExpense(@Valid @RequestBody ExpenseDto dto) {
+=======
+    public ResponseEntity<Expense> addExpense(@Valid @RequestBody ExpenseDTO dto) {
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         Expense expense = Expense.builder()
                 .groupId(dto.getGroupId())
                 .tripId(dto.getTripId())

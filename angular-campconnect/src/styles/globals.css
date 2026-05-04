@@ -473,4 +473,22 @@ html {
   visibility: hidden;
   transform: translateY(10px);
   transition: all 0.2s ease-in-out;
+<<<<<<< HEAD
 }
+=======
+}
+
+/* ===================================
+   LEAFLET MAP COMPATIBILITY
+   Prevent global img rules from shrinking tiles
+   =================================== */
+.leaflet-container img,
+.leaflet-container svg {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+.leaflet-container {
+  font: inherit;
+}
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)

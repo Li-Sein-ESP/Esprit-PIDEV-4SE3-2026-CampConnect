@@ -11,7 +11,11 @@ import com.campconnect.model.Campsite;
 import com.campconnect.repository.CampsiteRepository;
 
 /**
+<<<<<<< HEAD
  * REST Controller pour gérer les opérations CRUD sur les campings.
+=======
+ * REST Controller pour gÃƒÂ©rer les opÃƒÂ©rations CRUD sur les campings.
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
  * Endpoint: /api/campsites
  */
 @RestController
@@ -24,7 +28,11 @@ public class CampsiteController {
 
     /**
      * GET /api/campsites
+<<<<<<< HEAD
      * Récupère tous les campings.
+=======
+     * RÃƒÂ©cupÃƒÂ¨re tous les campings.
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
      */
     @GetMapping
     public ResponseEntity<List<Campsite>> getAllCampsites() {
@@ -34,7 +42,11 @@ public class CampsiteController {
 
     /**
      * GET /api/campsites/{id}
+<<<<<<< HEAD
      * Récupère un camping par son identifiant.
+=======
+     * RÃƒÂ©cupÃƒÂ¨re un camping par son identifiant.
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
      */
     @GetMapping("/{id}")
     public ResponseEntity<Campsite> getCampsiteById(@PathVariable String id) {
@@ -48,7 +60,11 @@ public class CampsiteController {
 
     /**
      * POST /api/campsites
+<<<<<<< HEAD
      * Crée un nouveau camping.
+=======
+     * CrÃƒÂ©e un nouveau camping.
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
      */
     @PostMapping
     public ResponseEntity<Campsite> createCampsite(@RequestBody Campsite campsite) {
@@ -58,7 +74,11 @@ public class CampsiteController {
 
     /**
      * PUT /api/campsites/{id}
+<<<<<<< HEAD
      * Met à jour un camping existant.
+=======
+     * Met ÃƒÂ  jour un camping existant.
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
      */
     @PutMapping("/{id}")
     public ResponseEntity<Campsite> updateCampsite(@PathVariable String id, @RequestBody Campsite campsiteDetails) {
@@ -75,6 +95,12 @@ public class CampsiteController {
             campsite.setAmenities(campsiteDetails.getAmenities());
             campsite.setImages(campsiteDetails.getImages());
             campsite.setAvailable(campsiteDetails.getAvailable());
+<<<<<<< HEAD
+=======
+            campsite.setStatus(campsiteDetails.getStatus());
+            campsite.setLatitude(campsiteDetails.getLatitude());
+            campsite.setLongitude(campsiteDetails.getLongitude());
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
             
             Campsite updated = campsiteRepository.save(campsite);
             return ResponseEntity.ok(updated);

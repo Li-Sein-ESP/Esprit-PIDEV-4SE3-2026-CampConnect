@@ -49,6 +49,10 @@ import { filter } from 'rxjs/operators';
             <div>
               <h4 class="font-semibold mb-4">Plan</h4>
               <ul class="space-y-2 text-sm text-gray-400">
+<<<<<<< HEAD
+=======
+                <li><a routerLink="/trips" class="hover:text-white transition-colors">My Trips</a></li>
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 <li><a routerLink="/plan-trip" class="hover:text-white transition-colors">Trip Planner</a></li>
                 <li><a routerLink="/transportation" class="hover:text-white transition-colors">Transportation</a></li>
                 <li><a routerLink="/gear" class="hover:text-white transition-colors">Gear</a></li>

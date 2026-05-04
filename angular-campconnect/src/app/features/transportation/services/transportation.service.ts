@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -13,10 +14,19 @@ export interface TransportDTO {
     imageUrl?: string;
 }
 
+=======
+import { Injectable, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
+import { TransportRoute, VehicleRental } from '../models/transportation.model';
+
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 @Injectable({
     providedIn: 'root'
 })
 export class TransportationService {
+<<<<<<< HEAD
     private http = inject(HttpClient);
     private apiUrl = 'http://localhost:8080/api/transports';
     private routes = signal<TransportRoute[]>([]);
@@ -39,16 +49,50 @@ export class TransportationService {
         return this.http.put<TransportDTO>(`${this.apiUrl}/${id}`, transport);
     }
 
+=======
+    private apiUrl = `${environment.apiUrl}/transports`;
+    private routes = signal<TransportRoute[]>([]);
+
+    constructor(private http: HttpClient) { }
+
+    /**
+     * Get all transports for administration
+     */
+    getAllTransports(): Observable<any[]> {
+        return this.http.get<any[]>(this.apiUrl);
+    }
+
+    /**
+     * Create a new transport option
+     */
+    createTransport(payload: any): Observable<any> {
+        return this.http.post<any>(this.apiUrl, payload);
+    }
+
+    /**
+     * Update an existing transport option
+     */
+    updateTransport(id: string, payload: any): Observable<any> {
+        return this.http.put<any>(`${this.apiUrl}/${id}`, payload);
+    }
+
+    /**
+     * Delete a transport option
+     */
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     deleteTransport(id: string): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
 
+<<<<<<< HEAD
     getTransportsByTrip(tripId: string): Observable<TransportDTO[]> {
         return this.http.get<TransportDTO[]>(`${this.apiUrl}/trip/${tripId}`);
     }
 
     // ============ Mock Data for UI Development ============
 
+=======
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     getMockRoutes(origin: string, destination: string): TransportRoute[] {
         return [
             {
@@ -117,4 +161,14 @@ export class TransportationService {
             }
         ];
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * Obtenir les statistiques de popularité des transports (JPQL/Aggregation Analytics)
+     */
+    getPopularity(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/popularity-stats`);
+    }
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

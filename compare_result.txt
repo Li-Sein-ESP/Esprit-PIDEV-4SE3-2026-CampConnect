@@ -1,0 +1,32 @@
+﻿=== FILES ONLY IN NEW PROJECT ===
+NEW: \controller\AdminCommunityController.java
+NEW: \controller\AdminSafetyController.java
+NEW: \controller\ForumThreadController.java
+NEW: \controller\IncidentController.java
+NEW: \controller\LeaderboardController.java
+NEW: \controller\SafetyAnalyticsController.java
+NEW: \dto\LeaderboardEntryDto.java
+NEW: \dto\LeaderboardResponseDto.java
+NEW: \dto\OpenIncidentSummaryDto.java
+NEW: \dto\ReservationDto.java
+NEW: \dto\SchedulerImpactDto.java
+NEW: \model\UserStats.java
+NEW: \repository\UserStatsRepository.java
+NEW: \scheduler\SafetyIncidentScheduler.java
+NEW: \service\LeaderboardService.java
+NEW: \service\SafetyAnalyticsService.java
+NEW: \service\impl\LeaderboardServiceImpl.java
+NEW: \service\impl\SafetyAnalyticsServiceImpl.java
+
+=== ANGULAR FEATURES IN NEW ===
+NEW_ANG: \admin\admin-incident-management\admin-incident-management.component.spec.ts
+NEW_ANG: \community\community-feed\community-feed.component.spec.ts
+NEW_ANG: \community\create-post\create-post.component.spec.ts
+NEW_ANG: \safety\report-incident\report-incident.component.spec.ts
+NEW_ANG: \safety\safety-analytics\safety-analytics.component.spec.ts
+NEW_ANG: \safety\services\safety.service.spec.ts
+NEW_ANG: \transportation\route-breakdown\route-breakdown.component.html
+NEW_ANG: \transportation\transportation-options\transportation-options.component.html
+NEW_ANG: \transportation\transportation-overview\transportation-overview.component.html
+NEW_ANG: \trips\my-trips.component.html
+NEW_ANG: \trips\plan-trip.component.html

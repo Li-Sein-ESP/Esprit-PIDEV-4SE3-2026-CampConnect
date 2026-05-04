@@ -11,7 +11,11 @@ import com.campconnect.model.Season;
 import com.campconnect.repository.SeasonRepository;
 
 /**
+<<<<<<< HEAD
  * REST Controller pour gérer les opérations CRUD sur les saisons.
+=======
+ * REST Controller pour gÃƒÂ©rer les opÃƒÂ©rations CRUD sur les saisons.
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
  * Endpoint: /api/seasons
  */
 @RestController
@@ -24,7 +28,11 @@ public class SeasonController {
 
     /**
      * GET /api/seasons
+<<<<<<< HEAD
      * Récupère toutes les saisons.
+=======
+     * RÃƒÂ©cupÃƒÂ¨re toutes les saisons.
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
      */
     @GetMapping
     public ResponseEntity<List<Season>> getAllSeasons() {
@@ -34,7 +42,11 @@ public class SeasonController {
 
     /**
      * GET /api/seasons/{id}
+<<<<<<< HEAD
      * Récupère une saison par son identifiant.
+=======
+     * RÃƒÂ©cupÃƒÂ¨re une saison par son identifiant.
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
      */
     @GetMapping("/{id}")
     public ResponseEntity<Season> getSeasonById(@PathVariable String id) {
@@ -48,7 +60,11 @@ public class SeasonController {
 
     /**
      * POST /api/seasons
+<<<<<<< HEAD
      * Crée une nouvelle saison.
+=======
+     * CrÃƒÂ©e une nouvelle saison.
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
      */
     @PostMapping
     public ResponseEntity<Season> createSeason(@RequestBody Season season) {
@@ -58,7 +74,11 @@ public class SeasonController {
 
     /**
      * PUT /api/seasons/{id}
+<<<<<<< HEAD
      * Met à jour une saison existante.
+=======
+     * Met ÃƒÂ  jour une saison existante.
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
      */
     @PutMapping("/{id}")
     public ResponseEntity<Season> updateSeason(@PathVariable String id, @RequestBody Season seasonDetails) {

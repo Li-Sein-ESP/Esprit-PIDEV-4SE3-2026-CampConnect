@@ -91,7 +91,11 @@ class GearControllerTest {
 
     @Test
     void create_ShouldReturn201() throws Exception {
+<<<<<<< HEAD
         UserDetailsImpl principal = new UserDetailsImpl("owner-1", "owner", "o@test.com", "pass", false,
+=======
+        UserDetailsImpl principal = new UserDetailsImpl("owner-1", "owner", "o@test.com", "pass",
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 List.of(), null);
 
         GearRequest request = new GearRequest();
@@ -119,7 +123,11 @@ class GearControllerTest {
 
     @Test
     void update_ShouldReturn200() throws Exception {
+<<<<<<< HEAD
         UserDetailsImpl principal = new UserDetailsImpl("owner-1", "owner", "o@test.com", "pass", false,
+=======
+        UserDetailsImpl principal = new UserDetailsImpl("owner-1", "owner", "o@test.com", "pass",
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 List.of(), null);
 
         GearRequest request = new GearRequest();
@@ -147,7 +155,11 @@ class GearControllerTest {
 
     @Test
     void delete_ShouldReturn204() throws Exception {
+<<<<<<< HEAD
         UserDetailsImpl principal = new UserDetailsImpl("owner-1", "owner", "o@test.com", "pass", false,
+=======
+        UserDetailsImpl principal = new UserDetailsImpl("owner-1", "owner", "o@test.com", "pass",
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 List.of(), null);
 
         doNothing().when(gearService).softDelete("gear-1", "owner-1");
@@ -159,7 +171,11 @@ class GearControllerTest {
 
     @Test
     void getProviderStats_ShouldReturnStats() throws Exception {
+<<<<<<< HEAD
         UserDetailsImpl principal = new UserDetailsImpl("owner-1", "owner", "o@test.com", "pass", false,
+=======
+        UserDetailsImpl principal = new UserDetailsImpl("owner-1", "owner", "o@test.com", "pass",
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 List.of(), null);
 
         ProviderStatsResponse response = new ProviderStatsResponse();

@@ -16,6 +16,14 @@ public class PostController {
 
     private final PostService postService;
 
+<<<<<<< HEAD
+=======
+    @GetMapping
+    public ResponseEntity<List<PostDTO>> getAllPosts() {
+        return ResponseEntity.ok(postService.getAllPosts());
+    }
+
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     @PostMapping
     public ResponseEntity<PostDTO> createPost(@RequestBody PostDTO postDTO) {
         return ResponseEntity.ok(postService.createPost(postDTO));

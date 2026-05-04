@@ -13,6 +13,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+<<<<<<< HEAD
+=======
+import java.util.Comparator;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @Service
 @RequiredArgsConstructor
@@ -31,12 +35,35 @@ public class PostServiceImpl implements PostService {
         post.setAuthorId(postDTO.getAuthorId());
         post.setAuthorName(postDTO.getAuthorName() != null ? postDTO.getAuthorName() : "Explorer");
         post.setAuthorUsername(postDTO.getAuthorUsername() != null ? postDTO.getAuthorUsername() : "explorer");
+<<<<<<< HEAD
+=======
+        post.setTitle(postDTO.getTitle());
+        post.setCategory(postDTO.getCategory());
+        if (postDTO.getTags() != null) {
+            post.setTags(postDTO.getTags());
+        }
+        if (postDTO.getImageUrls() != null) {
+            post.setImageUrls(postDTO.getImageUrls());
+        }
+        post.setLocation(postDTO.getLocation());
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
         Post savedPost = postRepository.save(post);
         return mapToDTO(savedPost);
     }
 
     @Override
+<<<<<<< HEAD
+=======
+    public List<PostDTO> getAllPosts() {
+        return postRepository.findAll().stream()
+            .sorted(Comparator.comparing(Post::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
+            .map(this::mapToDTO)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     public PostDTO getPostById(String id) {
         Post post = postRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Post not found"));
@@ -73,6 +100,15 @@ public class PostServiceImpl implements PostService {
         dto.setAuthorId(post.getAuthorId());
         dto.setAuthorName(post.getAuthorName());
         dto.setAuthorUsername(post.getAuthorUsername());
+<<<<<<< HEAD
+=======
+        dto.setTitle(post.getTitle());
+        dto.setCategory(post.getCategory());
+        dto.setTags(post.getTags());
+        dto.setImageUrls(post.getImageUrls());
+        dto.setLocation(post.getLocation());
+        dto.setCommentCount(post.getComments() != null ? post.getComments().size() : 0);
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         return dto;
     }
 }

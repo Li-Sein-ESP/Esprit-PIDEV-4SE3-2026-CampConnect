@@ -15,6 +15,28 @@ export interface Campsite {
     amenities: string[];
     capacity: number;
     available: boolean;
+<<<<<<< HEAD
+=======
+    status: string;
+    latitude: number;
+    longitude: number;
+}
+
+export interface CampsiteReview {
+    id?: string;
+    campsiteId?: string;
+    userId?: string;
+    userName?: string;
+    userAvatar?: string;
+    rating?: number;
+    title?: string;
+    content?: string;
+    photos?: string[];
+    verifiedStay?: boolean;
+    createdAt?: string;
+    helpfulByUsers?: string[];
+    helpful?: number;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }
 
 @Injectable({
@@ -119,4 +141,48 @@ export class CampsiteService {
     deleteCampsite(id: string): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * GET /api/campsites/{campsiteId}/reviews
+     * Retrieves all reviews for a specific campsite.
+     */
+    getReviews(campsiteId: string): Observable<CampsiteReview[]> {
+        return this.http.get<CampsiteReview[]>(`${this.apiUrl}/${campsiteId}/reviews`);
+    }
+
+    /**
+     * POST /api/campsites/{campsiteId}/reviews
+     * Adds a new review to a campsite.
+     */
+    addReview(campsiteId: string, review: CampsiteReview): Observable<CampsiteReview> {
+        return this.http.post<CampsiteReview>(`${this.apiUrl}/${campsiteId}/reviews`, review);
+    }
+
+    /**
+     * POST /api/campsites/{campsiteId}/reviews/{reviewId}/react?userId={userId}
+     * Toggles a helpful reaction on a review.
+     */
+    reactToReview(campsiteId: string, reviewId: string, userId: string): Observable<CampsiteReview> {
+        return this.http.post<CampsiteReview>(
+            `${this.apiUrl}/${campsiteId}/reviews/${reviewId}/react?userId=${userId}`, 
+            {}
+        );
+    }
+    /**
+     * POST /api/upload/image
+     * Uploads an image file to the backend and returns the URL.
+     */
+    uploadCampsiteImage(file: File): Observable<{ url: string; filename: string }> {
+        const formData = new FormData();
+        formData.append('file', file);
+        // Use the backend base URL (without /api suffix)
+        const backendBase = environment.apiUrl.substring(0, environment.apiUrl.lastIndexOf('/api'));
+        return this.http.post<{ url: string; filename: string }>(
+            `${backendBase}/api/upload/image`,
+            formData
+        );
+    }
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

@@ -1,13 +1,26 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+<<<<<<< HEAD
 import { LucideAngularModule, ChevronLeft, ChevronRight, ImageIcon, MapPin, Star, Share2, Heart, Accessibility, Sun, Info, Calendar, Map as MapIcon, Users, CheckCircle, AlertTriangle, Wifi, Zap, Droplets, Flame, TreePine, Mountain, Waves, ThumbsUp, MessageSquare, Filter, Loader2 } from 'lucide-angular';
+=======
+import { LucideAngularModule, ChevronLeft, ChevronRight, ImageIcon, MapPin, Star, Share2, Heart, Accessibility, Sun, Info, Calendar, Map as MapIcon, Users, CheckCircle, AlertTriangle, Wifi, Zap, Droplets, Flame, TreePine, Mountain, Waves, ThumbsUp, MessageSquare, Filter, Loader2, Leaf, Fish, Binoculars, ShieldAlert } from 'lucide-angular';
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import { ButtonComponent } from '../../../shared/components/button.component';
 import { BadgeComponent } from '../../../shared/components/badge.component';
 import { CardComponent, CardHeaderComponent, CardTitleComponent, CardDescriptionComponent, CardContentComponent } from '../../../shared/components/card.component';
 import { MapViewComponent } from '../../../shared/components/map-view/map-view.component';
 import { WriteReviewComponent } from '../write-review/write-review.component';
+<<<<<<< HEAD
 import { CampsiteService, Campsite } from '../../../core/services/campsite.service';
+=======
+import { CampsiteService, Campsite, CampsiteReview } from '../../../core/services/campsite.service';
+import { ComplianceChatComponent } from '../compliance-chat/compliance-chat.component';
+import { EnvironmentalRuleService, EnvironmentalRule } from '../../../core/services/environmental-rule.service';
+import { AuthService, User } from '../../../core/services/auth.service';
+import { DynamicPriceComponent } from '../dynamic-price/dynamic-price.component';
+import { SpatialMapComponent } from '../spatial-map/spatial-map';
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @Component({
     selector: 'app-campsite-detail',
@@ -24,7 +37,14 @@ import { CampsiteService, Campsite } from '../../../core/services/campsite.servi
         CardDescriptionComponent,
         CardContentComponent,
         MapViewComponent,
+<<<<<<< HEAD
         WriteReviewComponent
+=======
+        WriteReviewComponent,
+        ComplianceChatComponent,
+        DynamicPriceComponent,
+        SpatialMapComponent
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     ],
     templateUrl: './campsite-detail.component.html',
     styles: [`
@@ -68,6 +88,17 @@ export class CampsiteDetailComponent implements OnInit {
     readonly ThumbsUp = ThumbsUp;
     readonly MessageSquare = MessageSquare;
     readonly Loader2 = Loader2;
+<<<<<<< HEAD
+=======
+    readonly Leaf = Leaf;
+    readonly Fish = Fish;
+    readonly Binoculars = Binoculars;
+    readonly ShieldAlert = ShieldAlert;
+
+    environmentalRules: EnvironmentalRule[] = [];
+    rulesLoading = true;
+    showAlertsList = false;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
     terrainIcons: Record<string, any> = {
         forest: TreePine,
@@ -167,6 +198,7 @@ export class CampsiteDetailComponent implements OnInit {
         },
     ];
 
+<<<<<<< HEAD
     constructor(
         private route: ActivatedRoute,
         private router: Router,
@@ -174,14 +206,101 @@ export class CampsiteDetailComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
+=======
+    actualReviews: CampsiteReview[] = [];
+    currentUser: User | null = null;
+
+
+    constructor(
+        private route: ActivatedRoute,
+        private router: Router,
+        private campsiteService: CampsiteService,
+        private ruleService: EnvironmentalRuleService,
+        private authService: AuthService
+    ) { }
+
+    ngOnInit(): void {
+        this.authService.getCurrentUser().subscribe(user => {
+            this.currentUser = user;
+        });
+        
+        this.ruleService.getRules().subscribe({
+            next: (rules) => { this.environmentalRules = rules.filter(r => r.active !== false && r.severity !== 'INFO' && r.category !== 'CONTEXT'); this.rulesLoading = false; },
+            error: () => { this.rulesLoading = false; }
+        });
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         this.route.paramMap.subscribe(params => {
             this.siteId = params.get('id');
             if (this.siteId) {
                 this.loadCampsite(this.siteId);
+<<<<<<< HEAD
+=======
+                this.loadReviews(this.siteId);
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
             }
         });
     }
 
+<<<<<<< HEAD
+=======
+    loadReviews(id: string): void {
+        this.campsiteService.getReviews(id).subscribe({
+            next: (reviews) => {
+                this.actualReviews = reviews;
+            },
+            error: (err) => console.error('Error fetching reviews', err)
+        });
+    }
+
+    reactToReview(reviewId: string): void {
+        if (!this.currentUser) {
+            alert('Please login to react to a review');
+            return;
+        }
+        
+        // Handle mock reviews locally for the demo
+        if (reviewId.startsWith('rev-')) {
+            const mockIndex = this.mockReviews.findIndex(r => r.id === reviewId);
+            if (mockIndex !== -1) {
+                const review = this.mockReviews[mockIndex];
+                if (review.helpfulByUsers?.includes(this.currentUser.id)) {
+                    review.helpfulByUsers = review.helpfulByUsers.filter((id: string) => id !== this.currentUser!.id);
+                    review.helpful--;
+                } else {
+                    review.helpfulByUsers = review.helpfulByUsers || [];
+                    review.helpfulByUsers.push(this.currentUser.id);
+                    review.helpful++;
+                }
+            }
+            return;
+        }
+
+        if (this.siteId) {
+            this.campsiteService.reactToReview(this.siteId, reviewId, this.currentUser.id).subscribe({
+                next: (updatedReview) => {
+                    // Update the review in the list
+                    const index = this.actualReviews.findIndex(r => r.id === updatedReview.id);
+                    if (index !== -1) {
+                        this.actualReviews[index] = updatedReview;
+                    }
+                },
+                error: (err) => {
+                    console.error('Error reacting to review', err);
+                    if (err.status === 404) {
+                        alert('This review could not be found on the server.');
+                    }
+                }
+            });
+        }
+    }
+
+    onReviewSubmitted(newReview: CampsiteReview): void {
+        this.actualReviews.unshift(newReview);
+        // Recalculate rating and counts visually (or reload campsite from API)
+        this.loadCampsite(this.siteId!);
+    }
+
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     loadCampsite(id: string): void {
         this.isLoading = true;
         this.error = null;
@@ -217,9 +336,18 @@ export class CampsiteDetailComponent implements OnInit {
             rating: data.rating || 0,
             reviewCount: data.reviewCount || 0,
             amenities: (data.amenities || []).map(a => a.toLowerCase()),
+<<<<<<< HEAD
             images: data.images?.length ? data.images : [
                 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1200&q=80',
             ],
+=======
+            images: (data.images?.length ? data.images : [
+                'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1200&q=80',
+            ]).map(url => {
+                if (url.startsWith('data:') || url.startsWith('http')) return url;
+                return 'http://localhost:8090' + url;
+            }),
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
             description: data.description || 'A beautiful campsite waiting to be explored.',
             highlights: [
                 'Well-maintained facilities',
@@ -316,6 +444,7 @@ export class CampsiteDetailComponent implements OnInit {
     }
 
     get sortedReviews() {
+<<<<<<< HEAD
         return [...this.mockReviews].sort((a, b) => {
             if (this.reviewSort === 'recent') {
                 return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -327,6 +456,23 @@ export class CampsiteDetailComponent implements OnInit {
         });
     }
 
+=======
+        const source = this.actualReviews.length > 0 ? this.actualReviews : this.mockReviews;
+        return [...source].sort((a: any, b: any) => {
+            if (this.reviewSort === 'recent') {
+                return new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime();
+            }
+            if (this.reviewSort === 'helpful') {
+                const helpfulA = a.helpful || a.helpfulByUsers?.length || 0;
+                const helpfulB = b.helpful || b.helpfulByUsers?.length || 0;
+                return helpfulB - helpfulA;
+            }
+            return (b.rating || 0) - (a.rating || 0);
+        });
+    }
+
+
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     get mapMarkers() {
         return [
             {

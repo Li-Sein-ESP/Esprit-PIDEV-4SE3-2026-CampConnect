@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <app-modal [isOpen]="true" (close)="close.emit()" [size]="step === 'submitting' || step === 'success' ? 'sm' : 'lg'">
 
     <!-- Submitting State -->
@@ -15,11 +16,31 @@
         </div>
         <h3 class="mb-2">Review Submitted!</h3>
         <p class="text-[var(--color-text-secondary)]">
+=======
+<app-modal [isOpen]="true" (close)="close.emit()" [size]="isSubmitting || isSuccess ? 'sm' : 'lg'">
+
+    <!-- Submitting State -->
+    <div *ngIf="isSubmitting" class="text-center py-12">
+        <lucide-icon [name]="Loader2"
+            class="w-16 h-16 text-emerald-600 animate-spin mx-auto mb-4"></lucide-icon>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Submitting your review...</h3>
+        <p class="text-gray-500">This will only take a moment</p>
+    </div>
+
+    <!-- Success State -->
+    <div *ngIf="isSuccess" class="text-center py-12">
+        <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-emerald-200">
+            <lucide-icon [name]="CheckCircle" class="w-10 h-10 text-emerald-600"></lucide-icon>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 mb-2">Review Submitted!</h3>
+        <p class="text-gray-500">
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
             Thank you for sharing your experience
         </p>
     </div>
 
     <!-- Form Content -->
+<<<<<<< HEAD
     <div *ngIf="step === 'rating' || step === 'details'">
         <div class="mb-6">
             <h2 class="mb-2">Write a Review</h2>
@@ -77,11 +98,51 @@
                         <span *ngIf="getRatingValue(criterion.key) > 0"
                             class="ml-2 font-medium text-[var(--color-primary-600)]">
                             {{ getRatingValue(criterion.key) }}/5
+=======
+    <div *ngIf="!isSubmitting && !isSuccess" class="p-4 sm:p-6 max-h-[80vh] overflow-y-auto custom-scrollbar">
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-1">Write a Review</h2>
+            <p class="text-sm text-gray-500 flex items-center gap-2">
+                <lucide-icon [name]="MapPin" class="w-4 h-4"></lucide-icon> Share your thoughts with the community
+            </p>
+        </div>
+
+        <!-- Rating Step -->
+        <div class="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <h3 class="text-xl font-bold text-gray-900 mb-6 border-b border-gray-100 pb-2">1. Rate your experience</h3>
+
+            <!-- Criteria Ratings -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div *ngFor="let criterion of ratingCriteria" class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="mb-3">
+                        <div class="font-bold text-gray-900">{{ criterion.label }}</div>
+                        <div class="text-xs text-gray-500 mt-1">
+                            {{ criterion.description }}
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-1">
+                            <button *ngFor="let i of range(5)" (click)="setRating(criterion.key, i + 1)"
+                                (mouseenter)="setHoveredRating(criterion.key, i + 1)"
+                                (mouseleave)="setHoveredRating(criterion.key, 0)"
+                                class="transition-transform hover:scale-125 focus:outline-none">
+                                <lucide-icon [name]="Star" class="w-7 h-7 transition-colors duration-200"
+                                    [class.text-amber-500]="i < (getHoveredRatingValue(criterion.key) || getRatingValue(criterion.key))"
+                                    [class.fill-current]="i < (getHoveredRatingValue(criterion.key) || getRatingValue(criterion.key))"
+                                    [class.text-gray-200]="i >= (getHoveredRatingValue(criterion.key) || getRatingValue(criterion.key))"
+                                    [class.hover:text-amber-400]="i >= (getHoveredRatingValue(criterion.key) || getRatingValue(criterion.key))"></lucide-icon>
+                            </button>
+                        </div>
+                        <span *ngIf="getRatingValue(criterion.key) > 0"
+                            class="font-bold text-lg text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg">
+                            {{ getRatingValue(criterion.key) }}
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                         </span>
                     </div>
                 </div>
             </div>
 
+<<<<<<< HEAD
             <div class="flex justify-end gap-3">
                 <app-button variant="ghost" (click)="close.emit()">
                     Cancel
@@ -89,10 +150,26 @@
                 <app-button (click)="step = 'details'" [disabled]="!canContinueToDetails">
                     Continue
                 </app-button>
+=======
+            <!-- Overall Rating Preview -->
+            <div *ngIf="overallRating > 0" class="flex flex-col sm:flex-row items-center justify-between p-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-100 shadow-sm transition-all duration-300 scale-in-center mb-10">
+                <div class="text-sm font-bold text-emerald-800 uppercase tracking-wider mb-2 sm:mb-0">Overall Score</div>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-1">
+                        <lucide-icon *ngFor="let i of range(5)" [name]="Star" class="w-6 h-6"
+                            [class.text-amber-500]="i < overallRating" [class.fill-current]="i < overallRating"
+                            [class.text-gray-300]="i >= overallRating"></lucide-icon>
+                    </div>
+                    <div class="text-2xl font-extrabold text-emerald-700">
+                        {{ overallRating }}<span class="text-lg text-emerald-600/60 font-medium">/5</span>
+                    </div>
+                </div>
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
             </div>
         </div>
 
         <!-- Details Step -->
+<<<<<<< HEAD
         <div *ngIf="step === 'details'">
             <h3 class="mb-6">Share your experience</h3>
 
@@ -120,10 +197,26 @@
                     maxlength="100" />
                 <div class="text-xs text-[var(--color-text-tertiary)] mt-1 text-right">
                     {{ title.length }}/100
+=======
+        <div class="animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
+            <h3 class="text-xl font-bold text-gray-900 mb-6 border-b border-gray-100 pb-2">2. Share your experience</h3>
+
+            <!-- Review Title -->
+            <div class="mb-6">
+                <label class="block mb-2 text-sm font-bold text-gray-900 uppercase tracking-wide">
+                    Review Title
+                </label>
+                <input type="text" [(ngModel)]="title" placeholder="Summarize your experience (e.g. 'Amazing weekend getaway!')"
+                    class="w-full px-5 py-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-200 text-lg font-medium"
+                    maxlength="100" />
+                <div class="text-xs font-medium text-gray-400 mt-2 text-right">
+                    {{ title.length }} / 100
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 </div>
             </div>
 
             <!-- Review Content -->
+<<<<<<< HEAD
             <div class="mb-6">
                 <label class="block mb-2 font-medium text-[var(--color-text-primary)]">
                     Your Review
@@ -134,10 +227,23 @@
                     maxlength="1000"></textarea>
                 <div class="text-xs text-[var(--color-text-tertiary)] mt-1 text-right">
                     {{ content.length }}/1000
+=======
+            <div class="mb-8">
+                <label class="block mb-2 text-sm font-bold text-gray-900 uppercase tracking-wide">
+                    Your Review
+                </label>
+                <textarea [(ngModel)]="content"
+                    placeholder="Tell others about your stay... What did you love? What could be improved? Did the photos match reality?" rows="5"
+                    class="w-full px-5 py-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-200 resize-none text-base"
+                    maxlength="1000"></textarea>
+                <div class="text-xs font-medium text-gray-400 mt-2 text-right">
+                    {{ content.length }} / 1000
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 </div>
             </div>
 
             <!-- Photo Upload -->
+<<<<<<< HEAD
             <div class="mb-8">
                 <label class="block mb-2 font-medium text-[var(--color-text-primary)]">
                     Add Photos (Optional)
@@ -172,6 +278,48 @@
                 <app-button (click)="handleSubmit()" [disabled]="!canSubmit">
                     Submit Review
                 </app-button>
+=======
+            <div class="mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <label class="block text-sm font-bold text-gray-900 uppercase tracking-wide">
+                        Add Photos <span class="text-gray-400 normal-case font-normal">(Optional)</span>
+                    </label>
+                    <span class="text-xs font-medium text-gray-500">{{ photos.length }} / 5 photos</span>
+                </div>
+                
+                <div class="flex flex-wrap gap-4">
+                    <div *ngFor="let photo of photos; let i = index" class="relative w-24 h-24 rounded-xl overflow-hidden shadow-sm group">
+                        <img [src]="photo" [alt]="'Upload ' + (i + 1)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button (click)="removePhoto(i)"
+                                class="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 hover:scale-110 transition-all shadow-lg">
+                                <lucide-icon [name]="X" class="w-4 h-4"></lucide-icon>
+                            </button>
+                        </div>
+                    </div>
+
+                    <label *ngIf="photos.length < 5"
+                        class="w-24 h-24 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all group">
+                        <input type="file" accept="image/*" multiple (change)="handlePhotoUpload($event)"
+                            class="hidden" />
+                        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm mb-1 group-hover:text-emerald-600 transition-colors">
+                            <lucide-icon [name]="ImageIcon" class="w-5 h-5 text-gray-400 group-hover:text-emerald-600"></lucide-icon>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex flex-col-reverse sm:flex-row justify-end gap-4 mt-8 pt-6 border-t border-gray-100">
+                <button (click)="close.emit()" class="px-6 py-3 rounded-xl font-bold text-gray-600 hover:bg-gray-100 transition-colors text-center">
+                    Cancel
+                </button>
+                <button (click)="handleSubmit()" [disabled]="!canSubmit"
+                    class="px-8 py-3 rounded-xl font-bold transition-all shadow-md flex items-center justify-center gap-2"
+                    [class.bg-emerald-600]="canSubmit" [class.text-white]="canSubmit" [class.hover:bg-emerald-700]="canSubmit" [class.hover:shadow-lg]="canSubmit"
+                    [class.bg-gray-200]="!canSubmit" [class.text-gray-400]="!canSubmit" [class.cursor-not-allowed]="!canSubmit">
+                    Submit Review <lucide-icon [name]="CheckCircle" class="w-5 h-5"></lucide-icon>
+                </button>
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
             </div>
         </div>
     </div>

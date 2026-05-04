@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -7,20 +8,47 @@ import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
+=======
+import { Injectable } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+import { Group } from "../models/group.model";
+import { environment } from "../../../../environments/environment";
+
+@Injectable({
+  providedIn: "root",
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 })
 export class GroupService {
   private apiUrl = `${environment.apiUrl}/groups`;
 
+<<<<<<< HEAD
   constructor(private http: HttpClient) { }
+=======
+  constructor(private http: HttpClient) {}
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
   /**
    * Fetch all groups and filter locally to return only the ones the user belongs to.
    * This handles the lack of a dedicated `/me` endpoint on the backend.
    */
   getMyGroups(userId: string): Observable<Group[]> {
+<<<<<<< HEAD
     return this.http.get<Group[]>(this.apiUrl).pipe(
       map(groups => groups.filter(g => g.memberUserIds && g.memberUserIds.includes(userId)))
     );
+=======
+    return this.http
+      .get<Group[]>(this.apiUrl)
+      .pipe(
+        map((groups) =>
+          groups.filter(
+            (g) => g.memberUserIds && g.memberUserIds.includes(userId),
+          ),
+        ),
+      );
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
   }
 
   getGroupByTripId(tripId: string): Observable<Group> {
@@ -66,7 +94,43 @@ export class GroupService {
    * Leave a group
    */
   leaveGroup(groupId: string, userId: string): Observable<Group> {
+<<<<<<< HEAD
     return this.http.patch<Group>(`${this.apiUrl}/${groupId}/leave/${userId}`, {});
   }
 }
 
+=======
+    return this.http.patch<Group>(
+      `${this.apiUrl}/${groupId}/leave/${userId}`,
+      {},
+    );
+  }
+
+  /**
+   * Get pending group invitations for a user
+   */
+  getMyInvitations(userId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/invitations/user/${userId}`);
+  }
+
+  /**
+   * Accept a group invitation
+   */
+  acceptInvitation(invitationId: string): Observable<any> {
+    return this.http.patch<any>(
+      `${this.apiUrl}/invitations/${invitationId}/accept`,
+      {},
+    );
+  }
+
+  /**
+   * Decline a group invitation
+   */
+  declineInvitation(invitationId: string): Observable<any> {
+    return this.http.patch<any>(
+      `${this.apiUrl}/invitations/${invitationId}/decline`,
+      {},
+    );
+  }
+}
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)

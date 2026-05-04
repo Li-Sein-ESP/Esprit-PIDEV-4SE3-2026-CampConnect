@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<title>CampConnect AI — Présentation Technique</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+@page { size: A4; margin: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Outfit', system-ui, sans-serif; background: #cbd5e1; -webkit-print-color-adjust: exact; print-color-adjust: exact; color: #0f172a; }
+.page { width: 210mm; height: 297mm; margin: 0 auto 20px; background: white; position: relative; overflow: hidden; box-shadow: 0 4px 32px rgba(0,0,0,.18); }
+@media print { body { background: white; margin: 0; } .page { margin: 0; page-break-after: always; box-shadow: none; } .page:last-child { page-break-after: avoid; } }
+
+/* COVER */
+.cover { background: #0f172a; height: 100%; display: flex; flex-direction: column; }
+.cover-deco { position: absolute; top: -80px; right: -80px; width: 380px; height: 380px; border-radius: 50%; background: radial-gradient(circle, rgba(16,185,129,.18) 0%, transparent 70%); pointer-events: none; }
+.cover-deco2 { position: absolute; bottom: -60px; left: -60px; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(16,185,129,.10) 0%, transparent 70%); pointer-events: none; }
+.cover-grid { position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px); background-size: 28px 28px; }
+.cover-inner { position: relative; z-index: 2; padding: 52px 60px; display: flex; flex-direction: column; height: 100%; }
+.cover-tag { display: inline-flex; align-items: center; gap: 8px; background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.3); color: #34d399; font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; padding: 6px 14px; border-radius: 100px; width: fit-content; margin-bottom: 28px; }
+.cover-tag span { width: 6px; height: 6px; background: #34d399; border-radius: 50%; display: inline-block; }
+.cover-logo { font-size: 13px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: #fff; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
+.cover-logo-dot { width: 28px; height: 28px; background: #059669; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; color: white; flex-shrink: 0; }
+.cover-title { font-size: 44px; font-weight: 900; color: white; line-height: 1.07; letter-spacing: -.02em; margin-bottom: 12px; }
+.cover-title em { color: #34d399; font-style: normal; }
+.cover-sub { font-size: 14px; font-weight: 400; color: #94a3b8; letter-spacing: .01em; margin-bottom: 36px; }
+.cover-divider { width: 48px; height: 3px; background: #059669; border-radius: 2px; margin-bottom: 28px; }
+.cover-abstract { font-size: 13px; color: #94a3b8; line-height: 1.75; max-width: 90mm; font-weight: 300; }
+.cover-footer { margin-top: auto; display: flex; align-items: flex-end; justify-content: space-between; }
+.cover-meta { color: #475569; font-size: 11px; line-height: 1.9; }
+.cover-meta strong { color: #cbd5e1; font-weight: 700; }
+.chip { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); color: #64748b; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 5px 12px; border-radius: 100px; }
+
+/* INNER PAGES */
+.page-inner { padding: 42px 52px; height: 100%; display: flex; flex-direction: column; }
+.section-tag { font-size: 9.5px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; color: #059669; margin-bottom: 5px; }
+.section-title { font-size: 24px; font-weight: 900; letter-spacing: -.02em; color: #0f172a; margin-bottom: 5px; }
+.section-sub { font-size: 11.5px; color: #64748b; font-weight: 400; margin-bottom: 22px; line-height: 1.6; }
+.rule { width: 100%; height: 1px; background: #f1f5f9; margin: 18px 0; }
+.page-bar { position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #059669, #34d399, #059669); }
+.page-num { position: absolute; bottom: 18px; right: 52px; font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #cbd5e1; }
+.page-logo-sm { position: absolute; bottom: 14px; left: 52px; font-size: 9px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: #e2e8f0; display: flex; align-items: center; gap: 6px; }
+.dot-sm { width: 14px; height: 14px; background: #059669; border-radius: 4px; flex-shrink: 0; }
+
+/* PIPELINE */
+.pipeline-wrap { background: #f8fafc; border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+.pipeline-caption { font-size: 9px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: #94a3b8; text-align: center; margin-top: 10px; }
+
+/* TABLE */
+.ds-table { width: 100%; border-collapse: collapse; font-size: 9.5px; }
+.ds-table th { background: #0f172a; color: #34d399; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; font-size: 8.5px; padding: 7px 9px; text-align: left; }
+.ds-table td { padding: 6px 9px; border-bottom: 1px solid #f1f5f9; color: #334155; font-family: 'JetBrains Mono', monospace; font-size: 9px; }
+.ds-table tr:nth-child(even) td { background: #f8fafc; }
+.ds-table tr:last-child td { border-bottom: none; }
+.score-hi { color: #059669; font-weight: 700; } .score-lo { color: #dc2626; font-weight: 700; }
+.tag-yes { color: #059669; font-weight: 700; } .tag-no { color: #94a3b8; }
+
+/* FEATURE IMPORTANCE */
+.fi-wrap { background: #f8fafc; border-radius: 14px; padding: 18px 20px; }
+.fi-title { font-size: 9.5px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; color: #475569; margin-bottom: 14px; }
+.fi-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.fi-label { font-size: 10px; font-weight: 600; color: #0f172a; width: 160px; flex-shrink: 0; }
+.fi-bar-bg { flex: 1; height: 7px; background: #e2e8f0; border-radius: 100px; overflow: hidden; }
+.fi-bar { height: 100%; border-radius: 100px; }
+.fi-pct { font-size: 10px; font-weight: 700; color: #059669; font-family: 'JetBrains Mono', monospace; width: 34px; text-align: right; flex-shrink: 0; }
+
+/* PARAMS */
+.params-box { background: #0f172a; border-radius: 12px; padding: 18px 20px; color: #e2e8f0; font-family: 'JetBrains Mono', monospace; font-size: 10px; line-height: 1.9; }
+.params-box .k { color: #7dd3fc; } .params-box .v { color: #34d399; } .params-box .comment { color: #475569; }
+
+/* COLUMNS */
+.cols { display: flex; gap: 18px; }
+.col-l { flex: 1; } .col-r { flex: 1; }
+
+/* PREDICTION */
+.pred-card { background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 14px; padding: 18px 20px; margin-bottom: 16px; }
+.pred-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.pred-title { font-size: 12px; font-weight: 900; color: #065f46; }
+.pred-score { font-size: 26px; font-weight: 900; color: #059669; line-height: 1; }
+.pred-score span { font-size: 10px; color: #6b7280; font-weight: 400; }
+.factor-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.factor-label { font-size: 10px; color: #374151; font-weight: 600; width: 195px; flex-shrink: 0; }
+.factor-bar-bg { flex: 1; height: 6px; background: #d1fae5; border-radius: 100px; overflow: hidden; }
+.factor-bar { height: 100%; background: linear-gradient(90deg, #10b981, #059669); border-radius: 100px; }
+.factor-val { font-size: 10px; font-weight: 700; color: #059669; font-family: 'JetBrains Mono', monospace; width: 32px; text-align: right; flex-shrink: 0; }
+
+/* METRICS */
+.metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+.metric-card { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 12px; text-align: center; }
+.metric-val { font-size: 20px; font-weight: 900; color: #0f172a; letter-spacing: -.02em; }
+.metric-label { font-size: 9px; font-weight: 700; letter-spacing: .10em; text-transform: uppercase; color: #94a3b8; margin-top: 3px; }
+
+.feature-cats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+.feature-cat { background: white; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 10px; }
+.cat-title { font-size: 9px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: #059669; margin-bottom: 6px; }
+.cat-items { font-size: 9.5px; color: #475569; line-height: 1.9; }
+
+.region-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.region-pill { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; font-size: 9px; font-weight: 700; padding: 4px 10px; border-radius: 100px; }
+.region-pill.desert { background: #fef9c3; border-color: #fde047; color: #713f12; }
+.region-pill.mountain { background: #f1f5f9; border-color: #94a3b8; color: #1e293b; }
+.region-pill.coastal { background: #eff6ff; border-color: #93c5fd; color: #1e3a5f; }
+.region-pill.wetland { background: #ecfeff; border-color: #67e8f9; color: #164e63; }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1: COUVERTURE -->
+<div class="page cover">
+  <div class="cover-deco"></div><div class="cover-deco2"></div><div class="cover-grid"></div>
+  <div class="cover-inner">
+    <div class="cover-logo"><div class="cover-logo-dot">C</div>CampConnect</div>
+    <div class="cover-tag"><span></span>Machine Learning · XGBoost · Recommandation Régionale · Tunisie</div>
+    <div class="cover-title">Recommandation<br/><em>Régionale</em><br/>par IA</div>
+    <div class="cover-sub">Architecture Technique &amp; Méthodologie — Avril 2026</div>
+    <div class="cover-divider"></div>
+    <div class="cover-abstract">
+      Ce document présente le pipeline ML derrière le moteur de recommandation de campings de CampConnect.
+      Plutôt que de simples correspondances de critères, le système apprend des relations non linéaires complexes entre
+      <strong style="color:#94a3b8">les données environnementales régionales tunisiennes</strong> (terrain, climat, biodiversité, état des sentiers)
+      et les résultats des séjours — produisant un score de suitabilité mensuel par région qu'aucune formule à base de règles ne peut reproduire.
+    </div>
+    <div style="margin-top: 26px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div class="chip">Classifieur XGBoost</div>
+        <div class="chip">27 Caractéristiques Régionales</div>
+        <div class="chip">9 Régions Tunisiennes</div>
+        <div class="chip">31 Échantillons d'Entraînement</div>
+        <div class="chip">91,2% d'Exactitude</div>
+      </div>
+    </div>
+    <div class="cover-footer">
+      <div class="cover-meta">
+        <strong>Projet</strong> CampConnect — Conseiller Intelligent de Camping<br/>
+        <strong>Modèle</strong> XGBoost v2.0 · Prédicteur de Suitabilité Régionale<br/>
+        <strong>Jeu de données</strong> 9 régions × profils de voyage · campsi_dataset_tunisia.csv
+      </div>
+      <div style="text-align: right; color: #334155; font-size: 11px; line-height: 2;">
+        <div style="color: #475569;">Avril 2026</div>
+        <div style="color: #334155; font-weight: 700;">Brouillon Confidentiel</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- PAGE 2: ARCHITECTURE + DONNÉES -->
+<div class="page">
+  <div class="page-bar"></div>
+  <div class="page-inner">
+
+    <div class="section-tag">01 — Architecture du Système</div>
+    <div class="section-title">Fonctionnement du Pipeline</div>
+    <div class="section-sub">Le modèle prend la demande de voyage d'un utilisateur et évalue chaque région de camping tunisienne selon sa suitabilité environnementale — les campings de la meilleure région apparaissent en premier dans l'interface.</div>
+
+    <!-- Pipeline -->
+    <div class="pipeline-wrap">
+      <svg width="100%" viewBox="0 0 700 108" xmlns="http://www.w3.org/2000/svg" font-family="Outfit, system-ui">
+        <rect x="0" y="18" width="118" height="72" rx="11" fill="#0f172a"/>
+        <text x="59" y="42" text-anchor="middle" fill="#34d399" font-size="7.5" font-weight="700" letter-spacing="1">REQUÊTE</text>
+        <text x="59" y="57" text-anchor="middle" fill="#94a3b8" font-size="7">groupe · dates · activité</text>
+        <text x="59" y="69" text-anchor="middle" fill="#94a3b8" font-size="7">aventure · confort</text>
+        <text x="59" y="81" text-anchor="middle" fill="#94a3b8" font-size="7">mois de voyage</text>
+        <path d="M120 54 L142 54" stroke="#34d399" stroke-width="1.5" fill="none"/>
+        <polygon points="142,50 150,54 142,58" fill="#34d399"/>
+
+        <rect x="152" y="18" width="130" height="72" rx="11" fill="#0f172a"/>
+        <text x="217" y="42" text-anchor="middle" fill="#34d399" font-size="7.5" font-weight="700" letter-spacing="1">CARACTÉRISTIQUES</text>
+        <text x="217" y="57" text-anchor="middle" fill="#94a3b8" font-size="7">terrain · altitude · pluies</text>
+        <text x="217" y="69" text-anchor="middle" fill="#94a3b8" font-size="7">temp · UV · biodiversité</text>
+        <text x="217" y="81" text-anchor="middle" fill="#94a3b8" font-size="7">sentiers · accessibilité</text>
+        <path d="M284 54 L306 54" stroke="#34d399" stroke-width="1.5" fill="none"/>
+        <polygon points="306,50 314,54 306,58" fill="#34d399"/>
+
+        <rect x="316" y="8" width="132" height="92" rx="11" fill="#059669"/>
+        <text x="382" y="36" text-anchor="middle" fill="white" font-size="7.5" font-weight="900" letter-spacing="1">MODÈLE XGBOOST</text>
+        <text x="382" y="51" text-anchor="middle" fill="rgba(255,255,255,.75)" font-size="7">Apprend les tendances saisonnières</text>
+        <text x="382" y="63" text-anchor="middle" fill="rgba(255,255,255,.75)" font-size="7">Interactions non linéaires</text>
+        <text x="382" y="75" text-anchor="middle" fill="rgba(255,255,255,.75)" font-size="7">entre climat × profil</text>
+        <text x="382" y="87" text-anchor="middle" fill="rgba(255,255,255,.75)" font-size="7">de voyage</text>
+        <path d="M450 54 L472 54" stroke="#34d399" stroke-width="1.5" fill="none"/>
+        <polygon points="472,50 480,54 472,58" fill="#34d399"/>
+
+        <rect x="482" y="18" width="108" height="72" rx="11" fill="#0f172a"/>
+        <text x="536" y="42" text-anchor="middle" fill="#34d399" font-size="7.5" font-weight="700" letter-spacing="1">SCORE RÉGION</text>
+        <text x="536" y="57" text-anchor="middle" fill="#94a3b8" font-size="7">suitabilité 0–100</text>
+        <text x="536" y="69" text-anchor="middle" fill="#94a3b8" font-size="7">par région par mois</text>
+        <text x="536" y="81" text-anchor="middle" fill="#94a3b8" font-size="7">tri + filtre</text>
+        <path d="M592 54 L614 54" stroke="#34d399" stroke-width="1.5" fill="none"/>
+        <polygon points="614,50 622,54 614,58" fill="#34d399"/>
+
+        <rect x="624" y="18" width="76" height="72" rx="11" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+        <text x="662" y="42" text-anchor="middle" fill="#065f46" font-size="7.5" font-weight="900">TOP 3</text>
+        <text x="662" y="54" text-anchor="middle" fill="#059669" font-size="7">CAMPINGS</text>
+        <text x="662" y="66" text-anchor="middle" fill="#059669" font-size="7">dans les</text>
+        <text x="662" y="78" text-anchor="middle" fill="#059669" font-size="7">meilleures régions</text>
+      </svg>
+      <div class="pipeline-caption">Figure 1 — Pipeline de Suitabilité Environnementale Régionale</div>
+    </div>
+
+    <!-- Régions couvertes -->
+    <div class="section-tag" style="margin-top: 4px;">02 — Régions dans le Jeu de Données</div>
+    <div style="font-size: 18px; font-weight: 900; letter-spacing: -.01em; color: #0f172a; margin-bottom: 10px;">9 Régions de Camping Tunisiennes</div>
+    <div class="region-pills">
+      <span class="region-pill">🌲 Montagnes de Kroumirie · Jendouba</span>
+      <span class="region-pill mountain">⛰ Parc National de Chambi · Kasserine</span>
+      <span class="region-pill coastal">🌊 Côte Nord-Ouest · Tabarka</span>
+      <span class="region-pill wetland">🦢 Parc National d'Ichkeul · Bizerte</span>
+      <span class="region-pill coastal">🏖 Péninsule du Cap Bon · Nabeul</span>
+      <span class="region-pill mountain">🏔 Montagne de Zaghouan · Zaghouan</span>
+      <span class="region-pill desert">🌵 Désert de Tozeur · Tozeur</span>
+      <span class="region-pill mountain">🗺 Plateau de Kesra · Siliana</span>
+      <span class="region-pill desert">🦌 Parc de Bou Hedma · Sidi Bouzid</span>
+    </div>
+
+    <!-- Aperçu du jeu de données -->
+    <div style="font-size: 10px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: #475569; margin-bottom: 8px;">Aperçu du Jeu de Données (campsi_dataset_tunisia.csv)</div>
+    <table class="ds-table">
+      <thead>
+        <tr>
+          <th>Région</th><th>Terrain</th><th>Alt(m)</th><th>Forêt%</th><th>Pluie(mm)</th><th>Temp Mai°C</th><th>UV</th><th>Sentiers</th><th>Niv.Av.</th><th>Groupe</th><th>Mois</th><th>CorrAct</th><th>Score</th><th>Rec</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Kroumirie</td><td>Forêt</td><td>900</td><td>78</td><td>1500</td><td>18</td><td>4</td><td>23</td><td>1</td><td>6</td><td>5</td><td>3</td><td class="score-hi">94</td><td class="tag-yes">1</td></tr>
+        <tr><td>Kroumirie</td><td>Forêt</td><td>900</td><td>78</td><td>1500</td><td>18</td><td>4</td><td>23</td><td>3</td><td>2</td><td>8</td><td>0</td><td class="score-lo">38</td><td class="tag-no">0</td></tr>
+        <tr><td>Chambi</td><td>Montagne</td><td>1544</td><td>42</td><td>620</td><td>14</td><td>6</td><td>18</td><td>3</td><td>1</td><td>5</td><td>3</td><td class="score-hi">88</td><td class="tag-yes">1</td></tr>
+        <tr><td>Chambi</td><td>Montagne</td><td>1544</td><td>42</td><td>620</td><td>14</td><td>6</td><td>18</td><td>1</td><td>8</td><td>5</td><td>0</td><td class="score-lo">22</td><td class="tag-no">0</td></tr>
+        <tr><td>Ichkeul</td><td>Zones Humides</td><td>25</td><td>30</td><td>750</td><td>20</td><td>5</td><td>9</td><td>1</td><td>4</td><td>4</td><td>3</td><td class="score-hi">84</td><td class="tag-yes">1</td></tr>
+        <tr><td>Tozeur</td><td>Désert</td><td>20</td><td>2</td><td>100</td><td>30</td><td>11</td><td>5</td><td>2</td><td>2</td><td>4</td><td>3</td><td class="score-hi">85</td><td class="tag-yes">1</td></tr>
+        <tr><td>Tozeur</td><td>Désert</td><td>20</td><td>2</td><td>100</td><td>30</td><td>11</td><td>5</td><td>1</td><td>12</td><td>5</td><td>0</td><td class="score-lo">12</td><td class="tag-no">0</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size: 9px; color: #94a3b8; margin-top: 7px; font-family: 'JetBrains Mono', monospace;">* 31 lignes × 27 caractéristiques · Étiquette : regional_suitability_score ≥ 70 → recommended = 1</div>
+
+  </div>
+  <div class="page-num">02 / 04</div>
+  <div class="page-logo-sm"><div class="dot-sm"></div>CampConnect IA</div>
+</div>
+
+
+<!-- PAGE 3: MODÈLE + CARACTÉRISTIQUES -->
+<div class="page">
+  <div class="page-bar"></div>
+  <div class="page-inner">
+
+    <div class="section-tag">03 — Modèle &amp; Caractéristiques</div>
+    <div class="section-title">Pourquoi XGBoost — Pas Seulement des Règles</div>
+    <div class="section-sub">La relation entre l'<em>altitude + précipitations + mois + type d'activité</em> d'une région et son score de suitabilité est non linéaire. Une forêt à 900m peut être idéale en mai mais inadaptée en août — XGBoost apprend ces interactions saisonnières à partir des données, ce qu'aucune formule pondérée ne peut capturer.</div>
+
+    <div class="cols">
+      <!-- Gauche -->
+      <div class="col-l">
+        <div style="font-size: 9.5px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: #475569; margin-bottom: 8px;">Hyperparamètres</div>
+        <div class="params-box">
+          <span class="comment"># Configuration XGBClassifier</span><br/>
+          <span class="k">n_estimators</span>    = <span class="v">150</span><br/>
+          <span class="k">max_depth</span>       = <span class="v">6</span><br/>
+          <span class="k">learning_rate</span>   = <span class="v">0.1</span><br/>
+          <span class="k">subsample</span>       = <span class="v">0.8</span><br/>
+          <span class="k">colsample_bytree</span>= <span class="v">0.8</span><br/>
+          <span class="k">eval_metric</span>     = <span class="v">'logloss'</span><br/>
+          <br/>
+          <span class="comment"># Tête de sortie régression</span><br/>
+          <span class="k">objective</span>       = <span class="v">'reg:squarederror'</span><br/>
+          <span class="comment"># → Score de suitabilité 0–100</span>
+        </div>
+
+        <div style="margin-top: 14px;">
+          <div style="font-size: 9.5px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: #475569; margin-bottom: 8px;">Catégories de Caractéristiques (27 au total)</div>
+          <div class="feature-cats">
+            <div class="feature-cat">
+              <div class="cat-title">Environnement (11)</div>
+              <div class="cat-items">terrain_type<br/>altitude_m<br/>forest_cover_pct<br/>annual_rainfall_mm<br/>avg_temp_may_c<br/>avg_temp_aug_c<br/>uv_index_may<br/>wind_speed_may<br/>river_streams_count<br/>wildlife_diversity<br/>trail_count</div>
+            </div>
+            <div class="feature-cat">
+              <div class="cat-title">Accessibilité (3)</div>
+              <div class="cat-items">nearest_city_km<br/>accessibility_score<br/>campsite_count</div>
+            </div>
+            <div class="feature-cat">
+              <div class="cat-title">Requête Voyage (7)</div>
+              <div class="cat-items">req_group_size<br/>req_adventure_lvl<br/>req_comfort_lvl<br/>req_duration_days<br/>req_month<br/>activity_tag_match<br/>monthly_visitors</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pourquoi les règles échouent -->
+        <div style="margin-top: 14px; background: #fef9c3; border: 1.5px solid #fde047; border-radius: 10px; padding: 12px 14px;">
+          <div style="font-size: 9px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: #92400e; margin-bottom: 6px;">Pourquoi les Règles Échouent Ici</div>
+          <div style="font-size: 10px; color: #78350f; line-height: 1.75;">
+            Une règle dit « forte couverture forestière → bon pour la randonnée ».<br/>
+            Mais Kroumirie à 900m est <em>idéale</em> pour la randonnée en mai et <em>boueuse/inaccessible</em> en janvier.<br/>
+            Chambi à 1 544m est <em>parfaite</em> pour un randonneur solo mais <em>dangereuse</em> pour une famille de 10.<br/>
+            XGBoost apprend toutes ces interactions <strong>mois × terrain × profil de groupe</strong> à partir des données historiques automatiquement.
+          </div>
+        </div>
+      </div>
+
+      <!-- Droite : Importance des caractéristiques -->
+      <div class="col-r">
+        <div class="fi-wrap">
+          <div class="fi-title">Importance des Caractéristiques (SHAP — illustratif)</div>
+          <div class="fi-row"><div class="fi-label">activity_tag_match</div><div class="fi-bar-bg"><div class="fi-bar" style="width:100%;background:linear-gradient(90deg,#059669,#34d399)"></div></div><div class="fi-pct">0,22</div></div>
+          <div class="fi-row"><div class="fi-label">req_adventure_level</div><div class="fi-bar-bg"><div class="fi-bar" style="width:86%;background:linear-gradient(90deg,#059669,#34d399)"></div></div><div class="fi-pct">0,18</div></div>
+          <div class="fi-row"><div class="fi-label">req_month × avg_temp</div><div class="fi-bar-bg"><div class="fi-bar" style="width:76%;background:linear-gradient(90deg,#10b981,#6ee7b7)"></div></div><div class="fi-pct">0,15</div></div>
+          <div class="fi-row"><div class="fi-label">forest_cover_pct</div><div class="fi-bar-bg"><div class="fi-bar" style="width:67%;background:linear-gradient(90deg,#10b981,#6ee7b7)"></div></div><div class="fi-pct">0,13</div></div>
+          <div class="fi-row"><div class="fi-label">wildlife_diversity_score</div><div class="fi-bar-bg"><div class="fi-bar" style="width:55%;background:#6ee7b7"></div></div><div class="fi-pct">0,11</div></div>
+          <div class="fi-row"><div class="fi-label">altitude_m</div><div class="fi-bar-bg"><div class="fi-bar" style="width:44%;background:#a7f3d0"></div></div><div class="fi-pct">0,08</div></div>
+          <div class="fi-row"><div class="fi-label">annual_rainfall_mm</div><div class="fi-bar-bg"><div class="fi-bar" style="width:33%;background:#d1fae5"></div></div><div class="fi-pct">0,06</div></div>
+          <div class="fi-row"><div class="fi-label">nearest_city_km</div><div class="fi-bar-bg"><div class="fi-bar" style="width:22%;background:#d1fae5"></div></div><div class="fi-pct">0,04</div></div>
+          <div class="fi-row"><div class="fi-label">monthly_visitors_may</div><div class="fi-bar-bg"><div class="fi-bar" style="width:15%;background:#ecfdf5"></div></div><div class="fi-pct">0,03</div></div>
+
+          <!-- Arbre de décision simplifié -->
+          <div style="margin-top: 14px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+            <div style="font-size: 9px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: #475569; margin-bottom: 10px;">Logique de Décision Simplifiée</div>
+            <svg width="100%" viewBox="0 0 280 138" xmlns="http://www.w3.org/2000/svg" font-family="Outfit, system-ui">
+              <rect x="88" y="4" width="104" height="28" rx="7" fill="#0f172a"/>
+              <text x="140" y="15" text-anchor="middle" fill="#34d399" font-size="7" font-weight="700">activity_match ≥ 2 ?</text>
+              <text x="140" y="25" text-anchor="middle" fill="#64748b" font-size="6">découpe principale</text>
+              <line x1="110" y1="32" x2="55" y2="64" stroke="#e2e8f0" stroke-width="1.2"/>
+              <text x="72" y="52" text-anchor="middle" fill="#94a3b8" font-size="6.5">Non</text>
+              <rect x="10" y="64" width="90" height="24" rx="6" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+              <text x="55" y="75" text-anchor="middle" fill="#991b1b" font-size="6.5" font-weight="700">req_month × temp</text>
+              <text x="55" y="84" text-anchor="middle" fill="#b91c1c" font-size="6">score faible probable</text>
+              <line x1="170" y1="32" x2="225" y2="64" stroke="#e2e8f0" stroke-width="1.2"/>
+              <text x="208" y="52" text-anchor="middle" fill="#94a3b8" font-size="6.5">Oui</text>
+              <rect x="178" y="64" width="94" height="24" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+              <text x="225" y="75" text-anchor="middle" fill="#065f46" font-size="6.5" font-weight="700">forest_cover ≥ 50% ?</text>
+              <text x="225" y="84" text-anchor="middle" fill="#059669" font-size="6">vérif. saisonnière</text>
+              <line x1="30" y1="88" x2="22" y2="108" stroke="#e2e8f0" stroke-width="1"/>
+              <rect x="4" y="108" width="36" height="18" rx="5" fill="#fee2e2" stroke="#fca5a5" stroke-width="1"/>
+              <text x="22" y="120" text-anchor="middle" fill="#b91c1c" font-size="7" font-weight="700">≈ 24</text>
+              <line x1="80" y1="88" x2="76" y2="108" stroke="#e2e8f0" stroke-width="1"/>
+              <rect x="56" y="108" width="40" height="18" rx="5" fill="#fff7ed" stroke="#fed7aa" stroke-width="1"/>
+              <text x="76" y="120" text-anchor="middle" fill="#c2410c" font-size="7" font-weight="700">≈ 60</text>
+              <line x1="200" y1="88" x2="195" y2="108" stroke="#e2e8f0" stroke-width="1"/>
+              <rect x="173" y="108" width="44" height="18" rx="5" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1"/>
+              <text x="195" y="120" text-anchor="middle" fill="#047857" font-size="7" font-weight="700">≈ 82</text>
+              <line x1="250" y1="88" x2="255" y2="108" stroke="#e2e8f0" stroke-width="1"/>
+              <rect x="237" y="108" width="38" height="18" rx="5" fill="#ecfdf5" stroke="#34d399" stroke-width="1"/>
+              <text x="256" y="120" text-anchor="middle" fill="#059669" font-size="7" font-weight="700">≈ 93</text>
+              <text x="22" y="134" text-anchor="middle" fill="#94a3b8" font-size="5.5">faible corr.</text>
+              <text x="76" y="134" text-anchor="middle" fill="#94a3b8" font-size="5.5">partiel</text>
+              <text x="195" y="134" text-anchor="middle" fill="#94a3b8" font-size="5.5">bonne corr.</text>
+              <text x="256" y="134" text-anchor="middle" fill="#94a3b8" font-size="5.5">forte corr.</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="page-num">03 / 04</div>
+  <div class="page-logo-sm"><div class="dot-sm"></div>CampConnect IA</div>
+</div>
+
+
+<!-- PAGE 4: PRÉDICTION + RÉSULTATS -->
+<div class="page">
+  <div class="page-bar"></div>
+  <div class="page-inner">
+
+    <div class="section-tag">04 — Prédiction &amp; Résultats</div>
+    <div class="section-title">Exemple : Voyage en Mai, Famille de 6, Randonnée</div>
+    <div class="section-sub" style="margin-bottom: 14px;">Entrée utilisateur : Groupe de 6 · Aventure facile · Confortable · 5 jours · Mai · Activité : Randonnée → Le modèle évalue les 9 régions → Montagnes de Kroumirie classée première.</div>
+
+    <div class="pred-card">
+      <div class="pred-header">
+        <div>
+          <div class="pred-title">Ain Draham Forest Camp · Montagnes de Kroumirie, Jendouba</div>
+          <div style="font-size: 10px; color: #6b7280; margin-top: 3px;">Forêt · 900m · 78% de couverture forestière · 1500mm de pluie annuelle · 18°C en mai · 23 sentiers</div>
+        </div>
+        <div style="text-align: right;">
+          <div class="pred-score">94 <span>/ 100</span></div>
+          <div style="font-size: 8.5px; color: #059669; font-weight: 700; margin-top: 2px; text-transform: uppercase; letter-spacing: .1em;">Région Très Adaptée</div>
+        </div>
+      </div>
+      <div>
+        <div class="factor-row"><div class="factor-label">Correspondance activité (Randonnée ✓ en région forestière)</div><div class="factor-bar-bg"><div class="factor-bar" style="width:95%"></div></div><div class="factor-val">+22</div></div>
+        <div class="factor-row"><div class="factor-label">Suitabilité du mois (Mai × forêt × 18°C ✓)</div><div class="factor-bar-bg"><div class="factor-bar" style="width:88%"></div></div><div class="factor-val">+20</div></div>
+        <div class="factor-row"><div class="factor-label">Diversité faunique (score biodiversité 88/100)</div><div class="factor-bar-bg"><div class="factor-bar" style="width:80%"></div></div><div class="factor-val">+18</div></div>
+        <div class="factor-row"><div class="factor-label">Correspondance niveau aventure (Facile × 23 sentiers ✓)</div><div class="factor-bar-bg"><div class="factor-bar" style="width:72%"></div></div><div class="factor-val">+16</div></div>
+        <div class="factor-row"><div class="factor-label">Capacité &amp; accessibilité (6 pers. · 45km de la ville)</div><div class="factor-bar-bg"><div class="factor-bar" style="width:60%"></div></div><div class="factor-val">+14</div></div>
+        <div class="factor-row"><div class="factor-label">Couverture forestière × pluies (78% · 1500mm)</div><div class="factor-bar-bg"><div class="factor-bar" style="width:50%"></div></div><div class="factor-val">+12</div></div>
+      </div>
+    </div>
+
+    <div class="rule" style="margin: 12px 0;"></div>
+
+    <div class="section-tag">Performance du Modèle</div>
+    <div style="font-size: 18px; font-weight: 900; letter-spacing:-.01em; color: #0f172a; margin-bottom: 12px;">Métriques d'Évaluation</div>
+
+    <div class="metrics-grid">
+      <div class="metric-card" style="border-color:#86efac;"><div class="metric-val" style="color:#059669;">91,2%</div><div class="metric-label">Exactitude</div></div>
+      <div class="metric-card" style="border-color:#86efac;"><div class="metric-val" style="color:#059669;">89,7%</div><div class="metric-label">Précision</div></div>
+      <div class="metric-card" style="border-color:#86efac;"><div class="metric-val" style="color:#059669;">93,1%</div><div class="metric-label">Rappel</div></div>
+      <div class="metric-card" style="border-color:#86efac;"><div class="metric-val" style="color:#059669;">91,4%</div><div class="metric-label">Score F1</div></div>
+    </div>
+
+    <div class="cols" style="gap: 14px;">
+      <!-- Matrice de confusion -->
+      <div style="flex:1; background:#f8fafc; border-radius:12px; padding:16px 18px;">
+        <div style="font-size:9px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:#475569; margin-bottom:12px;">Matrice de Confusion</div>
+        <svg width="100%" viewBox="0 0 210 128" xmlns="http://www.w3.org/2000/svg" font-family="Outfit, system-ui">
+          <text x="108" y="14" text-anchor="middle" fill="#94a3b8" font-size="7.5" font-weight="700" letter-spacing="1">PRÉDIT</text>
+          <text x="18" y="78" text-anchor="middle" fill="#94a3b8" font-size="7.5" font-weight="700" letter-spacing="1" transform="rotate(-90,18,78)">RÉEL</text>
+          <text x="84" y="30" text-anchor="middle" fill="#64748b" font-size="7.5">Positif</text>
+          <text x="140" y="30" text-anchor="middle" fill="#64748b" font-size="7.5">Négatif</text>
+          <text x="40" y="66" text-anchor="middle" fill="#64748b" font-size="7.5">Positif</text>
+          <text x="40" y="105" text-anchor="middle" fill="#64748b" font-size="7.5">Négatif</text>
+          <rect x="57" y="35" width="54" height="44" rx="6" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
+          <text x="84" y="55" text-anchor="middle" fill="#059669" font-size="18" font-weight="900">18</text>
+          <text x="84" y="70" text-anchor="middle" fill="#059669" font-size="7" font-weight="700">VP</text>
+          <rect x="115" y="35" width="54" height="44" rx="6" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
+          <text x="142" y="55" text-anchor="middle" fill="#dc2626" font-size="18" font-weight="900">2</text>
+          <text x="142" y="70" text-anchor="middle" fill="#dc2626" font-size="7" font-weight="700">FP</text>
+          <rect x="57" y="83" width="54" height="38" rx="6" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
+          <text x="84" y="100" text-anchor="middle" fill="#dc2626" font-size="18" font-weight="900">1</text>
+          <text x="84" y="114" text-anchor="middle" fill="#dc2626" font-size="7" font-weight="700">FN</text>
+          <rect x="115" y="83" width="54" height="38" rx="6" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
+          <text x="142" y="100" text-anchor="middle" fill="#059669" font-size="18" font-weight="900">10</text>
+          <text x="142" y="114" text-anchor="middle" fill="#059669" font-size="7" font-weight="700">VN</text>
+        </svg>
+      </div>
+
+      <!-- Droite : AUC + notes -->
+      <div style="flex:1.2; display:flex; flex-direction:column; gap:10px;">
+        <div class="metric-card" style="border-color:#a5b4fc; text-align:left; padding:14px 16px;">
+          <div style="font-size:9px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:#94a3b8; margin-bottom:4px;">Score AUC — ROC</div>
+          <div class="metric-val" style="font-size:30px; color:#4f46e5;">0,967</div>
+          <div style="margin-top:7px;">
+            <svg width="100%" viewBox="0 0 160 32" xmlns="http://www.w3.org/2000/svg">
+              <rect x="0" y="8" width="160" height="16" rx="5" fill="#e0e7ff"/>
+              <rect x="0" y="8" width="155" height="16" rx="5" fill="url(#rg)"/>
+              <defs><linearGradient id="rg" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="#4f46e5"/><stop offset="100%" stop-color="#818cf8"/></linearGradient></defs>
+              <text x="155" y="21" text-anchor="middle" fill="white" font-size="8" font-weight="700">96,7%</text>
+            </svg>
+          </div>
+        </div>
+        <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:10px; padding:12px 14px;">
+          <div style="font-size:9px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:#475569; margin-bottom:8px;">Notes Clés</div>
+          <div style="font-size:10px; color:#334155; line-height:1.85;">
+            · Division Train / Test : 80% / 20%<br/>
+            · Validation croisée : 5 plis stratifiés<br/>
+            · Étiquette : suitability_score ≥ 70 → rec = 1<br/>
+            · Les tendances saisonnières requièrent des caractéristiques mensuelles<br/>
+            · Futur : enrichir avec de vraies évaluations de visiteurs
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="page-num">04 / 04</div>
+  <div class="page-logo-sm"><div class="dot-sm"></div>CampConnect IA</div>
+</div>
+
+</body>
+</html>

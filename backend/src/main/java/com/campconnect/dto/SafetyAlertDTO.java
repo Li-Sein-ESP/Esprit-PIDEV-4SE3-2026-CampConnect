@@ -14,6 +14,7 @@ public class SafetyAlertDTO {
     private String description;
     private String type;
     private String severity;
+<<<<<<< HEAD
     private String location;
     private String locationName;
     private String regionName;
@@ -24,4 +25,12 @@ public class SafetyAlertDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean active;
+=======
+    private String status;
+    private String locationName;
+    private String regionName;
+    private String tripId;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

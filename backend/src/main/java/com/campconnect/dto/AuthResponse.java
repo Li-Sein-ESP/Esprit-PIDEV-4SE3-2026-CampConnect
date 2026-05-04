@@ -13,8 +13,12 @@ public class AuthResponse {
 	private List<String> roles;
 	private java.util.Map<String, Object> profileDetails;
 
+<<<<<<< HEAD
 	public AuthResponse(String accessToken, String id, String username, String email, List<String> roles,
 			java.util.Map<String, Object> profileDetails) {
+=======
+	public AuthResponse(String accessToken, String id, String username, String email, List<String> roles, java.util.Map<String, Object> profileDetails) {
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 		this.token = accessToken;
 		this.id = id;
 		this.username = username;

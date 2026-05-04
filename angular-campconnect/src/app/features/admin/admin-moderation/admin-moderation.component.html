@@ -1,5 +1,6 @@
 <div class="min-h-screen bg-[var(--color-background)] py-12">
   <div class="container max-w-6xl">
+<<<<<<< HEAD
     <div class="mb-8">
       <h2 class="mb-2">Admin Moderation</h2>
       <p class="text-[var(--color-text-secondary)]">
@@ -20,5 +21,64 @@
         </div>
       </app-card-content>
     </app-card>
+=======
+    <div class="mb-8 flex items-center justify-between gap-4">
+      <div>
+        <h2 class="mb-2">Community Moderation Dashboard</h2>
+        <p class="text-[var(--color-text-secondary)]">Moderate posts and comments reported by the community</p>
+      </div>
+      <app-button variant="outline" (click)="loadModerationData()">Refresh</app-button>
+    </div>
+
+    <div *ngIf="error" class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      {{ error }}
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-2">
+      <app-card variant="elevated">
+        <app-card-content customClass="p-6">
+          <h3 class="mb-4">Posts ({{ posts.length }})</h3>
+
+          <div *ngIf="loading" class="text-sm text-[var(--color-text-secondary)]">Loading posts...</div>
+
+          <div *ngIf="!loading && posts.length === 0" class="text-sm text-[var(--color-text-secondary)]">
+            No posts to moderate.
+          </div>
+
+          <div class="space-y-4" *ngIf="posts.length > 0">
+            <div *ngFor="let post of posts" class="rounded-xl border border-slate-200 p-4">
+              <h4 class="mb-2 font-semibold text-slate-900">{{ post.title }}</h4>
+              <p class="mb-2 text-sm text-slate-600">{{ post.content }}</p>
+              <p class="mb-4 text-xs text-slate-500">Author: {{ post.authorName || 'Unknown' }}</p>
+              <div class="flex gap-2">
+                <app-button size="sm" variant="outline" (click)="flagPost(post.id)">Flag</app-button>
+                <app-button size="sm" (click)="deletePost(post.id)">Delete</app-button>
+              </div>
+            </div>
+          </div>
+        </app-card-content>
+      </app-card>
+
+      <app-card variant="elevated">
+        <app-card-content customClass="p-6">
+          <h3 class="mb-4">Comments ({{ comments.length }})</h3>
+
+          <div *ngIf="loading" class="text-sm text-[var(--color-text-secondary)]">Loading comments...</div>
+
+          <div *ngIf="!loading && comments.length === 0" class="text-sm text-[var(--color-text-secondary)]">
+            No comments to moderate.
+          </div>
+
+          <div class="space-y-4" *ngIf="comments.length > 0">
+            <div *ngFor="let comment of comments" class="rounded-xl border border-slate-200 p-4">
+              <p class="mb-2 text-sm text-slate-700">{{ comment.content }}</p>
+              <p class="mb-4 text-xs text-slate-500">Author: {{ comment.authorName || 'Unknown' }} - Post ID: {{ comment.postId }}</p>
+              <app-button size="sm" (click)="deleteComment(comment.id)">Delete Comment</app-button>
+            </div>
+          </div>
+        </app-card-content>
+      </app-card>
+    </div>
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
   </div>
 </div>

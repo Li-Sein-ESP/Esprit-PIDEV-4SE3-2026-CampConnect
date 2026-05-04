@@ -1,5 +1,11 @@
 import { Component, OnInit, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
+<<<<<<< HEAD
+=======
+import { AcademyService } from '../../academy/services/academy.service';
+import { EventService } from '../../events/services/event.service';
+import { forkJoin } from 'rxjs';
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -13,6 +19,7 @@ export class AdminDashboardComponent implements OnInit {
 
   @ViewChild('revenueChartCanvas', { static: true }) revenueChartCanvas!: ElementRef<HTMLCanvasElement>;
 
+<<<<<<< HEAD
   // Mock Stats Data required by user
   stats = {
     totalUsers: 24831,
@@ -21,6 +28,20 @@ export class AdminDashboardComponent implements OnInit {
     activeDeliveries: 342,
     activeBookings: 1893,
     environmentalAlerts: 7
+=======
+  // Stats Data - Initialized with zeros, then populated via API
+  stats = {
+    totalUsers: 0,
+    activeCampsites: 0,
+    marketplaceRevenue: 0,
+    activeDeliveries: 0,
+    activeBookings: 0,
+    environmentalAlerts: 0,
+    activeCourses: 0,
+    totalStudents: 0,
+    upcomingEvents: 0,
+    eventRegistrations: 0
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
   };
 
   // Mock Data for Activity Feeds based on Design
@@ -68,6 +89,7 @@ export class AdminDashboardComponent implements OnInit {
     9400, 8800
   ];
 
+<<<<<<< HEAD
   constructor(private decimalPipe: DecimalPipe) { }
 
   ngOnInit(): void {
@@ -75,6 +97,44 @@ export class AdminDashboardComponent implements OnInit {
     setTimeout(() => this.drawChart(), 100);
   }
 
+=======
+  constructor(
+    private decimalPipe: DecimalPipe,
+    private academyService: AcademyService,
+    private eventService: EventService
+  ) { }
+
+  ngOnInit(): void {
+    this.loadStats();
+    // We defer chart drawing to ensure view is fully settled
+    setTimeout(() => this.drawChart(), 100);
+  }
+
+  private loadStats() {
+    forkJoin({
+      courses: this.academyService.getCourses(),
+      events: this.eventService.getEvents(),
+      certStats: this.academyService.getCertificationStats()
+    }).subscribe({
+      next: ({ courses, events, certStats }) => {
+        this.stats.activeCourses = courses.length;
+        this.stats.upcomingEvents = events.filter(e => e.status === 'upcoming').length;
+
+        // Sum up total registrations from events
+        this.stats.eventRegistrations = events.reduce((acc, curr) => acc + (curr.registered || 0), 0);
+
+        // Use certification stats for total students
+        this.stats.totalStudents = certStats.reduce((acc, curr) => acc + curr.totalIssued, 0);
+
+        // Keep other stats as sensible defaults or placeholders if not available globally
+        this.stats.totalUsers = 24831;
+        this.stats.activeCampsites = 1247;
+      },
+      error: (err) => console.error('Error loading dashboard stats:', err)
+    });
+  }
+
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
   @HostListener('window:resize')
   onResize() {
     this.drawChart();

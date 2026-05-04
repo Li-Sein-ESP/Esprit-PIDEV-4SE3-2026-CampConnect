@@ -174,7 +174,11 @@ export class LoginComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.isSubmitting = false;
         console.error('Login failed', err);
+<<<<<<< HEAD
         this.errorMessage = 'Invalid username or password';
+=======
+        this.errorMessage = err.userMessage || 'Invalid username or password';
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
       }
     });
   }
@@ -208,7 +212,11 @@ export class LoginComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.isSubmitting = false;
         console.error('Signup failed', err);
+<<<<<<< HEAD
         this.errorMessage = 'Signup failed. Please try again.';
+=======
+        this.errorMessage = err.userMessage || 'Signup failed. Please try again.';
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
       }
     });
   }

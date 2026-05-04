@@ -11,12 +11,24 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.mapping.event.ValidatingMongoEventListener;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+<<<<<<< HEAD
+=======
+import org.springframework.web.client.RestTemplate;
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @Configuration
 @EnableMongoAuditing
 public class AppConfig {
 
     @Bean
+<<<<<<< HEAD
+=======
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+
+    @Bean
+>>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     public ModelMapper modelMapper() {
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setSkipNullEnabled(true);
