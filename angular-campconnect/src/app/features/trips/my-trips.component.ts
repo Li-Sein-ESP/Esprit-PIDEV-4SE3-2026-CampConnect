@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
-import { CardComponent, CardContentComponent, CardFooterComponent } from '../../shared/components/card.component';
-import { BadgeComponent } from '../../shared/components/badge.component';
-import { LucideAngularModule, Calendar, MapPin, Users, Plus, Edit, Trash2 } from 'lucide-angular';
-import { TripService } from './services/trip.service';
-=======
 import { Component, OnInit, signal, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Subject, takeUntil } from "rxjs";
@@ -33,7 +24,6 @@ import {
 import { TripService } from "./services/trip.service";
 import { AuthService } from "../../core/services/auth.service";
 import { TransportationService } from "../transportation/services/transportation.service";
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 interface Trip {
   id: string;
@@ -42,13 +32,6 @@ interface Trip {
   startDate: string;
   endDate: string;
   groupSize: number;
-<<<<<<< HEAD
-  status: 'planning' | 'confirmed' | 'completed' | 'cancelled';
-}
-
-@Component({
-  selector: 'app-my-trips',
-=======
   status: "planning" | "upcoming" | "active" | "completed" | "cancelled";
   imageUrl?: string;
   template?: boolean;
@@ -56,7 +39,6 @@ interface Trip {
 
 @Component({
   selector: "app-my-trips",
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
   standalone: true,
   imports: [
     CommonModule,
@@ -65,131 +47,6 @@ interface Trip {
     CardContentComponent,
     CardFooterComponent,
     BadgeComponent,
-<<<<<<< HEAD
-    LucideAngularModule
-  ],
-  template: `
-  <div class="container py-8">
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <h1 class="text-3xl font-bold text-[var(--color-text-heading)] mb-2">
-          My Trips
-        </h1>
-        <p class="text-[var(--color-text-secondary)]">
-          Manage and track all your outdoor adventures
-        </p>
-      </div>
-      <button
-        (click)="router.navigate(['/trip-intents/create'])"
-        class="flex items-center gap-2 px-6 py-3 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors font-medium"
-      >
-        <lucide-icon [img]="PlusIcon" [size]="20"></lucide-icon>
-        Plan New Trip
-      </button>
-    </div>
-
-    <!-- Tabs -->
-    <div class="flex gap-2 mb-6 border-b border-[var(--color-border-light)]">
-      <button
-        *ngFor="let tab of tabs"
-        (click)="activeTab = tab.value"
-        [class]="getTabClasses(tab.value)"
-      >
-        {{ tab.label }}
-      </button>
-    </div>
-
-    <!-- Trips Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <app-card
-        *ngFor="let trip of getFilteredTrips()"
-        variant="default"
-        padding="none"
-        customClass="overflow-hidden hover:shadow-lg transition-shadow"
-      >
-        <!-- Trip Image -->
-        <div class="h-48 bg-gradient-to-br from-[var(--color-primary-500)] to-[var(--color-primary-700)] relative">
-          <div class="absolute inset-0 flex items-center justify-center">
-            <lucide-icon [img]="MapPinIcon" [size]="64" class="text-white/30"></lucide-icon>
-          </div>
-          <div class="absolute top-4 right-4">
-            <app-badge [variant]="getStatusVariant(trip.status)">
-              {{ trip.status }}
-            </app-badge>
-          </div>
-        </div>
-
-        <!-- Trip Details -->
-        <app-card-content customClass="p-6">
-          <h3 class="text-xl font-semibold text-[var(--color-text-heading)] mb-2">
-            {{ trip.name }}
-          </h3>
-          <div class="space-y-2 text-sm text-[var(--color-text-secondary)]">
-            <div class="flex items-center gap-2">
-              <lucide-icon [img]="MapPinIcon" [size]="16"></lucide-icon>
-              {{ trip.destination }}
-            </div>
-            <div class="flex items-center gap-2">
-              <lucide-icon [img]="CalendarIcon" [size]="16"></lucide-icon>
-              {{ formatDate(trip.startDate) }} - {{ formatDate(trip.endDate) }}
-            </div>
-            <div class="flex items-center gap-2">
-              <lucide-icon [img]="UsersIcon" [size]="16"></lucide-icon>
-              {{ trip.groupSize }} {{ trip.groupSize === 1 ? 'person' : 'people' }}
-            </div>
-          </div>
-        </app-card-content>
-
-        <!-- Actions -->
-        <app-card-footer customClass="p-4 flex gap-2">
-          <button
-            (click)="viewTrip(trip.id)"
-            class="flex-1 px-4 py-2 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors text-sm font-medium"
-          >
-            View Details
-          </button>
-          <button
-            (click)="editTrip(trip.id)"
-            class="px-4 py-2 border border-[var(--color-border-medium)] rounded-lg hover:bg-[var(--color-neutral-50)] transition-colors"
-          >
-            <lucide-icon [img]="EditIcon" [size]="16" class="text-[var(--color-text-secondary)]"></lucide-icon>
-          </button>
-          <button
-            (click)="deleteTrip(trip.id)"
-            class="px-4 py-2 border border-[var(--color-border-medium)] rounded-lg hover:bg-[var(--color-error-50)] hover:border-[var(--color-error-500)] transition-colors"
-          >
-            <lucide-icon [img]="Trash2Icon" [size]="16" class="text-[var(--color-text-secondary)]"></lucide-icon>
-          </button>
-        </app-card-footer>
-      </app-card>
-    </div>
-
-    <!-- Empty State -->
-    <div *ngIf="getFilteredTrips().length === 0" class="text-center py-16">
-      <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-[var(--color-neutral-100)] flex items-center justify-center">
-        <lucide-icon [img]="MapPinIcon" [size]="48" class="text-[var(--color-text-tertiary)]"></lucide-icon>
-      </div>
-      <h3 class="text-xl font-semibold text-[var(--color-text-heading)] mb-2">
-        No trips found
-      </h3>
-      <p class="text-[var(--color-text-secondary)] mb-6">
-        Start planning your next outdoor adventure!
-      </p>
-      <button
-        (click)="router.navigate(['/trip-intents/create'])"
-        class="inline-flex items-center gap-2 px-6 py-3 bg-[var(--color-primary-600)] text-white rounded-lg hover:bg-[var(--color-primary-700)] transition-colors font-medium"
-      >
-        <lucide-icon [img]="PlusIcon" [size]="20"></lucide-icon>
-        Plan Your First Trip
-      </button>
-    </div>
-  </div>
-    `,
-  styles: []
-})
-export class MyTripsComponent {
-=======
     FormsModule,
     LucideAngularModule,
   ],
@@ -394,59 +251,12 @@ export class MyTripsComponent {
 })
 export class MyTripsComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
   CalendarIcon = Calendar;
   MapPinIcon = MapPin;
   UsersIcon = Users;
   PlusIcon = Plus;
   EditIcon = Edit;
   Trash2Icon = Trash2;
-<<<<<<< HEAD
-
-  activeTab: string = 'all';
-
-  tabs = [
-    { label: 'All Trips', value: 'all' },
-    { label: 'Upcoming', value: 'upcoming' },
-    { label: 'Completed', value: 'completed' },
-  ];
-
-  get trips(): Trip[] {
-    return this.tripService.trips().map(t => ({
-      ...t,
-      groupSize: (t as any).participants || (t as any).groupSize || 1
-    })) as unknown as Trip[];
-  }
-
-  constructor(public router: Router, private tripService: TripService) { }
-
-  getTabClasses(tabValue: string): string {
-    const baseClasses = 'px-4 py-2 font-medium transition-colors';
-    const activeClasses = 'text-[var(--color-primary-600)] border-b-2 border-[var(--color-primary-600)]';
-    const inactiveClasses = 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]';
-
-    return `${baseClasses} ${this.activeTab === tabValue ? activeClasses : inactiveClasses}`;
-  }
-
-  getFilteredTrips(): Trip[] {
-    if (this.activeTab === 'all') {
-      return this.trips;
-    } else if (this.activeTab === 'upcoming') {
-      return this.trips.filter(t => t.status === 'confirmed' || t.status === 'planning');
-    } else if (this.activeTab === 'completed') {
-      return this.trips.filter(t => t.status === 'completed');
-    }
-    return this.trips;
-  }
-
-  getStatusVariant(status: string): 'success' | 'warning' | 'info' | 'default' {
-    switch (status) {
-      case 'confirmed': return 'success';
-      case 'planning': return 'warning';
-      case 'completed': return 'info';
-      default: return 'default';
-    }
-=======
   ChevronRightIcon = ChevronRight;
   SearchIcon = Search;
   AwardIcon = Award;
@@ -642,26 +452,10 @@ export class MyTripsComponent implements OnInit, OnDestroy {
         imageUrl: t.imageUrl,
         template: t.template
     }));
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
   }
 
   formatDate(dateString: string): string {
     const date = new Date(dateString);
-<<<<<<< HEAD
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  }
-
-  viewTrip(id: string): void {
-    this.router.navigate(['/trips', id]);
-  }
-
-  editTrip(id: string): void {
-    console.log('Edit trip:', id);
-  }
-
-  deleteTrip(id: string): void {
-    console.log('Delete trip:', id);
-=======
     return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -686,6 +480,5 @@ export class MyTripsComponent implements OnInit, OnDestroy {
       },
       error: (err) => console.error("Failed", err)
     });
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
   }
 }

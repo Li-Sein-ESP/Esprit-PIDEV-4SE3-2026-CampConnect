@@ -13,11 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-<<<<<<< HEAD
-import com.campconnect.dto.GroupTaskDto;
-=======
 import com.campconnect.dto.GroupTaskDTO;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import com.campconnect.model.GroupTask;
 import com.campconnect.service.IGroupTaskService;
 
@@ -32,11 +28,7 @@ public class GroupTaskController {
     private final IGroupTaskService groupTaskService;
 
     @PostMapping
-<<<<<<< HEAD
-    public ResponseEntity<GroupTask> createGroupTask(@Valid @RequestBody GroupTaskDto dto) {
-=======
     public ResponseEntity<GroupTask> createGroupTask(@Valid @RequestBody GroupTaskDTO dto) {
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         GroupTask task = mapDtoToEntity(dto);
         GroupTask created = groupTaskService.createGroupTask(task);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
@@ -48,11 +40,7 @@ public class GroupTaskController {
     }
 
     @PutMapping("/{id}")
-<<<<<<< HEAD
-    public ResponseEntity<GroupTask> updateGroupTask(@PathVariable("id") String id, @RequestBody GroupTaskDto dto) {
-=======
     public ResponseEntity<GroupTask> updateGroupTask(@PathVariable("id") String id, @RequestBody GroupTaskDTO dto) {
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         GroupTask task = mapDtoToEntity(dto);
         return ResponseEntity.ok(groupTaskService.updateGroupTask(id, task));
     }
@@ -63,11 +51,7 @@ public class GroupTaskController {
         return ResponseEntity.noContent().build();
     }
 
-<<<<<<< HEAD
-    private GroupTask mapDtoToEntity(GroupTaskDto dto) {
-=======
     private GroupTask mapDtoToEntity(GroupTaskDTO dto) {
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         return GroupTask.builder()
                 .groupId(dto.getGroupId())
                 .title(dto.getTitle())

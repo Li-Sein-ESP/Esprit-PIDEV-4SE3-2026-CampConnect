@@ -33,13 +33,7 @@
 
       <!-- Community Navigation Links -->
       <nav class="cc-quick-links" aria-label="Community navigation">
-<<<<<<< HEAD
-        <div class="cc-quick-links-group-title"
-          style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #aab5aa; margin: 16px 0 8px 12px; letter-spacing: 0.5px;">
-          Flux & Médias</div>
-=======
         <div class="cc-quick-links-group-title">Flux & Médias</div>
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         <ul>
           <li>
             <a routerLink="/community" routerLinkActive="cc-quick-links__item--active"
@@ -57,13 +51,7 @@
           </li>
         </ul>
 
-<<<<<<< HEAD
-        <div class="cc-quick-links-group-title"
-          style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #aab5aa; margin: 16px 0 8px 12px; letter-spacing: 0.5px;">
-          Discussions</div>
-=======
         <div class="cc-quick-links-group-title">Discussions</div>
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         <ul>
           <li>
             <a routerLink="/community/forum" routerLinkActive="cc-quick-links__item--active"
@@ -81,22 +69,12 @@
           </li>
         </ul>
 
-<<<<<<< HEAD
-        <div class="cc-quick-links-group-title"
-          style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #aab5aa; margin: 16px 0 8px 12px; letter-spacing: 0.5px;">
-          Social</div>
-=======
         <div class="cc-quick-links-group-title">Social</div>
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         <ul>
           <li>
             <a routerLink="/community/messages" routerLinkActive="cc-quick-links__item--active"
               class="cc-quick-links__item">
-<<<<<<< HEAD
-              <span class="cc-quick-links__icon" style="background: #e1f5fe; color: #0288d1;">✉️</span>
-=======
               <span class="cc-quick-links__icon cc-quick-links__icon--message">✉️</span>
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
               Messagerie
             </a>
           </li>
@@ -184,29 +162,12 @@
       </div>
 
       <!-- Feed Tabs -->
-<<<<<<< HEAD
-      <div class="cc-feed-tabs" role="tablist" aria-label="Feed filter"
-        style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
-=======
       <div class="cc-feed-tabs" role="tablist" aria-label="Feed filter">
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         <button class="cc-feed-tabs__tab cc-feed-tabs__tab--active" role="tab" aria-selected="true"
           data-tab="latest">Latest</button>
         <button class="cc-feed-tabs__tab" role="tab" aria-selected="false" data-tab="popular">Popular</button>
         <button class="cc-feed-tabs__tab" role="tab" aria-selected="false" data-tab="following">Following</button>
         <button class="cc-feed-tabs__tab" role="tab" aria-selected="false" data-tab="nearby">Nearby</button>
-<<<<<<< HEAD
-        <a routerLink="/community/leaderboard" class="cc-feed-tabs__tab" role="tab" aria-selected="false"
-          style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-left: 8px; border-left: 1px solid rgba(0,0,0,0.08); padding-left: 14px;">
-          🏆 Leaderboard
-        </a>
-        <a routerLink="/community/forum" class="cc-feed-tabs__tab" role="tab" aria-selected="false"
-          style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
-          💬 Forum
-        </a>
-        <a routerLink="/community/messages" class="cc-feed-tabs__tab" role="tab" aria-selected="false"
-          style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
-=======
         <a routerLink="/community/leaderboard" class="cc-feed-tabs__tab cc-feed-tabs__tab--link cc-feed-tabs__tab--split" role="tab" aria-selected="false">
           🏆 Leaderboard
         </a>
@@ -214,7 +175,6 @@
           💬 Forum
         </a>
         <a routerLink="/community/messages" class="cc-feed-tabs__tab cc-feed-tabs__tab--link" role="tab" aria-selected="false">
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
           ✉️ Messages
         </a>
 
@@ -226,15 +186,9 @@
         <header class="cc-post__header">
           <img [src]="post?.author?.avatar" [alt]="post?.author?.name" class="cc-post__avatar"
             [routerLink]="['/community/profile', post?.author?.id]">
-<<<<<<< HEAD
-          <div class="cc-post__user-info" style="cursor: pointer;">
-            <span class="cc-post__username" [routerLink]="['/community/profile', post?.author?.id]"
-              style="cursor: pointer; margin-right: 4px;">{{
-=======
           <div class="cc-post__user-info">
             <span class="cc-post__username" [routerLink]="['/community/profile', post?.author?.id]"
               >{{
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
               post?.author?.name }}</span>
             <span class="cc-post__badge"
               *ngIf="post?.author?.role === 'Verified Camper' || post?.author?.role === 'Admin'">
@@ -252,23 +206,6 @@
             <span class="cc-post__meta-dot" aria-hidden="true"></span>
             <time class="cc-post__time">{{ post.timestamp }}</time>
           </div>
-<<<<<<< HEAD
-          <app-trust-score *ngIf="post?.author?.trustScore !== undefined" [score]="post?.author?.trustScore ?? 0"
-            variant="small" style="margin-left: auto; margin-right: 12px;"></app-trust-score>
-            
-          <div style="position: relative;">
-            <button class="cc-post__more-btn" aria-label="More options" (click)="toggleDropdown(post.id, $event)" 
-              style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; border: none; background: transparent; cursor: pointer;"
-              onmouseover="this.style.backgroundColor='rgba(0,0,0,0.05)'" onmouseout="this.style.backgroundColor='transparent'">
-              <lucide-icon [img] = "MoreHorizontalIcon" [size]="20" style="color: #6b7280;"></lucide-icon>
-            </button>
-            <div *ngIf="activeDropdown === post.id" style="position: absolute; right: 0; top: 100%; margin-top: 4px; padding: 6px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); border-radius: 12px; background: white; z-index: 100; min-width: 160px; border: 1px solid #f3f4f6;">
-              <button (click)="startEdit(post, $event)" style="display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 10px 12px; font-size: 14px; border: none; background: transparent; cursor: pointer; border-radius: 8px; color: #374151; font-weight: 500;" onmouseover="this.style.backgroundColor='#f9fafb'" onmouseout="this.style.backgroundColor='transparent'">
-                <lucide-icon [img]="PencilIcon" [size]="16"></lucide-icon>
-                Modifier le post
-              </button>
-              <button (click)="deletePost(post, $event)" style="display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 10px 12px; font-size: 14px; border: none; background: transparent; cursor: pointer; color: #dc2626; border-radius: 8px; font-weight: 500;" onmouseover="this.style.backgroundColor='#fef2f2'" onmouseout="this.style.backgroundColor='transparent'">
-=======
           <app-trust-score class="cc-post__trust" *ngIf="post?.author?.trustScore !== undefined" [score]="post?.author?.trustScore ?? 0"
             variant="small"></app-trust-score>
             
@@ -282,7 +219,6 @@
                 Modifier le post
               </button>
               <button class="cc-post__menu-item cc-post__menu-item--danger" (click)="deletePost(post, $event)">
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 <lucide-icon [img]="TrashIcon" [size]="16"></lucide-icon>
                 Supprimer le post
               </button>
@@ -291,28 +227,16 @@
         </header>
 
         <!-- Read Mode -->
-<<<<<<< HEAD
-        <div class="cc-post__body" *ngIf="editingPost?.id !== post.id" (click)="goToPost(post.id)" style="cursor: pointer;">
-=======
         <div class="cc-post__body cc-post__body--clickable" *ngIf="editingPost?.id !== post.id" (click)="goToPost(post.id)">
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
           <p class="cc-post__text" [innerHTML]="post.content"></p>
         </div>
 
         <!-- Edit Mode -->
-<<<<<<< HEAD
-        <div class="cc-post__edit-body" *ngIf="editingPost?.id === post.id" (click)="$event.stopPropagation()" style="padding: 12px 16px;">
-          <textarea [(ngModel)]="editContent" rows="3" style="width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-family: inherit; resize: vertical; margin-bottom: 8px;"></textarea>
-          <div style="display: flex; justify-content: flex-end; gap: 8px;">
-            <button (click)="cancelEdit($event)" style="padding: 6px 12px; border: 1px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer; font-size: 13px;">Cancel</button>
-            <button (click)="saveEdit($event)" style="padding: 6px 16px; border: none; border-radius: 6px; background: #2f5d44; color: white; cursor: pointer; font-size: 13px; font-weight: 500;">Save Changes</button>
-=======
         <div class="cc-post__edit-body" *ngIf="editingPost?.id === post.id" (click)="$event.stopPropagation()">
           <textarea class="cc-post__edit-textarea" [(ngModel)]="editContent" rows="3"></textarea>
           <div class="cc-post__edit-actions">
             <button class="cc-post__edit-btn cc-post__edit-btn--cancel" (click)="cancelEdit($event)">Cancel</button>
             <button class="cc-post__edit-btn cc-post__edit-btn--save" (click)="saveEdit($event)">Save Changes</button>
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
           </div>
         </div>
 

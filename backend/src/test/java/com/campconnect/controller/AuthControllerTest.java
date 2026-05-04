@@ -65,10 +65,6 @@ class AuthControllerTest {
 
         Authentication authentication = mock(Authentication.class);
         UserDetailsImpl userDetails = new UserDetailsImpl("1", "testuser", "test@test.com", "pass",
-<<<<<<< HEAD
-                false,
-=======
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")),
                 null);
         

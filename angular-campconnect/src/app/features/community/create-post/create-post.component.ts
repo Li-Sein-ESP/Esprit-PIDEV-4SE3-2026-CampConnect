@@ -12,10 +12,7 @@ import { AuthService } from '../../../core/services/auth.service';
 export interface MediaPreview {
   id: number;
   url: SafeUrl;
-<<<<<<< HEAD
-=======
   rawUrl: string;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
   type: 'image' | 'video';
   file: File;
 }
@@ -55,14 +52,6 @@ export class CreatePostComponent implements OnInit {
 
   /* ── Location autocomplete ───────────────── */
   locationSuggestions = [
-<<<<<<< HEAD
-    { name: 'Yosemite Valley', region: 'California, USA' },
-    { name: 'Yellowstone', region: 'Wyoming, USA' },
-    { name: 'Grand Canyon', region: 'Arizona, USA' },
-    { name: 'Banff National Park', region: 'Alberta, Canada' },
-    { name: 'Zion National Park', region: 'Utah, USA' },
-    { name: 'Glacier National Park', region: 'Montana, USA' }
-=======
     { name: 'Tunis', region: 'Grand Tunis, Tunisie' },
     { name: 'Ariana', region: 'Grand Tunis, Tunisie' },
     { name: 'Ben Arous', region: 'Grand Tunis, Tunisie' },
@@ -87,7 +76,6 @@ export class CreatePostComponent implements OnInit {
     { name: 'Gafsa', region: 'Sud-Ouest, Tunisie' },
     { name: 'Tozeur', region: 'Sud-Ouest, Tunisie' },
     { name: 'Kebili', region: 'Sud-Ouest, Tunisie' }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
   ];
   filteredLocations: typeof this.locationSuggestions = [];
   showLocationSuggestions = false;
@@ -198,17 +186,11 @@ export class CreatePostComponent implements OnInit {
       if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) return;
       const reader = new FileReader();
       reader.onload = (ev: any) => {
-<<<<<<< HEAD
-        this.uploadedFiles.push({
-          id: Date.now() + idx,
-          url: this.sanitizer.bypassSecurityTrustUrl(ev.target.result),
-=======
         const rawUrl = String(ev.target.result || '');
         this.uploadedFiles.push({
           id: Date.now() + idx,
           url: this.sanitizer.bypassSecurityTrustUrl(rawUrl),
           rawUrl,
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
           type: file.type.startsWith('video/') ? 'video' : 'image',
           file
         });
@@ -285,14 +267,6 @@ export class CreatePostComponent implements OnInit {
   onSubmit(): void {
     if (!this.canSubmit || this.isPosting) return;
 
-<<<<<<< HEAD
-    const payload = {
-      title: this.postForm.value.title || (this.postForm.value.content.substring(0, 30) + '...'),
-      description: this.postForm.value.content,
-      category: 'General',
-      tags: this.tags,
-      authorId: this.currentUser?.id
-=======
     const content = (this.postForm.value.content || '').trim();
     const title = (this.postForm.value.title || content.substring(0, 30) + '...').trim();
     const location = (this.postForm.value.location || '').trim();
@@ -315,7 +289,6 @@ export class CreatePostComponent implements OnInit {
       imageUrls,
       media: imageUrls,
       images: imageUrls
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     };
 
     console.log('Sending Post to Backend:', payload);
@@ -326,11 +299,7 @@ export class CreatePostComponent implements OnInit {
         this.isPosting = false;
         this.showSuccess = true;
         this.showToast('🎉', 'Your adventure has been shared with the community!');
-<<<<<<< HEAD
-        setTimeout(() => this.router.navigate(['/community']), 2000);
-=======
         setTimeout(() => this.router.navigate(['/community/feed']), 2000);
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
       },
       error: (err) => {
         console.error('Error creating post', err);
@@ -343,17 +312,10 @@ export class CreatePostComponent implements OnInit {
   onCancel(): void {
     if (this.canSubmit) {
       if (confirm('You have unsaved changes. Discard this post?')) {
-<<<<<<< HEAD
-        this.router.navigate(['/community']);
-      }
-    } else {
-      this.router.navigate(['/community']);
-=======
         this.router.navigate(['/community/feed']);
       }
     } else {
       this.router.navigate(['/community/feed']);
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     }
   }
 

@@ -3,21 +3,15 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { LucideAngularModule, BookOpen, Clock, Users, Award, Search, Star, TrendingUp, Play, ChevronRight, CheckCircle, ShieldCheck, Medal, GraduationCap, Eye, ArrowRight, Compass, Plus, Video as VideoIcon, Upload, File as FileIcon, CheckSquare, AlertCircle, Pencil, Trash2 } from 'lucide-angular';
 import { ButtonComponent } from '../../shared/components/button.component';
-<<<<<<< HEAD
-=======
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import { AcademyService } from './services/academy.service';
 import { Course, Certification, Video } from './models/academy.model';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 
-<<<<<<< HEAD
-=======
 gsap.registerPlugin(ScrollTrigger);
 
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 @Component({
   selector: 'app-academy',
   standalone: true,
@@ -262,11 +256,7 @@ export class AcademyComponent implements OnInit, AfterViewInit {
         },
         error: (err) => {
           console.error('Delete failed:', err);
-<<<<<<< HEAD
-          this.showToast('Error deleting content.', 'error');
-=======
           this.showToast('Error during deletion.', 'error');
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         }
       });
     }
@@ -340,21 +330,13 @@ export class AcademyComponent implements OnInit, AfterViewInit {
           next: () => {
             this.isSubmittingVideo = false;
             this.showVideoModal = false;
-<<<<<<< HEAD
-            this.showToast('Content updated!', 'success');
-=======
             this.showToast('Content updated! 🛠️', 'success');
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
             this.loadAcademyData();
           },
           error: (err) => {
             this.isSubmittingVideo = false;
             console.error('Failed to update video:', err);
-<<<<<<< HEAD
-            this.showToast('Error updating content.', 'error');
-=======
             this.showToast('Error during update.', 'error');
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
           }
         });
       } else {
@@ -362,21 +344,13 @@ export class AcademyComponent implements OnInit, AfterViewInit {
           next: () => {
             this.isSubmittingVideo = false;
             this.showVideoModal = false;
-<<<<<<< HEAD
-            this.showToast('Content added successfully!', 'success');
-=======
             this.showToast('Content added successfully! 🎉', 'success');
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
             this.loadAcademyData();
           },
           error: (err) => {
             this.isSubmittingVideo = false;
             console.error('Failed to create video:', err);
-<<<<<<< HEAD
-            this.showToast('Error adding content.', 'error');
-=======
             this.showToast('Error during content addition.', 'error');
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
           }
         });
       }
@@ -395,11 +369,7 @@ export class AcademyComponent implements OnInit, AfterViewInit {
       createVideoEntry(this.videoForm.videoUrl);
     } else {
       this.isSubmittingVideo = false;
-<<<<<<< HEAD
-      this.showToast('Please select a file or enter a URL.', 'error');
-=======
       this.showToast('Please choose a file or a URL.', 'error');
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     }
   }
 
@@ -408,13 +378,6 @@ export class AcademyComponent implements OnInit, AfterViewInit {
   }
 
   initMistAnimation() {
-<<<<<<< HEAD
-    // Animation initialization placeholder - GSAP can be added if needed
-  }
-
-  initScrollReveal() {
-    // Scroll reveal initialization placeholder - GSAP can be added if needed
-=======
     gsap.to('.mist-layer', {
       x: '20%',
       y: '10%',
@@ -437,7 +400,6 @@ export class AcademyComponent implements OnInit, AfterViewInit {
       stagger: 0.1,
       ease: 'back.out(1.7)'
     });
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
   }
 
   getIcon(iconName: string) {

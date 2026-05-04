@@ -1,12 +1,9 @@
 package com.campconnect.service;
 
-<<<<<<< HEAD
-=======
 import com.campconnect.model.Role;
 
 import com.campconnect.model.User;
 
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -16,10 +13,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-<<<<<<< HEAD
-import com.campconnect.model.User;
-=======
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class UserDetailsImpl implements UserDetails {
@@ -35,45 +28,21 @@ public class UserDetailsImpl implements UserDetails {
 	private String password;
 
 	private Collection<? extends GrantedAuthority> authorities;
-<<<<<<< HEAD
-
-	private boolean verifiedExpert;
-
-	private java.util.Map<String, Object> profileDetails;
-
-	public UserDetailsImpl(String id, String username, String email, String password,
-			boolean verifiedExpert, Collection<? extends GrantedAuthority> authorities,
-			java.util.Map<String, Object> profileDetails) {
-=======
 	private java.util.Map<String, Object> profileDetails;
 
 	public UserDetailsImpl(String id, String username, String email, String password,
 			Collection<? extends GrantedAuthority> authorities, java.util.Map<String, Object> profileDetails) {
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 		this.id = id;
 		this.username = username;
 		this.email = email;
 		this.password = password;
-<<<<<<< HEAD
-		this.verifiedExpert = verifiedExpert;
-=======
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 		this.authorities = authorities;
 		this.profileDetails = profileDetails;
 	}
 
-<<<<<<< HEAD
-	public java.util.Map<String, Object> getProfileDetails() {
-		return profileDetails;
-	}
-
-	public static UserDetailsImpl build(User user) {
-		List<GrantedAuthority> authorities = user.getRoles().stream()
-=======
 	public static UserDetailsImpl build(User user) {
 		List<GrantedAuthority> authorities = user.getRoles().stream()
 				.filter(role -> role != null && role.getName() != null)
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 				.map(role -> new SimpleGrantedAuthority(role.getName().name()))
 				.collect(Collectors.toList());
 
@@ -82,21 +51,10 @@ public class UserDetailsImpl implements UserDetails {
 				user.getUsername(),
 				user.getEmail(),
 				user.getPassword(),
-<<<<<<< HEAD
-				user.isVerifiedExpert(),
-=======
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 				authorities,
 				user.getProfileDetails());
 	}
 
-<<<<<<< HEAD
-	public boolean isVerifiedExpert() {
-		return verifiedExpert;
-	}
-
-=======
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return authorities;
@@ -110,13 +68,10 @@ public class UserDetailsImpl implements UserDetails {
 		return email;
 	}
 
-<<<<<<< HEAD
-=======
 	public java.util.Map<String, Object> getProfileDetails() {
 		return profileDetails;
 	}
 
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 	@Override
 	public String getPassword() {
 		return password;

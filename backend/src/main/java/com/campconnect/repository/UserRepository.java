@@ -1,10 +1,7 @@
 package com.campconnect.repository;
 
 import com.campconnect.model.User;
-<<<<<<< HEAD
-=======
 
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.Optional;
 

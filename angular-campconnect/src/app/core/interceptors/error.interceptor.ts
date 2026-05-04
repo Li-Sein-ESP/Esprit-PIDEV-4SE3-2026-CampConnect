@@ -1,28 +1,18 @@
-<<<<<<< HEAD
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
-=======
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
-<<<<<<< HEAD
-=======
 import { AuthService } from '../services/auth.service';
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
   private router = inject(Router);
-<<<<<<< HEAD
-=======
   private authService = inject(AuthService);
 
   private hasAuthHeader(headers: HttpHeaders): boolean {
     return headers.keys().some(key => key.toLowerCase() === 'authorization');
   }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
@@ -60,16 +50,10 @@ export class ErrorInterceptor implements HttpInterceptor {
               break;
             case 401:
               errorMessage = 'Session expired. Please login again.';
-<<<<<<< HEAD
-              // Clear token and redirect to login
-              localStorage.removeItem('token');
-              this.router.navigate(['/login']);
-=======
               if (this.hasAuthHeader(req.headers)) {
                 this.authService.logout();
                 this.router.navigate(['/login']);
               }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
               break;
             case 403:
               errorMessage = 'You do not have permission to access this resource.';

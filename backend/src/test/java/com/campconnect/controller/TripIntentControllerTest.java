@@ -1,10 +1,6 @@
 package com.campconnect.controller;
 
-<<<<<<< HEAD
-import com.campconnect.dto.TripIntentDto;
-=======
 import com.campconnect.dto.TripIntentDTO;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import com.campconnect.model.TripIntent;
 import com.campconnect.model.TripIntentStatus;
 import com.campconnect.service.ITripIntentService;
@@ -40,21 +36,12 @@ class TripIntentControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-<<<<<<< HEAD
-    void createTripIntent_ShouldReturnCreated() throws Exception {
-        // Arrange
-        TripIntentDto dto = new TripIntentDto();
-        dto.setTitle("Camping Trip");
-        dto.setCreatorUserId("user-1");
-
-=======
     void createTripIntent_Success() throws Exception {
         TripIntentDTO dto = new TripIntentDTO();
         dto.setCreatorUserId("user-1");
         dto.setTitle("Camping Trip");
         dto.setCampingStyle("WILD");
         dto.setExperienceLevel("BEGINNER");
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         TripIntent created = TripIntent.builder().id("trip-1").title("Camping Trip").build();
         when(tripIntentService.createTripIntent(any(TripIntent.class))).thenReturn(created);
 

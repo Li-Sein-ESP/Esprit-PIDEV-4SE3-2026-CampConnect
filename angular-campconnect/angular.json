@@ -39,26 +39,19 @@
                             "src/assets"
                         ],
                         "styles": [
-<<<<<<< HEAD
-                            "src/styles/globals.css"
-=======
                             "src/styles/globals.css",
                             "node_modules/leaflet/dist/leaflet.css"
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                         ],
                         "scripts": []
                     },
                     "configurations": {
                         "production": {
-<<<<<<< HEAD
-=======
                             "fileReplacements": [
                                 {
                                     "replace": "src/environments/environment.ts",
                                     "with": "src/environments/environment.prod.ts"
                                 }
                             ],
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                             "budgets": [
                                 {
                                     "type": "initial",
@@ -120,23 +113,16 @@
                             "src/assets"
                         ],
                         "styles": [
-<<<<<<< HEAD
-                            "src/styles/globals.css"
-=======
                             "src/styles/globals.css",
                             "node_modules/leaflet/dist/leaflet.css"
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                         ],
                         "scripts": []
                     }
                 }
             }
         }
-<<<<<<< HEAD
-=======
     },
     "cli": {
       "analytics": false
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     }
 }

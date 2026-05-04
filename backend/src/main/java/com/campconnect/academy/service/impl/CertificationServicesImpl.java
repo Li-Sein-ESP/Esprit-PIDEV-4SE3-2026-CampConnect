@@ -1,19 +1,10 @@
 package com.campconnect.academy.service.impl;
-<<<<<<< HEAD
-import com.campconnect.academy.service.ICertificationServices;
-
-import com.campconnect.model.User;
-
-import com.campconnect.academy.dto.CertificationDTO;
-import com.campconnect.academy.dto.UserCertificationDTO;
-=======
 
 import com.campconnect.academy.service.ICertificationServices;
 import com.campconnect.model.User;
 import com.campconnect.academy.dto.CertificationDTO;
 import com.campconnect.academy.dto.UserCertificationDTO;
 import com.campconnect.dto.CertificationStatsDTO;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import com.campconnect.academy.entity.Certification;
 import com.campconnect.academy.entity.UserCertification;
 import com.campconnect.enums.CertificationStatus;
@@ -27,13 +18,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
-<<<<<<< HEAD
-import java.util.List;
-=======
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import java.util.stream.Collectors;
 
 @Service
@@ -107,8 +94,6 @@ public class CertificationServicesImpl implements ICertificationServices {
         return convertToUserDTO(userCertificationRepository.save(userCert));
     }
 
-<<<<<<< HEAD
-=======
     @Override
     public CertificationDTO getCertificationByCourseId(String courseId) {
         List<Certification> certs = certificationRepository.findByRequiredCoursesId(courseId);
@@ -116,7 +101,6 @@ public class CertificationServicesImpl implements ICertificationServices {
         return convertToDTO(certs.get(0));
     }
 
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     private CertificationDTO convertToDTO(Certification cert) {
         CertificationDTO dto = new CertificationDTO();
         dto.setId(cert.getId());
@@ -180,8 +164,6 @@ public class CertificationServicesImpl implements ICertificationServices {
         dto.setStatus(cert.getStatus());
         return dto;
     }
-<<<<<<< HEAD
-=======
 
     /**
      * TÂCHE 2 – Complex MongoDB Aggregation Logic (represented by Java Stream grouping).
@@ -237,5 +219,4 @@ public class CertificationServicesImpl implements ICertificationServices {
                 .map(this::convertToUserDTO)
                 .collect(Collectors.toList());
     }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

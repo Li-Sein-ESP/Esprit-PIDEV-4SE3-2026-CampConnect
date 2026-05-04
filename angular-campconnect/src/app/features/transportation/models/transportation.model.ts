@@ -8,11 +8,8 @@ export interface TransportRoute {
     mode: 'car' | 'bus' | 'train' | 'flight' | 'carpool';
     price?: number;
     provider?: string;
-<<<<<<< HEAD
-=======
     averageRating?: number;
     reviewCount?: number;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }
 
 export interface Location {

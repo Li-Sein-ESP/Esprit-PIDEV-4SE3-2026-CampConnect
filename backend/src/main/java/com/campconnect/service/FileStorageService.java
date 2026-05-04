@@ -17,18 +17,11 @@ public class FileStorageService {
 
     private final Path fileStorageLocation;
 
-<<<<<<< HEAD
-    public FileStorageService() {
-        // Use a stable absolute path inside the backend project directory
-        String projectDir = System.getProperty("user.dir");
-        this.fileStorageLocation = Paths.get(projectDir, "uploads").toAbsolutePath().normalize();
-=======
     public FileStorageService(@org.springframework.beans.factory.annotation.Value("${app.upload.dir:#{null}}") String uploadDir) {
         // Fallback to "uploads" if not specified
         String path = (uploadDir != null && !uploadDir.isEmpty()) ? uploadDir : "uploads";
         this.fileStorageLocation = Paths.get(path).toAbsolutePath().normalize();
         
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         try {
             Files.createDirectories(this.fileStorageLocation);
         } catch (Exception ex) {
@@ -56,16 +49,8 @@ public class FileStorageService {
             Path targetLocation = this.fileStorageLocation.resolve(uniqueFileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-<<<<<<< HEAD
-            // Generate the URL to return to the client
-            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/uploads/")
-                    .path(uniqueFileName)
-                    .toUriString();
-=======
             // Generate a relative path to return to the client
             String fileDownloadUri = "/uploads/" + uniqueFileName;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
             return fileDownloadUri;
         } catch (IOException ex) {

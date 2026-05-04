@@ -1,10 +1,6 @@
 package com.campconnect.controller;
 
-<<<<<<< HEAD
-import com.campconnect.dto.ReservationDto;
-=======
 import com.campconnect.dto.ReservationRequest;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import com.campconnect.model.Reservation;
 import com.campconnect.service.ReservationServiceImpl;
 import jakarta.validation.Valid;
@@ -24,11 +20,7 @@ public class ReservationController {
     private final ReservationServiceImpl reservationService;
 
     @PostMapping
-<<<<<<< HEAD
-    public ResponseEntity<Reservation> createReservation(@Valid @RequestBody ReservationDto reservationDto) {
-=======
     public ResponseEntity<Reservation> createReservation(@Valid @RequestBody ReservationRequest reservationDto) {
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         Reservation reservation = new Reservation();
         reservation.setUserId(reservationDto.getUserId());
         reservation.setTargetId(reservationDto.getTargetId());
@@ -59,11 +51,7 @@ public class ReservationController {
     @PutMapping("/{id}")
     public ResponseEntity<Reservation> updateReservation(
             @PathVariable("id") String id,
-<<<<<<< HEAD
-            @Valid @RequestBody ReservationDto reservationDto) {
-=======
             @Valid @RequestBody ReservationRequest reservationDto) {
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         Reservation reservation = new Reservation();
         reservation.setUserId(reservationDto.getUserId());
         reservation.setTargetId(reservationDto.getTargetId());

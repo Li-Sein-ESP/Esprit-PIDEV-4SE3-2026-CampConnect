@@ -109,8 +109,6 @@ export interface UserProgress {
     enrolledAt: string;
     completedAt?: string;
 }
-<<<<<<< HEAD
-=======
 
 // ─── CertificationStats (mirrors CertificationStatsDTO.java) ───
 // TÂCHE 2 – Used by the Admin Analytics Dashboard (complex aggregation / JOIN equivalent)
@@ -121,4 +119,3 @@ export interface CertificationStats {
     activeCount: number;
     expiredCount: number;
 }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)

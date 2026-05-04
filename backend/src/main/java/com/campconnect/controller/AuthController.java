@@ -30,10 +30,6 @@ import com.campconnect.repository.RoleRepository;
 import com.campconnect.repository.UserRepository;
 import com.campconnect.service.UserDetailsImpl;
 
-<<<<<<< HEAD
-@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600, allowCredentials = "true")
-=======
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {

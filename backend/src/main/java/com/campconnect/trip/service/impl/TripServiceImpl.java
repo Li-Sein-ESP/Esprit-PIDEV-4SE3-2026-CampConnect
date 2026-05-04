@@ -12,10 +12,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-<<<<<<< HEAD
-import java.util.List;
-import java.util.UUID;
-=======
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -29,7 +25,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.time.ZoneId;
 import java.time.Instant;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @Service("itineraryTripService")
 public class TripServiceImpl implements ITripService {
@@ -37,35 +32,22 @@ public class TripServiceImpl implements ITripService {
     private final TripRepository repository;
     private final TransportRepository transportRepository;
     private final TripItineraryRepository itineraryRepository;
-<<<<<<< HEAD
-=======
     private final MongoTemplate mongoTemplate;
     private static final Logger logger = LoggerFactory.getLogger(TripServiceImpl.class);
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
     public TripServiceImpl(
             @Qualifier("itineraryTripRepository") TripRepository repository,
             TransportRepository transportRepository,
-<<<<<<< HEAD
-            TripItineraryRepository itineraryRepository) {
-        this.repository = repository;
-        this.transportRepository = transportRepository;
-        this.itineraryRepository = itineraryRepository;
-=======
             TripItineraryRepository itineraryRepository,
             MongoTemplate mongoTemplate) {
         this.repository = repository;
         this.transportRepository = transportRepository;
         this.itineraryRepository = itineraryRepository;
         this.mongoTemplate = mongoTemplate;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     }
 
     @Override
     public List<Trip> findAll() {
-<<<<<<< HEAD
-        return repository.findAll();
-=======
         logger.info("[ADMIN_OMNI_SCAN] Starting full diagnostic discovery for Admin Portal");
         List<Trip> allFound = new ArrayList<>();
         
@@ -107,7 +89,6 @@ public class TripServiceImpl implements ITripService {
             .filter(java.util.Objects::nonNull)
             .distinct()
             .collect(Collectors.toList());
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     }
 
     @Override
@@ -126,14 +107,10 @@ public class TripServiceImpl implements ITripService {
             trip.setId(UUID.randomUUID().toString());
         }
         mapDtoToEntity(dto, trip);
-<<<<<<< HEAD
-        return repository.save(trip);
-=======
         logger.info("Saving trip - title='{}', userId='{}'", dto.getTitle(), dto.getUserId());
         Trip saved = repository.save(trip);
         logger.info("Saved trip id='{}' userId='{}'", saved.getId(), saved.getUserId());
         return saved;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     }
 
     @Override
@@ -153,9 +130,6 @@ public class TripServiceImpl implements ITripService {
 
     @Override
     public List<Trip> findByUserId(String userId) {
-<<<<<<< HEAD
-        return repository.findByUserId(userId);
-=======
         logger.info("[OMNI_SCAN] Commencing full database scan for ID: '{}'", userId);
         
         List<Trip> results = new ArrayList<>();
@@ -308,7 +282,6 @@ public class TripServiceImpl implements ITripService {
         }
         
         return modern;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     }
 
     @Override
@@ -403,8 +376,6 @@ public class TripServiceImpl implements ITripService {
             trip.setImageUrl(dto.getImageUrl());
         trip.setTemplate(dto.isTemplate());
     }
-<<<<<<< HEAD
-=======
 
     @Override
     public java.util.List<com.campconnect.trip.entity.Trip> searchByKeywords(String query) {
@@ -426,5 +397,4 @@ public class TripServiceImpl implements ITripService {
     public Set<String> getDatabaseCollections() {
         return mongoTemplate.getCollectionNames();
     }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

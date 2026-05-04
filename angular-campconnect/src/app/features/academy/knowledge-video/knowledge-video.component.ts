@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
-import { ButtonComponent } from '../../../shared/components/button.component';
-import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
-=======
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,7 +10,6 @@ import {
 } from 'lucide-angular';
 import { AcademyService } from '../services/academy.service';
 import { Video } from '../models/academy.model';
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @Component({
   selector: 'app-knowledge-video-component',
@@ -26,18 +17,6 @@ import { Video } from '../models/academy.model';
   imports: [
     CommonModule,
     RouterModule,
-<<<<<<< HEAD
-    LucideAngularModule,
-    ButtonComponent,
-    CardComponent,
-    CardContentComponent
-  ],
-  templateUrl: './knowledge-video.component.html',
-  styles: []
-})
-export class KnowledgeVideoComponent {
-  // Component logic will be implemented
-=======
     FormsModule,
     LucideAngularModule
   ],
@@ -320,5 +299,4 @@ export class KnowledgeVideoComponent implements OnInit {
   navigateToExpert(expertId: string) {
     this.router.navigate(['/academy/expert', expertId]);
   }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

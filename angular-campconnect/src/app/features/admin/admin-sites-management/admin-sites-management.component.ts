@@ -1,18 +1,9 @@
-<<<<<<< HEAD
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
-import { ButtonComponent } from '../../../shared/components/button.component';
-import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
-=======
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LucideAngularModule, Plus, Pencil, Trash2, MapPin, Users, DollarSign, Star, X, Check, AlertTriangle, Image as ImageIcon, Upload, Loader2 } from 'lucide-angular';
 import { CampsiteService, Campsite } from '../../../core/services/campsite.service';
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @Component({
   selector: 'app-admin-sites-management-component',
@@ -20,19 +11,6 @@ import { CampsiteService, Campsite } from '../../../core/services/campsite.servi
   imports: [
     CommonModule,
     RouterModule,
-<<<<<<< HEAD
-    LucideAngularModule,
-    ButtonComponent,
-    CardComponent,
-    CardContentComponent
-  ],
-  templateUrl: './admin-sites-management.component.html',
-  styles: []
-})
-export class AdminSitesManagementComponent {
-  // Component logic will be implemented
-}
-=======
     FormsModule,
     ReactiveFormsModule,
     LucideAngularModule,
@@ -524,4 +502,3 @@ export class AdminSitesManagementComponent implements OnInit {
   }
 }
 
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)

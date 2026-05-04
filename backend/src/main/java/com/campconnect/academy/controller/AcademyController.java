@@ -19,11 +19,8 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 import com.campconnect.academy.dto.UserCertificationDTO;
-<<<<<<< HEAD
-=======
 import com.campconnect.dto.CertificationStatsDTO;
 import com.campconnect.dto.CommentDTO;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @RestController
 @RequestMapping("/api/academy")
@@ -148,8 +145,6 @@ public class AcademyController {
         return certificationService.getUserCertifications(userId);
     }
 
-<<<<<<< HEAD
-=======
     @GetMapping("/certifications/by-course/{courseId}")
     public ResponseEntity<CertificationDTO> getCertificationByCourseId(@PathVariable String courseId) {
         CertificationDTO cert = certificationService.getCertificationByCourseId(courseId);
@@ -176,7 +171,6 @@ public class AcademyController {
         return ResponseEntity.ok(certificationService.getUserCertificationsByStatus(userId, status));
     }
 
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     @PostMapping("/users/certifications")
     public ResponseEntity<UserCertificationDTO> earnCertification(@Valid @RequestBody UserCertificationDTO dto) {
         return ResponseEntity.ok(certificationService.earnCertification(dto));
@@ -218,8 +212,6 @@ public class AcademyController {
     public List<VideoDTO> getVideosByCategory(@PathVariable String category) {
         return videoService.getVideosByCategory(category);
     }
-<<<<<<< HEAD
-=======
 
     @PostMapping("/videos/{id}/comments")
     public ResponseEntity<CommentDTO> addCommentToVideo(@PathVariable String id, @Valid @RequestBody CommentDTO commentDTO) {
@@ -230,5 +222,4 @@ public class AcademyController {
     public ResponseEntity<VideoDTO> toggleVideoHelpful(@PathVariable String id) {
         return ResponseEntity.ok(videoService.toggleHelpful(id));
     }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

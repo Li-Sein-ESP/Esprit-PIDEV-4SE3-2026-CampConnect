@@ -3,10 +3,7 @@ package com.campconnect.trip.service;
 import com.campconnect.trip.dto.TripDTO;
 import com.campconnect.trip.entity.Trip;
 import java.util.List;
-<<<<<<< HEAD
-=======
 import java.util.Set;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 public interface ITripService {
     List<Trip> findAll();
@@ -26,8 +23,6 @@ public interface ITripService {
     void addTransportToTrip(String tripId, String transportId);
 
     void addItineraryToTrip(String tripId, String itineraryId);
-<<<<<<< HEAD
-=======
 
     // 3. Complex Keyword Search
     List<Trip> searchByKeywords(String query);
@@ -38,5 +33,4 @@ public interface ITripService {
     List<java.util.Map<String, Object>> getDifficultyStats();
 
     Set<String> getDatabaseCollections();
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

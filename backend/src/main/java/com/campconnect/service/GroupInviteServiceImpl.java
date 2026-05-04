@@ -6,11 +6,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-<<<<<<< HEAD
-import com.campconnect.dto.GroupInviteDetailDto;
-=======
 import com.campconnect.dto.GroupInviteDetailDTO;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import com.campconnect.model.Group;
 import com.campconnect.model.GroupInvite;
 import com.campconnect.model.GroupInviteStatus;
@@ -55,32 +51,19 @@ public class GroupInviteServiceImpl implements IGroupInviteService {
     }
 
     @Override
-<<<<<<< HEAD
-    public List<GroupInviteDetailDto> getInviteDetailsForUser(String userId) {
-=======
     public List<GroupInviteDetailDTO> getInviteDetailsForUser(String userId) {
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         List<GroupInvite> invites = getInvitesForUser(userId);
         return invites.stream().map(this::mapToDetailDto).toList();
     }
 
     @Override
-<<<<<<< HEAD
-    public List<GroupInviteDetailDto> getInviteDetailsFromUser(String userId) {
-=======
     public List<GroupInviteDetailDTO> getInviteDetailsFromUser(String userId) {
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         List<GroupInvite> invites = getInvitesByFromUser(userId);
         return invites.stream().map(this::mapToDetailDto).toList();
     }
 
-<<<<<<< HEAD
-    private GroupInviteDetailDto mapToDetailDto(GroupInvite invite) {
-        GroupInviteDetailDto dto = new GroupInviteDetailDto();
-=======
     private GroupInviteDetailDTO mapToDetailDto(GroupInvite invite) {
         GroupInviteDetailDTO dto = new GroupInviteDetailDTO();
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         dto.setId(invite.getId());
         dto.setTripIntentId(invite.getTripIntentId());
         dto.setGroupId(invite.getGroupId());

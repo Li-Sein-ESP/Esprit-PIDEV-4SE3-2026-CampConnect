@@ -1,12 +1,9 @@
 package com.campconnect.service;
 
-<<<<<<< HEAD
-=======
 import com.campconnect.model.Role;
 
 import com.campconnect.model.User;
 
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,11 +22,6 @@ import com.campconnect.dto.AuthResponse;
 import com.campconnect.dto.LoginRequest;
 import com.campconnect.dto.RegisterRequest;
 import com.campconnect.model.ERole;
-<<<<<<< HEAD
-import com.campconnect.model.Role;
-import com.campconnect.model.User;
-=======
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import com.campconnect.repository.RoleRepository;
 import com.campconnect.repository.UserRepository;
 
@@ -63,19 +55,11 @@ public class AuthService {
                 .collect(Collectors.toList());
 
         return new AuthResponse(jwt,
-<<<<<<< HEAD
-                userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getEmail(),
-                roles,
-                userDetails.getProfileDetails());
-=======
                                 userDetails.getId(),
                                 userDetails.getUsername(),
                                 userDetails.getEmail(),
                                 roles,
                                 userDetails.getProfileDetails());
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     }
 
     public void registerUser(RegisterRequest signUpRequest) {
@@ -89,15 +73,9 @@ public class AuthService {
 
         // Create new user's account
         User user = new User(signUpRequest.getUsername(),
-<<<<<<< HEAD
-                signUpRequest.getEmail(),
-                encoder.encode(signUpRequest.getPassword()),
-                signUpRequest.getName());
-=======
                              signUpRequest.getEmail(),
                              encoder.encode(signUpRequest.getPassword()),
                              signUpRequest.getName());
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
         Set<String> strRoles = signUpRequest.getRole();
         Set<Role> roles = new HashSet<>();
@@ -109,18 +87,6 @@ public class AuthService {
         } else {
             strRoles.forEach(role -> {
                 switch (role) {
-<<<<<<< HEAD
-                    case "admin":
-                        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(adminRole);
-
-                        break;
-                    default:
-                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(userRole);
-=======
                 case "admin":
                     Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
                             .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
@@ -131,18 +97,14 @@ public class AuthService {
                     Role userRole = roleRepository.findByName(ERole.ROLE_USER)
                             .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                     roles.add(userRole);
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 }
             });
         }
 
         user.setRoles(roles);
-<<<<<<< HEAD
-=======
         if (signUpRequest.getProfileDetails() != null) {
             user.setProfileDetails(signUpRequest.getProfileDetails());
         }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         userRepository.save(user);
     }
 }

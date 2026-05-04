@@ -1,18 +1,9 @@
-<<<<<<< HEAD
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
-import { ButtonComponent } from '../../../shared/components/button.component';
-import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
-=======
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { LucideAngularModule, ChevronLeft, Clock, BookOpen, Star, CheckCircle, Award, Users, ShieldCheck, Medal, Play, ChevronRight, TrendingUp, Target, Briefcase, FileText, GraduationCap, ArrowRight } from 'lucide-angular';
 import { AcademyService } from '../services/academy.service';
 import { Certification } from '../models/academy.model';
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @Component({
   selector: 'app-certification-programs-component',
@@ -20,18 +11,6 @@ import { Certification } from '../models/academy.model';
   imports: [
     CommonModule,
     RouterModule,
-<<<<<<< HEAD
-    LucideAngularModule,
-    ButtonComponent,
-    CardComponent,
-    CardContentComponent
-  ],
-  templateUrl: './certification-programs.component.html',
-  styles: []
-})
-export class CertificationProgramsComponent {
-  // Component logic will be implemented
-=======
     LucideAngularModule
   ],
   templateUrl: './certification-programs.component.html',
@@ -177,5 +156,4 @@ export class CertificationProgramsComponent implements OnInit {
   viewCertificate(certId: string) {
     this.router.navigate(['/academy/my-badges'], { queryParams: { cert: certId } });
   }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

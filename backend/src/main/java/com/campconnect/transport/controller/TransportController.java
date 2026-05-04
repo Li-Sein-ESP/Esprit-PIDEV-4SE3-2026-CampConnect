@@ -48,12 +48,9 @@ public class TransportController {
     public void assignTrip(@PathVariable("transportId") String transportId, @PathVariable("tripId") String tripId) {
         service.assignToTrip(transportId, tripId);
     }
-<<<<<<< HEAD
-=======
 
     @GetMapping("/popularity-stats")
     public List<java.util.Map<String, Object>> getPopularityStats() {
         return service.getPopularityStats();
     }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

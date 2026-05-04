@@ -10,8 +10,6 @@ public interface TripRepository extends MongoRepository<Trip, String> {
     List<Trip> findByUserId(String userId);
 
     List<Trip> findByTemplate(boolean template);
-<<<<<<< HEAD
-=======
 
     // 3. Complex Keyword Query: Search by title OR destination address
     List<Trip> findByTitleContainingIgnoreCaseOrDestinationAddressContainingIgnoreCase(String title, String address);
@@ -25,5 +23,4 @@ public interface TripRepository extends MongoRepository<Trip, String> {
         "{ '$sort': { 'tripCount': -1 } }"
     })
     java.util.List<java.util.Map<String, Object>> getTripStatsByDifficulty();
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

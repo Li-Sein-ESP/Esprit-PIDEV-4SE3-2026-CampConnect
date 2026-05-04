@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
-import { ButtonComponent } from '../../../shared/components/button.component';
-import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
-=======
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -15,7 +7,6 @@ import { CardComponent, CardContentComponent, CardHeaderComponent, CardTitleComp
 import { AcademyService } from '../../academy/services/academy.service';
 import { Course, Certification } from '../../academy/models/academy.model';
 import { FormsModule } from '@angular/forms';
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @Component({
   selector: 'app-admin-academy-governance-component',
@@ -26,22 +17,14 @@ import { FormsModule } from '@angular/forms';
     LucideAngularModule,
     ButtonComponent,
     CardComponent,
-<<<<<<< HEAD
-    CardContentComponent
-=======
     CardContentComponent,
     CardHeaderComponent,
     CardTitleComponent,
     FormsModule
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
   ],
   templateUrl: './admin-academy-governance.component.html',
   styles: []
 })
-<<<<<<< HEAD
-export class AdminAcademyGovernanceComponent {
-  // Component logic will be implemented
-=======
 export class AdminAcademyGovernanceComponent implements OnInit {
   PlusIcon = Plus;
   PencilIcon = Pencil;
@@ -512,5 +495,4 @@ export class AdminAcademyGovernanceComponent implements OnInit {
     this.showConfirmModal = false;
     this.itemToDelete = null;
   }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

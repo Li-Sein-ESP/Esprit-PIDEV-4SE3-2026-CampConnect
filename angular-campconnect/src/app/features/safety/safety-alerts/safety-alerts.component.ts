@@ -66,11 +66,8 @@ export class SafetyAlertsComponent implements OnInit {
   isEditingAlert = false;
   saving = false;
   savingAlert = false;
-<<<<<<< HEAD
-=======
   alertFormSubmitted = false;
   alertFormErrors: Record<string, string> = {};
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
   constructor(
     private router: Router,
@@ -168,8 +165,6 @@ export class SafetyAlertsComponent implements OnInit {
     this.router.navigate(['/safety/alerts', id]);
   }
 
-<<<<<<< HEAD
-=======
   openSafetyMap(): void {
     this.router.navigateByUrl('/safety/map').then((ok) => {
       if (!ok) {
@@ -186,7 +181,6 @@ export class SafetyAlertsComponent implements OnInit {
     });
   }
 
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
   formatDate(isoDate: string): string {
     if (!isoDate) return 'Recently';
     return new Date(isoDate).toLocaleDateString();
@@ -283,11 +277,8 @@ export class SafetyAlertsComponent implements OnInit {
     };
     this.editingAlert = newAlert;
     this.isEditingAlert = false;
-<<<<<<< HEAD
-=======
     this.alertFormSubmitted = false;
     this.alertFormErrors = {};
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     this.showEditModal = true;
   }
 
@@ -296,11 +287,8 @@ export class SafetyAlertsComponent implements OnInit {
     event.stopPropagation();
     this.editingAlert = JSON.parse(JSON.stringify(alert)); // Deep copy
     this.isEditingAlert = true;
-<<<<<<< HEAD
-=======
     this.alertFormSubmitted = false;
     this.alertFormErrors = {};
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     this.showEditModal = true;
   }
 
@@ -324,17 +312,12 @@ export class SafetyAlertsComponent implements OnInit {
     this.showEditModal = false;
     this.editingAlert = null;
     this.isEditingAlert = false;
-<<<<<<< HEAD
-=======
     this.alertFormSubmitted = false;
     this.alertFormErrors = {};
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
   }
 
   saveAlert(): void {
     if (!this.editingAlert) return;
-<<<<<<< HEAD
-=======
 
     this.alertFormSubmitted = true;
     if (!this.validateAlertForm()) {
@@ -344,7 +327,6 @@ export class SafetyAlertsComponent implements OnInit {
     // sanitize string fields before sending
     this.editingAlert.title = (this.editingAlert.title || '').trim();
     this.editingAlert.description = (this.editingAlert.description || '').trim();
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     
     this.savingAlert = true;
     const alertData = this.editingAlert;
@@ -378,8 +360,6 @@ export class SafetyAlertsComponent implements OnInit {
       }
     });
   }
-<<<<<<< HEAD
-=======
 
   validateAlertForm(): boolean {
     this.alertFormErrors = {};
@@ -424,5 +404,4 @@ export class SafetyAlertsComponent implements OnInit {
   hasAlertFieldError(field: string): boolean {
     return this.alertFormSubmitted && !!this.alertFormErrors[field];
   }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

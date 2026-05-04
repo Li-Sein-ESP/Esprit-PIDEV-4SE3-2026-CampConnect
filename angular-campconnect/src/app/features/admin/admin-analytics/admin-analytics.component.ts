@@ -1,18 +1,11 @@
-<<<<<<< HEAD
-import { Component } from '@angular/core';
-=======
 import { Component, OnInit } from '@angular/core';
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { ButtonComponent } from '../../../shared/components/button.component';
 import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
-<<<<<<< HEAD
-=======
 import { PricingAnalyticsService, CampsiteAudit } from '../../../core/services/pricing-analytics.service';
 import { FormsModule } from '@angular/forms';
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @Component({
   selector: 'app-admin-analytics-component',
@@ -23,15 +16,6 @@ import { FormsModule } from '@angular/forms';
     LucideAngularModule,
     ButtonComponent,
     CardComponent,
-<<<<<<< HEAD
-    CardContentComponent
-  ],
-  templateUrl: './admin-analytics.component.html',
-  styles: []
-})
-export class AdminAnalyticsComponent {
-  // Component logic will be implemented
-=======
     CardContentComponent,
     FormsModule
   ],
@@ -95,5 +79,4 @@ export class AdminAnalyticsComponent implements OnInit {
       error: () => this.loading = false
     });
   }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

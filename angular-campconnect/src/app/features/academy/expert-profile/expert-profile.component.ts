@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
-import { ButtonComponent } from '../../../shared/components/button.component';
-import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
-=======
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -44,7 +36,6 @@ interface Expert {
     color: string;
   }[];
 }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @Component({
   selector: 'app-expert-profile-component',
@@ -53,17 +44,6 @@ interface Expert {
     CommonModule,
     RouterModule,
     LucideAngularModule,
-<<<<<<< HEAD
-    ButtonComponent,
-    CardComponent,
-    CardContentComponent
-  ],
-  templateUrl: './expert-profile.component.html',
-  styles: []
-})
-export class ExpertProfileComponent {
-  // Component logic will be implemented
-=======
   ],
   templateUrl: './expert-profile.component.html',
   styles: [`
@@ -212,5 +192,4 @@ export class ExpertProfileComponent implements OnInit {
   viewAllVideos() {
     this.expandedVideos = !this.expandedVideos;
   }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

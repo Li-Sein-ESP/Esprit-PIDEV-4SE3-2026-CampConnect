@@ -10,9 +10,6 @@ public interface IVideoServices {
     VideoDTO updateVideo(String id, VideoDTO videoDTO);
     void deleteVideo(String id);
     List<VideoDTO> getVideosByCategory(String category);
-<<<<<<< HEAD
-=======
     com.campconnect.dto.CommentDTO addComment(String videoId, com.campconnect.dto.CommentDTO commentDTO);
     VideoDTO toggleHelpful(String videoId);
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

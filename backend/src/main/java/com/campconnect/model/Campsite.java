@@ -25,12 +25,9 @@ public class Campsite {
     private Integer reviewCount;
     private Integer capacity;
     private Boolean available;
-<<<<<<< HEAD
-=======
     private String status;
     private Double latitude;
     private Double longitude;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     
     @Builder.Default
     private List<String> images = new ArrayList<>();

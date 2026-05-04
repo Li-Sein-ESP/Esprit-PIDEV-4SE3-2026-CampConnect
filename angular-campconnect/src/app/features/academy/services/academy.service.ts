@@ -1,17 +1,11 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, map } from 'rxjs';
-<<<<<<< HEAD
-import { Course, Badge, Certification, UserCertification, Video } from '../models/academy.model';
-
-const API_URL = 'http://localhost:8080/api/academy';
-=======
 import { Course, Badge, Certification, UserCertification, Video, CertificationStats } from '../models/academy.model';
 
 import { environment } from '../../../../environments/environment';
 
 const API_URL = `${environment.apiUrl}/academy`;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @Injectable({
     providedIn: 'root'
@@ -23,17 +17,10 @@ export class AcademyService {
     constructor(private http: HttpClient) { }
 
     // ─── FIle Uploads ───
-<<<<<<< HEAD
-    uploadFile(file: File): Observable<{url: string}> {
-        const formData = new FormData();
-        formData.append('file', file);
-        return this.http.post<{url: string}>(`http://localhost:8080/api/upload`, formData);
-=======
     uploadFile(file: File): Observable<{ url: string }> {
         const formData = new FormData();
         formData.append('file', file);
         return this.http.post<{ url: string }>(`${environment.apiUrl}/upload`, formData);
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     }
 
     // ─── Courses ───
@@ -108,13 +95,10 @@ export class AcademyService {
         return this.http.delete<void>(`${API_URL}/certifications/${id}`);
     }
 
-<<<<<<< HEAD
-=======
     getCertificationByCourseId(courseId: string): Observable<Certification> {
         return this.http.get<Certification>(`${API_URL}/certifications/by-course/${courseId}`);
     }
 
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     // ─── User Certifications ───
     getUserCertifications(userId: string): Observable<UserCertification[]> {
         return this.http.get<UserCertification[]>(`${API_URL}/users/${userId}/certifications`);
@@ -124,14 +108,6 @@ export class AcademyService {
         return this.http.post<UserCertification>(`${API_URL}/users/certifications`, userCert);
     }
 
-<<<<<<< HEAD
-    // ─── Videos ───
-    private normalizeUrl(url: string | undefined): string {
-        if (!url) return '';
-        
-        const host = window.location.hostname;
-        const backendBase = `http://${host}:8080`;
-=======
     /**
      * TÂCHE 2 – Complex aggregation (equivalent to JPQL JOIN with GROUP BY).
      * Calls GET /api/academy/certifications/stats
@@ -164,7 +140,6 @@ export class AcademyService {
         // we want to get the base without the /api part for static files if needed
         const urlObj = new URL(environment.apiUrl);
         const backendBase = `${urlObj.protocol}//${urlObj.host}`;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
         const timestamp = new Date().getTime();
 
         // If it's a relative path OR it's an absolute path containing /uploads/
@@ -180,13 +155,8 @@ export class AcademyService {
 
     getVideos(): Observable<Video[]> {
         return this.http.get<Video[]>(`${API_URL}/videos`).pipe(
-<<<<<<< HEAD
-            map(videos => videos.map(v => ({ 
-                ...v, 
-=======
             map(videos => videos.map(v => ({
                 ...v,
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 id: (v as any)._id || v.id,
                 videoUrl: this.normalizeUrl(v.videoUrl),
                 thumbnailUrl: this.normalizeUrl(v.thumbnailUrl)
@@ -196,13 +166,8 @@ export class AcademyService {
 
     getVideoById(id: string): Observable<Video> {
         return this.http.get<Video>(`${API_URL}/videos/${id}`).pipe(
-<<<<<<< HEAD
-            map(v => ({ 
-                ...v, 
-=======
             map(v => ({
                 ...v,
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
                 id: (v as any)._id || v.id,
                 videoUrl: this.normalizeUrl(v.videoUrl),
                 thumbnailUrl: this.normalizeUrl(v.thumbnailUrl)

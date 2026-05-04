@@ -1,11 +1,5 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-<<<<<<< HEAD
-import { RouterModule } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
-import { ButtonComponent } from '../../../shared/components/button.component';
-import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
-=======
 import { Router, RouterModule } from '@angular/router';
 import {
   LucideAngularModule,
@@ -44,26 +38,10 @@ interface CertProgress {
   nextLessons: NextLesson[];
   pendingAssessment?: PendingAssessment;
 }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @Component({
   selector: 'app-certification-progress-component',
   standalone: true,
-<<<<<<< HEAD
-  imports: [
-    CommonModule,
-    RouterModule,
-    LucideAngularModule,
-    ButtonComponent,
-    CardComponent,
-    CardContentComponent
-  ],
-  templateUrl: './certification-progress.component.html',
-  styles: []
-})
-export class CertificationProgressComponent {
-  // Component logic will be implemented
-=======
   imports: [CommonModule, RouterModule, LucideAngularModule],
   templateUrl: './certification-progress.component.html',
   styles: [`
@@ -187,5 +165,4 @@ export class CertificationProgressComponent {
   continueLearning(id: string) { this.router.navigate(['/academy', id]); }
   startAssessment(id: string) { alert('Preparing elite assessment environment...'); }
   viewCertificate(certId: string) { this.router.navigate(['/academy/my-badges'], { queryParams: { cert: certId } }); }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

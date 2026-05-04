@@ -1,25 +1,11 @@
 import { Component } from '@angular/core';
-<<<<<<< HEAD
-import { RouterOutlet } from '@angular/router';
-=======
 import { RouterOutlet, Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationError } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { filter, map, Observable } from 'rxjs';
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @Component({
     selector: 'app-root',
     standalone: true,
-<<<<<<< HEAD
-    imports: [RouterOutlet],
-    template: `
-    <router-outlet></router-outlet>
-  `,
-    styles: []
-})
-export class AppComponent {
-    title = 'CampConnect';
-=======
     imports: [RouterOutlet, CommonModule],
     template: `
     <!-- Top Progress Bar -->
@@ -72,5 +58,4 @@ export class AppComponent {
             map(event => event instanceof NavigationStart)
         );
     }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

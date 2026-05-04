@@ -21,10 +21,7 @@ public class SafetyAlert {
     private String description;
     private String type;
     private String severity;
-<<<<<<< HEAD
-=======
     private String status = "PENDING";
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     private String locationName;
     private String regionName;
     private LocalDateTime createdAt = LocalDateTime.now();

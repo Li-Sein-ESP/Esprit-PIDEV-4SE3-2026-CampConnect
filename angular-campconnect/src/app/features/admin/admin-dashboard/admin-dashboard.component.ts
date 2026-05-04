@@ -1,11 +1,8 @@
 import { Component, OnInit, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
-<<<<<<< HEAD
-=======
 import { AcademyService } from '../../academy/services/academy.service';
 import { EventService } from '../../events/services/event.service';
 import { forkJoin } from 'rxjs';
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -19,16 +16,6 @@ export class AdminDashboardComponent implements OnInit {
 
   @ViewChild('revenueChartCanvas', { static: true }) revenueChartCanvas!: ElementRef<HTMLCanvasElement>;
 
-<<<<<<< HEAD
-  // Mock Stats Data required by user
-  stats = {
-    totalUsers: 24831,
-    activeCampsites: 1247,
-    marketplaceRevenue: 384920,
-    activeDeliveries: 342,
-    activeBookings: 1893,
-    environmentalAlerts: 7
-=======
   // Stats Data - Initialized with zeros, then populated via API
   stats = {
     totalUsers: 0,
@@ -41,7 +28,6 @@ export class AdminDashboardComponent implements OnInit {
     totalStudents: 0,
     upcomingEvents: 0,
     eventRegistrations: 0
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
   };
 
   // Mock Data for Activity Feeds based on Design
@@ -89,15 +75,6 @@ export class AdminDashboardComponent implements OnInit {
     9400, 8800
   ];
 
-<<<<<<< HEAD
-  constructor(private decimalPipe: DecimalPipe) { }
-
-  ngOnInit(): void {
-    // We defer chart drawing to ensure view is fully settled, but can draw on init too
-    setTimeout(() => this.drawChart(), 100);
-  }
-
-=======
   constructor(
     private decimalPipe: DecimalPipe,
     private academyService: AcademyService,
@@ -134,7 +111,6 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
   @HostListener('window:resize')
   onResize() {
     this.drawChart();

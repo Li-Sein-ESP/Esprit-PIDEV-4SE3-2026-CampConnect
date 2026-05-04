@@ -4,10 +4,7 @@ import { SafetyService } from '../services/safety.service';
 import { of } from 'rxjs';
 import { LucideAngularModule, AlertTriangle, ShieldCheck, Search, Filter, Info, CloudRain, Flame, AlertCircle, MapPin, Calendar, Clock, ChevronRight, Map as LucideMap, Edit3, Trash2 } from 'lucide-angular';
 import { Router } from '@angular/router';
-<<<<<<< HEAD
-=======
 import { ActivatedRoute } from '@angular/router';
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 import { FormsModule } from '@angular/forms';
 
 describe('SafetyAlertsComponent', () => {
@@ -37,9 +34,6 @@ describe('SafetyAlertsComponent', () => {
           description: 'Flash floods possible'
         }
       ])),
-<<<<<<< HEAD
-      deleteAlert: jasmine.createSpy('deleteAlert').and.returnValue(of(null)),
-=======
       getIncidents: jasmine.createSpy('getIncidents').and.returnValue(of([
         {
           id: 'inc-1',
@@ -64,7 +58,6 @@ describe('SafetyAlertsComponent', () => {
         location: { name: 'South Lake', region: 'Valley' },
         description: 'Strong winds expected'
       })),
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
       updateAlert: jasmine.createSpy('updateAlert').and.returnValue(of({ id: '1', title: 'Updated Fire' }))
     };
     mockRouter = { navigate: jasmine.createSpy('navigate') };
@@ -81,12 +74,8 @@ describe('SafetyAlertsComponent', () => {
       ],
       providers: [
         { provide: SafetyService, useValue: mockSafetyService },
-<<<<<<< HEAD
-        { provide: Router, useValue: mockRouter }
-=======
         { provide: Router, useValue: mockRouter },
         { provide: ActivatedRoute, useValue: {} }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
       ]
     }).compileComponents();
 
@@ -101,15 +90,10 @@ describe('SafetyAlertsComponent', () => {
 
   it('should load alerts on initialization', () => {
     expect(mockSafetyService.getAlerts).toHaveBeenCalled();
-<<<<<<< HEAD
-    expect(component.alerts.length).toBe(2);
-    expect(component.filteredAlerts.length).toBe(2);
-=======
     expect(mockSafetyService.getIncidents).toHaveBeenCalled();
     expect(component.alerts.length).toBe(2);
     expect(component.filteredAlerts.length).toBe(2);
     expect(component.incidents.length).toBe(1);
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
   });
 
   it('should filter alerts by searching for title', () => {
@@ -146,8 +130,6 @@ describe('SafetyAlertsComponent', () => {
     expect(mockSafetyService.deleteAlert).toHaveBeenCalledWith('1');
     expect(component.alerts.length).toBe(1);
   });
-<<<<<<< HEAD
-=======
 
   it('should add a new alert through saveAlert in create mode', () => {
     component.openAddAlertModal();
@@ -186,5 +168,4 @@ describe('SafetyAlertsComponent', () => {
     expect(s.warning).toBe(1);
     expect(s.info).toBe(0);
   });
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 });

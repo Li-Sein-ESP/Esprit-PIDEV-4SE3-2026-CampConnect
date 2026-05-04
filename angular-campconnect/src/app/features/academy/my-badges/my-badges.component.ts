@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
-import { ButtonComponent } from '../../../shared/components/button.component';
-import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
-=======
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -20,26 +12,10 @@ import { AuthService } from '../../../core/services/auth.service';
 import { UserCertification } from '../models/academy.model';
 
 type StatusFilter = 'ALL' | 'ACTIVE' | 'EXPIRED';
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @Component({
   selector: 'app-my-badges-component',
   standalone: true,
-<<<<<<< HEAD
-  imports: [
-    CommonModule,
-    RouterModule,
-    LucideAngularModule,
-    ButtonComponent,
-    CardComponent,
-    CardContentComponent
-  ],
-  templateUrl: './my-badges.component.html',
-  styles: []
-})
-export class MyBadgesComponent {
-  // Component logic will be implemented
-=======
   imports: [CommonModule, RouterModule, LucideAngularModule],
   templateUrl: './my-badges.component.html',
   styles: [`
@@ -197,5 +173,4 @@ export class MyBadgesComponent implements OnInit {
   selectCert(id: string): void { this.selectedCertId.set(id); }
   downloadCert(): void { window.print(); }
   shareCert(): void { alert('Generating secure verification link...'); }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

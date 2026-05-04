@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
-import { ButtonComponent } from '../../../shared/components/button.component';
-import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
-
-=======
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -49,17 +40,12 @@ interface OpenIncidentSummary {
   openIncidentCount: number;
 }
 
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 @Component({
   selector: 'app-admin-incident-management-component',
   standalone: true,
   imports: [
     CommonModule,
     RouterModule,
-<<<<<<< HEAD
-    LucideAngularModule,
-=======
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     ButtonComponent,
     CardComponent,
     CardContentComponent
@@ -67,10 +53,6 @@ interface OpenIncidentSummary {
   templateUrl: './admin-incident-management.component.html',
   styles: []
 })
-<<<<<<< HEAD
-export class AdminIncidentManagementComponent {
-  // Component logic will be implemented
-=======
 export class AdminIncidentManagementComponent implements OnInit {
   private readonly baseUrl = `${environment.apiUrl}/admin/safety`;
   private readonly analyticsUrl = `${environment.apiUrl}/safety/analytics`;
@@ -175,5 +157,4 @@ export class AdminIncidentManagementComponent implements OnInit {
       }
     });
   }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

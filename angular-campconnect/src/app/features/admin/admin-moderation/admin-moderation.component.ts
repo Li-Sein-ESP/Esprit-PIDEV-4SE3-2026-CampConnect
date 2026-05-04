@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
-import { ButtonComponent } from '../../../shared/components/button.component';
-import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
-
-=======
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -31,17 +22,12 @@ interface ModerationComment {
   authorName?: string;
 }
 
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 @Component({
   selector: 'app-admin-moderation-component',
   standalone: true,
   imports: [
     CommonModule,
     RouterModule,
-<<<<<<< HEAD
-    LucideAngularModule,
-=======
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     ButtonComponent,
     CardComponent,
     CardContentComponent
@@ -49,10 +35,6 @@ interface ModerationComment {
   templateUrl: './admin-moderation.component.html',
   styles: []
 })
-<<<<<<< HEAD
-export class AdminModerationComponent {
-  // Component logic will be implemented
-=======
 export class AdminModerationComponent implements OnInit {
   private readonly baseUrl = `${environment.apiUrl}/admin/community`;
 
@@ -118,5 +100,4 @@ export class AdminModerationComponent implements OnInit {
       }
     });
   }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

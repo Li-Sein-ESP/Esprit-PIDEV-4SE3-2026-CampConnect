@@ -6,8 +6,6 @@ import com.campconnect.trip.service.ITripService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-<<<<<<< HEAD
-=======
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,18 +13,12 @@ import com.campconnect.service.UserDetailsImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import com.fasterxml.jackson.databind.ObjectMapper;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 
 @RestController("itineraryTripController")
 @RequestMapping("/api/trips")
 @CrossOrigin(origins = "http://localhost:4200")
 public class TripController {
     private final ITripService service;
-<<<<<<< HEAD
-
-    public TripController(@Qualifier("itineraryTripService") ITripService service) {
-        this.service = service;
-=======
     private final com.fasterxml.jackson.databind.ObjectMapper mapper;
     private static final Logger logger = LoggerFactory.getLogger(TripController.class);
 
@@ -34,7 +26,6 @@ public class TripController {
                           com.fasterxml.jackson.databind.ObjectMapper mapper) {
         this.service = service;
         this.mapper = mapper;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     }
 
     @GetMapping
@@ -54,24 +45,6 @@ public class TripController {
 
     @GetMapping("/user/{userId}")
     public List<Trip> getByUserId(@PathVariable("userId") String userId) {
-<<<<<<< HEAD
-        return service.findByUserId(userId);
-    }
-
-    @PostMapping
-    public Trip create(@jakarta.validation.Valid @RequestBody TripDTO dto) {
-        return service.save(dto);
-    }
-
-    @PutMapping("/{id}")
-    public Trip update(@PathVariable("id") String id, @jakarta.validation.Valid @RequestBody TripDTO dto) {
-        return service.update(id, dto);
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") String id) {
-        service.delete(id);
-=======
         logger.info("HTTP GET /api/trips/user/{} - fetching trips for specific user", userId);
         List<Trip> result = service.findByUserId(userId);
         logger.info("Discovery complete: user '{}' has {} trips in collection", userId, result == null ? 0 : result.size());
@@ -137,7 +110,6 @@ public class TripController {
         }
         service.delete(id);
         logger.info("Deleted trip id='{}' by user='{}'", id, currentUser.getId());
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
     }
 
     @PostMapping("/{tripId}/assign-transport/{transportId}")
@@ -151,8 +123,6 @@ public class TripController {
             @PathVariable("itineraryId") String itineraryId) {
         service.addItineraryToTrip(tripId, itineraryId);
     }
-<<<<<<< HEAD
-=======
 
     @GetMapping("/search")
     public List<Trip> search(@RequestParam("q") String query) {
@@ -173,5 +143,4 @@ public class TripController {
     public java.util.Set<String> debugCollections() {
         return service.getDatabaseCollections();
     }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

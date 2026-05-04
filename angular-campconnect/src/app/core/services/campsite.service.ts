@@ -15,8 +15,6 @@ export interface Campsite {
     amenities: string[];
     capacity: number;
     available: boolean;
-<<<<<<< HEAD
-=======
     status: string;
     latitude: number;
     longitude: number;
@@ -36,7 +34,6 @@ export interface CampsiteReview {
     createdAt?: string;
     helpfulByUsers?: string[];
     helpful?: number;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }
 
 @Injectable({
@@ -141,8 +138,6 @@ export class CampsiteService {
     deleteCampsite(id: string): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
-<<<<<<< HEAD
-=======
 
     /**
      * GET /api/campsites/{campsiteId}/reviews
@@ -184,5 +179,4 @@ export class CampsiteService {
             formData
         );
     }
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }

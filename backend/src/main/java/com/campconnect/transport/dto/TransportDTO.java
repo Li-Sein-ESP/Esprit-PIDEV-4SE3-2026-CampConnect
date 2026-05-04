@@ -29,9 +29,6 @@ public class TransportDTO {
     private String provider;
 
     private String imageUrl;
-<<<<<<< HEAD
-=======
     private Double averageRating;
     private Integer reviewCount;
->>>>>>> 5560bca (feat: implement academic requirements (Scheduler, JPQL, Keywords) and fix spatial map glitches)
 }
