@@ -1,0 +1,108 @@
+<div class="min-h-screen bg-[var(--color-neutral-50)] py-12">
+  <div class="container max-w-6xl mx-auto px-4">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Reservation Management</h1>
+        <p class="text-gray-500 mt-2">Review, approve, and manage all campsite bookings.</p>
+      </div>
+      <div class="flex gap-3">
+        <div class="relative">
+          <lucide-icon [img]="Search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></lucide-icon>
+          <input type="text" placeholder="Search by campsite or user..." (input)="onSearch($event)"
+            class="pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[var(--color-primary-500)] outline-none transition-all w-64">
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats & Filters -->
+    <div class="flex flex-wrap items-center gap-4 mb-8">
+      <button *ngFor="let tab of [
+          { id: 'all', label: 'All Bookings' },
+          { id: 'pending', label: 'Pending' },
+          { id: 'confirmed', label: 'Confirmed' },
+          { id: 'cancelled', label: 'Cancelled' }
+        ]" (click)="setFilter(tab.id)"
+        class="px-6 py-2 rounded-full text-sm font-semibold transition-all"
+        [class.bg-[var(--color-primary-600)]]="filter === tab.id"
+        [class.text-white]="filter === tab.id"
+        [class.bg-white]="filter !== tab.id"
+        [class.text-gray-600]="filter !== tab.id"
+        [class.shadow-md]="filter === tab.id">
+        {{ tab.label }}
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-20">
+      <div class="w-12 h-12 border-4 border-[var(--color-primary-500)] border-t-transparent rounded-full animate-spin mb-4"></div>
+      <p class="text-gray-500 font-medium">Fetching reservations...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && filteredReservations.length === 0" class="bg-white rounded-3xl p-16 text-center shadow-sm border border-gray-100">
+      <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+        <lucide-icon [img]="AlertCircle" class="w-10 h-10 text-gray-300"></lucide-icon>
+      </div>
+      <h3 class="text-xl font-bold text-gray-900 mb-2">No Reservations Found</h3>
+      <p class="text-gray-500 max-w-sm mx-auto">There are no bookings matching your current filter criteria.</p>
+    </div>
+
+    <!-- Reservations List -->
+    <div *ngIf="!isLoading && filteredReservations.length > 0" class="space-y-4">
+      <div *ngFor="let res of filteredReservations" class="group bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-xl hover:border-[var(--color-primary-100)] transition-all">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          
+          <!-- Booking Basic Info -->
+          <div class="flex items-start gap-5">
+            <div class="w-16 h-16 rounded-2xl bg-[var(--color-primary-50)] flex items-center justify-center shrink-0">
+              <lucide-icon [img]="MapPin" class="w-8 h-8 text-[var(--color-primary-600)]"></lucide-icon>
+            </div>
+            <div>
+              <div class="flex items-center gap-3 mb-1">
+                <h3 class="font-bold text-gray-900 text-lg">{{ getCampsiteName(res.targetId) }}</h3>
+                <app-badge [variant]="statusConfig[res.status].variant" [dot]="true">
+                  {{ statusConfig[res.status].label }}
+                </app-badge>
+              </div>
+              <p class="text-sm text-gray-500 flex items-center gap-1.5 mb-2">
+                <lucide-icon [img]="MapPin" class="w-3.5 h-3.5"></lucide-icon>
+                {{ getCampsiteLocation(res.targetId) }}
+              </p>
+              <div class="flex flex-wrap gap-4 text-xs font-medium text-gray-400">
+                <span class="flex items-center gap-1.5">
+                  <lucide-icon [img]="Calendar" class="w-3.5 h-3.5"></lucide-icon>
+                  {{ formatDate(res.startDate) }} - {{ formatDate(res.endDate) }}
+                </span>
+                <span class="flex items-center gap-1.5 text-[var(--color-primary-600)] bg-[var(--color-primary-50)] px-2 py-0.5 rounded-full">
+                  Camper: {{ getUserName(res) }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-3 lg:border-l lg:pl-8 border-gray-100">
+            <ng-container *ngIf="res.status === 'PENDING'">
+              <app-button variant="primary" size="sm" (click)="approveReservation(res.id!)" customClass="!rounded-xl shadow-lg shadow-[var(--color-primary-500)]/20">
+                <lucide-icon [img]="CheckCircle" class="w-4 h-4 mr-2"></lucide-icon>
+                Approve
+              </app-button>
+              <app-button variant="outline" size="sm" (click)="rejectReservation(res.id!)" customClass="!rounded-xl !text-red-600 !border-red-100 hover:!bg-red-50">
+                <lucide-icon [img]="X" class="w-4 h-4 mr-2"></lucide-icon>
+                Decline
+              </app-button>
+            </ng-container>
+            
+            <app-button *ngIf="res.status !== 'PENDING'" variant="outline" size="sm" customClass="!rounded-xl">
+              View Log
+              <lucide-icon [img]="ChevronRight" class="w-4 h-4 ml-2"></lucide-icon>
+            </app-button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

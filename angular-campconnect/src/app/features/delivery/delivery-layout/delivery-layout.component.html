@@ -1,0 +1,20 @@
+<div class="cc-delivery-root font-sans w-full h-screen flex overflow-hidden bg-[#F3F4F6] text-[#111827]">
+    <!-- Mobile Overlay -->
+    <div *ngIf="isSidebarOpen$ | async" class="overlay lg:hidden fixed inset-0 bg-black/50 z-40 block"
+        (click)="closeSidebar()">
+    </div>
+
+    <!-- Shared Sidebar -->
+    <app-delivery-sidebar></app-delivery-sidebar>
+
+    <!-- Main Content Area Wrapper -->
+    <div class="flex-1 w-full overflow-hidden flex flex-col cc-main">
+        <!-- Unified Header with actions -->
+        <app-delivery-header></app-delivery-header>
+
+        <!-- Child Route Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-8 w-full block">
+            <router-outlet></router-outlet>
+        </main>
+    </div>
+</div>

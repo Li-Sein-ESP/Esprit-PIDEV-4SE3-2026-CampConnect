@@ -1,0 +1,178 @@
+<div class="min-h-screen bg-[var(--color-background)] pb-12">
+  <!-- Back Navigation -->
+  <div class="border-b border-[var(--color-border-light)] bg-white">
+    <div class="container py-4">
+      <button (click)="navigate('/companions')"
+        class="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-primary-600)] transition-colors">
+        <lucide-icon [img]="ChevronLeftIcon" [size]="20"></lucide-icon>
+        Back to Companion Matching
+      </button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-[var(--color-primary-700)] to-[var(--color-primary-800)] text-white">
+    <div class="container py-8">
+      <div class="flex items-center gap-3 mb-2">
+        <lucide-icon [img]="SettingsIcon" [size]="32" class="text-white"></lucide-icon>
+        <h1 class="text-3xl font-bold text-white">Matching Preferences</h1>
+      </div>
+      <p class="text-[var(--color-primary-100)] text-lg">
+        Help us find the most compatible camping companions for you
+      </p>
+    </div>
+  </div>
+
+  <div class="container py-8">
+    <div class="max-w-4xl mx-auto">
+      <div class="space-y-8">
+        <!-- Experience Level -->
+        <app-card variant="elevated">
+          <app-card-header>
+            <app-card-title>Experience Level</app-card-title>
+            <app-card-description>
+              We'll match you with companions who have similar outdoor experience
+            </app-card-description>
+          </app-card-header>
+          <app-card-content>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <button *ngFor="let level of experienceLevels" (click)="setExperienceLevel(level.value)"
+                class="p-4 rounded-xl border-2 transition-all text-left w-full relative"
+                [ngClass]="experienceLevel === level.value ? 'border-[var(--color-primary-500)] bg-[var(--color-primary-50)]' : 'border-[var(--color-border-light)] hover:border-[var(--color-primary-300)]'">
+                <div class="flex items-start justify-between mb-2">
+                  <lucide-icon [img]="MountainIcon" [size]="24"
+                    [class]="experienceLevel === level.value ? 'text-[var(--color-primary-600)]' : 'text-[var(--color-text-tertiary)]'"></lucide-icon>
+                  <lucide-icon *ngIf="experienceLevel === level.value" [img]="CheckCircleIcon" [size]="20"
+                    class="text-[var(--color-primary-600)] absolute top-4 right-4"></lucide-icon>
+                </div>
+                <div class="font-medium mb-1 text-[var(--color-text-heading)]">{{ level.label }}</div>
+                <div class="text-xs text-[var(--color-text-tertiary)]">
+                  {{ level.description }}
+                </div>
+              </button>
+            </div>
+          </app-card-content>
+        </app-card>
+
+        <!-- Preferred Activities -->
+        <app-card variant="elevated">
+          <app-card-header>
+            <app-card-title>Preferred Activities</app-card-title>
+            <app-card-description>
+              Select all activities you enjoy - we'll find companions with shared interests
+            </app-card-description>
+          </app-card-header>
+          <app-card-content>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              <button *ngFor="let activity of activities" (click)="toggleActivity(activity)"
+                class="px-4 py-3 rounded-lg border-2 transition-all font-medium text-sm w-full flex items-center justify-center gap-2"
+                [ngClass]="selectedActivities.includes(activity) ? 'border-[var(--color-primary-500)] bg-[var(--color-primary-50)] text-[var(--color-primary-700)]' : 'border-[var(--color-border-light)] hover:border-[var(--color-primary-300)] text-[var(--color-text-secondary)]'">
+                <lucide-icon *ngIf="selectedActivities.includes(activity)" [img]="CheckCircleIcon"
+                  [size]="16"></lucide-icon>
+                {{ activity }}
+              </button>
+            </div>
+            <p class="text-sm text-[var(--color-text-tertiary)] mt-4">
+              {{ selectedActivities.length }} activities selected
+            </p>
+          </app-card-content>
+        </app-card>
+
+        <!-- Trip Style -->
+        <app-card variant="elevated">
+          <app-card-header>
+            <app-card-title>Trip Style Preference</app-card-title>
+            <app-card-description>
+              What kind of camping experience are you looking for?
+            </app-card-description>
+          </app-card-header>
+          <app-card-content>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <button *ngFor="let style of tripStyles" (click)="setTripStyle(style.value)"
+                class="p-5 rounded-xl border-2 transition-all text-left w-full relative"
+                [ngClass]="tripStyle === style.value ? 'border-[var(--color-primary-500)] bg-[var(--color-primary-50)]' : 'border-[var(--color-border-light)] hover:border-[var(--color-primary-300)]'">
+                <div class="flex items-start justify-between mb-3">
+                  <span class="text-3xl">{{ style.icon }}</span>
+                  <lucide-icon *ngIf="tripStyle === style.value" [img]="CheckCircleIcon" [size]="20"
+                    class="text-[var(--color-primary-600)] absolute top-5 right-5"></lucide-icon>
+                </div>
+                <div class="font-medium mb-2 text-[var(--color-text-heading)]">{{ style.label }}</div>
+                <div class="text-sm text-[var(--color-text-secondary)]">
+                  {{ style.description }}
+                </div>
+              </button>
+            </div>
+          </app-card-content>
+        </app-card>
+
+        <!-- Group Size -->
+        <app-card variant="elevated">
+          <app-card-header>
+            <app-card-title>Preferred Group Size</app-card-title>
+            <app-card-description>
+              How many people would you ideally camp with?
+            </app-card-description>
+          </app-card-header>
+          <app-card-content>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <button *ngFor="let size of groupSizes" (click)="setGroupSize(size.value)"
+                class="p-4 rounded-xl border-2 transition-all text-center w-full"
+                [ngClass]="groupSize === size.value ? 'border-[var(--color-primary-500)] bg-[var(--color-primary-50)]' : 'border-[var(--color-border-light)] hover:border-[var(--color-primary-300)]'">
+                <span class="text-3xl block mb-2">{{ size.icon }}</span>
+                <div class="font-medium mb-1 text-[var(--color-text-heading)]">{{ size.label }}</div>
+                <div class="text-xs text-[var(--color-text-tertiary)]">
+                  {{ size.description }}
+                </div>
+                <lucide-icon *ngIf="groupSize === size.value" [img]="CheckCircleIcon" [size]="20"
+                  class="text-[var(--color-primary-600)] mx-auto mt-2"></lucide-icon>
+              </button>
+            </div>
+          </app-card-content>
+        </app-card>
+
+        <!-- Availability -->
+        <app-card variant="elevated">
+          <app-card-header>
+            <app-card-title>Availability Window</app-card-title>
+            <app-card-description>
+              When are you generally available for camping trips?
+            </app-card-description>
+          </app-card-header>
+          <app-card-content>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium mb-2 text-[var(--color-text-heading)]">Available From</label>
+                <div class="relative">
+                  <lucide-icon [img]="CalendarIcon" [size]="20"
+                    class="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]"></lucide-icon>
+                  <input type="date" [(ngModel)]="availabilityStart"
+                    class="w-full pl-11 pr-4 py-3 rounded-lg bg-white border-2 border-[var(--color-border-light)] focus:outline-none focus:border-[var(--color-primary-500)] focus:ring-2 focus:ring-[var(--color-primary-100)]" />
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-2 text-[var(--color-text-heading)]">Available Until</label>
+                <div class="relative">
+                  <lucide-icon [img]="CalendarIcon" [size]="20"
+                    class="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]"></lucide-icon>
+                  <input type="date" [(ngModel)]="availabilityEnd"
+                    class="w-full pl-11 pr-4 py-3 rounded-lg bg-white border-2 border-[var(--color-border-light)] focus:outline-none focus:border-[var(--color-primary-500)] focus:ring-2 focus:ring-[var(--color-primary-100)]" />
+                </div>
+              </div>
+            </div>
+          </app-card-content>
+        </app-card>
+
+        <!-- Actions -->
+        <div class="flex gap-4">
+          <app-button (click)="handleSave()" size="lg" customClass="flex-1 flex justify-center items-center gap-2">
+            <lucide-icon [img]="SparklesIcon" [size]="20"></lucide-icon>
+            Save & Find Matches
+          </app-button>
+          <app-button variant="outline" size="lg" (click)="navigate('/companions')">
+            Cancel
+          </app-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

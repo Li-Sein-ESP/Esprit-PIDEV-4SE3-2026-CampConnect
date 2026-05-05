@@ -1,0 +1,73 @@
+<div class="planning-container animate-fade-in">
+
+    <!-- Planning Header -->
+    <div class="planning-header">
+        <div class="header-title">
+            <h2>Group Tasks</h2>
+            <p>Plan your activities together.</p>
+        </div>
+        
+        <button *ngIf="!showNewTaskForm" (click)="showNewTaskForm = true" class="btn-add-task">
+            <lucide-icon [img]="Plus" size="18"></lucide-icon>
+            Add Task
+        </button>
+    </div>
+
+    <!-- New Objective Form -->
+    <div *ngIf="showNewTaskForm" class="new-task-form animate-fade-in">
+        <input type="text" [(ngModel)]="newTaskTitle" 
+               placeholder="What needs to be done?"
+               (keydown.enter)="addTask()" autofocus>
+        <div class="flex justify-end gap-4">
+            <button (click)="showNewTaskForm = false" class="text-sm font-bold text-gray-400 hover:text-red-500 transition">Cancel</button>
+            <button (click)="addTask()" [disabled]="!newTaskTitle.trim()" 
+                    class="px-8 py-3 bg-[var(--forest-600)] text-white rounded-xl font-bold disabled:opacity-50 transition shadow-lg">Save Task</button>
+        </div>
+    </div>
+
+    <!-- Itinerary Content -->
+    <div class="itinerary-grid">
+        
+        <!-- Active Objectives -->
+        <div class="itinerary-section">
+            <div class="section-label">Pending Tasks</div>
+            
+            <div *ngIf="pendingTasks.length === 0" class="p-10 border-2 border-dashed border-gray-100 rounded-[2.5rem] text-center">
+                <p class="text-sm text-gray-400 font-bold uppercase tracking-widest">No pending tasks. 🏕️</p>
+            </div>
+
+            <div *ngFor="let task of pendingTasks" class="task-card" (click)="toggleTask(task)">
+                <div class="check-container">
+                    <lucide-icon [img]="Check" size="18"></lucide-icon>
+                </div>
+                <div class="task-title">{{task.title}}</div>
+                <button (click)="deleteTask(task); $event.stopPropagation()" class="btn-delete p-2">
+                    <lucide-icon [img]="Trash2" size="18"></lucide-icon>
+                </button>
+            </div>
+        </div>
+
+        <!-- Cleared Objectives -->
+        <div class="itinerary-section" *ngIf="completedTasks.length > 0">
+            <div class="section-label">Completed Tasks</div>
+            
+            <div *ngFor="let task of completedTasks" class="task-card completed" (click)="toggleTask(task)">
+                <div class="check-container">
+                    <lucide-icon [img]="Check" size="18"></lucide-icon>
+                </div>
+                <div class="task-title">{{task.title}}</div>
+                <button (click)="deleteTask(task); $event.stopPropagation()" class="btn-delete p-2">
+                    <lucide-icon [img]="Trash2" size="18"></lucide-icon>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loadingTasks && pendingTasks.length === 0 && completedTasks.length === 0" class="flex flex-col items-center justify-center py-20">
+        <div class="w-10 h-10 border-2 border-forest-600/20 border-t-forest-600 rounded-full animate-spin"></div>
+        <p class="mt-4 text-[10px] font-bold text-forest-600/40 uppercase tracking-widest">Loading tasks...</p>
+    </div>
+
+</div>

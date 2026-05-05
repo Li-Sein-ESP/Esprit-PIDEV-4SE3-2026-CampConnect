@@ -1,0 +1,318 @@
+<div class="campconnect-forum">
+
+    <!-- ====== Hero Section ====== -->
+    <section class="cc-hero">
+        <div class="cc-hero__inner">
+            <div class="cc-hero__content">
+                <div class="cc-hero__eyebrow">
+                    <span class="cc-hero__eyebrow-dot"></span>
+                    2,847 Campers Online
+                </div>
+                <h1 class="cc-hero__title">Community Forum</h1>
+                <p class="cc-hero__subtitle">Ask, share, and learn from fellow campers. A space where outdoor wisdom
+                    flows freely.</p>
+
+                <div class="cc-hero__actions">
+                    <button *ngIf="authService.isAuthenticated() | async" class="cc-btn cc-btn--hero"
+                        (click)="navigateToCreate()">
+                        ✍️ Start a Topic
+                    </button>
+                    <button class="cc-btn cc-btn--hero-ghost">
+                        📖 Forum Guidelines
+                    </button>
+                </div>
+
+                <div class="cc-hero__stats">
+                    <div class="cc-hero__stat">
+                        <span class="cc-hero__stat-value">12.4k</span>
+                        <span class="cc-hero__stat-label">Topics</span>
+                    </div>
+                    <span class="cc-hero__stat-divider"></span>
+                    <div class="cc-hero__stat">
+                        <span class="cc-hero__stat-value">89.2k</span>
+                        <span class="cc-hero__stat-label">Replies</span>
+                    </div>
+                    <span class="cc-hero__stat-divider"></span>
+                    <div class="cc-hero__stat">
+                        <span class="cc-hero__stat-value">34.1k</span>
+                        <span class="cc-hero__stat-label">Members</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cc-hero__decoration" aria-hidden="true">🏔️</div>
+        </div>
+    </section>
+
+    <!-- ====== Main Content ====== -->
+    <main class="cc-page" role="main">
+        <div class="cc-page-grid">
+
+            <!-- ====== LEFT COLUMN ====== -->
+            <div class="cc-main-column">
+
+                <!-- ===== Categories Section ===== -->
+                <section class="cc-section" aria-labelledby="categoriesTitle">
+                    <div class="cc-section__header">
+                        <div class="cc-section__header-left">
+                            <div class="cc-section__icon cc-section__icon--green">📂</div>
+                            <div>
+                                <h2 class="cc-section__title" id="categoriesTitle">Discussion Categories</h2>
+                                <p class="cc-section__subtitle">Find the right place for your conversation</p>
+                            </div>
+                        </div>
+                        <div class="cc-section__header-right">
+                            <div class="cc-filters">
+                                <button class="cc-filter-pill"
+                                    [class.cc-filter-pill--active]="activeCategoryFilter === 'all'"
+                                    (click)="setActiveCategoryFilter('all')">All</button>
+                                <button class="cc-filter-pill"
+                                    [class.cc-filter-pill--active]="activeCategoryFilter === 'popular'"
+                                    (click)="setActiveCategoryFilter('popular')">Popular</button>
+                                <button class="cc-filter-pill"
+                                    [class.cc-filter-pill--active]="activeCategoryFilter === 'recent'"
+                                    (click)="setActiveCategoryFilter('recent')">Recent</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cc-categories-grid">
+                        <div *ngFor="let cat of categories; let i = index" class="cc-category-card cc-stagger"
+                            [class]="'cc-category-card ' + cat.colorClass + ' cc-stagger cc-stagger-' + (i + 1)"
+                            (click)="navigateToCategory(cat.id)" role="button"
+                            [attr.aria-label]="'Browse ' + cat.name + ' category'">
+
+                            <div class="cc-category-card__icon">{{ cat.icon }}</div>
+
+                            <div class="cc-category-card__body">
+                                <h3 class="cc-category-card__name">{{ cat.name }}</h3>
+                                <p class="cc-category-card__desc">{{ cat.description }}</p>
+                                <div class="cc-category-card__stats">
+                                    <span class="cc-category-card__stat">
+                                        <span class="cc-category-card__stat-icon">💬</span>
+                                        <span class="cc-category-card__stat-value">{{ formatTopicsCount(cat.topicsCount)
+                                            }}</span> topics
+                                    </span>
+                                    <span class="cc-category-card__stat">
+                                        <span class="cc-category-card__stat-icon">👥</span>
+                                        <span class="cc-category-card__stat-value">{{ cat.membersCount }}</span> members
+                                    </span>
+                                </div>
+                                <div class="cc-category-card__activity">
+                                    <div class="cc-category-card__activity-avatar">
+                                        <img [src]="'https://api.dicebear.com/9.x/adventurer/svg?seed=' + cat.avatarSeed + '&backgroundColor=' + cat.avatarBg"
+                                            [alt]="cat.lastUser" loading="lazy">
+                                    </div>
+                                    <span class="cc-category-card__activity-text">
+                                        <strong>{{ cat.lastUser }}</strong> posted {{ cat.lastActive }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <span class="cc-category-card__arrow">→</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ===== Recent Discussions ===== -->
+                <section class="cc-section" aria-labelledby="discussionsTitle">
+                    <div class="cc-section__header">
+                        <div class="cc-section__header-left">
+                            <div class="cc-section__icon cc-section__icon--amber">🔥</div>
+                            <div>
+                                <h2 class="cc-section__title" id="discussionsTitle">Recent Discussions</h2>
+                                <p class="cc-section__subtitle">What the community is talking about right now</p>
+                            </div>
+                        </div>
+                        <div class="cc-section__header-right">
+                            <div class="cc-search">
+                                <span class="cc-search__icon">🔍</span>
+                                <input type="text" class="cc-search__input" placeholder="Search discussions..."
+                                    [(ngModel)]="searchQuery" aria-label="Search discussions">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cc-discussions">
+                        <div class="cc-discussions__header">
+                            <span class="cc-discussions__header-label">📌 Topic</span>
+                            <div class="cc-filters">
+                                <button class="cc-filter-pill"
+                                    [class.cc-filter-pill--active]="activeSortFilter === 'latest'"
+                                    (click)="setActiveSortFilter('latest')">Latest</button>
+                                <button class="cc-filter-pill"
+                                    [class.cc-filter-pill--active]="activeSortFilter === 'popular'"
+                                    (click)="setActiveSortFilter('popular')">Most Replied</button>
+                                <button class="cc-filter-pill"
+                                    [class.cc-filter-pill--active]="activeSortFilter === 'unanswered'"
+                                    (click)="setActiveSortFilter('unanswered')">Unanswered</button>
+                            </div>
+                        </div>
+
+                        <ul class="cc-discussions__list">
+                            <li *ngFor="let topic of filteredTopics">
+                                <button class="cc-discussion-row" (click)="navigateToTopic(topic.id)"
+                                    [attr.aria-label]="topic.title">
+
+                                    <!-- Avatar -->
+                                    <div class="cc-discussion-row__avatar"
+                                        [class.cc-discussion-row__avatar--placeholder]="!topic.avatarSeed">
+                                        <img *ngIf="topic.avatarSeed"
+                                            [src]="'https://api.dicebear.com/9.x/adventurer/svg?seed=' + topic.avatarSeed + '&backgroundColor=' + topic.avatarBg"
+                                            [alt]="topic.author" loading="lazy">
+                                        <span *ngIf="!topic.avatarSeed">{{ topic.authorInitials }}</span>
+                                    </div>
+
+                                    <!-- Body -->
+                                    <div class="cc-discussion-row__body">
+                                        <div class="cc-discussion-row__title-line">
+                                            <span class="cc-discussion-row__title">{{ topic.title }}</span>
+                                            <span *ngIf="topic.isPinned" class="cc-discussion-row__pinned">📌
+                                                Pinned</span>
+                                            <span *ngIf="topic.isHot" class="cc-discussion-row__hot">🔥 Hot</span>
+                                        </div>
+                                        <div class="cc-discussion-row__meta">
+                                            <span class="cc-discussion-row__author">{{ topic.author }}</span>
+                                            <!-- TrustScore integration -->
+                                            <app-trust-score [score]="topic?.trustScore ?? 0" variant="small">
+                                            </app-trust-score>
+                                            <span>·</span>
+                                            <span class="cc-discussion-row__category-tag">{{ topic.categoryTag }}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Right side -->
+                                    <div class="cc-discussion-row__right">
+                                        <span class="cc-discussion-row__replies">
+                                            <span class="cc-discussion-row__replies-icon">💬</span>
+                                            {{ topic.replies }}
+                                        </span>
+                                        <span class="cc-discussion-row__time">{{ topic.lastReplyDate }}</span>
+                                    </div>
+
+                                </button>
+                            </li>
+
+                            <!-- Empty search state -->
+                            <li *ngIf="filteredTopics.length === 0"
+                                style="padding: 32px 28px; text-align: center; color: #9a9490; font-size: 14px;">
+                                No discussions match "{{ searchQuery }}"
+                            </li>
+                        </ul>
+
+                        <div class="cc-load-more">
+                            <button *ngIf="authService.isAuthenticated() | async" class="cc-btn cc-btn--primary"
+                                (click)="navigateToCreate()">
+                                ✍️ Start a New Discussion
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+            </div><!-- /.cc-main-column -->
+
+            <!-- ====== SIDEBAR ====== -->
+            <aside class="cc-sidebar" aria-label="Forum sidebar">
+
+                <!-- Forum Guidelines -->
+                <div class="cc-sidebar-card">
+                    <div class="cc-sidebar-card__header">📜 Community Guidelines</div>
+                    <div class="cc-sidebar-card__body">
+                        <div class="cc-guideline">
+                            <span class="cc-guideline__icon">🤝</span>
+                            <span class="cc-guideline__text">Be respectful and supportive of all experience
+                                levels</span>
+                        </div>
+                        <div class="cc-guideline">
+                            <span class="cc-guideline__icon">🔍</span>
+                            <span class="cc-guideline__text">Search before posting — your question may already be
+                                answered</span>
+                        </div>
+                        <div class="cc-guideline">
+                            <span class="cc-guideline__icon">📸</span>
+                            <span class="cc-guideline__text">Share photos and specific details when asking for
+                                help</span>
+                        </div>
+                        <div class="cc-guideline">
+                            <span class="cc-guideline__icon">🌿</span>
+                            <span class="cc-guideline__text">Promote Leave No Trace principles in all discussions</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Members -->
+                <div class="cc-sidebar-card">
+                    <div class="cc-sidebar-card__header">🟢 Active Members</div>
+                    <div class="cc-sidebar-card__body">
+                        <div class="cc-active-users">
+                            <div class="cc-active-user">
+                                <div class="cc-active-user__avatar">
+                                    <img src="https://api.dicebear.com/9.x/adventurer/svg?seed=mod1&backgroundColor=c0aede"
+                                        alt="TrailMaster_Jo" loading="lazy">
+                                </div>
+                                <div class="cc-active-user__info">
+                                    <span class="cc-active-user__name">TrailMaster_Jo</span>
+                                    <span class="cc-active-user__role">Moderator · 1.2k posts</span>
+                                </div>
+                            </div>
+                            <div class="cc-active-user">
+                                <div class="cc-active-user__avatar">
+                                    <img src="https://api.dicebear.com/9.x/adventurer/svg?seed=mod2&backgroundColor=ffd5dc"
+                                        alt="PineNeedlePete" loading="lazy">
+                                </div>
+                                <div class="cc-active-user__info">
+                                    <span class="cc-active-user__name">PineNeedlePete</span>
+                                    <span class="cc-active-user__role">Expert · 847 posts</span>
+                                </div>
+                            </div>
+                            <div class="cc-active-user">
+                                <div class="cc-active-user__avatar">
+                                    <img src="https://api.dicebear.com/9.x/adventurer/svg?seed=mod3&backgroundColor=d5f0c1"
+                                        alt="CampfireClara" loading="lazy">
+                                </div>
+                                <div class="cc-active-user__info">
+                                    <span class="cc-active-user__name">CampfireClara</span>
+                                    <span class="cc-active-user__role">Regular · 312 posts</span>
+                                </div>
+                            </div>
+                            <div class="cc-active-user">
+                                <div class="cc-active-user__avatar">
+                                    <img src="https://api.dicebear.com/9.x/adventurer/svg?seed=mod4&backgroundColor=ffdfbf"
+                                        alt="SummitSeeker" loading="lazy">
+                                </div>
+                                <div class="cc-active-user__info">
+                                    <span class="cc-active-user__name">SummitSeeker</span>
+                                    <span class="cc-active-user__role">Regular · 189 posts</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Popular Tags -->
+                <div class="cc-sidebar-card">
+                    <div class="cc-sidebar-card__header">🏷️ Trending Tags</div>
+                    <div class="cc-sidebar-card__body">
+                        <div class="cc-popular-tags">
+                            <span class="cc-popular-tag">#hammockcamping</span>
+                            <span class="cc-popular-tag">#overlanding</span>
+                            <span class="cc-popular-tag">#ultralight</span>
+                            <span class="cc-popular-tag">#wintercamping</span>
+                            <span class="cc-popular-tag">#vanlife</span>
+                            <span class="cc-popular-tag">#trailcooking</span>
+                            <span class="cc-popular-tag">#NationalParks</span>
+                            <span class="cc-popular-tag">#wildcamping</span>
+                            <span class="cc-popular-tag">#solotrip</span>
+                            <span class="cc-popular-tag">#campfire</span>
+                            <span class="cc-popular-tag">#stargazing</span>
+                            <span class="cc-popular-tag">#dogcamping</span>
+                        </div>
+                    </div>
+                </div>
+
+            </aside>
+
+        </div>
+    </main>
+
+</div>

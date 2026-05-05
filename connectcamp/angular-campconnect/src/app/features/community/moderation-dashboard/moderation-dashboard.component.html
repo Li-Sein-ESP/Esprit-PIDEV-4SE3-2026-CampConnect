@@ -1,0 +1,278 @@
+<div class="min-h-screen bg-[var(--color-background)] pb-12">
+  <!-- Header -->
+  <div class="bg-gradient-to-br from-red-600 to-red-800 text-white">
+    <div class="container py-12">
+      <div class="flex items-center gap-3 mb-4">
+        <lucide-icon [img]="ShieldIcon" [size]="32"></lucide-icon>
+        <h1 class="text-3xl font-bold text-white">Moderation Dashboard</h1>
+      </div>
+      <p class="text-xl text-white/90">
+        Review reported content and maintain community standards
+      </p>
+    </div>
+  </div>
+
+  <div class="container py-12">
+    <!-- Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <app-card variant="bordered">
+        <app-card-content customClass="text-center py-6">
+          <lucide-icon [img]="AlertTriangleIcon" [size]="32" class="text-amber-600 mx-auto mb-3"></lucide-icon>
+          <div class="text-3xl font-bold text-amber-600 mb-1">{{ stats.pending }}</div>
+          <div class="text-sm text-[var(--color-text-secondary)]">Pending</div>
+        </app-card-content>
+      </app-card>
+      <app-card variant="bordered">
+        <app-card-content customClass="text-center py-6">
+          <lucide-icon [img]="EyeIcon" [size]="32" class="text-blue-600 mx-auto mb-3"></lucide-icon>
+          <div class="text-3xl font-bold text-blue-600 mb-1">{{ stats.reviewing }}</div>
+          <div class="text-sm text-[var(--color-text-secondary)]">Reviewing</div>
+        </app-card-content>
+      </app-card>
+      <app-card variant="bordered">
+        <app-card-content customClass="text-center py-6">
+          <lucide-icon [img]="CheckCircleIcon" [size]="32" class="text-green-600 mx-auto mb-3"></lucide-icon>
+          <div class="text-3xl font-bold text-green-600 mb-1">{{ stats.resolved }}</div>
+          <div class="text-sm text-[var(--color-text-secondary)]">Resolved</div>
+        </app-card-content>
+      </app-card>
+      <app-card variant="bordered">
+        <app-card-content customClass="text-center py-6">
+          <lucide-icon [img]="TrendingUpIcon" [size]="32"
+            class="text-[var(--color-primary-600)] mx-auto mb-3"></lucide-icon>
+          <div class="text-3xl font-bold text-[var(--color-primary-600)] mb-1">
+            {{ stats.totalToday }}
+          </div>
+          <div class="text-sm text-[var(--color-text-secondary)]">Today</div>
+        </app-card-content>
+      </app-card>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Reports List -->
+      <div class="lg:col-span-2">
+        <div class="mb-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold text-[var(--color-text-heading)]">Report Queue</h2>
+          </div>
+
+          <div class="flex gap-2 flex-wrap">
+            <button (click)="filter = 'all'" class="px-4 py-2 rounded-lg font-medium transition-all"
+              [class.bg-[var(--color-primary-600)]]="filter === 'all'" [class.text-white]="filter === 'all'"
+              [class.bg-[var(--color-neutral-100)]]="filter !== 'all'"
+              [class.text-[var(--color-text-secondary)]]="filter !== 'all'"
+              [class.hover:bg-[var(--color-neutral-200)]]="filter !== 'all'">
+              All
+            </button>
+            <button (click)="filter = 'pending'" class="px-4 py-2 rounded-lg font-medium transition-all"
+              [class.bg-[var(--color-primary-600)]]="filter === 'pending'" [class.text-white]="filter === 'pending'"
+              [class.bg-[var(--color-neutral-100)]]="filter !== 'pending'"
+              [class.text-[var(--color-text-secondary)]]="filter !== 'pending'"
+              [class.hover:bg-[var(--color-neutral-200)]]="filter !== 'pending'">
+              Pending ({{ stats.pending }})
+            </button>
+            <button (click)="filter = 'reviewing'" class="px-4 py-2 rounded-lg font-medium transition-all"
+              [class.bg-[var(--color-primary-600)]]="filter === 'reviewing'" [class.text-white]="filter === 'reviewing'"
+              [class.bg-[var(--color-neutral-100)]]="filter !== 'reviewing'"
+              [class.text-[var(--color-text-secondary)]]="filter !== 'reviewing'"
+              [class.hover:bg-[var(--color-neutral-200)]]="filter !== 'reviewing'">
+              Reviewing ({{ stats.reviewing }})
+            </button>
+            <button (click)="filter = 'resolved'" class="px-4 py-2 rounded-lg font-medium transition-all"
+              [class.bg-[var(--color-primary-600)]]="filter === 'resolved'" [class.text-white]="filter === 'resolved'"
+              [class.bg-[var(--color-neutral-100)]]="filter !== 'resolved'"
+              [class.text-[var(--color-text-secondary)]]="filter !== 'resolved'"
+              [class.hover:bg-[var(--color-neutral-200)]]="filter !== 'resolved'">
+              Resolved
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <app-card *ngFor="let report of filteredReports" variant="elevated"
+            [customClass]="'cursor-pointer hover:shadow-lg transition-all ' + (selectedReport?.id === report.id ? 'ring-2 ring-[var(--color-primary-600)]' : '')"
+            (click)="handleStartReview(report)">
+            <app-card-content customClass="p-6">
+              <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center flex-shrink-0">
+                    <lucide-icon [img]="FlagIcon" [size]="20" class="text-red-600"></lucide-icon>
+                  </div>
+                  <div>
+                    <h6 class="mb-1 font-semibold text-[var(--color-text-heading)]">{{ report.reason }}</h6>
+                    <div class="flex items-center gap-2 text-sm text-[var(--color-text-tertiary)]">
+                      <app-badge variant="default" size="sm"
+                        [customClass]="report.type === 'post' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'">
+                        {{ report.type }}
+                      </app-badge>
+                      <span>•</span>
+                      <span>{{ report.reportCount }} {{ report.reportCount === 1 ? 'report' : 'reports' }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <app-badge variant="default"
+                  [customClass]="getStatusConfig(report.status).color + ' border-2 flex items-center gap-1'">
+                  <lucide-icon [img]="getStatusConfig(report.status).icon" [size]="12"></lucide-icon>
+                  {{ getStatusConfig(report.status).label }}
+                </app-badge>
+              </div>
+
+              <div class="bg-[var(--color-neutral-50)] rounded-lg p-4 mb-3">
+                <div class="flex items-center gap-2 mb-2">
+                  <lucide-icon [img]="UserIcon" [size]="16" class="text-[var(--color-text-tertiary)]"></lucide-icon>
+                  <span class="text-sm font-medium text-[var(--color-text-primary)]">{{ report.content.author }}</span>
+                </div>
+                <div *ngIf="report.content.threadTitle" class="text-sm text-[var(--color-text-secondary)] mb-2">
+                  In: {{ report.content.threadTitle }}
+                </div>
+                <p class="text-sm text-[var(--color-text-secondary)] line-clamp-2">
+                  {{ report.content.text }}
+                </p>
+              </div>
+
+              <div class="flex items-center justify-between text-sm">
+                <div class="flex items-center gap-2">
+                  <img [src]="report.reportedBy.avatar" [alt]="report.reportedBy.name"
+                    class="w-6 h-6 rounded-full object-cover" />
+                  <span class="text-[var(--color-text-tertiary)]">
+                    Reported by {{ report.reportedBy.name }}
+                  </span>
+                </div>
+                <span class="text-[var(--color-text-tertiary)]">{{ report.reportedAt }}</span>
+              </div>
+            </app-card-content>
+          </app-card>
+
+          <app-card *ngIf="filteredReports.length === 0" variant="elevated" customClass="text-center py-12">
+            <div class="max-w-md mx-auto">
+              <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <lucide-icon [img]="CheckCircleIcon" [size]="32" class="text-green-600"></lucide-icon>
+              </div>
+              <h3 class="mb-2 text-xl font-semibold text-[var(--color-text-heading)]">All Clear!</h3>
+              <p class="text-[var(--color-text-secondary)]">
+                No {{ filter === 'all' ? '' : filter }} reports to review
+              </p>
+            </div>
+          </app-card>
+        </div>
+      </div>
+
+      <!-- Moderation Actions -->
+      <div class="lg:col-span-1">
+        <div class="sticky top-24">
+          <app-card *ngIf="selectedReport; else placeholder" variant="elevated">
+            <app-card-header>
+              <app-card-title>Moderation Actions</app-card-title>
+              <app-card-description>Review and take action on this report</app-card-description>
+            </app-card-header>
+            <app-card-content>
+              <div class="space-y-4 mb-6">
+                <div>
+                  <label class="block text-sm font-medium mb-2 text-[var(--color-text-primary)]">Report Details</label>
+                  <div class="bg-[var(--color-neutral-50)] rounded-lg p-3 space-y-2 text-sm">
+                    <div class="flex justify-between">
+                      <span class="text-[var(--color-text-tertiary)]">Type</span>
+                      <span class="font-medium capitalize text-[var(--color-text-primary)]">{{ selectedReport.type
+                        }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-[var(--color-text-tertiary)]">Reports</span>
+                      <span class="font-medium text-[var(--color-text-primary)]">{{ selectedReport.reportCount }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-[var(--color-text-tertiary)]">Reason</span>
+                      <span class="font-medium text-right text-[var(--color-text-primary)]">{{ selectedReport.reason
+                        }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium mb-2 text-[var(--color-text-primary)]">Content Preview</label>
+                  <div class="bg-[var(--color-neutral-50)] rounded-lg p-3">
+                    <p class="text-sm text-[var(--color-text-secondary)] mb-2">
+                      By: <span class="font-medium text-[var(--color-text-primary)]">{{ selectedReport.content.author
+                        }}</span>
+                    </p>
+                    <p class="text-sm text-[var(--color-text-secondary)]">
+                      {{ selectedReport.content.text }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <app-button [fullWidth]="true" variant="default"
+                  customClass="bg-amber-600 hover:bg-amber-700 text-white flex justify-center items-center gap-2"
+                  (click)="handleAction(selectedReport.id, 'hide')">
+                  <lucide-icon [img]="EyeOffIcon" [size]="16"></lucide-icon>
+                  Hide Content
+                </app-button>
+                <app-button [fullWidth]="true" variant="default"
+                  customClass="bg-red-600 hover:bg-red-700 text-white flex justify-center items-center gap-2"
+                  (click)="handleAction(selectedReport.id, 'delete')">
+                  <lucide-icon [img]="Trash2Icon" [size]="16"></lucide-icon>
+                  Delete Content
+                </app-button>
+                <app-button [fullWidth]="true" variant="default"
+                  customClass="bg-orange-600 hover:bg-orange-700 text-white flex justify-center items-center gap-2"
+                  (click)="handleAction(selectedReport.id, 'warn')">
+                  <lucide-icon [img]="BanIcon" [size]="16"></lucide-icon>
+                  Warn User
+                </app-button>
+                <app-button [fullWidth]="true" variant="outline" customClass="flex justify-center items-center gap-2"
+                  (click)="handleAction(selectedReport.id, 'dismiss')">
+                  <lucide-icon [img]="XIcon" [size]="16"></lucide-icon>
+                  Dismiss Report
+                </app-button>
+              </div>
+
+              <div class="mt-6 pt-6 border-t border-[var(--color-border-light)]">
+                <app-button [fullWidth]="true" variant="outline" customClass="flex justify-center items-center gap-2"
+                  (click)="navigate('/community/thread/' + selectedReport.content.id)">
+                  <lucide-icon [img]="EyeIcon" [size]="16"></lucide-icon>
+                  View Full Thread
+                </app-button>
+              </div>
+            </app-card-content>
+          </app-card>
+
+          <ng-template #placeholder>
+            <app-card variant="bordered" customClass="bg-[var(--color-secondary-50)]">
+              <app-card-content customClass="p-6 text-center">
+                <lucide-icon [img]="ShieldIcon" [size]="48"
+                  class="text-[var(--color-text-tertiary)] mx-auto mb-3"></lucide-icon>
+                <h6 class="mb-2 font-semibold text-[var(--color-text-heading)]">Select a Report</h6>
+                <p class="text-sm text-[var(--color-text-secondary)]">
+                  Click on a report from the list to review and take action
+                </p>
+              </app-card-content>
+            </app-card>
+          </ng-template>
+
+          <!-- Quick Stats -->
+          <app-card variant="bordered" customClass="mt-6 bg-blue-50 border-blue-200">
+            <app-card-content customClass="p-4">
+              <h6 class="mb-3 font-semibold text-blue-900">Moderation Stats</h6>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between text-blue-700">
+                  <span>Actions Today</span>
+                  <span class="font-medium">23</span>
+                </div>
+                <div class="flex justify-between text-blue-700">
+                  <span>Avg Response Time</span>
+                  <span class="font-medium">18 min</span>
+                </div>
+                <div class="flex justify-between text-blue-700">
+                  <span>Active Moderators</span>
+                  <span class="font-medium">5</span>
+                </div>
+              </div>
+            </app-card-content>
+          </app-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

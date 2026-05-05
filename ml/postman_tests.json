@@ -1,0 +1,116 @@
+{
+  "info": {
+    "name": "CampConnect Forecast ML Service",
+    "description": "Postman Collection for the ML Demand Forecast Service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Health check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/health",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5000",
+          "path": [
+            "health"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2. Flask forecast single campsite",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"campsites\": [{\n    \"id\": \"test001\", \"name\": \"Camp Tabarka Nature\",\n    \"region\": \"Tabarka\", \"capacity\": 40,\n    \"price_per_night\": 75.0, \"activity\": \"Randonnée\",\n    \"customer_type\": \"Famille\", \"rating\": 4.5\n  }],\n  \"target_month\": 7\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/forecast",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5000",
+          "path": [
+            "forecast"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3. Flask forecast multiple campsites",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"campsites\": [\n    {\n      \"id\": \"test001\",\n      \"name\": \"Camp Tabarka Nature\",\n      \"region\": \"Tabarka\",\n      \"capacity\": 40,\n      \"price_per_night\": 75.0,\n      \"activity\": \"Randonnée\",\n      \"customer_type\": \"Famille\",\n      \"rating\": 4.5\n    },\n    {\n      \"id\": \"test002\",\n      \"name\": \"Bizerte Coastal Camp\",\n      \"region\": \"Bizerte\",\n      \"capacity\": 60,\n      \"price_per_night\": 85.0,\n      \"activity\": \"Natation\",\n      \"customer_type\": \"Groupe d'amis\",\n      \"rating\": 4.2\n    },\n    {\n      \"id\": \"test003\",\n      \"name\": \"Ain Draham Winter Retreat\",\n      \"region\": \"Ain Draham\",\n      \"capacity\": 20,\n      \"price_per_night\": 95.0,\n      \"activity\": \"Photographie\",\n      \"customer_type\": \"Couple\",\n      \"rating\": 4.8\n    }\n  ],\n  \"target_month\": 7\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/forecast",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "5000",
+          "path": [
+            "forecast"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "4. Spring Boot forecast",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer <YOUR_JWT_TOKEN>"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8090/api/ml/demand-forecast?month=7",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8090",
+          "path": [
+            "api",
+            "ml",
+            "demand-forecast"
+          ],
+          "query": [
+            {
+              "key": "month",
+              "value": "7"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

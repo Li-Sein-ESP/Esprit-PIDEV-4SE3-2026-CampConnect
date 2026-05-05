@@ -1,0 +1,76 @@
+<!-- ========== FOOTER ========== -->
+<footer class="cc-footer">
+    <div class="cc-container">
+        <div class="cc-footer__grid">
+            <div class="cc-footer__brand">
+                <a routerLink="/" (click)="scrollToTop()" class="cc-navbar__logo">
+                    <svg class="cc-navbar__logo-icon" viewBox="0 0 32 32" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 2L3 28h26L16 2z" stroke="currentColor" stroke-width="2" fill="none" />
+                        <path d="M10 28l6-10 6 10" stroke="currentColor" stroke-width="2" fill="none" />
+                        <circle cx="16" cy="12" r="2" fill="currentColor" />
+                    </svg>
+                    <span>CampConnect V2</span>
+                </a>
+                <p>Reconnecting people with the great outdoors through technology and community.</p>
+            </div>
+
+            <div class="cc-footer__col">
+                <h4>Explore</h4>
+                <ul>
+                    <li><a routerLink="/campsites">Campsites</a></li>
+                    <li><a routerLink="/academy">Academy</a></li>
+                    <li><a routerLink="/events">Events</a></li>
+                    <li><a routerLink="/community">Community</a></li>
+                </ul>
+            </div>
+
+            <div class="cc-footer__col">
+                <h4>Academy & Events</h4>
+                <ul>
+                    <li><a routerLink="/academy">Browse Courses</a></li>
+                    <li><a routerLink="/events">Upcoming Events</a></li>
+                    <li><a routerLink="/academy/certifications">Certifications</a></li>
+                    <li><a routerLink="/events/my-registrations">My Bookings</a></li>
+                </ul>
+            </div>
+
+            <div class="cc-footer__col">
+                <h4>Account</h4>
+                <ul>
+                    <li><a [routerLink]="dashboardRoute">Dashboard</a></li>
+                    <li><a routerLink="/profile">Profile</a></li>
+                    <li><a routerLink="/help">Help Center</a></li>
+                    <li><a routerLink="/privacy">Privacy Policy</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="cc-footer__bottom">
+            <p>&copy; 2026 CampConnect. All rights reserved. Crafted for adventure.</p>
+            <div class="cc-footer__social">
+                <a href="https://twitter.com" target="_blank" aria-label="Twitter">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg>
+                </a>
+                <a href="https://instagram.com" target="_blank" aria-label="Instagram">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="2" width="20" height="20" rx="5" />
+                        <circle cx="12" cy="12" r="5" />
+                        <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none" />
+                    </svg>
+                </a>
+                <a href="https://youtube.com" target="_blank" aria-label="YouTube">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.35 29 29 0 0 0-.46-5.33z" />
+                        <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="currentColor"
+                            stroke="none" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>

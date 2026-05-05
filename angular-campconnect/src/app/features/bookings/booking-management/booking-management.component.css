@@ -1,0 +1,91 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+/* Base Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Premium Card Effects */
+.stat-premium-card, .booking-item-card {
+  will-change: transform, shadow;
+}
+
+.glass-tabs-wrapper {
+  box-shadow: 
+    0 10px 40px -10px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(0, 0, 0, 0.02);
+}
+
+.nav-pill {
+  position: relative;
+  overflow: hidden;
+}
+
+.active-nav-pill {
+  background: white !important;
+  color: #10b981 !important; /* Emerald 500 */
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(16, 185, 129, 0.1);
+}
+
+.active-nav-pill lucide-icon {
+  color: #10b981;
+}
+
+/* Booking Card Specifics */
+.booking-item-card {
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+/* Custom Scrollbar for the tabs on mobile */
+.glass-tabs-wrapper::-webkit-scrollbar {
+  display: none;
+}
+.glass-tabs-wrapper {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Hover States for Buttons inside cards */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 1024px) {
+  .booking-item-card {
+    border-radius: 32px;
+  }
+}
+
+/* Utility Classes for Premium Look */
+.font-black {
+  font-weight: 900;
+}
+
+.tracking-tight {
+  letter-spacing: -0.025em;
+}
+
+.tracking-tighter {
+  letter-spacing: -0.05em;
+}

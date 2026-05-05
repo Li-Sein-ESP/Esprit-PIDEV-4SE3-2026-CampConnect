@@ -1,0 +1,259 @@
+<div class="invites-container animate-fade-in">
+    <!-- Header Section -->
+    <header class="page-header">
+        <div class="header-content">
+            <h1 class="title">Adventure Invitations</h1>
+            <p class="subtitle">Connect with your future travel companions and manage your group requests.</p>
+        </div>
+        <div class="header-stats" *ngIf="!loading">
+            <div class="stat-bubble">
+                <span class="stat-val">{{ receivedPending.length }}</span>
+                <span class="stat-label">New</span>
+            </div>
+            <div class="stat-bubble sent">
+                <span class="stat-val">{{ sentInvites.length }}</span>
+                <span class="stat-label">Sent</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+        <button class="tab-item" [class.active]="activeTab === 'received'" (click)="setTab('received')">
+            <div class="tab-icon-wrap">
+                <lucide-icon [img]="Mail" size="18"></lucide-icon>
+                <span class="dot-indicator" *ngIf="receivedPending.length > 0"></span>
+            </div>
+            <span>Received Requests</span>
+        </button>
+        <button class="tab-item" [class.active]="activeTab === 'sent'" (click)="setTab('sent')">
+            <div class="tab-icon-wrap">
+                <lucide-icon [img]="Send" size="18"></lucide-icon>
+            </div>
+            <span>Sent Invitations</span>
+        </button>
+        <div class="tab-slider" [class.shift]="activeTab === 'sent'"></div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="content-viewport" [ngSwitch]="activeTab">
+        
+        <!-- Loading State -->
+        <div *ngIf="loading" class="state-view">
+            <div class="modern-spinner"></div>
+            <p>Syncing with your adventure network...</p>
+        </div>
+
+        <!-- RECEIVED TAB -->
+        <div *ngSwitchCase="'received'" class="tab-pane">
+            
+            <!-- Empty State -->
+            <div *ngIf="!loading && receivedPending.length === 0 && receivedHistory.length === 0" class="empty-view">
+                <div class="empty-illustration">
+                    <lucide-icon [img]="MailOpen" size="64"></lucide-icon>
+                </div>
+                <h2>Your inbox is quiet</h2>
+                <p>No new requests yet. Why not explore some active travel projects?</p>
+                <button class="btn btn-primary-alt mt-6" routerLink="/trip-intents">Explore Feed</button>
+            </div>
+
+            <!-- Pending Invitations -->
+            <div class="cards-stack" *ngIf="!loading && receivedPending.length > 0">
+                <div class="invite-card premium-glass" *ngFor="let item of receivedPending">
+                    <div class="card-header">
+                        <div class="user-info">
+                            <img [src]="item.sender.avatar || 'https://ui-avatars.com/api/?name=' + item.sender.name" class="user-avatar">
+                            <div class="user-meta">
+                                <h4 class="user-name">{{ item.sender.name || item.sender.username }}</h4>
+                                <span class="time-stamp">{{ formatTimeAgo(item.invite.createdAt) }}</span>
+                            </div>
+                        </div>
+                        <div class="ai-badge">
+                            <lucide-icon [img]="Sparkles" size="14"></lucide-icon>
+                            <span>AI Verified Match</span>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="project-info">
+                            <span class="label">Wants to join your project:</span>
+                            <a [routerLink]="['/trip-intents', item.invite.tripIntentId]" class="project-link">
+                                <lucide-icon [img]="Tent" size="18"></lucide-icon>
+                                {{ item.trip.title }}
+                            </a>
+                        </div>
+
+                        <div class="message-bubble" *ngIf="item.invite.message">
+                            <p>{{ item.invite.message }}</p>
+                        </div>
+
+                        <!-- AI Insight Card -->
+                        <div class="ai-insight-box" *ngIf="item.invite.compatibilityScore">
+                            <div class="insight-header">
+                                <div class="insight-score">
+                                    <span class="score-num">{{ item.invite.compatibilityScore | number:'1.0-0' }}%</span>
+                                    <span class="score-label">Affinity</span>
+                                </div>
+                                <p class="insight-text">{{ item.invite.aiInsight }}</p>
+                            </div>
+                            
+                            <div class="traits-cloud" *ngIf="item.invite.traitScores">
+                                <div class="trait-pill" *ngFor="let trait of item.invite.traitScores | keyvalue">
+                                    <span class="trait-name">{{ trait.key }}</span>
+                                    <div class="trait-bar">
+                                        <div class="trait-fill" [style.width.%]="trait.value"></div>
+                                    </div>
+                                    <span class="trait-pct">{{ trait.value | number:'1.0-0' }}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-actions">
+                        <button class="btn btn-primary-alt" (click)="openFeedbackModal(item.invite.id, 'accept')">
+                            <lucide-icon [img]="Check" size="18"></lucide-icon>
+                            Confirm Request
+                        </button>
+                        <button class="btn btn-ghost-alt" (click)="openFeedbackModal(item.invite.id, 'decline')">
+                            <lucide-icon [img]="XList" size="18"></lucide-icon>
+                            Decline
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Section -->
+            <div class="history-section" *ngIf="!loading && receivedHistory.length > 0">
+                <h3 class="history-title">Recent Activity</h3>
+                <div class="history-table">
+                    <div class="history-row" *ngFor="let item of receivedHistory">
+                        <div class="row-user">
+                            <img [src]="item.sender.avatar || 'https://ui-avatars.com/api/?name=User'" class="avatar-xs">
+                            <span>{{ item.sender.name || item.sender.username }}</span>
+                        </div>
+                        <div class="row-project">{{ item.trip.title }}</div>
+                        <div class="row-status">
+                            <span class="status-chip" [ngClass]="getStatusClass(item.invite.status)">
+                                {{ item.invite.status }}
+                            </span>
+                        </div>
+                        <div class="row-date">{{ formatTimeAgo(item.invite.createdAt) }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SENT TAB -->
+        <div *ngSwitchCase="'sent'" class="tab-pane">
+            <div *ngIf="!loading && sentInvites.length === 0" class="empty-view">
+                <div class="empty-illustration">
+                    <lucide-icon [img]="Navigation" size="64"></lucide-icon>
+                </div>
+                <h2>You haven't reached out yet</h2>
+                <p>Find companions whose vibe matches yours and start a conversation!</p>
+                <button class="btn btn-primary-alt mt-6" routerLink="/companions">Discover Companions</button>
+            </div>
+
+            <div class="cards-grid" *ngIf="!loading && sentInvites.length > 0">
+                <div class="sent-card glass-card" *ngFor="let item of sentInvites">
+                    <div class="sent-card-top">
+                        <div class="recipient-info">
+                            <img [src]="item.receiver.avatar || 'https://ui-avatars.com/api/?name=' + item.receiver.name" class="avatar-md">
+                            <div class="recipient-meta">
+                                <h5>{{ item.receiver.name || item.receiver.username }}</h5>
+                                <span class="sent-at">Sent {{ formatTimeAgo(item.invite.createdAt) }}</span>
+                            </div>
+                        </div>
+                        <span class="status-indicator" [ngClass]="getStatusClass(item.invite.status)"></span>
+                    </div>
+                    
+                    <div class="sent-card-body">
+                        <div class="project-ref">
+                            <lucide-icon [img]="Target" size="14"></lucide-icon>
+                            <span>{{ item.trip.title }}</span>
+                        </div>
+                        <p class="sent-msg" *ngIf="item.invite.message">"{{ item.invite.message }}"</p>
+                    </div>
+
+                    <div class="sent-card-footer" *ngIf="item.invite.status === 'PENDING'">
+                        <button class="btn-cancel" (click)="cancelInvite(item.invite.id)">
+                            <lucide-icon [img]="XList" size="14"></lucide-icon>
+                            Recall Invitation
+                        </button>
+                    </div>
+                    <div class="sent-card-status-label" *ngIf="item.invite.status !== 'PENDING'">
+                        Status: <strong>{{ item.invite.status }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Interactive Feedback Modal -->
+    <div class="modal-backdrop" *ngIf="showFeedbackModal" (click)="closeFeedbackModal()">
+        <div class="premium-modal" (click)="$event.stopPropagation()">
+            
+            <div class="modal-content-wrap" *ngIf="!successState">
+                <div class="modal-head">
+                    <div class="head-icon" [ngClass]="pendingDecision?.action === 'accept' ? 'bg-sage' : 'bg-clay'">
+                        <lucide-icon [img]="pendingDecision?.action === 'accept' ? Check : XList" size="24"></lucide-icon>
+                    </div>
+                    <h2>{{ pendingDecision?.action === 'accept' ? 'Confirm Acceptance' : 'Confirm Decline' }}</h2>
+                    <p>Help our AI learn! Why did you make this decision?</p>
+                </div>
+
+                <div class="modal-body">
+                    <div class="reason-grid">
+                        <button *ngFor="let trait of traitsList" 
+                                class="reason-chip" 
+                                [class.active]="selectedReason === trait"
+                                (click)="selectedReason = trait">
+                            {{ trait }}
+                        </button>
+                        <button class="reason-chip other" 
+                                [class.active]="selectedReason === 'Other'"
+                                (click)="selectedReason = 'Other'">
+                            Something else
+                        </button>
+                    </div>
+
+                    <div class="ai-feedback-poll">
+                        <label>Was the AI matching score helpful?</label>
+                        <div class="poll-actions">
+                            <button class="poll-btn" [class.active]="helpfulPrediction === true" (click)="helpfulPrediction = true">
+                                <lucide-icon [img]="Sparkles" size="16"></lucide-icon>
+                                <span>Spot on!</span>
+                            </button>
+                            <button class="poll-btn" [class.active]="helpfulPrediction === false" (click)="helpfulPrediction = false">
+                                <lucide-icon [img]="XList" size="16"></lucide-icon>
+                                <span>Not really</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-foot">
+                    <button class="btn-secondary" (click)="closeFeedbackModal()">Cancel</button>
+                    <button class="btn-action" 
+                            [class.btn-primary-alt]="pendingDecision?.action === 'accept'"
+                            [class.btn-danger-alt]="pendingDecision?.action === 'decline'"
+                            [disabled]="!selectedReason || helpfulPrediction === null"
+                            (click)="submitDecision()">
+                        Submit Decision
+                    </button>
+                </div>
+            </div>
+
+            <!-- Success State -->
+            <div class="modal-success-view" *ngIf="successState">
+                <div class="confetti-placeholder"></div>
+                <div class="success-icon-wrap" [ngClass]="successState === 'accept' ? 'bg-sage' : 'bg-clay'">
+                    <lucide-icon [img]="successState === 'accept' ? Check : XList" size="48"></lucide-icon>
+                </div>
+                <h3>Action Completed</h3>
+                <p>{{ successState === 'accept' ? 'New member added to the group!' : 'Request declined successfully.' }}</p>
+                <div class="progress-loader"></div>
+            </div>
+        </div>
+    </div>
+</div>

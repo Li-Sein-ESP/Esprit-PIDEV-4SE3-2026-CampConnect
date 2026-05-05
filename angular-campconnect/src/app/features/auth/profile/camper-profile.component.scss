@@ -1,0 +1,935 @@
+/* ── CampConnect Profile Component ── */
+.cc-profile {
+    --cc-primary: #2D5016;
+    --cc-primary-light: #4A7C24;
+    --cc-accent: #C8A96E;
+    --cc-accent-light: #E8D5A8;
+    --cc-warm: #8B6914;
+    --cc-earth: #6B4423;
+    --cc-bg: #F7F4EF;
+    --cc-card: #FFFFFF;
+    --cc-text: #1A1A1A;
+    --cc-text-secondary: #5C5C5C;
+    --cc-border: #E8E2D8;
+    --cc-radius: 16px;
+    --cc-shadow: 0 2px 16px rgba(45, 80, 22, 0.06);
+    --cc-shadow-hover: 0 8px 32px rgba(45, 80, 22, 0.12);
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--cc-bg);
+    color: var(--cc-text);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: block;
+}
+
+/* ── Cover Section ── */
+.cc-profile .cc-cover {
+    position: relative;
+    height: 340px;
+    background:
+        linear-gradient(135deg, rgba(45, 80, 22, 0.55) 0%, rgba(200, 169, 110, 0.35) 100%),
+        url('https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1600&q=80') center/cover no-repeat;
+    border-radius: 0 0 32px 32px;
+    overflow: hidden;
+}
+
+.cc-profile .cc-cover::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: linear-gradient(to top, rgba(247, 244, 239, 0.95), transparent);
+    pointer-events: none;
+}
+
+.cc-profile .cc-cover__nav {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+}
+
+.cc-profile .cc-cover__logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    font-weight: 800;
+    font-size: 1.25rem;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+    letter-spacing: -0.02em;
+}
+
+.cc-profile .cc-cover__logo svg {
+    filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.2));
+}
+
+.cc-profile .cc-cover__actions {
+    display: flex;
+    gap: 10px;
+}
+
+.cc-profile .cc-cover__actions button {
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.cc-profile .cc-cover__actions button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+/* ── Profile Info ── */
+.cc-profile .cc-info {
+    position: relative;
+    z-index: 3;
+    margin-top: -100px;
+    padding: 0 40px;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cc-profile .cc-info__wrapper {
+    display: flex;
+    align-items: flex-end;
+    gap: 28px;
+    flex-wrap: wrap;
+}
+
+.cc-profile .cc-avatar {
+    width: 148px;
+    height: 148px;
+    border-radius: 50%;
+    border: 5px solid var(--cc-card);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+    object-fit: cover;
+    background: var(--cc-accent-light);
+    flex-shrink: 0;
+}
+
+.cc-profile .cc-info__details {
+    flex: 1;
+    min-width: 200px;
+    padding-bottom: 8px;
+}
+
+.cc-profile .cc-info__name-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.cc-profile .cc-info__name {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--cc-text);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.cc-profile .cc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 14px;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.cc-profile .cc-badge--verified {
+    background: linear-gradient(135deg, var(--cc-primary), var(--cc-primary-light));
+    color: #fff;
+}
+
+.cc-profile .cc-badge--camper {
+    background: var(--cc-accent-light);
+    color: var(--cc-earth);
+}
+
+.cc-profile .cc-info__bio {
+    margin: 8px 0 0;
+    color: var(--cc-text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    max-width: 520px;
+}
+
+.cc-profile .cc-info__location {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--cc-text-secondary);
+    font-size: 0.85rem;
+    margin-top: 6px;
+}
+
+.cc-profile .cc-info__cta {
+    padding-bottom: 12px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.cc-profile .cc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border: none;
+    font-family: inherit;
+}
+
+.cc-profile .cc-btn--primary {
+    background: linear-gradient(135deg, var(--cc-primary), var(--cc-primary-light));
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(45, 80, 22, 0.25);
+}
+
+.cc-profile .cc-btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(45, 80, 22, 0.35);
+}
+
+.cc-profile .cc-btn--outline {
+    background: var(--cc-card);
+    color: var(--cc-primary);
+    border: 1.5px solid var(--cc-border);
+}
+
+.cc-profile .cc-btn--outline:hover {
+    border-color: var(--cc-primary);
+    background: rgba(45, 80, 22, 0.04);
+    transform: translateY(-1px);
+}
+
+/* ── Stats Row ── */
+.cc-profile .cc-stats {
+    max-width: 1100px;
+    margin: 32px auto 0;
+    padding: 0 40px;
+}
+
+.cc-profile .cc-stats__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.cc-profile .cc-stat-card {
+    background: var(--cc-card);
+    border-radius: var(--cc-radius);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: var(--cc-shadow);
+    border: 1px solid var(--cc-border);
+    transition: all 0.3s ease;
+    cursor: default;
+}
+
+.cc-profile .cc-stat-card:hover {
+    box-shadow: var(--cc-shadow-hover);
+    transform: translateY(-3px);
+}
+
+.cc-profile .cc-stat-card__icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.cc-profile .cc-stat-card__icon--trips {
+    background: linear-gradient(135deg, #E8F5E2, #D0EBCA);
+    color: var(--cc-primary);
+}
+
+.cc-profile .cc-stat-card__icon--camps {
+    background: linear-gradient(135deg, #FFF3DC, #FFE8B8);
+    color: var(--cc-warm);
+}
+
+.cc-profile .cc-stat-card__icon--reviews {
+    background: linear-gradient(135deg, #F0E4D4, #E6D5BE);
+    color: var(--cc-earth);
+}
+
+.cc-profile .cc-stat-card__icon--gear {
+    background: linear-gradient(135deg, #E2EFF8, #CADDED);
+    color: #2A6496;
+}
+
+.cc-profile .cc-stat-card__value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--cc-text);
+}
+
+.cc-profile .cc-stat-card__label {
+    font-size: 0.8rem;
+    color: var(--cc-text-secondary);
+    margin-top: 2px;
+    font-weight: 500;
+}
+
+/* ── Tabs ── */
+.cc-profile .cc-tabs {
+    max-width: 1100px;
+    margin: 36px auto 0;
+    padding: 0 40px;
+}
+
+.cc-profile .cc-tabs__nav {
+    display: flex;
+    gap: 4px;
+    background: var(--cc-card);
+    border-radius: var(--cc-radius);
+    padding: 6px;
+    box-shadow: var(--cc-shadow);
+    border: 1px solid var(--cc-border);
+    overflow-x: auto;
+}
+
+.cc-profile .cc-tabs__btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    background: transparent;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--cc-text-secondary);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-family: inherit;
+    white-space: nowrap;
+    position: relative;
+}
+
+.cc-profile .cc-tabs__btn:hover {
+    color: var(--cc-primary);
+    background: rgba(45, 80, 22, 0.04);
+}
+
+.cc-profile .cc-tabs__btn--active {
+    background: linear-gradient(135deg, var(--cc-primary), var(--cc-primary-light));
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(45, 80, 22, 0.2);
+}
+
+.cc-profile .cc-tabs__btn--active:hover {
+    color: #fff;
+    background: linear-gradient(135deg, var(--cc-primary), var(--cc-primary-light));
+}
+
+/* ── Tab Content ── */
+.cc-profile .cc-content {
+    max-width: 1100px;
+    margin: 28px auto 0;
+    padding: 0 40px 60px;
+}
+
+.cc-profile .cc-tab-panel {
+    display: none;
+    animation: ccFadeIn 0.35s ease;
+}
+
+.cc-profile .cc-tab-panel--active {
+    display: block;
+}
+
+@keyframes ccFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.cc-profile .cc-section-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0 0 16px;
+    color: var(--cc-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cc-profile .cc-section-title__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--cc-primary);
+}
+
+/* ── Quick Actions (merged from Dashboard) ── */
+.cc-profile .cc-quick-actions {
+    margin-bottom: 28px;
+}
+
+.cc-profile .cc-quick-actions__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.cc-profile .cc-quick-action-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 96px;
+    border-radius: 14px;
+    border: 1.5px solid var(--cc-border);
+    background: var(--cc-card);
+    text-decoration: none;
+    color: var(--cc-text);
+    transition: all 0.2s ease;
+}
+
+.cc-profile .cc-quick-action-card:hover {
+    transform: translateY(-1px);
+    border-color: rgba(45, 80, 22, 0.35);
+    box-shadow: var(--cc-shadow-hover);
+}
+
+.cc-profile .cc-quick-action-card__emoji {
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+.cc-profile .cc-quick-action-card__label {
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.cc-profile .cc-quick-action-card--invite {
+    border-color: #f2d1d1;
+}
+
+.cc-profile .cc-quick-action-card__count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #dc2626;
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 8px rgba(220, 38, 38, 0.35);
+}
+
+/* ── Trip Cards ── */
+.cc-profile .cc-trip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 18px;
+    margin-bottom: 36px;
+}
+
+.cc-profile .cc-trip-card {
+    background: var(--cc-card);
+    border-radius: var(--cc-radius);
+    overflow: hidden;
+    box-shadow: var(--cc-shadow);
+    border: 1px solid var(--cc-border);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.cc-profile .cc-trip-card:hover {
+    box-shadow: var(--cc-shadow-hover);
+    transform: translateY(-4px);
+}
+
+.cc-profile .cc-trip-card__img {
+    height: 180px;
+    object-fit: cover;
+    width: 100%;
+    display: block;
+}
+
+.cc-profile .cc-trip-card__body {
+    padding: 18px 20px;
+}
+
+.cc-profile .cc-trip-card__title {
+    font-weight: 700;
+    font-size: 1rem;
+    margin: 0 0 6px;
+}
+
+.cc-profile .cc-trip-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--cc-text-secondary);
+    font-size: 0.8rem;
+}
+
+.cc-profile .cc-trip-card__meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.cc-profile .cc-trip-card__tag {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.cc-profile .cc-trip-card__tag--completed {
+    background: #E8F5E2;
+    color: var(--cc-primary);
+}
+
+.cc-profile .cc-trip-card__tag--upcoming {
+    background: #FFF3DC;
+    color: var(--cc-warm);
+}
+
+/* ── Rental Cards ── */
+.cc-profile .cc-rental-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 36px;
+}
+
+.cc-profile .cc-rental-card {
+    background: var(--cc-card);
+    border-radius: var(--cc-radius);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: var(--cc-shadow);
+    border: 1px solid var(--cc-border);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.cc-profile .cc-rental-card:hover {
+    box-shadow: var(--cc-shadow-hover);
+    transform: translateY(-2px);
+}
+
+.cc-profile .cc-rental-card__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #F7F4EF, #EDE8DD);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.5rem;
+}
+
+.cc-profile .cc-rental-card__title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin: 0 0 2px;
+}
+
+.cc-profile .cc-rental-card__sub {
+    font-size: 0.8rem;
+    color: var(--cc-text-secondary);
+}
+
+.cc-profile .cc-rental-card__status {
+    margin-left: auto;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.cc-profile .cc-rental-card__status--active {
+    background: #E8F5E2;
+    color: var(--cc-primary);
+}
+
+.cc-profile .cc-rental-card__status--returned {
+    background: #F0E4D4;
+    color: var(--cc-earth);
+}
+
+/* ── Badges / Achievements ── */
+.cc-profile .cc-badges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 36px;
+}
+
+.cc-profile .cc-badge-card {
+    background: var(--cc-card);
+    border-radius: var(--cc-radius);
+    padding: 28px 20px;
+    text-align: center;
+    box-shadow: var(--cc-shadow);
+    border: 1px solid var(--cc-border);
+    transition: all 0.3s ease;
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+}
+
+.cc-profile .cc-badge-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+}
+
+.cc-profile .cc-badge-card--beginner::before {
+    background: linear-gradient(90deg, #A8D98A, #7BC057);
+}
+
+.cc-profile .cc-badge-card--verified::before {
+    background: linear-gradient(90deg, var(--cc-primary), var(--cc-primary-light));
+}
+
+.cc-profile .cc-badge-card--safety::before {
+    background: linear-gradient(90deg, var(--cc-accent), var(--cc-warm));
+}
+
+.cc-profile .cc-badge-card--explorer::before {
+    background: linear-gradient(90deg, #6BA3D6, #4A8AC4);
+}
+
+.cc-profile .cc-badge-card--fire::before {
+    background: linear-gradient(90deg, #E8825C, #D4603E);
+}
+
+.cc-profile .cc-badge-card:hover {
+    box-shadow: var(--cc-shadow-hover);
+    transform: translateY(-4px);
+}
+
+.cc-profile .cc-badge-card__icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+}
+
+.cc-profile .cc-badge-card--beginner .cc-badge-card__icon {
+    background: linear-gradient(135deg, #E8F5E2, #D0EBCA);
+}
+
+.cc-profile .cc-badge-card--verified .cc-badge-card__icon {
+    background: linear-gradient(135deg, #D4E8C8, #B8D9A2);
+}
+
+.cc-profile .cc-badge-card--safety .cc-badge-card__icon {
+    background: linear-gradient(135deg, #FFF3DC, #FFE8B8);
+}
+
+.cc-profile .cc-badge-card--explorer .cc-badge-card__icon {
+    background: linear-gradient(135deg, #E2EFF8, #CADDED);
+}
+
+.cc-profile .cc-badge-card--fire .cc-badge-card__icon {
+    background: linear-gradient(135deg, #FCE4DC, #F8CCBB);
+}
+
+.cc-profile .cc-badge-card__title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin: 0 0 4px;
+}
+
+.cc-profile .cc-badge-card__desc {
+    font-size: 0.78rem;
+    color: var(--cc-text-secondary);
+    line-height: 1.5;
+}
+
+.cc-profile .cc-badge-card__date {
+    margin-top: 10px;
+    font-size: 0.7rem;
+    color: var(--cc-accent);
+    font-weight: 600;
+}
+
+/* ── Empty State for Tabs ── */
+.cc-profile .cc-empty {
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--cc-card);
+    border-radius: var(--cc-radius);
+    border: 1px solid var(--cc-border);
+    box-shadow: var(--cc-shadow);
+}
+
+.cc-profile .cc-empty__icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+}
+
+.cc-profile .cc-empty__title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin: 0 0 6px;
+}
+
+.cc-profile .cc-empty__desc {
+    color: var(--cc-text-secondary);
+    font-size: 0.9rem;
+}
+
+/* ── Review Cards ── */
+.cc-profile .cc-review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.cc-profile .cc-review-card {
+    background: var(--cc-card);
+    border-radius: var(--cc-radius);
+    padding: 22px 24px;
+    box-shadow: var(--cc-shadow);
+    border: 1px solid var(--cc-border);
+    transition: all 0.3s ease;
+}
+
+.cc-profile .cc-review-card:hover {
+    box-shadow: var(--cc-shadow-hover);
+}
+
+.cc-profile .cc-review-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.cc-profile .cc-review-card__place {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.cc-profile .cc-review-card__stars {
+    color: var(--cc-accent);
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+}
+
+.cc-profile .cc-review-card__text {
+    color: var(--cc-text-secondary);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.cc-profile .cc-review-card__date {
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: var(--cc-accent);
+    font-weight: 500;
+}
+
+/* ── Saved Items ── */
+.cc-profile .cc-saved-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+}
+
+.cc-profile .cc-saved-card {
+    background: var(--cc-card);
+    border-radius: var(--cc-radius);
+    overflow: hidden;
+    box-shadow: var(--cc-shadow);
+    border: 1px solid var(--cc-border);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.cc-profile .cc-saved-card:hover {
+    box-shadow: var(--cc-shadow-hover);
+    transform: translateY(-3px);
+}
+
+.cc-profile .cc-saved-card__img {
+    height: 140px;
+    width: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.cc-profile .cc-saved-card__body {
+    padding: 14px 16px;
+}
+
+.cc-profile .cc-saved-card__title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin: 0 0 4px;
+}
+
+.cc-profile .cc-saved-card__sub {
+    font-size: 0.78rem;
+    color: var(--cc-text-secondary);
+}
+
+.cc-profile .cc-saved-card__heart {
+    float: right;
+    color: #E05252;
+    font-size: 1rem;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .cc-profile .cc-cover {
+        height: 220px;
+    }
+
+    .cc-profile .cc-cover__nav {
+        padding: 14px 20px;
+    }
+
+    .cc-profile .cc-info {
+        padding: 0 20px;
+        margin-top: -70px;
+    }
+
+    .cc-profile .cc-avatar {
+        width: 110px;
+        height: 110px;
+    }
+
+    .cc-profile .cc-info__name {
+        font-size: 1.5rem;
+    }
+
+    .cc-profile .cc-stats {
+        padding: 0 20px;
+    }
+
+    .cc-profile .cc-stats__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cc-profile .cc-tabs {
+        padding: 0 20px;
+    }
+
+    .cc-profile .cc-content {
+        padding: 0 20px 40px;
+    }
+
+    .cc-profile .cc-quick-actions__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .cc-profile .cc-info__wrapper {
+        gap: 16px;
+    }
+
+    .cc-profile .cc-trip-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cc-profile .cc-badges-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cc-profile .cc-tabs__btn {
+        padding: 10px 14px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .cc-profile .cc-stats__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cc-profile .cc-badges-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cc-profile .cc-rental-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cc-profile .cc-quick-actions__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cc-profile .cc-saved-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cc-profile .cc-info__cta {
+        width: 100%;
+    }
+
+    .cc-profile .cc-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

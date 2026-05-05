@@ -1,0 +1,192 @@
+<div class="min-h-screen bg-[#FDFCF8] font-sans pb-20">
+    <!-- Navigation Header -->
+    <nav class="bg-white border-b border-gray-200 py-3 px-6 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto flex items-center gap-2 cursor-pointer" routerLink="/environmental">
+            <lucide-icon [img]="ChevronLeftIcon" size="16" class="text-gray-500"></lucide-icon>
+            <span class="text-sm text-gray-600 font-medium">Back to Safety Overview</span>
+        </div>
+    </nav>
+
+    <div class="max-w-5xl mx-auto px-6 py-8">
+
+        <!-- Main Header Card -->
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 mb-8">
+            <div class="flex items-center gap-3 mb-1">
+                <lucide-icon [img]="ShieldCheckIcon" size="32" class="text-[#1B362C]"></lucide-icon>
+                <h1 class="text-4xl font-bold text-[#1B362C]">Rocky Mountain Spring Adventure</h1>
+            </div>
+            <p class="text-sm text-gray-500 mb-8 ml-11">Compliance Report</p>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 ml-11">
+                <div>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Destination</p>
+                    <div class="flex items-center gap-1.5 text-sm font-semibold text-[#1B362C]">
+                        <lucide-icon [img]="MapPinIcon" size="16" class="text-gray-400"></lucide-icon>
+                        Rocky Mountain National Park, CO
+                    </div>
+                </div>
+                <div>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Dates</p>
+                    <div class="flex items-center gap-1.5 text-sm font-semibold text-[#1B362C]">
+                        <lucide-icon [img]="CalendarIcon" size="16" class="text-gray-400"></lucide-icon>
+                        March 10-14, 2026
+                    </div>
+                </div>
+                <div>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Zone</p>
+                    <div class="text-sm font-semibold text-[#1B362C]">Wilderness Zone 3</div>
+                </div>
+                <div>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Participants</p>
+                    <div class="text-sm font-semibold text-[#1B362C]">4 people</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Boxes -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div
+                class="bg-white border border-[#10B981]/30 rounded-xl p-8 flex flex-col items-center justify-center text-center">
+                <lucide-icon [img]="CircleCheckIcon" size="40" class="text-[#10B981] mb-2"></lucide-icon>
+                <span class="text-4xl font-bold text-[#10B981]">{{ allowedCount }}</span>
+                <span class="text-sm font-bold text-[#10B981]">Allowed</span>
+            </div>
+            <div
+                class="bg-white border border-[#D97706]/30 rounded-xl p-8 flex flex-col items-center justify-center text-center">
+                <lucide-icon [img]="AlertTriangleIcon" size="40" class="text-[#D97706] mb-2"></lucide-icon>
+                <span class="text-4xl font-bold text-[#D97706]">{{ restrictedCount }}</span>
+                <span class="text-sm font-bold text-[#D97706]">Restricted</span>
+            </div>
+            <div
+                class="bg-white border border-[#EF4444]/30 rounded-xl p-8 flex flex-col items-center justify-center text-center">
+                <lucide-icon [img]="CircleXIcon" size="40" class="text-[#EF4444] mb-2"></lucide-icon>
+                <span class="text-4xl font-bold text-[#EF4444]">{{ prohibitedCount }}</span>
+                <span class="text-sm font-bold text-[#EF4444]">Prohibited</span>
+            </div>
+        </div>
+
+        <!-- Prohibited Alert -->
+        <div class="bg-[#FEF2F2] border border-[#FECACA] rounded-xl p-6 flex gap-4 mb-12">
+            <lucide-icon [img]="CircleXIcon" size="24" class="text-[#EF4444] flex-shrink-0"></lucide-icon>
+            <div>
+                <h3 class="font-bold text-[#1B362C] mb-1">Prohibited Activities Detected</h3>
+                <p class="text-sm text-gray-600 leading-relaxed">
+                    1 activity is currently prohibited in your destination area. Please review the restrictions below
+                    and adjust your plans accordingly. Violations may result in citations, fines, and potential legal
+                    consequences.
+                </p>
+            </div>
+        </div>
+
+        <!-- Compliance List -->
+        <section>
+            <h2 class="text-2xl font-bold text-[#1B362C] mb-6">Compliance Requirements &amp; Restrictions</h2>
+            <div class="space-y-6">
+                <div *ngFor="let card of complianceData" class="bg-white rounded-xl p-6 shadow-sm border mb-6"
+                    [ngClass]="getBorderClass(card.status)">
+
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 rounded-xl flex items-center justify-center border border-current/10"
+                                [ngClass]="getIconBgClass(card.status)">
+                                <lucide-icon [img]="getIcon(card.iconName)" size="24"></lucide-icon>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-[#1B362C]">{{ card.title }}</h3>
+                                <p class="text-xs text-gray-500">{{ card.category }}</p>
+                            </div>
+                        </div>
+                        <span
+                            class="text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 uppercase tracking-wider"
+                            [ngClass]="getBadgeClass(card.status)">
+                            <lucide-icon *ngIf="card.status === 'Allowed'" [img]="CircleCheckIcon" size="12"
+                                class="text-white"></lucide-icon>
+                            <lucide-icon *ngIf="card.status === 'Restricted'" [img]="AlertTriangleIcon" size="12"
+                                class="text-white"></lucide-icon>
+                            <lucide-icon *ngIf="card.status === 'Prohibited'" [img]="CircleXIcon" size="12"
+                                class="text-white"></lucide-icon>
+                            {{ card.status }}
+                        </span>
+                    </div>
+
+                    <p class="text-sm text-gray-600 mb-4 leading-relaxed">{{ card.description }}</p>
+
+                    <!-- Requirements -->
+                    <div *ngIf="getRequirements(card).length > 0" class="mb-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <lucide-icon [img]="CircleCheckIcon" size="16" class="text-[#10B981]"></lucide-icon>
+                            <h4 class="text-sm font-bold text-[#1B362C]">Requirements</h4>
+                        </div>
+                        <ul class="space-y-2 pl-6">
+                            <li *ngFor="let item of getRequirements(card)"
+                                class="text-xs text-gray-600 flex items-center gap-2">
+                                <lucide-icon [img]="CircleCheckIcon" size="14"
+                                    class="text-[#10B981]/60 flex-shrink-0"></lucide-icon>
+                                {{ item.text }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Restrictions -->
+                    <div *ngIf="getRestrictions(card).length > 0">
+                        <div class="flex items-center gap-2 mb-2">
+                            <lucide-icon [img]="CircleXIcon" size="16" class="text-[#EF4444]"></lucide-icon>
+                            <h4 class="text-sm font-bold text-[#1B362C]">Restrictions</h4>
+                        </div>
+                        <ul class="space-y-2 pl-6">
+                            <li *ngFor="let item of getRestrictions(card)"
+                                class="text-xs text-gray-600 flex items-center gap-2">
+                                <lucide-icon [img]="CircleXIcon" size="14"
+                                    class="text-[#EF4444]/60 flex-shrink-0"></lucide-icon>
+                                {{ item.text }}
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Important Notice -->
+        <div class="mt-8 bg-[#F0F9FF] border border-[#BAE6FD] rounded-xl p-6">
+            <div class="flex gap-3 mb-4">
+                <lucide-icon [img]="InfoIcon" size="20" class="text-[#0284C7] flex-shrink-0"></lucide-icon>
+                <div>
+                    <h4 class="font-bold text-[#1B362C]">Important Notice</h4>
+                    <p class="text-xs text-gray-600 leading-relaxed">
+                        Regulations and conditions can change rapidly due to weather, wildlife activity, or other
+                        factors.
+                        Always check for updates within 48 hours of your trip and follow all posted signs and ranger
+                        instructions.
+                    </p>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <button routerLink="/safety/alerts"
+                    class="bg-white border border-gray-300 rounded-lg px-4 py-2 text-xs font-bold text-[#1B362C] flex items-center gap-2 hover:bg-gray-50 transition-colors">
+                    <lucide-icon [img]="AlertTriangleIcon" size="14" class="text-gray-500"></lucide-icon>
+                    View Active Alerts
+                </button>
+                <button routerLink="/safety/zones"
+                    class="bg-white border border-gray-300 rounded-lg px-4 py-2 text-xs font-bold text-[#1B362C] flex items-center gap-2 hover:bg-gray-50 transition-colors">
+                    <lucide-icon [img]="MapPinIcon" size="14" class="text-gray-500"></lucide-icon>
+                    Environmental Zones
+                </button>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-3 mt-10">
+            <button
+                class="bg-[#1B362C] hover:bg-[#142821] text-white px-6 py-3 rounded-lg flex items-center gap-2 font-bold text-sm transition-colors shadow-sm">
+                <lucide-icon [img]="FileTextIcon" size="16" class="text-white"></lucide-icon>
+                Print Report
+            </button>
+            <button
+                class="bg-white border border-gray-300 hover:bg-gray-50 text-[#1B362C] px-6 py-3 rounded-lg flex items-center gap-2 font-bold text-sm transition-colors shadow-sm">
+                <lucide-icon [img]="EyeIcon" size="16" class="text-[#1B362C]"></lucide-icon>
+                View Trip Details
+            </button>
+        </div>
+    </div>
+</div>

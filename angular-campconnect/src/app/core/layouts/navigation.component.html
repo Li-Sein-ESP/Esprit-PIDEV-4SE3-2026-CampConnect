@@ -1,0 +1,132 @@
+<!-- ========== NAVBAR ========== -->
+<header class="cc-navbar cc-navbar--scrolled" (clickOutside)="isUserMenuOpen = false; activeDropdown = null">
+    <div class="cc-navbar__inner">
+
+        <!-- Logo -->
+        <a routerLink="/" class="cc-navbar__logo">
+            <svg class="cc-navbar__logo-icon" width="34" height="34" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 2L3 28h26L16 2z" stroke="#1b4332" stroke-width="2" fill="none" />
+                <path d="M10 28l6-10 6 10" stroke="#1b4332" stroke-width="2" fill="none" />
+                <circle cx="16" cy="12" r="2" fill="#1b4332" />
+            </svg>
+            <span style="color: #1b4332;">CampConnect</span>
+        </a>
+
+        <!-- Desktop Nav Menu with Dropdowns -->
+        <nav class="cc-navbar__links">
+            <div *ngFor="let item of menuItems" class="cc-nav-item">
+                <button class="cc-nav-link" (click)="toggleDropdown(item.label, $event)">
+                    {{ item.label }}
+                    <svg *ngIf="item.children" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <!-- Dropdown -->
+                <div *ngIf="item.children && activeDropdown === item.label" class="cc-dropdown">
+                    <a *ngFor="let child of item.children"
+                       [routerLink]="child.link"
+                       class="cc-dropdown__item"
+                       (click)="setActiveDropdown(null)">
+                        {{ child.label }}
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Actions -->
+        <div class="cc-navbar__actions">
+
+            <!-- Notifications Dropdown -->
+            <div *ngIf="isLoggedIn" class="cc-user-menu" style="margin-right: 1rem; position: relative;">
+                <div class="cc-user-menu__trigger" (click)="toggleNotificationMenu()" style="position: relative; padding: 0.5rem; border-radius: 50%; background: rgba(0,0,0,0.03); cursor: pointer;">
+                    <lucide-icon [img]="BellIcon" size="20" style="color: #1b4332;"></lucide-icon>
+                    <!-- Badge -->
+                    <span *ngIf="(unreadCount$ | async) as count" 
+                          style="position: absolute; top: -2px; right: -2px; background: #e63946; color: white; font-size: 10px; font-weight: bold; padding: 2px 5px; border-radius: 10px; border: 2px solid white;">
+                        {{ count > 9 ? '9+' : count }}
+                    </span>
+                </div>
+                
+                <!-- Dropdown Menu -->
+                <div *ngIf="isNotificationMenuOpen" class="cc-user-dropdown" (click)="$event.stopPropagation()" style="width: 320px; right: -50px; max-height: 400px; overflow-y: auto; display: block !important; visibility: visible !important; opacity: 1 !important;">
+                    <div style="padding: 10px 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 800; color: #1b4332;">Notifications</span>
+                        <button *ngIf="(unreadCount$ | async)" (click)="markAllNotificationsAsRead()" style="background: none; border: none; font-size: 11px; color: #2a9d8f; cursor: pointer; font-weight: bold;">
+                            Tout lu
+                        </button>
+                    </div>
+                    
+                    <div *ngIf="(notifications$ | async)?.length === 0" style="padding: 30px; text-align: center; color: #888;">
+                        <lucide-icon [img]="BellIcon" size="24" style="color: #ccc; margin-bottom: 10px;"></lucide-icon><br>
+                        Aucune notification
+                    </div>
+
+                    <button *ngFor="let n of (notifications$ | async)" 
+                            (click)="handleNotificationClick(n)"
+                            [style.background]="n.read ? 'white' : '#f4f7f5'"
+                            style="width: 100%; text-align: left; padding: 12px 15px; border: none; border-bottom: 1px solid #f0f0f0; cursor: pointer; display: flex; flex-direction: column; gap: 4px; transition: background 0.2s;">
+                        <span style="font-size: 13px; font-weight: 800; color: #1b4332; display: flex; align-items: center; gap: 5px;">
+                            <span *ngIf="!n.read" style="width: 6px; height: 6px; background: #e63946; border-radius: 50%; display: inline-block;"></span>
+                            {{ n.title }}
+                        </span>
+                        <span style="font-size: 12px; color: #555; line-height: 1.4;">{{ n.message }}</span>
+                        <span style="font-size: 10px; color: #999;">{{ n.createdAt | date:'short' }}</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Logged in: User avatar + dropdown -->
+            <div *ngIf="isLoggedIn" class="cc-user-menu" (click)="toggleUserMenu()">
+                <div class="cc-user-menu__trigger">
+                    <div class="cc-user-menu__avatar">
+                        {{ (currentUser$ | async)?.username?.substring(0, 2)?.toUpperCase() || 'US' }}
+                    </div>
+                    <span class="cc-user-menu__name">
+                        {{ (currentUser$ | async)?.username || (currentUser$ | async)?.email || 'Account' }}
+                    </span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         [style.transform]="isUserMenuOpen ? 'rotate(180deg)' : 'rotate(0)'"
+                         style="transition: transform 0.2s ease;">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+
+                <!-- Dropdown Menu -->
+                <div *ngIf="isUserMenuOpen" class="cc-user-dropdown" (click)="$event.stopPropagation()">
+                    <a routerLink="/profile" class="cc-user-dropdown__item" (click)="isUserMenuOpen = false">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        Profile
+                    </a>
+                    <a [routerLink]="dashboardLink" class="cc-user-dropdown__item" (click)="isUserMenuOpen = false">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                        </svg>
+                        Dashboard
+                    </a>
+                    <div class="cc-user-dropdown__divider"></div>
+                    <button (click)="logout(); isUserMenuOpen = false" class="cc-user-dropdown__item cc-user-dropdown__item--danger">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        Sign Out
+                    </button>
+                </div>
+            </div>
+
+            <!-- Not logged in -->
+            <ng-container *ngIf="!isLoggedIn">
+                <a routerLink="/login" class="cc-btn cc-btn--outline cc-btn--sm">Sign In</a>
+                <a routerLink="/signup" class="cc-btn cc-btn--primary cc-btn--sm">Get Started</a>
+            </ng-container>
+
+        </div>
+    </div>
+</header>

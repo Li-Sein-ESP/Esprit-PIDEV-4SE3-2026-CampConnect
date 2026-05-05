@@ -1,0 +1,514 @@
+<div class="lb-page">
+
+    <!-- ===== HERO ===== -->
+    <section class="lb-hero">
+        <svg class="lb-hero__mountains" viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path
+                d="M0,120 L100,60 L200,90 L350,20 L500,80 L600,30 L700,70 L800,15 L900,55 L1000,25 L1100,65 L1200,40 L1200,120 Z"
+                fill="white" />
+        </svg>
+
+        <nav class="lb-hero__nav">
+            <a class="lb-hero__brand" routerLink="/community">
+                <svg class="lb-hero__brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 20h18L12 4 3 20z" />
+                    <path d="M9.5 20V14l2.5-2 2.5 2v6" />
+                </svg>
+                <span class="lb-hero__brand-name">CampConnect</span>
+            </a>
+        </nav>
+
+        <div class="lb-hero__content">
+            <div class="lb-hero__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+            </div>
+            <h1 class="lb-hero__title">Top Campers This Month</h1>
+            <p class="lb-hero__subtitle">Earn badges. Build trust. Explore more.</p>
+
+            <div class="lb-hero__tabs">
+                <button *ngFor="let p of periods" class="lb-hero__tab"
+                    [class.lb-hero__tab--active]="selectedPeriod === p.key" (click)="selectPeriod(p.key)">
+                    {{ p.label }}
+                </button>
+            </div>
+            <p *ngIf="loading" class="lb-hero__subtitle" style="margin-top: 10px; opacity: 0.85;">Loading leaderboard...</p>
+        </div>
+    </section>
+
+    <!-- ===== PODIUM ===== -->
+    <section class="lb-podium">
+
+        <!-- Rank 2 -->
+        <div class="lb-podium__card lb-podium__card--rank-2" [class.lb-podium__card--visible]="podiumVisible">
+            <div class="lb-podium__rank lb-podium__rank--2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="18 15 12 9 6 15" />
+                </svg>
+                2nd
+            </div>
+            <div class="lb-podium__avatar-wrap">
+                <div class="lb-podium__avatar-ring lb-podium__avatar-ring--2"></div>
+                <div class="lb-podium__avatar">
+                    <img *ngIf="podiumCampers[1]?.avatar" [src]="podiumCampers[1].avatar"
+                        [alt]="podiumCampers[1].username" class="lb-podium__avatar-img">
+                    <div *ngIf="!podiumCampers[1]?.avatar"
+                        class="lb-podium__avatar-fallback lb-podium__avatar-fallback--2">{{ podiumCampers[1]?.initials
+                        }}</div>
+                </div>
+            </div>
+            <div class="lb-podium__name">{{ podiumCampers[1]?.username }}</div>
+            <div class="lb-podium__handle">{{ podiumCampers[1]?.handle }}</div>
+            <div class="lb-podium__stats">
+                <div class="lb-podium__stat">
+                    <span class="lb-podium__stat-value">{{ podiumCampers[1]?.points | number }}</span>
+                    <span class="lb-podium__stat-label">Points</span>
+                </div>
+                <div class="lb-podium__stat-divider"></div>
+                <div class="lb-podium__stat">
+                    <div class="lb-podium__trust">
+                        <svg class="lb-podium__trust-ring" viewBox="0 0 40 40">
+                            <circle class="lb-podium__trust-bg" cx="20" cy="20" r="18" />
+                            <circle class="lb-podium__trust-fill" cx="20" cy="20" r="18" stroke="var(--lb-green-400)"
+                                [style.stroke-dashoffset]="trustStrokeDashoffset(podiumCampers[1]?.trustScore || 0)" />
+                        </svg>
+                        <span class="lb-podium__trust-value">{{ podiumCampers[1]?.trustScore }}</span>
+                    </div>
+                    <span class="lb-podium__stat-label">Trust</span>
+                </div>
+            </div>
+            <div class="lb-podium__badges">
+                <ng-container *ngFor="let b of podiumCampers[1]?.badges?.slice(0,4); let i = index">
+                    <div class="lb-podium__badge" [class]="'lb-podium__badge--' + b.theme" [title]="b.title">
+                        <ng-container [ngSwitch]="b.icon">
+                            <svg *ngSwitchCase="'tent'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round">
+                                <path d="M3 20h18L12 4 3 20z" />
+                                <path d="M9.5 20V14l2.5-2 2.5 2v6" />
+                            </svg>
+                            <svg *ngSwitchCase="'trail'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round">
+                                <path d="M22 18H6a2 2 0 0 1-2-2V7l4-3 4 3 4-3 4 3" />
+                                <path d="M14 18v-6" />
+                                <path d="M18 18v-4" />
+                            </svg>
+                            <svg *ngSwitchCase="'fire'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round">
+                                <path
+                                    d="M12 12c2-2.96 0-7-1-8 0 3.038-1.773 4.741-3 6-1.226 1.26-2 3.24-2 5a6 6 0 1 0 12 0c0-1.532-1.056-3.94-2-5-1.786 3-2.791 3-4 2z" />
+                            </svg>
+                            <svg *ngSwitchCase="'moon'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                            </svg>
+                            <svg *ngSwitchCase="'leaf'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round">
+                                <path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 17 3.5 17 3.5s1 5.5-3.5 10" />
+                                <path d="M11 20v-5" />
+                            </svg>
+                            <svg *ngSwitchCase="'binoculars'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round">
+                                <circle cx="12" cy="12" r="3" />
+                                <path
+                                    d="M22 12c-2.667 4.667-6 7-10 7s-7.333-2.333-10-7c2.667-4.667 6-7 10-7s7.333 2.333 10 7" />
+                            </svg>
+                            <svg *ngSwitchCase="'star'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+                                <circle cx="12" cy="12" r="1.5" />
+                            </svg>
+                            <svg *ngSwitchDefault viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                            </svg>
+                        </ng-container>
+                    </div>
+                </ng-container>
+                <span *ngIf="(podiumCampers[1]?.badges?.length || 0) > 4" class="lb-podium__badge-more">+{{
+                    (podiumCampers[1]?.badges?.length || 0) - 4 }}</span>
+            </div>
+        </div>
+
+        <!-- Rank 1 (center, tallest) -->
+        <div class="lb-podium__card lb-podium__card--rank-1" [class.lb-podium__card--visible]="podiumVisible"
+            style="transition-delay: 0.1s">
+            <div class="lb-podium__rank lb-podium__rank--1">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+                1st
+            </div>
+            <div class="lb-podium__avatar-wrap">
+                <div class="lb-podium__avatar-ring lb-podium__avatar-ring--1"></div>
+                <div class="lb-podium__avatar">
+                    <img *ngIf="podiumCampers[0]?.avatar" [src]="podiumCampers[0].avatar"
+                        [alt]="podiumCampers[0].username" class="lb-podium__avatar-img">
+                    <div *ngIf="!podiumCampers[0]?.avatar"
+                        class="lb-podium__avatar-fallback lb-podium__avatar-fallback--1">{{ podiumCampers[0]?.initials
+                        }}</div>
+                </div>
+            </div>
+            <div class="lb-podium__name">{{ podiumCampers[0]?.username }}</div>
+            <div class="lb-podium__handle">{{ podiumCampers[0]?.handle }}</div>
+            <div class="lb-podium__stats">
+                <div class="lb-podium__stat">
+                    <span class="lb-podium__stat-value">{{ podiumCampers[0]?.points | number }}</span>
+                    <span class="lb-podium__stat-label">Points</span>
+                </div>
+                <div class="lb-podium__stat-divider"></div>
+                <div class="lb-podium__stat">
+                    <div class="lb-podium__trust">
+                        <svg class="lb-podium__trust-ring" viewBox="0 0 40 40">
+                            <circle class="lb-podium__trust-bg" cx="20" cy="20" r="18" />
+                            <circle class="lb-podium__trust-fill" cx="20" cy="20" r="18" stroke="var(--lb-gold)"
+                                [style.stroke-dashoffset]="trustStrokeDashoffset(podiumCampers[0]?.trustScore || 0)" />
+                        </svg>
+                        <span class="lb-podium__trust-value">{{ podiumCampers[0]?.trustScore }}</span>
+                    </div>
+                    <span class="lb-podium__stat-label">Trust</span>
+                </div>
+            </div>
+            <div class="lb-podium__badges">
+                <ng-container *ngFor="let b of podiumCampers[0]?.badges?.slice(0,5)">
+                    <div class="lb-podium__badge" [class]="'lb-podium__badge--' + b.theme" [title]="b.title">
+                        <ng-container [ngSwitch]="b.icon">
+                            <svg *ngSwitchCase="'tent'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round">
+                                <path d="M3 20h18L12 4 3 20z" />
+                                <path d="M9.5 20V14l2.5-2 2.5 2v6" />
+                            </svg>
+                            <svg *ngSwitchCase="'fire'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round">
+                                <path
+                                    d="M12 12c2-2.96 0-7-1-8 0 3.038-1.773 4.741-3 6-1.226 1.26-2 3.24-2 5a6 6 0 1 0 12 0c0-1.532-1.056-3.94-2-5-1.786 3-2.791 3-4 2z" />
+                            </svg>
+                            <svg *ngSwitchCase="'star'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+                                <circle cx="12" cy="12" r="1.5" />
+                            </svg>
+                            <svg *ngSwitchCase="'trail'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round">
+                                <path d="M22 18H6a2 2 0 0 1-2-2V7l4-3 4 3 4-3 4 3" />
+                                <path d="M14 18v-6" />
+                                <path d="M18 18v-4" />
+                            </svg>
+                            <svg *ngSwitchCase="'binoculars'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round">
+                                <circle cx="12" cy="12" r="3" />
+                                <path
+                                    d="M22 12c-2.667 4.667-6 7-10 7s-7.333-2.333-10-7c2.667-4.667 6-7 10-7s7.333 2.333 10 7" />
+                            </svg>
+                            <svg *ngSwitchDefault viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                            </svg>
+                        </ng-container>
+                    </div>
+                </ng-container>
+                <span *ngIf="(podiumCampers[0]?.badges?.length || 0) > 5" class="lb-podium__badge-more">+{{
+                    (podiumCampers[0]?.badges?.length || 0) - 5 }}</span>
+            </div>
+        </div>
+
+        <!-- Rank 3 -->
+        <div class="lb-podium__card lb-podium__card--rank-3" [class.lb-podium__card--visible]="podiumVisible"
+            style="transition-delay: 0.05s">
+            <div class="lb-podium__rank lb-podium__rank--3">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="18 15 12 9 6 15" />
+                </svg>
+                3rd
+            </div>
+            <div class="lb-podium__avatar-wrap">
+                <div class="lb-podium__avatar-ring lb-podium__avatar-ring--3"></div>
+                <div class="lb-podium__avatar">
+                    <img *ngIf="podiumCampers[2]?.avatar" [src]="podiumCampers[2].avatar"
+                        [alt]="podiumCampers[2].username" class="lb-podium__avatar-img">
+                    <div *ngIf="!podiumCampers[2]?.avatar"
+                        class="lb-podium__avatar-fallback lb-podium__avatar-fallback--3">{{ podiumCampers[2]?.initials
+                        }}</div>
+                </div>
+            </div>
+            <div class="lb-podium__name">{{ podiumCampers[2]?.username }}</div>
+            <div class="lb-podium__handle">{{ podiumCampers[2]?.handle }}</div>
+            <div class="lb-podium__stats">
+                <div class="lb-podium__stat">
+                    <span class="lb-podium__stat-value">{{ podiumCampers[2]?.points | number }}</span>
+                    <span class="lb-podium__stat-label">Points</span>
+                </div>
+                <div class="lb-podium__stat-divider"></div>
+                <div class="lb-podium__stat">
+                    <div class="lb-podium__trust">
+                        <svg class="lb-podium__trust-ring" viewBox="0 0 40 40">
+                            <circle class="lb-podium__trust-bg" cx="20" cy="20" r="18" />
+                            <circle class="lb-podium__trust-fill" cx="20" cy="20" r="18" stroke="var(--lb-green-500)"
+                                [style.stroke-dashoffset]="trustStrokeDashoffset(podiumCampers[2]?.trustScore || 0)" />
+                        </svg>
+                        <span class="lb-podium__trust-value">{{ podiumCampers[2]?.trustScore }}</span>
+                    </div>
+                    <span class="lb-podium__stat-label">Trust</span>
+                </div>
+            </div>
+            <div class="lb-podium__badges">
+                <ng-container *ngFor="let b of podiumCampers[2]?.badges?.slice(0,4)">
+                    <div class="lb-podium__badge" [class]="'lb-podium__badge--' + b.theme" [title]="b.title">
+                        <ng-container [ngSwitch]="b.icon">
+                            <svg *ngSwitchCase="'tent'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round">
+                                <path d="M3 20h18L12 4 3 20z" />
+                                <path d="M9.5 20V14l2.5-2 2.5 2v6" />
+                            </svg>
+                            <svg *ngSwitchCase="'leaf'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round">
+                                <path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 17 3.5 17 3.5s1 5.5-3.5 10" />
+                                <path d="M11 20v-5" />
+                            </svg>
+                            <svg *ngSwitchCase="'fire'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round">
+                                <path
+                                    d="M12 12c2-2.96 0-7-1-8 0 3.038-1.773 4.741-3 6-1.226 1.26-2 3.24-2 5a6 6 0 1 0 12 0c0-1.532-1.056-3.94-2-5-1.786 3-2.791 3-4 2z" />
+                            </svg>
+                            <svg *ngSwitchDefault viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                            </svg>
+                        </ng-container>
+                    </div>
+                </ng-container>
+                <span *ngIf="(podiumCampers[2]?.badges?.length || 0) > 4" class="lb-podium__badge-more">+{{
+                    (podiumCampers[2]?.badges?.length || 0) - 4 }}</span>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- ===== STATS BAR ===== -->
+    <div class="lb-stats-bar">
+        <div class="lb-stats-card" [class.lb-stats-card--visible]="statsVisible">
+            <div class="lb-stats-card__icon lb-stats-card__icon--green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+            </div>
+            <div>
+                <div class="lb-stats-card__value">{{ stats.activeCampers | number }}</div>
+                <div class="lb-stats-card__label">Active Campers</div>
+            </div>
+        </div>
+        <div class="lb-stats-card" [class.lb-stats-card--visible]="statsVisible" style="transition-delay:0.1s">
+            <div class="lb-stats-card__icon lb-stats-card__icon--amber">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+            </div>
+            <div>
+                <div class="lb-stats-card__value">{{ stats.totalBadges | number }}</div>
+                <div class="lb-stats-card__label">Badges Earned</div>
+            </div>
+        </div>
+        <div class="lb-stats-card" [class.lb-stats-card--visible]="statsVisible" style="transition-delay:0.2s">
+            <div class="lb-stats-card__icon lb-stats-card__icon--terra">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M3 20h18L12 4 3 20z" />
+                    <path d="M9.5 20V14l2.5-2 2.5 2v6" />
+                </svg>
+            </div>
+            <div>
+                <div class="lb-stats-card__value">{{ stats.totalTrips | number }}</div>
+                <div class="lb-stats-card__label">Trips Completed</div>
+            </div>
+        </div>
+        <div class="lb-stats-card" [class.lb-stats-card--visible]="statsVisible" style="transition-delay:0.3s">
+            <div class="lb-stats-card__icon lb-stats-card__icon--slate">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
+                </svg>
+            </div>
+            <div>
+                <div class="lb-stats-card__value">{{ stats.avgTrustScore }}</div>
+                <div class="lb-stats-card__label">Avg Trust Score</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== RANKING TABLE ===== -->
+    <div class="lb-table-wrap">
+        <div class="lb-table-header">
+            <div class="lb-table-header__left">
+                <h2 class="lb-table-header__title">Full Rankings</h2>
+                <span class="lb-table-header__count">Top {{ campers.length }}</span>
+            </div>
+            <div class="lb-table-header__search">
+                <svg class="lb-table-header__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                </svg>
+                <input class="lb-table-header__search-input" type="text" placeholder="Search campers..."
+                    [(ngModel)]="searchQuery" />
+            </div>
+        </div>
+
+        <div class="lb-table">
+            <!-- Head -->
+            <div class="lb-table__head">
+                <div class="lb-table__th lb-table__th--center">Rank</div>
+                <div class="lb-table__th">Camper</div>
+                <div class="lb-table__th">Points</div>
+                <div class="lb-table__th">Badges</div>
+                <div class="lb-table__th lb-table__th--right">Trend</div>
+            </div>
+
+            <!-- Rows 4+ -->
+            <div *ngFor="let camper of tableCampers; let i = index" class="lb-table__row"
+                [class.lb-table__row--visible]="tableVisible" [class.lb-table__row--self]="camper.isSelf"
+                [style.transition-delay]="(i * 60) + 'ms'">
+
+                <!-- Rank number -->
+                <div>
+                    <div class="lb-table__rank lb-table__rank--default">{{ camper.id }}</div>
+                </div>
+
+                <!-- User Info -->
+                <div class="lb-table__user">
+                    <div class="lb-table__user-avatar">
+                        <img *ngIf="camper.avatar" [src]="camper.avatar" [alt]="camper.username"
+                            style="width:100%;height:100%;object-fit:cover;display:block;border-radius:10px;">
+                        <div *ngIf="!camper.avatar" class="lb-table__user-avatar-inner"
+                            [style.background]="camper.avatarBg" [style.color]="camper.avatarColor">
+                            {{ camper.initials }}
+                        </div>
+                    </div>
+                    <div class="lb-table__user-info">
+                        <div class="lb-table__user-name" [class.lb-table__user-name--self]="camper.isSelf">
+                            {{ camper.username }}
+                        </div>
+                        <div class="lb-table__user-meta">{{ camper.trips }} trips · Joined {{ camper.joinedDate }}</div>
+                    </div>
+                </div>
+
+                <!-- Points -->
+                <div class="lb-table__points">
+                    {{ camper.points | number }}<span class="lb-table__points-label">pts</span>
+                </div>
+
+                <!-- Badges -->
+                <div class="lb-table__badges">
+                    <ng-container *ngFor="let b of camper.badges.slice(0, 3)">
+                        <div class="lb-table__badge-icon" [class]="'lb-podium__badge--' + b.theme" [title]="b.title">
+                            <ng-container [ngSwitch]="b.icon">
+                                <svg *ngSwitchCase="'tent'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round">
+                                    <path d="M3 20h18L12 4 3 20z" />
+                                    <path d="M9.5 20V14l2.5-2 2.5 2v6" />
+                                </svg>
+                                <svg *ngSwitchCase="'trail'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round">
+                                    <path d="M22 18H6a2 2 0 0 1-2-2V7l4-3 4 3 4-3 4 3" />
+                                    <path d="M14 18v-6" />
+                                    <path d="M18 18v-4" />
+                                </svg>
+                                <svg *ngSwitchCase="'fire'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round">
+                                    <path
+                                        d="M12 12c2-2.96 0-7-1-8 0 3.038-1.773 4.741-3 6-1.226 1.26-2 3.24-2 5a6 6 0 1 0 12 0c0-1.532-1.056-3.94-2-5-1.786 3-2.791 3-4 2z" />
+                                </svg>
+                                <svg *ngSwitchCase="'moon'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round">
+                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                                </svg>
+                                <svg *ngSwitchCase="'leaf'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round">
+                                    <path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 17 3.5 17 3.5s1 5.5-3.5 10" />
+                                    <path d="M11 20v-5" />
+                                </svg>
+                                <svg *ngSwitchCase="'binoculars'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round">
+                                    <circle cx="12" cy="12" r="3" />
+                                    <path
+                                        d="M22 12c-2.667 4.667-6 7-10 7s-7.333-2.333-10-7c2.667-4.667 6-7 10-7s7.333 2.333 10 7" />
+                                </svg>
+                                <svg *ngSwitchCase="'star'" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+                                    <circle cx="12" cy="12" r="1.5" />
+                                </svg>
+                                <svg *ngSwitchDefault viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="12" cy="12" r="10" />
+                                </svg>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                    <span *ngIf="camper.badges.length > 3" class="lb-table__badge-count">+{{ camper.badges.length - 3
+                        }}</span>
+                </div>
+
+                <!-- Trend -->
+                <div class="lb-table__trend" [class.lb-table__trend--up]="camper.rankChange > 0"
+                    [class.lb-table__trend--down]="camper.rankChange < 0"
+                    [class.lb-table__trend--same]="camper.rankChange === 0">
+                    <ng-container *ngIf="camper.rankChange > 0">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round">
+                            <polyline points="18 15 12 9 6 15" />
+                        </svg>
+                        {{ camper.rankChange }}
+                    </ng-container>
+                    <ng-container *ngIf="camper.rankChange < 0">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round">
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                        {{ -camper.rankChange }}
+                    </ng-container>
+                    <ng-container *ngIf="camper.rankChange === 0">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                    </ng-container>
+                </div>
+            </div>
+
+            <div class="lb-table__footer">
+                <button class="lb-table__load-more">Load More Campers</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <div class="lb-footer">
+        <p class="lb-footer__text">
+            Rankings refresh every 24 hours · <span class="lb-footer__brand">CampConnect</span> Community Leaderboard
+        </p>
+    </div>
+
+    <!-- ===== YOUR POSITION FLOATING BAR ===== -->
+    <div class="lb-your-position" [class.lb-your-position--visible]="yourPositionVisible && selfCamper">
+        <div class="lb-your-position__rank">#{{ selfRank }}</div>
+        <div class="lb-your-position__info">
+            <span class="lb-your-position__label">Your Position</span>
+            <span class="lb-your-position__name">{{ selfCamper?.username }}</span>
+        </div>
+        <div class="lb-your-position__divider"></div>
+        <div>
+            <div class="lb-your-position__points">{{ selfCamper?.points | number }}</div>
+            <div class="lb-your-position__points-label">pts this month</div>
+        </div>
+    </div>
+
+</div>

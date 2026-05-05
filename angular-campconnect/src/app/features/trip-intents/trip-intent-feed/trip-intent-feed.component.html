@@ -1,0 +1,128 @@
+<div class="page-container animate-fade-in">
+    <!-- Premium Header Section -->
+    <div class="cc-hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Discover Adventures</h1>
+            <p class="hero-subtitle">Join a unique project or find the perfect companions for your expedition.</p>
+        </div>
+        <div class="hero-actions">
+            <button class="cc-btn cc-btn--outline bg-whiteish" routerLink="/companions/groups">
+                <lucide-icon [img]="Users" size="20"></lucide-icon>
+                My Projects
+            </button>
+            <button class="cc-btn cc-btn--primary" routerLink="/trip-intents/create">
+                <lucide-icon [img]="Plus" size="20"></lucide-icon>
+                Organize an Expedition
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters Area -->
+    <div class="filters-band">
+        <div class="search-container">
+            <div class="search-box">
+                <lucide-icon [img]="Search" size="18" class="search-icon"></lucide-icon>
+                <input type="text" 
+                       [(ngModel)]="searchQuery" 
+                       (ngModelChange)="applyFilter()"
+                       placeholder="Search by destination, title or organizer..." 
+                       class="search-input">
+            </div>
+        </div>
+        <div class="filter-pills">
+            <button class="filter-pill" [class.active]="selectedStyle === 'ALL'" (click)="setFilter('ALL')">All</button>
+            <button class="filter-pill" [class.active]="selectedStyle === 'WILD'" (click)="setFilter('WILD')">Wild</button>
+            <button class="filter-pill" [class.active]="selectedStyle === 'GLAMPING'" (click)="setFilter('GLAMPING')">Glamping</button>
+            <button class="filter-pill" [class.active]="selectedStyle === 'CAR_CAMPING'" (click)="setFilter('CAR_CAMPING')">Car Camping</button>
+            <button class="filter-pill" [class.active]="selectedStyle === 'TRADITIONAL'" (click)="setFilter('TRADITIONAL')">Traditional</button>
+            <button class="filter-pill" [class.active]="selectedStyle === 'BACKPACKING'" (click)="setFilter('BACKPACKING')">Backpacking</button>
+        </div>
+    </div>
+
+    <!-- Main Content State -->
+    <div *ngIf="loading" class="state-container loading-state">
+        <div class="premium-spinner"></div>
+        <p>Searching for distant horizons...</p>
+    </div>
+
+    <div *ngIf="!loading && filteredIntents.length === 0" class="state-container empty-state">
+        <div class="empty-icon-wrapper">
+            <lucide-icon [img]="Target" size="40"></lucide-icon>
+        </div>
+        <h3>No adventures on the horizon</h3>
+        <p>There are no projects matching this filter yet.</p>
+    </div>
+
+    <!-- Intents Grid -->
+    <div *ngIf="!loading && filteredIntents.length > 0" class="intents-grid">
+        <div *ngFor="let intent of filteredIntents" class="premium-card hover-lift" (click)="navigateToDetail(intent.id)">
+            
+            <div class="card-hero" 
+                 [style.background-image]="'url(' + (intent.imageUrl || getFallbackImage(intent.campingStyle)) + ')'">
+                <div class="card-hero-overlay"></div>
+                <div class="badges-container">
+                    <span *ngIf="intent.isTrending" class="badge-trending">
+                        <lucide-icon [img]="Flame" size="14"></lucide-icon> Trending
+                    </span>
+                    <span *ngIf="intent.compatibilityScore" class="badge-match" [ngClass]="{'match-high': intent.compatibilityScore > 75, 'match-medium': intent.compatibilityScore <= 75}">
+                        <lucide-icon [img]="Target" size="14"></lucide-icon> Match {{ intent.compatibilityScore | number:'1.0-0' }}%
+                    </span>
+                    <span class="badge-style">{{ getStyleLabel(intent.campingStyle) }}</span>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="creator-stamp">
+                    <img src="https://ui-avatars.com/api/?name=CA&background=2F4F3E&color=fff&rounded=true" alt="Avatar" class="creator-avatar">
+                    <div class="creator-info">
+                        <span class="creator-label">Organized by</span>
+                        <span class="creator-name">{{ intent.creatorName || (intent.creatorUserId.substring(0,8)) }}</span>
+                    </div>
+                </div>
+
+                <h3 class="intent-title">{{ intent.title || 'Timeless Camping Project' }}</h3>
+
+                <div class="intent-metrics">
+                    <div class="metric-item">
+                        <div class="metric-icon"><lucide-icon [img]="Calendar" size="16"></lucide-icon></div>
+                        <div class="metric-text">
+                            <span class="metric-val">{{ formatDate(intent.dateFrom) }} — {{ formatDate(intent.dateTo) }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-item" *ngIf="intent.preferredZone">
+                        <div class="metric-icon"><lucide-icon [img]="MapPin" size="16"></lucide-icon></div>
+                        <div class="metric-text">
+                            <span class="metric-val truncate">{{ intent.preferredZone }}</span>
+                        </div>
+                    </div>
+
+                    <div class="metrics-row-split">
+                        <div class="metric-item">
+                            <div class="metric-icon"><lucide-icon [img]="Target" size="16"></lucide-icon></div>
+                            <div class="metric-text">
+                                <span class="metric-label">Level</span>
+                                <span class="metric-val capitalize">{{ intent.experienceLevel.toLowerCase() }}</span>
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-icon"><lucide-icon [img]="DollarSign" size="16"></lucide-icon></div>
+                            <div class="metric-text">
+                                <span class="metric-label">Max Budget</span>
+                                <span class="metric-val">{{ intent.budgetMax }} DT</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer" [class.is-member]="isMember(intent.id)">
+                <span class="footer-action" *ngIf="!isMember(intent.id)">Join Expedition →</span>
+                <span class="footer-action member-status" *ngIf="isMember(intent.id)">
+                    <lucide-icon [img]="Check" size="14"></lucide-icon>
+                    Already Member
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

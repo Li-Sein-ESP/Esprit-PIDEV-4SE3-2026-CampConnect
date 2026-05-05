@@ -1,0 +1,157 @@
+<div class="min-h-screen bg-[var(--color-background)] py-12">
+  <div class="container max-w-6xl">
+    <div class="mb-8">
+      <h2 class="mb-2">Gear Cart</h2>
+      <p class="text-[var(--color-text-secondary)]">
+        Review your selected gear before checkout
+      </p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="text-center py-12">
+      <p class="text-[var(--color-text-secondary)]">Loading your cart...</p>
+    </div>
+
+    <!-- Error State -->
+    <app-card *ngIf="error && !loading" variant="elevated">
+      <app-card-content customClass="text-center py-8">
+        <p class="text-red-600 mb-4">{{ error }}</p>
+        <app-button (click)="loadCart()">Try Again</app-button>
+      </app-card-content>
+    </app-card>
+
+    <!-- Empty Cart -->
+    <app-card *ngIf="!loading && !error && cart && cart.items.length === 0" variant="elevated">
+      <app-card-content customClass="text-center py-16">
+        <div class="max-w-md mx-auto">
+          <h3 class="mb-4">Your cart is empty</h3>
+          <p class="text-[var(--color-text-secondary)] mb-6">
+            Browse our gear marketplace to add items to your cart.
+          </p>
+          <app-button routerLink="/gear">
+            Browse Gear
+          </app-button>
+        </div>
+      </app-card-content>
+    </app-card>
+
+    <!-- Cart with Items -->
+    <div *ngIf="!loading && !error && cart && cart.items.length > 0" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Cart Items -->
+      <div class="lg:col-span-2 space-y-4">
+        <app-card *ngFor="let item of cart.items; trackBy: trackByItemId" variant="elevated">
+          <app-card-content customClass="p-6">
+            <div class="flex gap-4">
+              <!-- Item Image -->
+              <div class="w-24 h-24 bg-[var(--color-surface)] rounded-lg overflow-hidden flex-shrink-0">
+                <img 
+                  *ngIf="item.gearImage" 
+                  [src]="item.gearImage" 
+                  [alt]="item.gearName"
+                  class="w-full h-full object-cover"
+                />
+                <div *ngIf="!item.gearImage" class="w-full h-full flex items-center justify-center text-4xl">
+                  📦
+                </div>
+              </div>
+
+              <!-- Item Details -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-start justify-between mb-2">
+                  <div>
+                    <h4 class="font-semibold text-lg mb-1">{{ item.gearName }}</h4>
+                    <p class="text-sm text-[var(--color-text-secondary)]">
+                      {{ item.gearCategory }} • {{ item.gearCondition }}
+                    </p>
+                  </div>
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
+                        [class.bg-emerald-100]="item.itemType === 'RENT'"
+                        [class.text-emerald-800]="item.itemType === 'RENT'"
+                        [class.bg-blue-100]="item.itemType === 'BUY'"
+                        [class.text-blue-800]="item.itemType === 'BUY'">
+                    {{ getItemTypeLabel(item.itemType) }}
+                  </span>
+                </div>
+
+                <div class="space-y-1 text-sm text-[var(--color-text-secondary)]">
+                  <div *ngIf="item.startDate && item.endDate">
+                    📅 {{ item.startDate }} to {{ item.endDate }} ({{ item.rentalDays }} days)
+                  </div>
+                  <div *ngIf="item.requiresDelivery">
+                    🚚 Delivery to: {{ item.deliveryAddress }}
+                  </div>
+                  <div>
+                    Quantity: {{ item.quantity }}
+                  </div>
+                </div>
+
+                <div class="mt-3 flex items-center justify-between">
+                  <div>
+                    <div class="font-semibold">${{ item.lineTotal.toFixed(2) }}</div>
+                    <div class="text-xs text-[var(--color-text-secondary)]">
+                      ${{ item.unitPrice.toFixed(2) }} each
+                      <span *ngIf="item.deposit > 0"> + ${{ item.deposit.toFixed(2) }} deposit</span>
+                    </div>
+                  </div>
+                  <app-button 
+                    variant="outline" 
+                    size="sm"
+                    (click)="removeItem(item.id)">
+                    Remove
+                  </app-button>
+                </div>
+              </div>
+            </div>
+          </app-card-content>
+        </app-card>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="lg:col-span-1">
+        <app-card variant="elevated" class="sticky top-4">
+          <app-card-content customClass="p-6">
+            <h3 class="font-semibold text-lg mb-4">Order Summary</h3>
+            
+            <div class="space-y-3 mb-6">
+              <div class="flex justify-between text-sm">
+                <span class="text-[var(--color-text-secondary)]">Subtotal</span>
+                <span class="font-medium">${{ cart.subtotal.toFixed(2) }}</span>
+              </div>
+              <div *ngIf="cart.totalDeposit > 0" class="flex justify-between text-sm">
+                <span class="text-[var(--color-text-secondary)]">Total Deposit</span>
+                <span class="font-medium">${{ cart.totalDeposit.toFixed(2) }}</span>
+              </div>
+              <div class="border-t border-[var(--color-border)] pt-3">
+                <div class="flex justify-between">
+                  <span class="font-semibold">Total</span>
+                  <span class="font-semibold text-xl">${{ cart.grandTotal.toFixed(2) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-3">
+              <app-button 
+                variant="primary" 
+                customClass="w-full"
+                (click)="checkout()">
+                Proceed to Checkout
+              </app-button>
+              <app-button 
+                variant="outline" 
+                customClass="w-full"
+                routerLink="/gear">
+                Continue Shopping
+              </app-button>
+            </div>
+
+            <div class="mt-6 pt-6 border-t border-[var(--color-border)]">
+              <p class="text-xs text-[var(--color-text-secondary)]">
+                <span class="font-medium">Note:</span> Deposits for rental items will be refunded upon return in good condition.
+              </p>
+            </div>
+          </app-card-content>
+        </app-card>
+      </div>
+    </div>
+  </div>
+</div>

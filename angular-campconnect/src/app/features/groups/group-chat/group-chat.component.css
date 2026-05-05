@@ -1,0 +1,211 @@
+/* =========================================
+   GROUP CHAT - PREMIUM FROSTED THEME
+   ========================================= */
+
+:host {
+    --chat-bg: #f5f2eb;
+    --my-bubble: linear-gradient(135deg, #2F4F3E 0%, #1d3027 100%);
+    --their-bubble: #ffffff;
+}
+
+.chat-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: transparent;
+    border: none;
+    overflow: hidden;
+    position: relative;
+}
+
+/* --- HEADER --- */
+.chat-header {
+    padding: 1.5rem 0;
+    background: transparent;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    margin-bottom: 1rem;
+}
+
+.chat-header h2 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #0a100e;
+    letter-spacing: -0.02em;
+}
+
+/* --- MESSAGES AREA --- */
+.messages-area {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.messages-area::-webkit-scrollbar { width: 4px; }
+.messages-area::-webkit-scrollbar-thumb { background: #e2e2e2; border-radius: 10px; }
+
+/* BUBBLES */
+.message-row {
+    display: flex;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.message-row.mine { justify-content: flex-end; }
+
+.bubble {
+    padding: 1rem 1.25rem;
+    border-radius: 1.5rem;
+    max-width: 80%;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.bubble-mine {
+    background: var(--my-bubble);
+    color: white;
+    border-bottom-right-radius: 0.5rem;
+    box-shadow: 0 10px 20px -5px rgba(47, 79, 62, 0.3);
+}
+
+.bubble-theirs {
+    background: var(--their-bubble);
+    color: #2F4F3E;
+    border: 1px solid rgba(0,0,0,0.03);
+    border-bottom-left-radius: 0.5rem;
+}
+
+.sender-name {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #a0a0a0;
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+.timestamp {
+    font-size: 0.6rem;
+    margin-top: 0.5rem;
+    display: block;
+    opacity: 0.6;
+    font-weight: 600;
+}
+
+.bubble-mine .timestamp { text-align: right; color: rgba(255,255,255,0.8); }
+
+/* --- INPUT AREA --- */
+.input-area {
+    padding: 1.5rem 0;
+    background: transparent;
+}
+
+.input-wrapper {
+    background: white;
+    border-radius: 2rem;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.02);
+    transition: all 0.3s ease;
+}
+
+.input-wrapper:focus-within {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(47, 79, 62, 0.1);
+    border-color: rgba(47, 79, 62, 0.2);
+}
+
+textarea {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #2F4F3E;
+    resize: none;
+    outline: none;
+    max-height: 120px;
+}
+
+.btn-send {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--my-bubble);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-send:hover:not(:disabled) {
+    transform: scale(1.1) rotate(-15deg);
+    box-shadow: 0 5px 15px rgba(47, 79, 62, 0.4);
+}
+
+.btn-send:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.action-icon {
+    color: #b0b0b0;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.action-icon:hover { color: var(--forest-600); }
+
+/* --- EMOJI PICKER --- */
+.emoji-picker {
+    position: absolute;
+    bottom: 90px;
+    right: 1rem;
+    background: white;
+    border-radius: 1.5rem;
+    padding: 1rem;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+    border: 1px solid rgba(0,0,0,0.05);
+    z-index: 100;
+    width: 280px;
+}
+
+.emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+}
+
+.emoji-btn {
+    font-size: 1.4rem;
+    line-height: 1;
+    padding: 6px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+    text-align: center;
+    background: transparent;
+    border: none;
+}
+.emoji-btn:hover {
+    background: #f0f7f3;
+    transform: scale(1.3);
+}
+
+/* --- CHAT IMAGE --- */
+.chat-image {
+    max-width: 220px;
+    max-height: 200px;
+    border-radius: 1rem;
+    object-fit: cover;
+    display: block;
+    margin-bottom: 0.25rem;
+}

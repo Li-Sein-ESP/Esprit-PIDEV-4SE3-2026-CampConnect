@@ -1,0 +1,134 @@
+<div class="chat-container">
+
+    <!-- Full Screen Image Modal -->
+    <div *ngIf="fullScreenImage" class="fixed inset-0 z-[1000] bg-black/90 flex items-center justify-center p-4" (click)="closeFullScreenImage()">
+        <button class="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors" (click)="closeFullScreenImage()">
+            <lucide-icon [img]="X" size="32"></lucide-icon>
+        </button>
+        <img [src]="fullScreenImage" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl" (click)="$event.stopPropagation()">
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div *ngIf="messageToDelete" class="fixed inset-0 z-[1000] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in" (click)="cancelDelete()">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl" (click)="$event.stopPropagation()">
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Supprimer le message ?</h3>
+            <p class="text-gray-500 text-sm mb-6">Cette action est définitive et le message sera supprimé pour tous les membres du groupe.</p>
+            <div class="flex gap-3 justify-end">
+                <button (click)="cancelDelete()" class="px-4 py-2 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-100 transition-colors">
+                    Annuler
+                </button>
+                <button (click)="deleteMessage()" class="px-4 py-2 rounded-xl text-sm font-semibold bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/30 transition-all">
+                    Supprimer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Header -->
+    <div class="chat-header">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2>Group Chat</h2>
+                <div class="flex items-center gap-1.5 mt-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Group</span>
+                </div>
+            </div>
+            <div class="flex -space-x-2">
+                <img *ngFor="let member of (group?.members || []) | slice:0:3" 
+                     [src]="getAvatar(member.id)" 
+                     class="w-7 h-7 rounded-full border-2 border-white">
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages Area -->
+    <div id="chat-scroll-container" class="messages-area custom-scrollbar">
+        <div *ngIf="loading && allMessages.length === 0" class="flex flex-col items-center justify-center h-full py-10">
+            <div class="w-8 h-8 border-2 border-forest-600/20 border-t-forest-600 rounded-full animate-spin"></div>
+            <p class="text-[10px] font-bold text-forest-600/40 uppercase tracking-widest mt-4">Loading messages...</p>
+        </div>
+
+        <div class="flex flex-col mt-auto pb-4">
+            <ng-container *ngFor="let msg of allMessages; let i = index">
+                <div class="message-row animate-fade-in" [ngClass]="{'mine': msg.senderUserId === currentUserId}">
+                    
+                    <!-- Avatar for others -->
+                    <img *ngIf="msg.senderUserId !== currentUserId" 
+                         [src]="getAvatar(msg.senderUserId)" 
+                         class="w-10 h-10 rounded-full mr-3 self-end mb-2 border-2 border-white shadow-sm">
+
+                    <div class="flex flex-col max-w-[80%] md:max-w-[70%]">
+                        <!-- Sender Name -->
+                        <span *ngIf="msg.senderUserId !== currentUserId && (i === 0 || allMessages[i-1].senderUserId !== msg.senderUserId)"
+                              class="sender-name">
+                            {{ getUserName(msg.senderUserId) }}
+                        </span>
+
+                        <!-- Bubble: Image & Text message -->
+                        <div class="bubble group relative" [ngClass]="msg.senderUserId === currentUserId ? 'bubble-mine' : 'bubble-theirs'">
+                            
+                            <!-- Delete button (only for current user's messages) -->
+                            <button *ngIf="msg.senderUserId === currentUserId" 
+                                    (click)="confirmDelete(msg.id)"
+                                    class="absolute -top-3 -left-2 bg-red-500 text-white rounded-full p-1.5 shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 z-10"
+                                    title="Delete message">
+                                <lucide-icon [img]="Trash2" size="12"></lucide-icon>
+                            </button>
+
+                            <img *ngIf="msg.imageUrl" [src]="msg.imageUrl" class="chat-image cursor-pointer hover:opacity-90 transition-opacity" alt="shared image" (click)="openFullScreenImage(msg.imageUrl)">
+                            <p *ngIf="msg.content">{{msg.content}}</p>
+                            <span class="timestamp">{{ formatTime(msg.createdAt) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+
+    <!-- Emoji Picker Popup -->
+    <div *ngIf="showEmojiPicker" class="emoji-picker animate-fade-in">
+        <div class="emoji-grid">
+            <button *ngFor="let emoji of emojiList" (click)="insertEmoji(emoji)" class="emoji-btn">{{emoji}}</button>
+        </div>
+    </div>
+
+    <!-- Hidden file input -->
+    <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" class="hidden">
+
+    <!-- Input Area -->
+    <div class="input-area">
+        <!-- Image Preview -->
+        <div *ngIf="selectedImagePreview" class="relative inline-block mb-2 ml-[3.5rem]">
+            <img [src]="selectedImagePreview" class="h-20 w-auto rounded-lg border-2 border-forest-500 shadow-md object-cover">
+            <button (click)="removeImagePreview()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-sm hover:bg-red-600 transition-colors">
+                <lucide-icon [img]="X" size="14"></lucide-icon>
+            </button>
+        </div>
+
+        <div class="input-wrapper">
+            <!-- Attachment button -->
+            <button (click)="fileInput.click()" class="action-icon p-1" title="Send an image">
+                <lucide-icon [img]="Paperclip" size="20"></lucide-icon>
+            </button>
+            
+            <textarea [(ngModel)]="newMessage" 
+                      (keydown.enter)="$event.preventDefault(); sendMessage()"
+                      placeholder="Type a message..."
+                      rows="1"></textarea>
+
+            <!-- Emoji button -->
+            <button (click)="toggleEmojiPicker()" class="action-icon p-1 hidden sm:block" title="Emojis"
+                    [style.color]="showEmojiPicker ? '#2F4F3E' : ''">
+                <lucide-icon [img]="Smile" size="20"></lucide-icon>
+            </button>
+
+            <button (click)="sendMessage()" 
+                    [disabled]="!newMessage.trim() && !selectedImagePreview"
+                    class="btn-send">
+                <lucide-icon [img]="Send" size="18"></lucide-icon>
+            </button>
+        </div>
+    </div>
+
+</div>

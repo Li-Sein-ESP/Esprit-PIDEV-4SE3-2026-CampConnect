@@ -1,0 +1,211 @@
+/* =========================================
+   GROUP EXPENSES - PREMIUM BUDGETARY GEAR
+   ========================================= */
+
+:host {
+    --clay-warm: #C97A3D;
+    --forest-deep: #2F4F3E;
+    --sage-light: #f0f7f3;
+}
+
+.expenses-container {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 3rem;
+}
+
+/* --- LEFT COLUMN: HISTORY --- */
+.history-header {
+    margin-bottom: 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.total-spent-card {
+    background: white;
+    padding: 1.5rem 2rem;
+    border-radius: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+.total-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #a0a0a0;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.total-amount {
+    font-size: 1.75rem;
+    font-weight: 900;
+    color: var(--forest-deep);
+}
+
+.expense-item {
+    background: white;
+    padding: 1.25rem 1.5rem;
+    border-radius: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(0,0,0,0.02);
+}
+.expense-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.category-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 1rem;
+    background: var(--sage-light);
+    color: var(--forest-deep);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.exp-details h4 {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #0a100e;
+    margin-bottom: 0.25rem;
+}
+
+.exp-details p {
+    font-size: 0.75rem;
+    color: #a0a0a0;
+    font-weight: 600;
+}
+
+.exp-amount {
+    margin-left: auto;
+    text-align: right;
+}
+
+.amount-val {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--clay-warm);
+}
+
+/* --- RIGHT COLUMN: ACTIONS & BALANCES --- */
+.sidebar-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.action-card {
+    background: var(--forest-deep);
+    color: white;
+    padding: 2.5rem;
+    border-radius: 2.5rem;
+    box-shadow: 0 20px 40px rgba(47, 79, 62, 0.2);
+}
+
+.action-card h3 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+}
+
+.input-group { margin-bottom: 1.25rem; }
+.input-group label {
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.premium-input {
+    width: 100%;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid transparent;
+    padding: 1rem 1.25rem;
+    border-radius: 1.25rem;
+    color: white;
+    font-weight: 600;
+    outline: none;
+    transition: all 0.3s;
+}
+.premium-input::placeholder { color: rgba(255,255,255,0.2); }
+.premium-input:focus { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
+
+.input-invalid {
+    border-color: #ff6b6b !important;
+    background: rgba(255, 107, 107, 0.1) !important;
+    box-shadow: 0 0 15px rgba(255, 107, 107, 0.2);
+}
+
+.validation-badge {
+    position: absolute;
+    right: 1rem;
+    top: 0;
+    background: #ff6b6b;
+    color: white;
+    font-size: 10px;
+    font-weight: 900;
+    padding: 2px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    animation: pulseBadge 2s infinite;
+}
+
+@keyframes pulseBadge {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+}
+
+.shake-error {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+/* BALANCE CARD */
+.balance-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 2.5rem;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.03);
+}
+
+.balance-item {
+    padding: 1rem;
+    background: var(--sage-light);
+    border-radius: 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.debt-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--forest-deep);
+}
+
+.debt-amount { color: #ef4444; }
+
+@media (max-width: 1024px) {
+    .expenses-container { grid-template-columns: 1fr; }
+}

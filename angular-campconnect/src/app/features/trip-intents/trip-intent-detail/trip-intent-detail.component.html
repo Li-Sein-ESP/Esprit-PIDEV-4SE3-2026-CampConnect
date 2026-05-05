@@ -1,0 +1,216 @@
+<div class="detail-container animate-fade-in" *ngIf="!loading && !error && intent">
+
+    <div class="nav-header">
+        <button class="btn-back" routerLink="/trip-intents">
+            <lucide-icon [img]="ArrowLeft" size="18"></lucide-icon>
+            <span>Back to Explorer</span>
+        </button>
+    </div>
+
+    <div class="page-layout">
+        <!-- Main Content -->
+        <div class="main-content">
+            
+            <!-- Hero Header Card -->
+            <div class="hero-card" 
+                 [style.background-image]="'url(' + (intent.imageUrl || getFallbackImage(intent.campingStyle)) + ')'">
+                <div class="hero-glass">
+                    <div class="hero-top">
+                        <div class="badges-stack">
+                            <span class="badge-glass">{{ getStyleLabel(intent.campingStyle) }}</span>
+                            <span class="badge-status" [ngClass]="'status-' + intent.status.toLowerCase()">
+                                {{ getStatusLabel(intent.status) }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <h1 class="intent-title">{{ intent.title || 'Nature Expedition' }}</h1>
+                    
+                    <div class="hero-footer">
+                        <div class="stat-pill">
+                            <lucide-icon [img]="Calendar" size="16"></lucide-icon>
+                            <span>{{ getDaysDifference(intent.dateFrom, intent.dateTo) }} Days Trip</span>
+                        </div>
+                        <div class="stat-pill" *ngIf="intent.preferredZone">
+                            <lucide-icon [img]="MapPin" size="16"></lucide-icon>
+                            <span>{{ intent.preferredZone }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Information -->
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="card-header">
+                        <lucide-icon [img]="Compass" size="20"></lucide-icon>
+                        <h3>Trip Vision</h3>
+                    </div>
+                    <div class="info-body">
+                        <div class="detail-item">
+                            <div class="icon-wrap bg-sage">
+                                <lucide-icon [img]="Calendar" size="20"></lucide-icon>
+                            </div>
+                            <div class="text-wrap">
+                                <label>Planned Window</label>
+                                <p>{{ formatDate(intent.dateFrom) }} — {{ formatDate(intent.dateTo) }}</p>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="icon-wrap bg-clay">
+                                <lucide-icon [img]="DollarSign" size="20"></lucide-icon>
+                            </div>
+                            <div class="text-wrap">
+                                <label>Estimated Budget</label>
+                                <p>Maximum of <strong>{{ intent.budgetMax }} DT</strong> per person</p>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="icon-wrap bg-earth">
+                                <lucide-icon [img]="Target" size="20"></lucide-icon>
+                            </div>
+                            <div class="text-wrap">
+                                <label>Experience Target</label>
+                                <p>Seeking <strong>{{ intent.experienceLevel | titlecase }}</strong> companions</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Insights Section -->
+                <div class="info-card ai-card" *ngIf="!isCreator && intent.compatibilityScore !== undefined">
+                    <div class="card-header">
+                        <lucide-icon [img]="Flame" size="20" class="text-clay"></lucide-icon>
+                        <h3>AI Compatibility Analysis</h3>
+                    </div>
+                    <div class="ai-body">
+                        <div class="score-display">
+                            <div class="score-circle">
+                                <svg viewBox="0 0 36 36" class="circular-chart">
+                                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <path class="circle" [style.stroke-dasharray]="intent.compatibilityScore + ', 100'"
+                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                </svg>
+                                <div class="percentage">{{ intent.compatibilityScore | number:'1.0-0' }}%</div>
+                            </div>
+                            <div class="score-text">
+                                <p class="insight-msg">{{ getCompatibilityMessage().message }}</p>
+                            </div>
+                        </div>
+
+                        <div class="traits-grid" *ngIf="participantScoresArray.length > 0">
+                            <div class="trait-row" *ngFor="let p of participantScoresArray">
+                                <span class="trait-name">{{ p.name }}</span>
+                                <div class="trait-bar">
+                                    <div class="trait-fill" [style.width.%]="p.score"></div>
+                                </div>
+                                <span class="trait-val">{{ p.score | number:'1.0-0' }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Actions -->
+        <div class="sidebar">
+            <div class="sticky-sidebar">
+                <!-- Organizer Card -->
+                <div class="action-card profile-section">
+                    <div class="organizer-chip">
+                        <img src="https://ui-avatars.com/api/?name=User&background=6B8F71&color=fff&size=100" alt="Avatar">
+                        <div class="org-info">
+                            <span class="label">Organizer</span>
+                            <span class="name">{{ intent.creatorName || 'Aventurier' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Actions Card -->
+                <div class="action-card management-card" [ngClass]="{'owner-mode': isCreator}">
+                    <h3 class="action-title">{{ isCreator ? 'Manage Your Project' : 'Join Adventure' }}</h3>
+                    
+                    <div class="action-group">
+                        <ng-container *ngIf="isCreator">
+                            <button class="btn btn-primary-alt" routerLink="/invites">
+                                <lucide-icon [img]="Users" size="18"></lucide-icon>
+                                Manage Invitations
+                            </button>
+                            
+                            <button class="btn btn-secondary-alt" (click)="navigateToGroup(intent.groupId)" *ngIf="intent.groupId">
+                                <lucide-icon [img]="Share2" size="18" class="rotate-90"></lucide-icon>
+                                Access Group Space
+                            </button>
+
+                            <div class="divider"><span>Configuration</span></div>
+                            
+                            <button class="btn btn-ghost-alt" [routerLink]="['/trip-intents/edit', intent.id]">
+                                <lucide-icon [img]="Settings" size="18"></lucide-icon>
+                                Edit Details
+                            </button>
+                            
+                            <button class="btn btn-danger-alt" (click)="deleteIntent()">
+                                <lucide-icon [img]="Trash2" size="18"></lucide-icon>
+                                Close Project
+                            </button>
+                        </ng-container>
+
+                        <ng-container *ngIf="!isCreator">
+                            <div *ngIf="isMember" class="member-badge">
+                                <lucide-icon [img]="Check" size="18"></lucide-icon>
+                                Already a Member
+                            </div>
+
+                            <button *ngIf="!isMember"
+                                class="btn btn-join"
+                                (click)="requestToJoin()"
+                                [disabled]="isJoining || hasRequested"
+                                [ngClass]="{'loading': isJoining, 'requested': hasRequested, 'success': requestSuccess}">
+                                
+                                <lucide-icon [img]="Users" size="18" *ngIf="!isJoining && !hasRequested && !requestSuccess"></lucide-icon>
+                                <lucide-icon [img]="Loader2" size="18" class="animate-spin" *ngIf="isJoining"></lucide-icon>
+                                <lucide-icon [img]="Clock" size="18" *ngIf="hasRequested && !requestSuccess"></lucide-icon>
+                                <lucide-icon [img]="Check" size="18" *ngIf="requestSuccess"></lucide-icon>
+                                
+                                <span>{{ 
+                                    isJoining ? 'Sending...' : 
+                                    (hasRequested ? 'Request Pending' : 
+                                    (requestSuccess ? 'Sent Successfully!' : 'Request to Join')) 
+                                }}</span>
+                            </button>
+
+                            <button *ngIf="hasRequested && !requestSuccess"
+                                class="btn btn-cancel mt-2"
+                                (click)="cancelJoinRequest()"
+                                [disabled]="isJoining">
+                                <lucide-icon [img]="Trash2" size="16"></lucide-icon>
+                                Cancel Request
+                            </button>
+
+                            <button class="btn btn-secondary-alt w-full mt-4" (click)="navigateToGroup(intent.groupId)" *ngIf="isMember && intent.groupId">
+                                <lucide-icon [img]="Share2" size="18" class="rotate-90"></lucide-icon>
+                                Enter Group Space
+                            </button>
+                        </ng-container>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading & Error States -->
+<div *ngIf="loading" class="state-container">
+    <div class="modern-loader"></div>
+    <p>Exploring the wilderness...</p>
+</div>
+
+<div *ngIf="error && !loading" class="state-container error-state">
+    <div class="error-icon">!</div>
+    <h2>Project Not Found</h2>
+    <p>This adventure may have already started or been moved to a new horizon.</p>
+    <button class="btn btn-primary-alt mt-4" routerLink="/trip-intents">Return to Feed</button>
+</div>

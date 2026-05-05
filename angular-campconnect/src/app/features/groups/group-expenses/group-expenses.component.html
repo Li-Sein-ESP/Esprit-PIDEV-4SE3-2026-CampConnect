@@ -1,0 +1,130 @@
+<div class="expenses-container animate-fade-in">
+
+    <!-- Left Column: History -->
+    <div class="history-column">
+        <div class="history-header">
+            <div class="total-spent-card">
+                <span class="total-label">Total Spent</span>
+                <div class="total-amount">{{getTotalSpent()}} DT</div>
+            </div>
+            
+            <button (click)="showNewExpenseForm = true" class="px-6 py-3 bg-[var(--sage-light)] text-[var(--forest-deep)] rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-white hover:shadow-md transition-all">
+                <lucide-icon [img]="Plus" size="16" class="inline mr-2"></lucide-icon>
+                Add Expense
+            </button>
+        </div>
+
+        <div class="expense-history custom-scrollbar pr-4">
+            <div *ngIf="expenses.length === 0" class="p-20 border-2 border-dashed border-gray-100 rounded-[2.5rem] text-center">
+                <p class="text-sm text-gray-400 font-bold uppercase tracking-widest">No financial logs recorded yet. 💰</p>
+            </div>
+
+            <div *ngFor="let exp of expenses" class="expense-item animate-fade-in group">
+                <div class="category-icon">
+                    <lucide-icon [img]="Receipt" size="20"></lucide-icon>
+                </div>
+                <div class="exp-details">
+                    <h4>{{exp.description}}</h4>
+                    <p>Paid by <span class="text-[var(--forest-deep)]">{{getMemberName(exp.paidByUserId)}}</span></p>
+                </div>
+                <div class="exp-amount">
+                    <div class="amount-val">{{exp.amount}} DT</div>
+                    <div class="text-[9px] font-black text-gray-300 uppercase tracking-tighter">Split among {{exp.participants.length}}</div>
+                </div>
+                
+                <!-- Delete Action (visible to payer or group creator) -->
+                <button *ngIf="exp.paidByUserId === currentUserId || currentUserId === group?.creatorUserId"
+                        (click)="deleteExpense(exp)"
+                        class="ml-4 p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                        title="Delete expense">
+                    <lucide-icon [img]="Trash2" size="16"></lucide-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Sidebar -->
+    <div class="sidebar-panel">
+        
+        <!-- Add Expense Form -->
+        <div *ngIf="showNewExpenseForm" class="action-card animate-fade-in" [class.shake-error]="formError">
+            <h3 class="flex items-center justify-between">
+                Add Expense
+                <lucide-icon [img]="X" size="18" class="cursor-pointer opacity-50 hover:opacity-100" (click)="showNewExpenseForm = false"></lucide-icon>
+            </h3>
+            <div class="space-y-4">
+                <div class="input-group relative">
+                    <label>Description</label>
+                    <input type="text" [(ngModel)]="newExpenseDescription" placeholder="e.g. Food" 
+                           class="premium-input" [class.input-invalid]="formError && !newExpenseDescription">
+                    <span *ngIf="formError && !newExpenseDescription" class="validation-badge">Required</span>
+                </div>
+                <div class="input-group relative">
+                    <label>Amount (DT)</label>
+                    <input type="number" [(ngModel)]="newExpenseAmount" placeholder="0.00" 
+                           class="premium-input" [class.input-invalid]="formError && (!newExpenseAmount || newExpenseAmount <= 0)">
+                    <span *ngIf="formError && (!newExpenseAmount || newExpenseAmount <= 0)" class="validation-badge">Required</span>
+                </div>
+                <div class="input-group">
+                    <label>Payer</label>
+                    <select [(ngModel)]="newExpensePaidBy" class="premium-input bg-forest-800">
+                        <option *ngFor="let member of members" [value]="member.userId">{{getMemberName(member.userId)}}</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Split among</label>
+                    <div class="split-checklist custom-scrollbar max-h-32 overflow-y-auto bg-white/5 rounded-xl p-2 border border-white/10">
+                        <label *ngFor="let member of members" class="flex items-center gap-3 p-2 hover:bg-white/10 rounded-lg cursor-pointer transition">
+                            <input type="checkbox" [checked]="newExpenseSplitAmong.includes(member.userId)"
+                                   (change)="toggleSplitMember(member.userId)"
+                                   class="w-4 h-4 rounded border-none bg-white/20 text-[var(--clay-500)] focus:ring-0">
+                            <span class="text-xs font-bold text-white/80">{{getMemberName(member.userId)}}</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-4 pt-4 border-t border-white/10">
+                    <button (click)="showNewExpenseForm = false" class="text-xs font-bold text-white/50 hover:text-white transition">Cancel</button>
+                    <button (click)="submitExpense()"
+                            class="px-6 py-2 bg-[var(--clay-500)] text-white rounded-xl font-bold text-xs hover:bg-[#b06a33] transition">Save Expense</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Balances Card -->
+        <div class="balance-card animate-fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                    <lucide-icon [img]="Wallet" size="20"></lucide-icon>
+                </div>
+                <div>
+                    <h3 class="text-lg font-extrabold text-[var(--forest-900)]">Balances</h3>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Who owes what</p>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <div *ngIf="balances.length === 0 || getTotalSpent() === 0" class="text-center py-6">
+                    <p class="text-xs text-gray-400 font-medium">Everyone is perfectly balanced. ⚖️</p>
+                </div>
+
+                <div *ngFor="let balance of balances">
+                    <div *ngIf="(balance.owes | keyvalue).length > 0" class="balance-item">
+                        <div class="flex items-center gap-2 mb-3">
+                            <img [src]="'https://ui-avatars.com/api/?name='+balance.userId+'&background=random&size=24'" class="w-6 h-6 rounded-full">
+                            <span class="text-xs font-black text-[var(--forest-900)] uppercase">{{getMemberName(balance.userId)}} owes</span>
+                        </div>
+                        <div class="space-y-2 pl-4">
+                            <div *ngFor="let debt of balance.owes | keyvalue" class="debt-row">
+                                <span class="opacity-60">{{getMemberName(debt.key)}}</span>
+                                <span class="debt-amount">{{debt.value | number:'1.2-2'}} DT</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,234 @@
+<!-- Loading State -->
+<div *ngIf="loading" class="flex flex-col items-center justify-center min-h-screen bg-[#fdfcf8]">
+    <div class="premium-loader"></div>
+    <p class="mt-6 text-[var(--forest-600)] font-bold tracking-widest uppercase text-xs">Assembling Expedition Data...</p>
+</div>
+
+<!-- Main Group Layout -->
+<div *ngIf="!loading && group" class="group-layout">
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <!-- Group Header -->
+        <div class="group-header-brand">
+            <button class="back-link" routerLink="/companions/groups">
+                <lucide-icon [img]="ArrowLeft" size="14"></lucide-icon>
+                <span>Back to groups</span>
+            </button>
+            
+            <h1 class="group-title">{{ group.name }}</h1>
+            <p class="group-subtitle">
+                <lucide-icon [img]="Compass" size="12"></lucide-icon>
+                Camping Group
+            </p>
+        </div>
+
+        <!-- Navigation Menu -->
+        <div class="nav-menu">
+            <button (click)="switchTab('chat')" [class.active]="activeTab === 'chat'" class="nav-item">
+                <lucide-icon [img]="MessageSquare" size="20"></lucide-icon>
+                <span>Discussion</span>
+                <span class="unread-badge animate-bounce" *ngIf="unreadChatCount > 0">{{ unreadChatCount }}</span>
+            </button>
+
+            <button (click)="switchTab('planning')" [class.active]="activeTab === 'planning'" class="nav-item">
+                <lucide-icon [img]="CheckSquare" size="20"></lucide-icon>
+                <span>Planning</span>
+            </button>
+
+            <button (click)="switchTab('expenses')" [class.active]="activeTab === 'expenses'" class="nav-item">
+                <lucide-icon [img]="Receipt" size="20"></lucide-icon>
+                <span>Budget</span>
+            </button>
+
+            <div class="mt-auto pt-6 border-t border-white/5">
+                <button (click)="switchTab('settings')" [class.active]="activeTab === 'settings'" class="nav-item">
+                <lucide-icon [img]="Settings" size="20"></lucide-icon>
+                <span>Group Settings</span>
+            </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Hero Banner -->
+        <div class="hero-banner" [style.background-image]="'url(https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?auto=format&fit=crop&q=80&w=1200)'">
+            <div class="hero-overlay"></div>
+            <div class="hero-info animate-fade-in">
+                <div class="members-stack">
+                    <img *ngFor="let member of (group.members || []) | slice:0:5" 
+                         [src]="getMemberAvatar(member.id)"
+                         class="avatar-ring" 
+                         [title]="member.name">
+                    <button (click)="toggleMembersModal()" class="btn-manage-members" title="View Members">
+                        <lucide-icon [img]="Users" size="18"></lucide-icon>
+                    </button>
+                </div>
+
+                <div *ngIf="group.status === 'INACTIVE' && membersToEvaluate.length > 0" class="mb-1">
+                    <button (click)="openFeedbackModal()" class="px-6 py-2.5 text-xs font-bold text-white bg-[var(--clay-500)] hover:bg-[#b06a33] rounded-full shadow-lg transition-all flex items-center gap-2">
+                        <lucide-icon [img]="MessageSquare" size="14"></lucide-icon>
+                        LEAVE FEEDBACK
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI MERGE PROPOSALS ALERTS -->
+        <div *ngIf="mergeProposals.length > 0" class="px-8 mt-6">
+            <div *ngFor="let proposal of mergeProposals" class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6 shadow-sm flex items-center justify-between animate-fade-in mb-4">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center flex-shrink-0 shadow-lg">
+                        <lucide-icon [img]="Compass" size="24"></lucide-icon>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-black text-amber-900">Opportunité de Fusion IA (Match: {{proposal.matchScore | number:'1.0-0'}}%)</h3>
+                        <p class="text-sm font-medium text-amber-800/80 mt-1">{{proposal.message}}</p>
+                        <p class="text-xs font-bold text-amber-600/60 mt-1 uppercase tracking-widest">Cible : {{proposal.targetTripTitle}}</p>
+                        
+                        <!-- Status message for double handshake -->
+                        <div *ngIf="hasAccepted(proposal) && !hasOtherAccepted(proposal)" class="mt-3 text-xs font-bold text-amber-700 bg-amber-100/50 inline-block px-3 py-1 rounded-lg">
+                            ⏳ Vous avez accepté. En attente de l'autre groupe...
+                        </div>
+                        <div *ngIf="!hasAccepted(proposal) && hasOtherAccepted(proposal)" class="mt-3 text-xs font-black text-orange-600 bg-orange-100 inline-block px-3 py-1 rounded-lg animate-pulse">
+                            🔥 L'autre groupe a déjà accepté ! Rejoignez-les.
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button *ngIf="!hasAccepted(proposal)" (click)="handleRejectProposal(proposal)" class="px-4 py-2 bg-white text-amber-600 font-bold rounded-xl hover:bg-amber-100 transition-all text-xs">Ignorer</button>
+                    <button *ngIf="!hasAccepted(proposal)" (click)="handleAcceptProposal(proposal)" class="px-6 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-black rounded-xl shadow-lg hover:shadow-orange-500/20 hover:scale-105 transition-all text-xs">Accepter la fusion</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- View Container -->
+        <div class="view-container custom-scrollbar">
+            <ng-container [ngSwitch]="activeTab">
+                <!-- Chat View -->
+                <div *ngSwitchCase="'chat'" class="h-full animate-fade-in">
+                    <app-group-chat [groupId]="group.id" [group]="group" [currentUserId]="currentUserId" class="block h-full"></app-group-chat>
+                </div>
+
+                <!-- Planning View -->
+                <div *ngSwitchCase="'planning'" class="h-full animate-fade-in">
+                    <app-group-planning [groupId]="group.id" class="block h-full"></app-group-planning>
+                </div>
+
+                <!-- Expenses View -->
+                <div *ngSwitchCase="'expenses'" class="h-full animate-fade-in">
+                    <app-group-expenses [groupId]="group.id" [group]="group" [currentUserId]="currentUserId" class="block h-full"></app-group-expenses>
+                </div>
+
+                <!-- Settings View -->
+                <div *ngSwitchCase="'settings'" class="h-full animate-fade-in">
+                    <div class="max-w-3xl bg-white border border-black/5 rounded-[2.5rem] p-10 shadow-sm">
+                        <div class="flex items-center gap-4 mb-10">
+                            <div class="w-14 h-14 rounded-2xl bg-[#f0f7f3] text-[var(--forest-600)] flex items-center justify-center">
+                                <lucide-icon [img]="Settings" size="24"></lucide-icon>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-extrabold text-[var(--forest-900)]">Group Settings</h2>
+                                <p class="text-sm text-[var(--sage-500)] font-medium">Update group info and preferences.</p>
+                            </div>
+                        </div>
+
+                        <form [formGroup]="groupForm" (ngSubmit)="onUpdateGroup()" class="space-y-6">
+                            <div class="form-group">
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Group Name</label>
+                                <input type="text" formControlName="name" [readonly]="currentUserId !== group.creatorUserId"
+                                    class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[var(--sage-500)] transition font-bold text-gray-700"
+                                    [class.opacity-60]="currentUserId !== group.creatorUserId">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 flex items-center justify-between">
+                                    Group Status
+                                    <span *ngIf="currentUserId !== group.creatorUserId" class="text-[8px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">CREATOR ONLY</span>
+                                </label>
+                                <select formControlName="status" [attr.disabled]="currentUserId !== group.creatorUserId ? '' : null"
+                                    class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[var(--sage-500)] transition font-bold text-gray-700 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60">
+                                    <option value="ACTIVE">Active</option>
+                                    <option value="INACTIVE">Inactive (Archived)</option>
+                                </select>
+                            </div>
+
+                            <div *ngIf="currentUserId === group.creatorUserId" class="pt-6 flex justify-end">
+                                <button type="submit" [disabled]="groupForm.invalid || isUpdating"
+                                    class="px-8 py-4 bg-[var(--forest-600)] text-white rounded-2xl font-bold hover:bg-[var(--forest-900)] shadow-xl shadow-forest-600/10 transition-all flex items-center gap-3">
+                                    <lucide-icon *ngIf="!isUpdating" [img]="Save" size="18"></lucide-icon>
+                                    <div *ngIf="isUpdating" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div *ngIf="currentUserId === group.creatorUserId" class="p-6 border border-red-100 bg-red-50/30 rounded-[2rem]">
+                                <h3 class="text-sm font-black text-red-800 uppercase tracking-wider mb-2">Danger Zone</h3>
+                                <p class="text-xs text-red-600/60 mb-6">Permanently delete this group and all its data. This cannot be undone.</p>
+                                <button (click)="onDeleteGroup()" class="w-full py-3 bg-white text-red-600 border border-red-100 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white transition-all">
+                                    Delete Group
+                                </button>
+                            </div>
+                            <div class="p-6 border border-amber-100 bg-amber-50/30 rounded-[2rem]">
+                                <h3 class="text-sm font-black text-amber-800 uppercase tracking-wider mb-2">Leave Group</h3>
+                                <p class="text-xs text-amber-600/60 mb-6">Remove yourself from this group. You will lose access to all chats.</p>
+                                <button (click)="onLeaveGroup()" class="w-full py-3 bg-white text-amber-600 border border-amber-100 rounded-xl text-xs font-bold hover:bg-amber-600 hover:text-white transition-all">
+                                    Leave Group
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </main>
+</div>
+
+<!-- Members Modal -->
+<div *ngIf="showMembersModal" 
+     class="fixed inset-0 z-[100] flex items-center justify-center p-4 premium-modal-overlay animate-fade-in"
+     (click)="toggleMembersModal()">
+    
+    <div class="premium-modal w-full max-w-lg scale-in-up" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-extrabold tracking-tight">Group Members</h3>
+                    <p class="text-xs text-white/50 font-bold uppercase tracking-widest mt-1">{{ group?.members?.length }} Campers Joined</p>
+                </div>
+                <button (click)="toggleMembersModal()" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
+                    <lucide-icon [img]="X" size="20"></lucide-icon>
+                </button>
+            </div>
+        </div>
+
+        <div class="p-6 max-h-[60vh] overflow-y-auto">
+            <div class="space-y-4">
+                <div *ngFor="let member of group?.members" class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-all group">
+                    <img [src]="getMemberAvatar(member.id)" class="h-14 w-14 rounded-full border-4 border-white shadow-sm">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <h4 class="font-bold text-gray-900">{{ member.name || 'Explorer' }}</h4>
+                            <span *ngIf="member.id === group?.creatorUserId" class="px-2 py-0.5 rounded-full bg-[var(--forest-600)] text-[8px] font-black text-white uppercase tracking-tighter">Captain</span>
+                        </div>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Verified Camper</p>
+                    </div>
+                    <button class="w-10 h-10 rounded-xl bg-white text-gray-400 hover:text-[var(--forest-600)] hover:shadow-md transition-all opacity-0 group-hover:opacity-100">
+                        <lucide-icon [img]="Compass" size="18"></lucide-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<app-feedback-modal *ngIf="showFeedbackModal && group"
+    [tripIntentId]="group.tripId"
+    [groupId]="group.id"
+    [membersToEvaluate]="membersToEvaluate"
+    (close)="showFeedbackModal = false"
+    (feedbackSubmitted)="onFeedbackSubmitted()">
+</app-feedback-modal>

@@ -1,0 +1,137 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-all animate-fade-in">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+        
+        <!-- Header -->
+        <div class="p-6 pb-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+            <div>
+                <h3 class="text-xl font-bold text-gray-900 font-cabinet">Share your experience</h3>
+                <p class="text-sm text-gray-500 mt-1">Help our AI understand you better.</p>
+            </div>
+            <button (click)="closeModal()" class="text-gray-400 hover:text-gray-700 transition-colors p-2 rounded-full hover:bg-gray-100">
+                <lucide-icon [img]="X" size="20"></lucide-icon>
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6" *ngIf="currentMember">
+            
+            <div class="flex items-center gap-4 mb-8 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                <div class="w-12 h-12 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-xl relative overflow-hidden group">
+                    <img *ngIf="currentMember.avatarUrl" [src]="currentMember.avatarUrl" class="w-full h-full object-cover">
+                    <span *ngIf="!currentMember.avatarUrl">{{ currentMember.name?.charAt(0) || currentMember.username?.charAt(0) || '?' }}</span>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg text-gray-900">{{ currentMember.name || currentMember.username }}</h4>
+                    <p class="text-sm text-gray-500">Evaluation {{ currentIndex + 1 }} of {{ membersToEvaluate.length }}</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Openness -->
+                <div class="trait-block">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Was this person open-minded regarding unexpected events?
+                    </label>
+                    <input type="range" min="1" max="10" [(ngModel)]="currentFeedback.opennessScore" class="w-full accent-indigo-600">
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                        <span>Not at all (1)</span><span>Very open (10)</span>
+                    </div>
+                </div>
+
+                <!-- Conscientiousness -->
+                <div class="trait-block">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Was this person serious and organized in the camp?
+                    </label>
+                    <input type="range" min="1" max="10" [(ngModel)]="currentFeedback.conscientiousnessScore" class="w-full accent-indigo-600">
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                        <span>Chaotic (1)</span><span>Very responsible (10)</span>
+                    </div>
+                </div>
+
+                <!-- Extraversion -->
+                <div class="trait-block">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Was this person very communicative and hyper social?
+                    </label>
+                    <input type="range" min="1" max="10" [(ngModel)]="currentFeedback.extraversionScore" class="w-full accent-indigo-600">
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                        <span>Reserved (1)</span><span>Extraverted (10)</span>
+                    </div>
+                </div>
+
+                <!-- Agreeableness -->
+                <div class="trait-block">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Was this person cooperative and easy to get along with?
+                    </label>
+                    <input type="range" min="1" max="10" [(ngModel)]="currentFeedback.agreeablenessScore" class="w-full accent-indigo-600">
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                        <span>Conflictual (1)</span><span>Very pleasant (10)</span>
+                    </div>
+                </div>
+
+                <!-- Neuroticism -->
+                <div class="trait-block">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Did this person often react with anxiety or stress when facing problems?
+                    </label>
+                    <input type="range" min="1" max="10" [(ngModel)]="currentFeedback.neuroticismScore" class="w-full accent-indigo-600">
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                        <span>Very calm (1)</span><span>Very anxious (10)</span>
+                    </div>
+                </div>
+
+                <hr class="border-gray-100 my-6">
+
+                <!-- Final ML Label -->
+                <div class="bg-gray-50 rounded-xl p-5 border border-gray-100">
+                    <h4 class="font-bold text-gray-900 mb-1 flex items-center gap-2">
+                        <lucide-icon [img]="Star" size="18" class="text-orange-400"></lucide-icon>
+                        Final Verdict
+                    </h4>
+                    <p class="text-sm text-gray-500 mb-4">Would you be willing to go camping with this person again in the future?</p>
+                    
+                    <div class="flex gap-4">
+                        <button type="button" 
+                                class="flex-1 text-center p-3 rounded-lg border-2 transition-all font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                [ngClass]="currentFeedback.isCompatible === true ? 'border-indigo-600 bg-indigo-50 text-indigo-600' : 'border-gray-200 text-gray-500 hover:bg-gray-50'"
+                                (click)="currentFeedback.isCompatible = true">
+                            Yes, absolutely!
+                        </button>
+                        <button type="button" 
+                                class="flex-1 text-center p-3 rounded-lg border-2 transition-all font-medium focus:outline-none focus:ring-2 focus:ring-red-500"
+                                [ngClass]="currentFeedback.isCompatible === false ? 'border-red-500 bg-red-50 text-red-600' : 'border-gray-200 text-gray-500 hover:bg-gray-50'"
+                                (click)="currentFeedback.isCompatible = false">
+                            No, better avoid
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3" *ngIf="currentMember">
+            <button class="px-5 py-2.5 rounded-xl font-medium text-gray-600 hover:bg-gray-200 transition-colors" (click)="closeModal()">
+                Later
+            </button>
+            <button class="px-6 py-2.5 rounded-xl font-medium bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:translate-y-0"
+                    (click)="submitCurrentFeedback()"
+                    [disabled]="isSubmitting">
+                <span *ngIf="!isSubmitting">{{ currentIndex < membersToEvaluate.length - 1 ? 'Next' : 'Finish' }}</span>
+                <span *ngIf="isSubmitting">Sending...</span>
+            </button>
+        </div>
+        
+        <!-- State when done -->
+        <div class="flex-1 flex flex-col items-center justify-center p-12 text-center" *ngIf="!currentMember">
+            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4">
+                <lucide-icon [img]="Star" size="32"></lucide-icon>
+            </div>
+            <h3 class="text-2xl font-bold mb-2">Thank you for your feedback!</h3>
+            <p class="text-gray-500 mb-6">Your evaluations will allow our AI to offer increasingly precise matches.</p>
+            <button class="px-6 py-2.5 rounded-xl font-medium bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:-translate-y-0.5 transition-all" (click)="closeModal()">
+                Close
+            </button>
+        </div>
+    </div>
+</div>

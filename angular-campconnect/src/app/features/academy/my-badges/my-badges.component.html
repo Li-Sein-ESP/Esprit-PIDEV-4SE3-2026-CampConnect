@@ -1,0 +1,307 @@
+<div class="academy-container relative min-h-screen bg-[#F1EDE1] text-[#0A1F1C] font-sans overflow-x-hidden">
+
+  <!-- Back Navigation -->
+  <nav class="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-[#F1EDE1]/60 border-b border-[#0A1F1C]/5 py-6">
+    <div class="container mx-auto px-6 flex justify-between items-center max-w-7xl">
+      <button (click)="goBack()"
+        class="flex items-center gap-2 text-[#0A1F1C]/40 hover:text-[#2d6a4f] transition-all font-bold uppercase tracking-widest text-[10px] group">
+        <lucide-icon [img]="ChevronLeft" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></lucide-icon>
+        Back to Roadmap
+      </button>
+      <div class="flex items-center gap-4">
+        <div class="px-4 py-1.5 rounded-full bg-[#0A1F1C]/5 border border-[#0A1F1C]/10 flex items-center gap-2">
+          <lucide-icon [img]="ShieldCheck" class="w-3.5 h-3.5 text-green-600"></lucide-icon>
+          <span class="text-[9px] font-black uppercase tracking-widest text-[#0A1F1C]/60">Verified Credentials</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="relative pt-48 pb-12 overflow-hidden">
+    <div class="absolute inset-0 flex items-center justify-center select-none pointer-events-none z-0">
+      <h1 class="hero-outline-text text-[20vw] font-black uppercase tracking-tighter w-full text-center opacity-30">
+        CREDENTIALS
+      </h1>
+    </div>
+    <div class="container mx-auto px-6 relative z-10 max-w-7xl">
+      <div class="flex flex-col items-center text-center">
+        <div class="inline-flex items-center gap-3 bg-[#0A1F1C]/5 backdrop-blur-md px-4 py-2 rounded-full border border-[#0A1F1C]/10 mb-8">
+          <lucide-icon [img]="Award" class="w-4 h-4 text-[#d4a373]"></lucide-icon>
+          <span class="text-[10px] font-black uppercase tracking-widest text-[#0A1F1C]/60 tracking-[0.2em]">The Honor Roll</span>
+        </div>
+        <h2 class="font-serif text-6xl md:text-8xl font-medium text-[#0A1F1C] leading-[0.8] tracking-tight mb-6">
+          My <span class="text-[#d4a373]">Badges</span>
+        </h2>
+
+        <!-- TÂCHE 3 – Status filter bar: clicking ACTIVE/EXPIRED triggers a real HTTP call -->
+        <!-- to GET /api/academy/users/{id}/certifications/filter?status=...           -->
+        <!-- Backend: findByUser_IdAndStatus() — keyword method across 2 entities      -->
+        <div class="mt-8 inline-flex bg-white/70 backdrop-blur-sm p-1.5 rounded-2xl border border-[#0A1F1C]/10 shadow-sm gap-1">
+          <button (click)="setFilter('ALL')" [disabled]="isFiltering()"
+            class="px-6 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 outline-none disabled:opacity-50"
+            [class.bg-[#0A1F1C]]="activeFilter() === 'ALL'"
+            [class.text-white]="activeFilter() === 'ALL'"
+            [class.text-[#0A1F1C]/40]="activeFilter() !== 'ALL'">
+            All
+          </button>
+          <button (click)="setFilter('ACTIVE')" [disabled]="isFiltering()"
+            class="px-6 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 outline-none flex items-center gap-2 disabled:opacity-50"
+            [class.bg-emerald-600]="activeFilter() === 'ACTIVE'"
+            [class.text-white]="activeFilter() === 'ACTIVE'"
+            [class.text-[#0A1F1C]/40]="activeFilter() !== 'ACTIVE'">
+            <lucide-icon [img]="ShieldCheck" class="w-3 h-3"></lucide-icon>
+            Active
+          </button>
+          <button (click)="setFilter('EXPIRED')" [disabled]="isFiltering()"
+            class="px-6 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 outline-none flex items-center gap-2 disabled:opacity-50"
+            [class.bg-red-500]="activeFilter() === 'EXPIRED'"
+            [class.text-white]="activeFilter() === 'EXPIRED'"
+            [class.text-[#0A1F1C]/40]="activeFilter() !== 'EXPIRED'">
+            <lucide-icon [img]="ShieldOff" class="w-3 h-3"></lucide-icon>
+            Expired
+          </button>
+        </div>
+        <!-- Filtering spinner -->
+        <div *ngIf="isFiltering()" class="mt-3 flex items-center justify-center gap-2">
+          <lucide-icon [img]="RefreshCw" class="w-3.5 h-3.5 text-[#0A1F1C]/30 animate-spin"></lucide-icon>
+          <span class="text-[9px] font-black uppercase tracking-widest text-[#0A1F1C]/25">Querying backend...</span>
+        </div>
+        <!-- Filter hint label -->
+        <p class="mt-3 text-[9px] font-bold uppercase tracking-widest text-[#0A1F1C]/25">
+          <ng-container *ngIf="activeFilter() === 'ALL'">Showing all {{ displayedCerts().length }} diploma(s)</ng-container>
+          <ng-container *ngIf="activeFilter() === 'ACTIVE'">
+            Keyword query: findByUser_IdAndStatus(userId, ACTIVE) — {{ displayedCerts().length }} result(s)
+          </ng-container>
+          <ng-container *ngIf="activeFilter() === 'EXPIRED'">
+            Keyword query: findByUser_IdAndStatus(userId, EXPIRED) — {{ displayedCerts().length }} result(s)
+          </ng-container>
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-6 max-w-7xl relative z-20 pb-40">
+
+    <!-- Loading -->
+    <div *ngIf="isLoading()" class="flex flex-col items-center justify-center py-32 gap-4">
+      <lucide-icon [img]="Award" class="w-12 h-12 text-[#d4a373] animate-pulse"></lucide-icon>
+      <p class="text-[9px] font-black uppercase tracking-widest text-[#0A1F1C]/30">Loading your credentials...</p>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="hasError() && !isLoading()"
+      class="text-center py-20 bg-red-50 rounded-[2rem] border border-red-100">
+      <lucide-icon [img]="AlertTriangle" class="w-10 h-10 text-red-400 mx-auto mb-4"></lucide-icon>
+      <h3 class="font-bold text-red-700 mb-2">Could not load certifications</h3>
+      <p class="text-red-500 text-sm mb-6">Make sure you are logged in.</p>
+      <button (click)="loadCertifications()"
+        class="px-6 py-3 bg-red-500 text-white rounded-full font-bold text-sm hover:bg-red-600 transition-all flex items-center gap-2 mx-auto">
+        <lucide-icon [img]="RefreshCw" class="w-4 h-4"></lucide-icon>
+        Retry
+      </button>
+    </div>
+
+    <!-- Main grid (loaded) -->
+    <div *ngIf="!isLoading() && !hasError()" class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+
+      <!-- LEFT: Certificate List -->
+      <div class="lg:col-span-4 flex flex-col gap-6">
+        <div class="flex items-center gap-4 mb-2 px-4">
+          <span class="text-[10px] font-black uppercase tracking-[0.3em] text-[#0A1F1C]/20">
+            {{ displayedCerts().length }} Award(s)
+          </span>
+          <div class="h-px flex-1 bg-[#0A1F1C]/10"></div>
+        </div>
+
+        <!-- Empty filtered state -->
+        <div *ngIf="displayedCerts().length === 0"
+          class="text-center py-12 bg-white/60 rounded-[2rem] border border-[#0A1F1C]/5">
+          <lucide-icon [img]="Inbox" class="w-10 h-10 text-[#0A1F1C]/20 mx-auto mb-3"></lucide-icon>
+          <p class="text-[10px] font-black uppercase tracking-widest text-[#0A1F1C]/30">
+            No {{ activeFilter() === 'ALL' ? '' : activeFilter().toLowerCase() }} diplomas found
+          </p>
+        </div>
+
+        <!-- Cert cards -->
+        <div class="flex flex-col gap-4">
+          <div *ngFor="let cert of displayedCerts()"
+            (click)="selectCert(cert.certificationId)"
+            class="cert-selection-card p-6 cursor-pointer flex items-center gap-6 shadow-sm group hover:shadow-xl transition-all"
+            [class.active]="selectedCertId() === cert.certificationId">
+
+            <!-- Icon / Status indicator -->
+            <div class="w-16 h-16 rounded-2xl border flex items-center justify-center shrink-0 transition-all relative"
+              [class.bg-emerald-50]="!isExpired(cert)"
+              [class.border-emerald-200]="!isExpired(cert)"
+              [class.bg-red-50]="isExpired(cert)"
+              [class.border-red-200]="isExpired(cert)">
+              <lucide-icon [img]="isExpired(cert) ? ShieldOff : ShieldCheck"
+                class="w-7 h-7"
+                [class.text-emerald-500]="!isExpired(cert)"
+                [class.text-red-400]="isExpired(cert)">
+              </lucide-icon>
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-black text-[#0A1F1C] tracking-tighter mb-1 truncate">
+                {{ cert.certificationName }}
+              </h3>
+              <!-- Status badge -->
+              <div class="flex items-center gap-2">
+                <div class="w-1.5 h-1.5 rounded-full"
+                  [class.bg-emerald-500]="!isExpired(cert)"
+                  [class.bg-red-400]="isExpired(cert)">
+                </div>
+                <span class="text-[9px] font-black uppercase tracking-widest"
+                  [class.text-emerald-600]="!isExpired(cert)"
+                  [class.text-red-500]="isExpired(cert)">
+                  {{ cert.status }}
+                </span>
+              </div>
+              <!-- Expiry date -->
+              <p class="text-[9px] text-[#0A1F1C]/30 mt-1 font-medium">
+                Expires: {{ formatDate(cert.expiryDate) }}
+              </p>
+            </div>
+
+            <lucide-icon [img]="Eye" class="w-5 h-5 text-[#2d6a4f]"
+              *ngIf="selectedCertId() === cert.certificationId">
+            </lucide-icon>
+            <lucide-icon [img]="ChevronRight" class="w-5 h-5 text-[#0A1F1C]/10"
+              *ngIf="selectedCertId() !== cert.certificationId">
+            </lucide-icon>
+          </div>
+        </div>
+
+        <!-- Vault card -->
+        <div class="card-asymmetric bg-white border border-[#0A1F1C]/10 p-8 mt-4 shadow-sm">
+          <div class="flex items-center gap-3 mb-4">
+            <lucide-icon [img]="ShieldCheck" class="w-5 h-5 text-blue-600"></lucide-icon>
+            <h4 class="text-sm font-black text-[#0A1F1C] uppercase tracking-widest">Global Vault</h4>
+          </div>
+          <p class="text-[11px] text-[#0A1F1C]/40 font-medium leading-relaxed mb-6">
+            Your credentials are secured on the CampConnect immutable ledger,
+            accessible worldwide for professional verification.
+          </p>
+          <button class="text-[9px] font-black uppercase tracking-widest text-blue-600 hover:text-[#0A1F1C] transition-colors flex items-center gap-2 group">
+            Vault Security Specs
+            <lucide-icon [img]="ExternalLink" class="w-3 h-3 group-hover:scale-110"></lucide-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- RIGHT: Credential viewer -->
+      <div class="lg:col-span-8">
+
+        <!-- No cert selected / empty -->
+        <div *ngIf="!selectedCert()" class="flex flex-col items-center justify-center py-32 bg-white/50 rounded-[3rem] border border-[#0A1F1C]/5">
+          <lucide-icon [img]="Award" class="w-16 h-16 text-[#d4a373]/30 mx-auto mb-4"></lucide-icon>
+          <p class="text-[10px] font-black uppercase tracking-widest text-[#0A1F1C]/20">Select a diploma to preview</p>
+        </div>
+
+        <!-- Cert viewer -->
+        <div *ngIf="selectedCert()" class="bg-white border border-[#0A1F1C]/10 rounded-[3rem] p-4 relative overflow-hidden group shadow-2xl">
+
+          <!-- Expired ribbon -->
+          <div *ngIf="isExpired(selectedCert()!)"
+            class="absolute top-6 right-6 z-10 px-4 py-2 bg-red-100 text-red-600 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5">
+            <lucide-icon [img]="Clock" class="w-3 h-3"></lucide-icon>
+            Expired — Renewal Required
+          </div>
+
+          <div class="medallion-inner p-16 lg:p-24 flex flex-col items-center text-center">
+
+            <!-- Icon -->
+            <div class="w-40 h-40 rounded-[3rem] flex items-center justify-center shadow-sm mb-12 relative"
+              [class.bg-emerald-50]="!isExpired(selectedCert()!)"
+              [class.bg-red-50]="isExpired(selectedCert()!)">
+              <div class="absolute -inset-4 border rounded-[3.5rem] animate-pulse"
+                [class.border-emerald-200]="!isExpired(selectedCert()!)"
+                [class.border-red-200]="isExpired(selectedCert()!)">
+              </div>
+              <lucide-icon
+                [img]="isExpired(selectedCert()!) ? ShieldOff : ShieldCheck"
+                class="w-20 h-20"
+                [class.text-emerald-400]="!isExpired(selectedCert()!)"
+                [class.text-red-400]="isExpired(selectedCert()!)">
+              </lucide-icon>
+            </div>
+
+            <div class="text-[10px] font-bold uppercase tracking-[0.5em] text-[#d4a373] mb-6">
+              Certificate of Completion
+            </div>
+
+            <h2 class="font-serif text-5xl lg:text-7xl font-medium text-[#0A1F1C] tracking-tight leading-[0.9] mb-8 max-w-xl">
+              {{ selectedCert()!.certificationName }}
+            </h2>
+
+            <p class="text-lg text-[#0A1F1C]/40 font-medium max-w-2xl leading-relaxed mb-12">
+              Issued to <strong class="text-[#0A1F1C]/70">{{ selectedCert()!.username }}</strong>
+              upon successful completion of the required survival training program.
+            </p>
+
+            <!-- Metadata grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 w-full max-w-2xl border-t border-[#0A1F1C]/5 pt-12 text-left">
+              <div>
+                <div class="text-[9px] font-black text-[#0A1F1C]/20 uppercase tracking-[0.3em] mb-4 text-center md:text-left">
+                  Certification Matrix
+                </div>
+                <div class="flex flex-col gap-4">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-black text-[#0A1F1C]/40 uppercase tracking-widest">Earned Date</span>
+                    <span class="text-sm font-black text-[#0A1F1C]">{{ formatDate(selectedCert()!.earnedDate) }}</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-black text-[#0A1F1C]/40 uppercase tracking-widest">Expiry Date</span>
+                    <span class="text-sm font-black"
+                      [class.text-emerald-600]="!isExpired(selectedCert()!)"
+                      [class.text-red-500]="isExpired(selectedCert()!)">
+                      {{ formatDate(selectedCert()!.expiryDate) }}
+                    </span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-[11px] font-black text-[#0A1F1C]/40 uppercase tracking-widest">Status</span>
+                    <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest"
+                      [class.bg-emerald-100]="!isExpired(selectedCert()!)"
+                      [class.text-emerald-700]="!isExpired(selectedCert()!)"
+                      [class.bg-red-100]="isExpired(selectedCert()!)"
+                      [class.text-red-600]="isExpired(selectedCert()!)">
+                      {{ selectedCert()!.status }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-col items-center md:items-end justify-center">
+                <div class="flex flex-col items-center md:items-end gap-1">
+                  <span class="text-[9px] font-black text-[#0A1F1C]/20 uppercase tracking-[0.3em]">Authorized by</span>
+                  <div class="text-2xl font-black italic text-[#0A1F1C] tracking-tighter select-none">CampConnect</div>
+                  <div class="h-px w-24 bg-[#0A1F1C]/10 mt-1"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex flex-wrap gap-4 p-8 border-t border-[#0A1F1C]/5 bg-[#0A1F1C]/5">
+            <button (click)="downloadCert()"
+              class="flex-1 py-6 bg-[#2d6a4f] text-white rounded-full font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:scale-[1.02] transition-all active:scale-[0.98] shadow-xl">
+              <lucide-icon [img]="Download" class="w-5 h-5"></lucide-icon>
+              Download PDF
+            </button>
+            <button (click)="shareCert()"
+              class="py-6 px-10 bg-white border border-[#0A1F1C]/10 rounded-full font-bold uppercase tracking-widest text-[10px] text-[#0A1F1C]/60 hover:bg-[#F1EDE1] flex items-center gap-3 transition-all shadow-sm">
+              <lucide-icon [img]="Share2" class="w-4 h-4"></lucide-icon>
+              Distribute
+            </button>
+            <button (click)="downloadCert()"
+              class="py-6 px-10 bg-white border border-[#0A1F1C]/10 rounded-full font-bold uppercase tracking-widest text-[10px] text-[#0A1F1C]/60 hover:bg-[#F1EDE1] flex items-center gap-3 transition-all shadow-sm">
+              <lucide-icon [img]="Printer" class="w-4 h-4"></lucide-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

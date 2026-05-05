@@ -1,0 +1,188 @@
+<div class="create-container">
+    <!-- Mini Nav -->
+    <nav class="nav-header">
+        <button class="btn-icon" routerLink="/trip-intents">
+            <lucide-icon [img]="ArrowLeft" size="16"></lucide-icon>
+            <span>Back to Feed</span>
+        </button>
+    </nav>
+
+    <!-- Main Card View -->
+    <div class="form-card animate-fade-in">
+        
+        <!-- Left Pane: Branding & Progress -->
+        <aside class="form-sidebar">
+            <div class="sidebar-content">
+                <lucide-icon [img]="Tent" size="48" class="mb-6 opacity-40"></lucide-icon>
+                <h1>Organize Your Expedition</h1>
+                <p>Launch the idea, describe your vibe, and let our AI find the perfect companions to share your adventure.</p>
+                
+                <div class="progress-steps">
+                    <div class="step" [class.active]="currentStep === 1">
+                        <div class="step-num">1</div>
+                        <span [class.font-bold]="currentStep === 1">The Vision</span>
+                    </div>
+                    <div class="step" [class.active]="currentStep === 2">
+                        <div class="step-num">2</div>
+                        <span [class.font-bold]="currentStep === 2">The Style</span>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-bg-icon">
+                <lucide-icon [img]="Map" size="120"></lucide-icon>
+            </div>
+        </aside>
+
+        <!-- Right Pane: Actual Form -->
+        <main class="form-main">
+            <form [formGroup]="intentForm" (ngSubmit)="onSubmit()">
+
+                <!-- Step 1: Essentials -->
+                <section class="form-section" *ngIf="currentStep === 1">
+                    <div class="section-title">
+                        <lucide-icon [img]="Target" size="20"></lucide-icon>
+                        <span>Expedition Basics</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Adventure Name</label>
+                        <div class="input-container">
+                            <div class="error-badge" *ngIf="intentForm.get('title')?.touched && intentForm.get('title')?.invalid">Required</div>
+                            <input type="text" formControlName="title" placeholder="Ex: Weekend escape in the High Atlas"
+                                [class.is-invalid]="intentForm.get('title')?.invalid && intentForm.get('title')?.touched">
+                        </div>
+                        <div class="error-msg" *ngIf="intentForm.get('title')?.touched && intentForm.get('title')?.invalid">
+                            <span *ngIf="intentForm.get('title')?.errors?.['minlength']">Minimum 5 characters.</span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Departure</label>
+                            <div class="input-container icon-input">
+                                <div class="error-badge" *ngIf="intentForm.get('dateFrom')?.touched && intentForm.get('dateFrom')?.invalid">!</div>
+                                <lucide-icon [img]="Calendar" size="18" class="input-icon"></lucide-icon>
+                                <input type="date" formControlName="dateFrom" [min]="today"
+                                    [class.is-invalid]="intentForm.get('dateFrom')?.invalid && intentForm.get('dateFrom')?.touched">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Return</label>
+                            <div class="input-container icon-input">
+                                <div class="error-badge" *ngIf="intentForm.get('dateTo')?.touched && intentForm.get('dateTo')?.invalid">!</div>
+                                <lucide-icon [img]="Calendar" size="18" class="input-icon"></lucide-icon>
+                                <input type="date" formControlName="dateTo" [min]="intentForm.get('dateFrom')?.value || today"
+                                    [class.is-invalid]="intentForm.get('dateTo')?.invalid && intentForm.get('dateTo')?.touched">
+                            </div>
+                            <div class="error-msg" *ngIf="intentForm.hasError('dateRangeInvalid') && intentForm.get('dateTo')?.touched">
+                                Must be after departure.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Région Préférée</label>
+                            <div class="input-container icon-input select-wrapper">
+                                <div class="error-badge" *ngIf="intentForm.get('preferredZone')?.touched && intentForm.get('preferredZone')?.invalid">!</div>
+                                <lucide-icon [img]="Map" size="18" class="input-icon"></lucide-icon>
+                                <select formControlName="preferredZone" 
+                                        [class.is-invalid]="intentForm.get('preferredZone')?.invalid && intentForm.get('preferredZone')?.touched">
+                                    <option value="" disabled selected>Choisir une région...</option>
+                                    <option value="Ain Draham (Jendouba)">Ain Draham (Jendouba)</option>
+                                    <option value="Beni Mtir (Jendouba)">Beni Mtir (Jendouba)</option>
+                                    <option value="Cap Angela (Bizerte)">Cap Angela (Bizerte)</option>
+                                    <option value="Cap Serrat (Bizerte)">Cap Serrat (Bizerte)</option>
+                                    <option value="Ghar El Melh (Bizerte)">Ghar El Melh (Bizerte)</option>
+                                    <option value="Zaghouan">Zaghouan</option>
+                                    <option value="Testour (Béja)">Testour (Béja)</option>
+                                    <option value="El Haouaria (Nabeul)">El Haouaria (Nabeul)</option>
+                                    <option value="Korbous (Nabeul)">Korbous (Nabeul)</option>
+                                    <option value="Siliana">Siliana</option>
+                                    <option value="Tozeur">Tozeur</option>
+                                    <option value="Douz (Kébili)">Douz (Kébili)</option>
+                                    <option value="Tataouine">Tataouine</option>
+                                    <option value="Kasserine">Kasserine</option>
+                                    <option value="Autre (Tunisie)">Autre (Tunisie)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Max Budget (p.p)</label>
+                            <div class="input-container icon-input">
+                                <div class="error-badge" *ngIf="intentForm.get('budgetMax')?.touched && intentForm.get('budgetMax')?.invalid">!</div>
+                                <lucide-icon [img]="DollarSign" size="18" class="input-icon"></lucide-icon>
+                                <input type="number" formControlName="budgetMax" placeholder="1000"
+                                    [class.is-invalid]="intentForm.get('budgetMax')?.invalid && intentForm.get('budgetMax')?.touched">
+                                <span class="currency">DT</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Cover Photo (URL)</label>
+                        <div class="input-container icon-input">
+                            <lucide-icon [img]="Image" size="18" class="input-icon"></lucide-icon>
+                            <input type="text" formControlName="imageUrl" placeholder="https://unsplash.com/...">
+                        </div>
+                        <div class="preview-box" *ngIf="intentForm.get('imageUrl')?.value">
+                            <img [src]="intentForm.get('imageUrl')?.value" alt="Preview">
+                        </div>
+                    </div>
+
+                    <div class="submit-box">
+                        <button type="button" class="btn-launch" (click)="nextStep()">
+                            Continue to Style →
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Step 2: Vibe -->
+                <section class="form-section" *ngIf="currentStep === 2">
+                    <div class="section-title">
+                        <lucide-icon [img]="Flame" size="20"></lucide-icon>
+                        <span>Style & Expertise</span>
+                    </div>
+
+                    <div class="style-grid">
+                        <div *ngFor="let style of campingStyles" 
+                             class="style-option"
+                             [class.selected]="intentForm.get('campingStyle')?.value === style.value"
+                             (click)="setCampingStyle(style.value)">
+                            <div class="opt-icon">
+                                <lucide-icon [img]="style.icon" size="20"></lucide-icon>
+                            </div>
+                            <div class="opt-info">
+                                <h4>{{ style.label }}</h4>
+                                <p>{{ style.desc.substring(0, 30) }}...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-6">
+                        <label>Expertise Required</label>
+                        <div class="input-container icon-input">
+                            <lucide-icon [img]="Navigation" size="18" class="input-icon"></lucide-icon>
+                            <select formControlName="experienceLevel">
+                                <option *ngFor="let level of experienceLevels" [value]="level">
+                                    {{ getStyleLabel(level) }} level
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="submit-box flex gap-4">
+                        <button type="button" class="btn-launch" style="background: var(--sage-light); color: var(--forest-deep); box-shadow: none;" (click)="prevStep()">
+                            ← Back
+                        </button>
+                        <button type="submit" class="btn-launch" [disabled]="isSubmitting || intentForm.invalid">
+                            <span *ngIf="!isSubmitting">Launch Adventure!</span>
+                            <span *ngIf="isSubmitting">Preparing...</span>
+                        </button>
+                    </div>
+                </section>
+
+            </form>
+        </main>
+    </div>
+</div>

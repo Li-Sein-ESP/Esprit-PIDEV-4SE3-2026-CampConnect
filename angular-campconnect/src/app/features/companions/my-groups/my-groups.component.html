@@ -1,0 +1,124 @@
+<div class="groups-container animate-fade-in">
+  <!-- Premium Header -->
+  <header class="page-header">
+    <div class="header-content">
+      <h1 class="title">Mes Groupes d'Aventure</h1>
+      <p class="subtitle">Gérez vos expéditions actives et collaborez avec vos compagnons de voyage.</p>
+    </div>
+    <div class="header-illustration">
+      <lucide-icon [img]="Users" size="64" class="text-sage"></lucide-icon>
+    </div>
+  </header>
+
+  <!-- Content Viewport -->
+  <main class="content-viewport">
+    
+    <!-- Loading State -->
+    <div *ngIf="loading" class="state-view">
+      <div class="modern-spinner"></div>
+      <p>Synchronisation de vos cercles de voyage...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="state-view error">
+      <div class="error-badge">!</div>
+      <p>{{ error }}</p>
+      <button class="btn btn-ghost-alt mt-4" (click)="loadGroups()">Réessayer la connexion</button>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && !error && groups.length === 0" class="empty-view premium-glass">
+      <div class="empty-icon-wrap">
+        <lucide-icon [img]="Users" size="48"></lucide-icon>
+      </div>
+      <h2>Aucun groupe actif</h2>
+      <p>L'aventure vous appelle ! Rejoignez un projet existant ou lancez le vôtre pour commencer à bâtir votre communauté.</p>
+      
+      <div class="empty-actions">
+        <button class="btn btn-primary-alt" routerLink="/trip-intents">
+          <lucide-icon [img]="MapPin" size="18"></lucide-icon>
+          Explorer les Projets
+        </button>
+        <button class="btn btn-ghost-alt" routerLink="/trip-intents/create">
+          <lucide-icon [img]="Plus" size="18"></lucide-icon>
+          Nouvel Intent
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div *ngIf="!loading && !error && groups.length > 0" class="filter-container animate-fade-in">
+      <div class="search-box">
+        <lucide-icon [img]="Search" size="20" class="search-icon"></lucide-icon>
+        <input type="text" 
+               [(ngModel)]="searchQuery" 
+               placeholder="Rechercher une expédition..." 
+               class="search-input">
+      </div>
+
+      <div class="filter-tabs">
+        <button (click)="setFilter('ALL')" [class.active]="currentFilter === 'ALL'" class="filter-tab">
+          Tous
+          <span class="count">{{ groups.length }}</span>
+        </button>
+        <button (click)="setFilter('ACTIVE')" [class.active]="currentFilter === 'ACTIVE'" class="filter-tab">
+          Actifs
+        </button>
+        <button (click)="setFilter('INACTIVE')" [class.active]="currentFilter === 'INACTIVE'" class="filter-tab">
+          Archivés
+        </button>
+      </div>
+    </div>
+
+    <!-- Groups Grid -->
+    <div *ngIf="!loading && !error && groups.length > 0" class="groups-grid">
+      <div *ngFor="let group of filteredGroups; let i = index" 
+           class="group-card premium-glass hover-lift"
+           [routerLink]="['/groups', group.id]"
+           [style.animation-delay]="(i * 0.1) + 's'">
+        
+        <div class="card-hero" [style.background-image]="'url(https://images.unsplash.com/photo-' + (i % 2 === 0 ? '1464822759023-fed622ff2c3b' : '1501785888041-af3ef285b470') + '?auto=format&fit=crop&q=80&w=600)'">
+          <div class="card-hero-overlay"></div>
+          <div class="hero-badges">
+            <span class="status-badge" [class.active]="group.status === 'ACTIVE'">
+              {{ group.status }}
+            </span>
+          </div>
+        </div>
+
+        <div class="card-content">
+          <div class="group-header">
+            <h3 class="group-name">{{ group.name }}</h3>
+            <span class="creation-date">{{ formatDate(group.createdAt) }}</span>
+          </div>
+          
+          <p class="group-desc line-clamp-2">
+            {{ group.description || 'Un espace de voyage unique dédié à la collaboration et à la planification de cette expédition.' }}
+          </p>
+
+          <div class="group-stats">
+            <div class="stat-item">
+              <div class="stat-icon"><lucide-icon [img]="Users" size="16"></lucide-icon></div>
+              <div class="stat-meta">
+                <span class="stat-val">{{ group.members?.length || 0 }}</span>
+                <span class="stat-label">Compagnons</span>
+              </div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-icon"><lucide-icon [img]="Calendar" size="16"></lucide-icon></div>
+              <div class="stat-meta">
+                <span class="stat-val">CampConnect</span>
+                <span class="stat-label">Expédition active</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-action">
+          <span class="action-text">Ouvrir le Tableau de Bord</span>
+          <lucide-icon [img]="ArrowRight" size="18" class="action-icon"></lucide-icon>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

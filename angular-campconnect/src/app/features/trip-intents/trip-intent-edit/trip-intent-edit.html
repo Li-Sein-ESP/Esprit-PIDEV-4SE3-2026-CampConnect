@@ -1,0 +1,108 @@
+<div class="create-container">
+  <nav class="nav-header">
+    <button class="btn-icon" [routerLink]="['/trip-intents', intentId]">
+      <lucide-icon [img]="ArrowLeft" size="16"></lucide-icon>
+      <span>Back to Details</span>
+    </button>
+  </nav>
+
+  <div class="form-card animate-fade-in" *ngIf="!isLoading">
+    <aside class="form-sidebar">
+      <div class="sidebar-content">
+        <lucide-icon [img]="Settings" size="48" class="mb-6 opacity-40"></lucide-icon>
+        <h1>Refine Your Expedition</h1>
+        <p>Adjust your vision. These changes will be reflected in your group space and for all potential travelers.</p>
+      </div>
+      <div class="sidebar-bg-icon">
+        <lucide-icon [img]="Map" size="120"></lucide-icon>
+      </div>
+    </aside>
+
+    <main class="form-main">
+      <form [formGroup]="intentForm" (ngSubmit)="onSubmit()">
+
+        <section class="form-section">
+          <div class="section-title">
+            <lucide-icon [img]="Target" size="20"></lucide-icon>
+            <span>Core Parameters</span>
+          </div>
+
+          <div class="form-group">
+            <label>Adventure Name</label>
+            <div class="input-container">
+              <input type="text" formControlName="title" [class.is-invalid]="intentForm.get('title')?.invalid && intentForm.get('title')?.touched">
+            </div>
+          </div>
+
+          <div class="form-row flex gap-4">
+            <div class="form-group flex-1">
+              <label>Departure</label>
+              <div class="input-container icon-input">
+                <lucide-icon [img]="Calendar" size="18" class="input-icon"></lucide-icon>
+                <input type="date" formControlName="dateFrom" [min]="today">
+              </div>
+            </div>
+            <div class="form-group flex-1">
+              <label>Return</label>
+              <div class="input-container icon-input">
+                <lucide-icon [img]="Calendar" size="18" class="input-icon"></lucide-icon>
+                <input type="date" formControlName="dateTo" [min]="intentForm.get('dateFrom')?.value || today">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Target Destination</label>
+            <div class="input-container icon-input">
+              <lucide-icon [img]="Map" size="18" class="input-icon"></lucide-icon>
+              <input type="text" formControlName="preferredZone">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Cover Photo URL</label>
+            <div class="input-container icon-input">
+              <lucide-icon [img]="Image" size="18" class="input-icon"></lucide-icon>
+              <input type="text" formControlName="imageUrl">
+            </div>
+            <div class="preview-box" *ngIf="intentForm.get('imageUrl')?.value">
+              <img [src]="intentForm.get('imageUrl')?.value" alt="Preview">
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-title">
+            <lucide-icon [img]="Flame" size="20"></lucide-icon>
+            <span>Atmosphere</span>
+          </div>
+
+          <div class="style-grid">
+            <div *ngFor="let style of campingStyles" class="style-option" [class.selected]="intentForm.get('campingStyle')?.value === style.value" (click)="setCampingStyle(style.value)">
+              <div class="opt-icon">
+                <lucide-icon [img]="style.icon" size="20"></lucide-icon>
+              </div>
+              <div class="opt-info">
+                <h4>{{ style.label }}</h4>
+                <p>{{ style.desc.substring(0, 30) }}...</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="submit-box">
+          <button type="submit" class="btn-update" [disabled]="isSubmitting || intentForm.invalid">
+            <span *ngIf="!isSubmitting">Save Changes →</span>
+            <span *ngIf="isSubmitting">Updating...</span>
+          </button>
+        </div>
+
+      </form>
+    </main>
+  </div>
+
+  <div *ngIf="isLoading" class="flex flex-col items-center justify-center p-20">
+      <div class="loader-modern"></div>
+      <p class="mt-4 text-forest-deep font-bold">Synchronizing details...</p>
+  </div>
+</div>
