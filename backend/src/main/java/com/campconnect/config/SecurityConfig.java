@@ -1,13 +1,14 @@
 package com.campconnect.config;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.stream.Collectors; // Included
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Value; // Included
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpMethod; // Included
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -35,7 +36,10 @@ public class SecurityConfig {
   @Autowired
   private com.campconnect.config.AuthEntryPointJwt unauthorizedHandler;
 
-  // 1. Injects the variable you set in the Azure Portal
+  /**
+   * Reads the ALLOWED_ORIGINS variable from your Azure Environment Variables.
+   * Defaults to localhost if the variable isn't found.
+   */
   @Value("${ALLOWED_ORIGINS:http://localhost:4200}") 
   private String allowedOrigins;
 
@@ -62,16 +66,19 @@ public class SecurityConfig {
     return new BCryptPasswordEncoder();
   }
 
-  // 2. Updated CORS logic to handle Azure and Localhost dynamically
+  /**
+   * Configures CORS to trust your Azure Frontend URL and allows credentials for logins.
+   */
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
       CorsConfiguration configuration = new CorsConfiguration();
       
-      // Splits the Azure string by commas to allow multiple URLs
-      configuration.setAllowedOrigins(Arrays.stream(allowedOrigins.split(","))
-                                            .map(String::trim)
-                                            .collect(Collectors.toList()));
+      // Convert the comma-separated string from Azure into a list of origins
+      List<String> origins = Arrays.stream(allowedOrigins.split(","))
+                                   .map(String::trim)
+                                   .collect(Collectors.toList());
       
+      configuration.setAllowedOrigins(origins); 
       configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
       configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "x-auth-token", "Accept", "X-Requested-With"));
       configuration.setExposedHeaders(Arrays.asList("x-auth-token"));
@@ -89,27 +96,25 @@ public class SecurityConfig {
         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            // 3. IMPORTANT: Explicitly allow the browser's preflight security checks
+            // 1. Handshake: Always permit OPTIONS requests to pass CORS preflight checks
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             
-            // Public Endpoints
+            // 2. Public Endpoints: No login required
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/test/**").permitAll()
             .requestMatchers("/ws/**").permitAll()
             .requestMatchers("/api/payments/**").permitAll()
             .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/v3/api-docs").permitAll()
-            
-            // ML and Recommendations
             .requestMatchers("/api/ml/**").permitAll()
             .requestMatchers("/api/recommendations/health").permitAll()
             .requestMatchers("/api/recommendations/gear/categories").permitAll()
             
-            // Public marketplace browsing
+            // 3. Public GET Browsing
             .requestMatchers(HttpMethod.GET, "/api/gear/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
             
-            // Role-Based Access
+            // 4. Role-Protected Endpoints
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             .requestMatchers("/api/marketplace/manage/**").hasRole("EQUIPMENT_PROVIDER")
             .requestMatchers("/api/sites/manage/**").hasRole("SITE_OWNER")
