@@ -61,3 +61,5 @@ jobs:
           app-name: 'campconnect-api'
           slot-name: 'Production'
           package: '*.jar'
+
+          
