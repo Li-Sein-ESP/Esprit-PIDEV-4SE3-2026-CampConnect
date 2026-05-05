@@ -23,6 +23,7 @@ import {
 import { ButtonComponent } from '../../../shared/components/button.component';
 import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
 import { BadgeComponent } from '../../../shared/components/badge.component';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface Author {
   name: string;
@@ -236,7 +237,10 @@ export class AskForHelpComponent {
     { id: 'destinations', name: 'Destinations', count: 1 },
   ];
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private auth: AuthService
+  ) { }
 
   get filteredQuestions(): Question[] {
     return this.questions.filter((q) => {
@@ -270,6 +274,10 @@ export class AskForHelpComponent {
   }
 
   navigateToCreate(): void {
+    if (this.auth.isAccountBanned()) {
+      this.router.navigate(['/community/feed'], { queryParams: { postingBlocked: '1' } });
+      return;
+    }
     this.router.navigate(['/community/create']);
   }
 

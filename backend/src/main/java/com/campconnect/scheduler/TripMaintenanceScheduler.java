@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * TÂCHE PROPOSITION 1 : Maintenance automatique des ressources.
- * Ce scheduler vérifie périodiquement les voyages annulés et libère les transports associés.
+ * TÃƒâ€šCHE PROPOSITION 1 : Maintenance automatique des ressources.
+ * Ce scheduler vÃƒÂ©rifie pÃƒÂ©riodiquement les voyages annulÃƒÂ©s et libÃƒÂ¨re les transports associÃƒÂ©s.
  */
 @Component
 public class TripMaintenanceScheduler {
@@ -30,13 +30,13 @@ public class TripMaintenanceScheduler {
     @Autowired
     private TransportRepository transportRepository;
 
-    // Exécution tous les soirs à minuit (cron = "0 0 0 * * ?")
+    // ExÃƒÂ©cution tous les soirs ÃƒÂ  minuit (cron = "0 0 0 * * ?")
     // Pour les tests, on peut mettre toutes les 5 minutes (cron = "0 */5 * * * ?")
     @Scheduled(cron = "0 0 0 * * ?")
     public void cleanupCancelledTripsResources() {
         logger.info("[SCHEDULER] Starting resource cleanup for CANCELLED trips at {}", LocalDateTime.now());
 
-        // 1. Trouver tous les voyages annulés qui ont encore des transports liés
+        // 1. Trouver tous les voyages annulÃƒÂ©s qui ont encore des transports liÃƒÂ©s
         List<Trip> cancelledTrips = tripRepository.findAll().stream()
                 .filter(trip -> trip.getStatus() == TripStatus.CANCELLED)
                 .filter(trip -> trip.getTransportIds() != null && !trip.getTransportIds().isEmpty())
@@ -47,7 +47,7 @@ public class TripMaintenanceScheduler {
         for (Trip trip : cancelledTrips) {
             for (String transportId : trip.getTransportIds()) {
                 transportRepository.findById(transportId).ifPresent(transport -> {
-                    // Libération du transport
+                    // LibÃƒÂ©ration du transport
                     transport.setTripId(null);
                     transport.setStatus(TransportStatus.AVAILABLE);
                     transportRepository.save(transport);

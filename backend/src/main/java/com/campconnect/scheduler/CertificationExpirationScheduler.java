@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * TÂCHE 1 – @Scheduled updated to expire outdated certifications.
+ * TÃƒâ€šCHE 1 Ã¢â‚¬â€œ @Scheduled updated to expire outdated certifications.
  *
  * This scheduler runs daily at 2:00 AM to check for any active certifications
  * that have passed their expiry date. It automatically updates their status

@@ -1,0 +1,342 @@
+<div class="min-h-screen bg-gradient-to-br from-[#dfece3] via-[#eef5f0] to-[#e2ebe6] pb-20">
+  <!-- Creative header -->
+  <header class="relative overflow-hidden border-b border-emerald-900/10 bg-[#0f3d2e] text-white">
+    <div class="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-emerald-500/20 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-16 left-1/4 h-48 w-48 rounded-full bg-amber-400/15 blur-2xl"></div>
+    <svg class="pointer-events-none absolute right-[12%] top-6 h-24 w-24 text-white/10" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.35"/>
+      <polygon points="50,18 58,48 50,42 42,48" opacity="0.5"/>
+    </svg>
+    <div class="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <a routerLink="/trips"
+        class="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-200/90 hover:text-white transition-colors">
+        <span aria-hidden="true">←</span> My trips
+      </a>
+      <div class="mt-6 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+        <div class="max-w-xl">
+          <p class="text-[10px] font-bold uppercase tracking-[0.35em] text-amber-200/90">Traveler's Logbook</p>
+          <h1 class="mt-2 font-serif text-3xl font-bold tracking-tight sm:text-4xl lg:text-[2.65rem] leading-[1.1]">
+            Adjust the flow<br class="hidden sm:block" /> of your trip
+          </h1>
+          <p class="mt-4 text-sm leading-relaxed text-emerald-100/90">
+            A quiet corner to reschedule a journey, slip in an activity, or feel the rhythm of your next departure — no jargon, just clear gestures.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2 lg:pb-1">
+          <span class="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-50 backdrop-blur-sm">Delay</span>
+          <span class="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-50 backdrop-blur-sm">Reminders</span>
+          <span class="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-50 backdrop-blur-sm">Schedules</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <div *ngIf="feedbackOk"
+      class="mb-6 flex items-start gap-3 rounded-2xl border border-emerald-300/50 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-950 shadow-sm">
+      <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-xs text-white" aria-hidden="true">✓</span>
+      <span>{{ feedbackOk }}</span>
+    </div>
+    <div *ngIf="feedbackErr"
+      class="mb-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-900 shadow-sm">
+      <span class="mt-0.5 text-base" aria-hidden="true">!</span>
+      <span>{{ feedbackErr }}</span>
+    </div>
+
+    <div class="grid gap-8 lg:grid-cols-12 lg:items-start">
+      <div class="space-y-6 lg:col-span-7 xl:col-span-8">
+
+        <!-- Step 1 -->
+        <section
+          class="overflow-hidden rounded-2xl border border-white/60 bg-white/90 shadow-lg shadow-emerald-950/5 ring-1 ring-emerald-900/[0.04] backdrop-blur-sm">
+          <div class="flex items-start gap-4 border-b border-emerald-900/6 bg-gradient-to-r from-amber-50/80 via-white to-emerald-50/40 px-5 py-4 sm:px-6">
+            <span
+              class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-800 to-emerald-950 text-sm font-bold text-amber-100 shadow-md">
+              1
+            </span>
+            <div class="min-w-0 pt-0.5">
+              <h2 class="text-base font-semibold text-slate-900">Which trip to open?</h2>
+              <p class="mt-1 text-xs text-slate-500 leading-relaxed">
+                Hover over a name to see the dates at a glance.
+              </p>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+                  <span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span> Past
+                </span>
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-800">
+                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Upcoming
+                </span>
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-sky-800">
+                  <span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span> On the way
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="p-5 sm:p-6">
+            <label class="sr-only" for="lab-trip-select">Trip</label>
+            <select id="lab-trip-select" [(ngModel)]="selectedTripId" (ngModelChange)="onTripChange()"
+              class="w-full max-w-lg rounded-2xl border border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-slate-900 shadow-inner focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/25">
+              <option [ngValue]="null">Choose a stop from the list...</option>
+              <option *ngFor="let t of tripService.trips()" [ngValue]="t.id" [attr.title]="tripOptionTitle(t)">{{ t.name }}</option>
+            </select>
+            <p class="mt-3 text-xs text-slate-500" *ngIf="!tripService.trips().length">
+              No trips for now — go back to <a routerLink="/trips"
+                class="font-semibold text-emerald-700 underline decoration-emerald-300 underline-offset-2 hover:text-emerald-900">My trips</a>.
+            </p>
+            <div *ngIf="selectedTripId && tripTemporalPhase() === 'past'"
+              class="mt-4 rounded-2xl border border-slate-200/80 bg-gradient-to-br from-slate-50 to-slate-100/80 px-4 py-4 text-sm text-slate-800 leading-relaxed">
+              <span class="font-semibold">This chapter is already closed.</span>
+              <span class="block mt-1 text-slate-600 text-xs">{{ pastTripExplanation() }}</span>
+              <span class="mt-3 block rounded-xl bg-white/70 px-3 py-2 text-xs text-slate-600">
+                We keep your routes read-only. To move schedules, choose a trip still active on the agenda.
+              </span>
+            </div>
+            <div *ngIf="selectedTripId && tripTemporalPhase() === 'future'"
+              class="mt-4 rounded-2xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-white px-4 py-4 text-sm text-emerald-950 leading-relaxed">
+              <span class="font-semibold">Adventure is on the horizon.</span>
+              <span class="block mt-1 text-xs text-emerald-900/85">{{ futureTripExplanation() }}</span>
+              <span class="mt-3 block rounded-xl border border-emerald-100 bg-white/80 px-3 py-2 text-xs text-emerald-900">
+                You can already rehearse the scenario: a mock delay, a reminder, or a small slip of activities in the notebook.
+              </span>
+            </div>
+            <div *ngIf="selectedTripId && tripTemporalPhase() === 'active'"
+              class="mt-4 rounded-2xl border border-sky-200/80 bg-gradient-to-br from-sky-50 to-white px-4 py-4 text-sm text-sky-950 leading-relaxed">
+              <span class="font-semibold">You are in the trip window.</span>
+              <span class="block mt-1 text-xs text-sky-900/85">{{ activeTripExplanation() }}</span>
+              <span class="mt-3 block rounded-xl border border-sky-100 bg-white/80 px-3 py-2 text-xs text-sky-900">
+                The tools below follow your current reality.
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <div *ngIf="!selectedTripId"
+          class="rounded-2xl border-2 border-dashed border-emerald-800/15 bg-white/50 px-6 py-12 text-center backdrop-blur-sm sm:px-10">
+          <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-100 to-amber-50 text-2xl shadow-inner" aria-hidden="true">🧭</div>
+          <p class="text-base font-semibold text-slate-800">Choose a stop to unfold the thread</p>
+          <p class="mx-auto mt-2 max-w-sm text-sm text-slate-500">
+            On the right, a small digital compass will wake up when you refresh the overview.
+          </p>
+        </div>
+
+        <ng-container *ngIf="selectedTripId && tripTemporalPhase() === 'past'">
+          <section
+            class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-md ring-1 ring-slate-900/[0.03] backdrop-blur-sm">
+            <div class="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:px-6 bg-slate-50/90">
+              <div>
+                <h2 class="text-base font-semibold text-slate-900">Road memories</h2>
+                <p class="mt-1 text-xs text-slate-500 max-w-prose">What was attached to the trip — for the record.</p>
+              </div>
+              <button type="button" (click)="loadTransports()" [disabled]="loadingTransports"
+                class="text-xs font-semibold text-emerald-800 underline-offset-2 hover:underline disabled:opacity-45">
+                {{ loadingTransports ? '...' : 'Refresh' }}
+              </button>
+            </div>
+            <div class="p-5 sm:p-6 space-y-4">
+              <div *ngIf="loadingTransports" class="flex items-center gap-2 text-sm text-slate-600">
+                <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-emerald-600 border-t-transparent" aria-hidden="true"></span>
+                Loading...
+              </div>
+              <div *ngIf="!loadingTransports && !transports.length"
+                class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                Nothing written on this page for this trip.
+              </div>
+              <div class="space-y-3" *ngIf="transports.length">
+                <div *ngFor="let tr of transports" class="rounded-xl border border-slate-200 bg-slate-50/80 p-4">
+                  <div class="font-semibold text-slate-900">
+                    {{ tr.provider || 'Provider' }}<span class="font-normal text-slate-400"> · </span>{{ friendlyMode(tr.mode) }}
+                  </div>
+                  <div class="mt-1 text-xs text-slate-600">
+                    <strong class="font-semibold">{{ transportStatusLabel(tr.status) }}</strong>
+                    <span *ngIf="tr.delayMinutes"> · +{{ tr.delayMinutes }}&nbsp;min</span>
+                  </div>
+                  <div class="mt-1 text-xs text-slate-500" *ngIf="tr.departureTime">Departure: {{ tr.departureTime | date:'short' }}</div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </ng-container>
+
+        <ng-container *ngIf="selectedTripId && tripTemporalPhase() !== 'past'">
+          <section
+            class="overflow-hidden rounded-2xl border border-white/60 bg-white/90 shadow-lg shadow-emerald-950/5 ring-1 ring-emerald-900/[0.04] backdrop-blur-sm">
+            <div class="flex flex-wrap items-start justify-between gap-3 border-b border-emerald-900/6 bg-gradient-to-r from-amber-50/60 to-transparent px-5 py-4 sm:px-6">
+              <div class="flex items-start gap-4">
+                <span
+                  class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-800 to-emerald-950 text-sm font-bold text-amber-100 shadow-md">2</span>
+                <div class="min-w-0 pt-0.5">
+                  <h2 class="text-base font-semibold text-slate-900">On the road</h2>
+                  <p class="mt-1 text-xs text-slate-500 leading-relaxed max-w-prose">An unexpected event, a reminder before departure, or a return to calm.</p>
+                </div>
+              </div>
+              <button type="button" (click)="loadTransports()" [disabled]="loadingTransports"
+                class="text-xs font-semibold text-emerald-800 underline-offset-2 hover:underline disabled:opacity-45">
+                {{ loadingTransports ? '...' : 'Refresh' }}
+              </button>
+            </div>
+            <div class="p-5 sm:p-6 space-y-4">
+              <div *ngIf="loadingTransports" class="flex items-center gap-2 text-sm text-slate-600">
+                <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-emerald-600 border-t-transparent" aria-hidden="true"></span>
+                Loading...
+              </div>
+              <div *ngIf="!loadingTransports && !transports.length"
+                class="rounded-xl border border-amber-200/90 bg-gradient-to-br from-amber-50 to-white px-4 py-3 text-sm text-amber-950 leading-relaxed">
+                <span class="font-semibold">No vehicle attached to this trip yet.</span>
+                <span class="block mt-1 text-xs text-amber-900/90">Add it from your trip sheet or the transport space, then refresh.</span>
+              </div>
+              <div class="space-y-3" *ngIf="transports.length">
+                <div *ngFor="let tr of transports"
+                  class="rounded-2xl border border-slate-200/90 bg-gradient-to-br from-white to-slate-50/80 p-4 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-4">
+                  <div class="min-w-0 flex-1">
+                    <div class="font-semibold text-slate-900">
+                      {{ tr.provider || 'Provider' }}<span class="font-normal text-slate-400"> · </span>{{ friendlyMode(tr.mode) }}
+                    </div>
+                    <div class="mt-1 text-xs text-slate-600">
+                      <strong class="font-semibold">{{ transportStatusLabel(tr.status) }}</strong>
+                      <span *ngIf="tr.delayMinutes"> · +{{ tr.delayMinutes }}&nbsp;min</span>
+                    </div>
+                    <div class="mt-1 text-xs text-slate-500" *ngIf="tr.departureTime">Departure: {{ tr.departureTime | date:'short' }}</div>
+                  </div>
+                  <div class="mt-3 flex flex-wrap gap-2 sm:mt-0">
+                    <button type="button" [disabled]="busyTransportId === tr.id" (click)="simulateTransportDelay(tr.id, 30)"
+                      class="rounded-xl bg-gradient-to-b from-amber-500 to-amber-600 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-white shadow-sm hover:from-amber-600 hover:to-amber-700 disabled:opacity-50">
+                      +30&nbsp;min
+                    </button>
+                    <button type="button" [disabled]="busyTransportId === tr.id" (click)="setDepartureReminderWindow(tr.id)"
+                      class="rounded-xl bg-slate-800 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-white shadow-sm hover:bg-slate-900 disabled:opacity-50">
+                      Reminder
+                    </button>
+                    <button type="button" [disabled]="busyTransportId === tr.id" (click)="clearTransportDelay(tr.id)"
+                      class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-700 hover:bg-slate-50 disabled:opacity-50">
+                      Reset
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section
+            class="overflow-hidden rounded-2xl border border-white/60 bg-white/90 shadow-lg shadow-emerald-950/5 ring-1 ring-emerald-900/[0.04] backdrop-blur-sm">
+            <div class="flex items-start gap-4 border-b border-emerald-900/6 bg-gradient-to-r from-emerald-50/50 to-transparent px-5 py-4 sm:px-6">
+              <span
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-800 to-emerald-950 text-sm font-bold text-amber-100 shadow-md">3</span>
+              <div class="min-w-0 flex-1 pt-0.5">
+                <h2 class="text-base font-semibold text-slate-900">Slide an activity</h2>
+                <p class="mt-1 text-xs text-slate-500 leading-relaxed max-w-prose">The whole program, or only what contains your word (e.g., kayak, meal).</p>
+              </div>
+            </div>
+            <div class="p-5 sm:p-6">
+              <div class="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end">
+                <label class="flex flex-col gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-600">
+                  Minutes
+                  <input type="number" [(ngModel)]="manualShiftMinutes" min="1"
+                    class="w-full max-w-[7rem] rounded-2xl border border-slate-200 px-3 py-2.5 text-sm font-semibold text-slate-900 shadow-inner" />
+                </label>
+                <label class="flex min-w-[12rem] flex-1 flex-col gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-600">
+                  Magic word
+                  <input type="text" [(ngModel)]="manualKeyword" placeholder="kayak, meal..."
+                    class="w-full rounded-2xl border border-slate-200 px-3 py-2.5 text-sm text-slate-900 shadow-inner" />
+                </label>
+                <button type="button" (click)="runManualReschedule()" [disabled]="busyReschedule"
+                  class="rounded-2xl bg-gradient-to-b from-emerald-800 to-emerald-950 px-6 py-2.5 text-xs font-semibold uppercase tracking-widest text-amber-50 shadow-md hover:from-emerald-900 hover:to-black/30 disabled:opacity-50 sm:mb-px">
+                  {{ busyReschedule ? '...' : 'Apply' }}
+                </button>
+              </div>
+            </div>
+          </section>
+        </ng-container>
+      </div>
+
+      <!-- Right panel -->
+      <aside class="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-6 lg:self-start">
+        <div class="overflow-hidden rounded-2xl border border-emerald-900/20 bg-[#0f3d2e] text-white shadow-2xl shadow-emerald-950/30 ring-1 ring-white/10">
+          <div class="relative px-5 py-5 sm:px-6">
+            <div class="pointer-events-none absolute -right-8 top-0 h-32 w-32 rounded-full bg-amber-400/10 blur-2xl"></div>
+            <div class="relative flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p class="text-[10px] font-bold uppercase tracking-[0.28em] text-amber-200/90">Compass</p>
+                <h2 class="mt-1 font-serif text-xl font-bold tracking-tight text-white">Overview</h2>
+                <p class="mt-2 max-w-[260px] text-xs leading-relaxed text-emerald-100/85">
+                  Three indicators to feel if the air is calm, if something is approaching, or if a trip is changing season.
+                </p>
+              </div>
+              <button type="button" (click)="refreshOverview()" [disabled]="loadingOverview"
+                class="shrink-0 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-white/20 disabled:opacity-50">
+                {{ loadingOverview ? '...' : 'Refresh' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="border-t border-white/10 bg-gradient-to-b from-emerald-950/40 to-emerald-950/90 px-5 py-5 sm:px-6">
+            <div *ngIf="loadingOverview" class="flex flex-col items-center justify-center py-10 gap-3 text-emerald-100/90">
+              <span class="inline-block h-8 w-8 animate-spin rounded-full border-2 border-amber-200 border-t-transparent" aria-hidden="true"></span>
+              <span class="text-sm font-medium">Turning the little needle...</span>
+            </div>
+
+            <div *ngIf="!loadingOverview && overview" class="space-y-3">
+              <p class="text-[11px] text-emerald-200/80 border-b border-white/10 pb-3">
+                Last reading <time class="font-medium text-white">{{ overview!.generatedAt | date:'medium' }}</time>
+              </p>
+              <div class="grid gap-3">
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+                  <div class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-amber-200/90">
+                    <span aria-hidden="true">⏱</span> Unexpected events
+                  </div>
+                  <div class="mt-2 flex items-baseline gap-2">
+                    <span class="text-3xl font-bold tabular-nums text-white">{{ overview!.delayedTransports?.length || 0 }}</span>
+                    <span class="text-xs text-emerald-200/80">delays reported</span>
+                  </div>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+                  <div class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-amber-200/90">
+                    <span aria-hidden="true">🔔</span> Next slot
+                  </div>
+                  <div class="mt-2 flex items-baseline gap-2">
+                    <span class="text-3xl font-bold tabular-nums text-white">
+                      {{ (overview!.upcomingReminders?.activityCount || 0) + (overview!.upcomingReminders?.transportCount || 0) }}
+                    </span>
+                    <span class="text-xs text-emerald-200/80">on the near horizon</span>
+                  </div>
+                  <p class="mt-2 text-[11px] text-emerald-100/75">
+                    {{ overview!.upcomingReminders?.activityCount || 0 }} activity(ies) · {{ overview!.upcomingReminders?.transportCount || 0 }} departure(s)
+                  </p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+                  <div class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-amber-200/90">
+                    <span aria-hidden="true">✦</span> Trip seasons
+                  </div>
+                  <ul class="mt-3 space-y-2 text-sm text-emerald-50/95">
+                    <li class="flex justify-between gap-2">
+                      <span class="text-emerald-200/90">Transition to "ongoing"</span>
+                      <strong class="tabular-nums text-amber-100">{{ overview!.tripStatusEngine?.tripsEligiblePlannedToOngoing ?? 0 }}</strong>
+                    </li>
+                    <li class="flex justify-between gap-2">
+                      <span class="text-emerald-200/90">Curtain on the end</span>
+                      <strong class="tabular-nums text-amber-100">{{ overview!.tripStatusEngine?.tripsEligibleToCompleted ?? 0 }}</strong>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <p class="text-center text-[10px] leading-relaxed text-emerald-300/70 pt-1">
+                All this continues for you behind the scenes — this panel merely translates them into numbers.
+              </p>
+            </div>
+
+            <div *ngIf="!overview && !loadingOverview" class="flex flex-col items-center py-10 px-2 text-center">
+              <div class="mb-4 flex h-20 w-20 items-center justify-center rounded-full border border-white/15 bg-white/5 text-3xl shadow-inner" aria-hidden="true">🧭</div>
+              <p class="text-sm font-semibold text-white">The compass is still sleeping</p>
+              <p class="mt-2 max-w-[240px] text-xs text-emerald-200/80 leading-relaxed">
+                One click and you'll see the three indicators light up with what's happening on your files.
+              </p>
+              <button type="button" (click)="refreshOverview()"
+                class="mt-6 w-full max-w-[200px] rounded-2xl border border-amber-300/40 bg-gradient-to-b from-amber-400/90 to-amber-600 py-3 text-[10px] font-bold uppercase tracking-widest text-emerald-950 shadow-lg hover:from-amber-300 hover:to-amber-500">
+                Wake up the view
+              </button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>

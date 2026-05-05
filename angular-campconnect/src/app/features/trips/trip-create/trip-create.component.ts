@@ -36,6 +36,22 @@ export class TripCreateComponent {
   readonly Users = Users;
   readonly Plus = Plus;
 
+  campingPlaces = [
+    "Camping Bouhertma (Jendouba)",
+    "Camping Bni Mtir (Aïn Draham)",
+    "Zen Camp Aïn Draham",
+    "Camping El Mrij (Aïn Draham)",
+    "Camping Les Jasmins (Nabeul)",
+    "Camping Rtiba (Nabeul)",
+    "Camping Borj Cédria (Tunis)",
+    "Parc du Belvédère (Tunis)",
+    "Camping Ksar Ghilane (Désert)",
+    "Camping Douz Sahara",
+    "Sahara Camping El Faouar",
+    "Camping Sidi Mechreg (Bizerte)",
+    "Camping Cap Serrat (Béja)"
+  ];
+
   tripData = {
     name: "",
     destination: "",

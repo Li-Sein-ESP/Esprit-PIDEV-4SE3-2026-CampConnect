@@ -20,6 +20,10 @@ export class TransportationService {
         return this.http.get<any[]>(this.apiUrl);
     }
 
+    getTransportById(id: string): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/${id}`);
+    }
+
     /**
      * Create a new transport option
      */
@@ -115,5 +119,22 @@ export class TransportationService {
      */
     getPopularity(): Observable<any[]> {
         return this.http.get<any[]>(`${this.apiUrl}/popularity-stats`);
+    }
+
+    getTransportsByTripId(tripId: string): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/trip/${tripId}`);
+    }
+
+    /** Lab : simule un retard (scheduler Smart Reschedule) ou réinitialise si delayMinutes ≤ 0. */
+    applyTestingDelay(
+        transportId: string,
+        delayMinutes: number,
+        departureTimeIso?: string | null,
+    ): Observable<any> {
+        const body: Record<string, unknown> = { delayMinutes };
+        if (departureTimeIso) {
+            body['departureTime'] = departureTimeIso;
+        }
+        return this.http.patch<any>(`${this.apiUrl}/${transportId}/testing/delay`, body);
     }
 }

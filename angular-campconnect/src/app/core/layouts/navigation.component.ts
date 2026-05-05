@@ -134,7 +134,7 @@ export class NavigationComponent implements OnInit {
           { label: "Campsites", link: "/campsites" },
           { label: "Academy", link: "/academy" },
           { label: "Events", link: "/events" },
-          { label: "Safety Alerts", link: "/safety" },
+          { label: "Safety Alerts", link: "/safety/alerts" },
           { label: "Safety Map", link: "/safety/map" },
           { label: "Report Incident", link: "/safety/report-incident" },
         ],

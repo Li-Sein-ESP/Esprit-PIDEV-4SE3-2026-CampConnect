@@ -1,0 +1,6 @@
+@echo off
+echo [1/2] Nettoyage du port 5000...
+powershell -Command "Get-NetTCPConnection -LocalPort 5050 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }"
+echo [2/2] Demarrage du service CampConnect AI...
+C:\Users\lenovo\anaconda3\python.exe app.py
+pause

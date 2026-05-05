@@ -22,7 +22,9 @@ public class Transport {
     private int duration;
     private String provider;
     private String imageUrl;
+    private java.time.Instant departureTime; // New field for notifications
     private TransportStatus status = TransportStatus.AVAILABLE;
+    private int delayMinutes; // New field for smart reschedule
     // Rating summary fields (computed from transport reviews)
     private Double averageRating;
     private Integer reviewCount;

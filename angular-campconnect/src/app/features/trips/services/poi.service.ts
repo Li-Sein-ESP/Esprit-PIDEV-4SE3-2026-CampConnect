@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 
-const API_URL = 'http://localhost:8080/api/pointofinterests';
+const API_URL = `${environment.apiUrl}/pointofinterests`;
 
 export interface PointOfInterest {
     id: string;
@@ -29,30 +30,20 @@ export interface PointOfInterest {
 export class PoiService {
     constructor(private http: HttpClient) { }
 
-    private getHttpOptions() {
-        const token = localStorage.getItem('token');
-        return {
-            headers: new HttpHeaders({
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            })
-        };
-    }
-
     getAll(): Observable<PointOfInterest[]> {
-        return this.http.get<any[]>(API_URL, this.getHttpOptions()).pipe(
+        return this.http.get<any[]>(API_URL).pipe(
             map(items => items.map(item => this.mapToFrontend(item)))
         );
     }
 
     getByItineraryId(itineraryId: string): Observable<PointOfInterest[]> {
-        return this.http.get<any[]>(`${API_URL}/itinerary/${itineraryId}`, this.getHttpOptions()).pipe(
+        return this.http.get<any[]>(`${API_URL}/itinerary/${itineraryId}`).pipe(
             map(items => items.map(item => this.mapToFrontend(item)))
         );
     }
 
     create(poi: any): Observable<PointOfInterest> {
-        return this.http.post<any>(API_URL, poi, this.getHttpOptions()).pipe(
+        return this.http.post<any>(API_URL, poi).pipe(
             map(item => this.mapToFrontend(item))
         );
     }

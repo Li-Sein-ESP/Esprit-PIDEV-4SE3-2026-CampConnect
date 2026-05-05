@@ -1,24 +1,283 @@
 <div class="min-h-screen bg-[var(--color-background)] py-12">
   <div class="container max-w-6xl">
-    <div class="mb-8">
-      <h2 class="mb-2">Admin Moderation</h2>
-      <p class="text-[var(--color-text-secondary)]">
-        This feature is coming soon
-      </p>
+    <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h2 class="mb-2">AI Moderation Queue</h2>
+        <p class="text-[var(--color-text-secondary)]">
+          Toutes les publications passent ici après analyse IA (texte + images) : validez pour les publier sur le feed, ou refusez / bannissez selon les scores et indices affichés.
+        </p>
+      </div>
+      <div class="flex gap-2">
+        <app-button variant="outline" (click)="loadPendingRecords()">Refresh</app-button>
+        <app-button [isLoading]="training" (click)="trainModel()">Train Model</app-button>
+      </div>
     </div>
 
-    <app-card variant="elevated">
-      <app-card-content customClass="text-center py-16">
-        <div class="max-w-md mx-auto">
-          <h3 class="mb-4">Under Development</h3>
-          <p class="text-[var(--color-text-secondary)] mb-6">
-            This page is currently being developed and will be available soon.
-          </p>
-          <app-button routerLink="/">
-            Return Home
-          </app-button>
+    <!-- AI Model Status Card -->
+    <app-card variant="elevated" class="mb-8" *ngIf="modelStatus">
+      <app-card-content customClass="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="flex items-center gap-2">
+            <span class="text-xl">🤖</span>
+            AI Model Information
+          </h3>
+          <span [class]="modelStatus.exists ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'" 
+                class="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider">
+            {{ modelStatus.exists ? 'Active' : 'Missing' }}
+          </span>
+        </div>
+        
+        <div class="grid gap-6 md:grid-cols-4">
+          <div>
+            <p class="text-xs font-semibold uppercase text-slate-500 mb-1">Algorithm</p>
+            <p class="text-sm font-medium">{{ modelStatus.modelName }}</p>
+          </div>
+          <div>
+            <p class="text-xs font-semibold uppercase text-slate-500 mb-1">Last Trained</p>
+            <p class="text-sm font-medium">{{ modelStatus.lastModified ? (modelStatus.lastModified | date:'medium') : 'Never' }}</p>
+          </div>
+          <div>
+            <p class="text-xs font-semibold uppercase text-slate-500 mb-1">Thresholds</p>
+            <p class="text-sm font-medium">Review: {{ modelStatus.reviewThreshold }} | Block: {{ modelStatus.blockThreshold }}</p>
+          </div>
+          <div>
+            <p class="text-xs font-semibold uppercase text-slate-500 mb-1">Python Runtime</p>
+            <p class="text-sm font-medium font-mono text-[10px]">{{ modelStatus.pythonPath }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="!modelStatus.exists" class="mt-4 flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-lg text-red-700 text-sm">
+          <span>⚠️</span>
+          <span>The model file was not found. Please click <strong>Train Model</strong> to initialize the AI.</span>
         </div>
       </app-card-content>
+    </app-card>
+
+    <div *ngIf="error" class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      {{ error }}
+    </div>
+
+    <div *ngIf="success" class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+      {{ success }}
+    </div>
+
+    <div class="mb-6 grid gap-4 md:grid-cols-3">
+      <app-card variant="elevated">
+        <app-card-content customClass="p-5">
+          <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">Pending records</p>
+          <p class="text-3xl font-bold text-slate-900">{{ pendingRecords.length }}</p>
+        </app-card-content>
+      </app-card>
+      <app-card variant="elevated">
+        <app-card-content customClass="p-5">
+          <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">High risk (&ge; 75%)</p>
+          <p class="text-3xl font-bold text-amber-700">{{ getHighRiskCount() }}</p>
+        </app-card-content>
+      </app-card>
+      <app-card variant="elevated">
+        <app-card-content customClass="p-5">
+          <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">Average queue score</p>
+          <p class="text-3xl font-bold text-slate-900">{{ getAverageQueueScore() }}</p>
+        </app-card-content>
+      </app-card>
+    </div>
+
+    <!-- 🛡️ Onglets de Modération (Règle 2 & 3) -->
+    <div class="mb-6 flex border-b border-slate-200">
+      <button 
+        (click)="activeTab = 'PENDING'"
+        [class]="activeTab === 'PENDING' ? 'border-b-2 border-emerald-600 text-emerald-600' : 'text-slate-500'"
+        class="px-6 py-3 font-semibold text-sm transition-all focus:outline-none">
+        Files d'attente IA (Images)
+      </button>
+      <button 
+        (click)="activeTab = 'AUDIT'"
+        [class]="activeTab === 'AUDIT' ? 'border-b-2 border-emerald-600 text-emerald-600' : 'text-slate-500'"
+        class="px-6 py-3 font-semibold text-sm transition-all focus:outline-none">
+        Audit Nettoyage Auto (Jointure User + Log)
+      </button>
+    </div>
+
+    <!-- 🟢 ONGLET 1: Pending decisions (AI Moderation) -->
+    <app-card variant="elevated" *ngIf="activeTab === 'PENDING'">
+      <app-card-content customClass="p-6">
+        <h3 class="mb-4">Pending AI Decisions</h3>
+
+        <div *ngIf="loading" class="text-sm text-[var(--color-text-secondary)]">Loading moderation queue...</div>
+
+        <div *ngIf="!loading && pendingRecords.length === 0" class="text-sm text-[var(--color-text-secondary)]">
+          No pending records. All clear.
+        </div>
+
+        <div class="space-y-6" *ngIf="pendingRecords.length > 0">
+          <div *ngFor="let record of pendingRecords"
+               [class]="isRejected(record.id) ? 'rounded-xl border-2 border-red-300 bg-red-50 p-5 opacity-80' : 'rounded-xl border border-slate-200 p-5'">
+
+            <!-- ✅ Bannière de rejet -->
+            <div *ngIf="isRejected(record.id)"
+                 class="mb-4 flex items-center gap-3 rounded-lg bg-red-100 border border-red-300 px-4 py-3">
+              <span class="text-xl">🚫</span>
+              <div>
+                <p class="font-bold text-red-700 text-sm">Cette publication a été rejetée</p>
+                <p class="text-xs text-red-500">Le post a été marqué comme non conforme et n'est plus visible dans le fil d'actualité.</p>
+              </div>
+            </div>
+
+            <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <p class="text-xs uppercase tracking-wide text-slate-500">Post {{ record.postId }}</p>
+                <h4 class="font-semibold text-slate-900">{{ record.authorName || 'Unknown author' }}</h4>
+              </div>
+              <div class="flex items-center gap-2">
+                <span [class]="record.decision === 'BLOCK' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'"
+                      class="rounded-full px-2 py-1 text-xs font-semibold">
+                  {{ record.decision }}
+                </span>
+                <span class="rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
+                  Score {{ asPercent(record.maxCombinedScore) }}
+                </span>
+              </div>
+            </div>
+
+            <p class="mb-3 text-sm text-slate-700">{{ record.content || '(no text content)' }}</p>
+
+            <!-- 📊 Détails des Scores (Unsafe & Text) -->
+            <div class="mb-4 grid grid-cols-2 gap-4 rounded-lg bg-slate-50 p-3 border border-slate-100" *ngIf="record.evidence?.length">
+              <div *ngFor="let ev of record.evidence" class="col-span-2 sm:col-span-1 space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold uppercase text-slate-400">Probabilité Image Non-Safe</span>
+                  <span [class]="ev.unsafeProbability > 0.5 ? 'text-red-600' : 'text-emerald-600'" class="text-xs font-black">
+                    {{ asPercent(ev.unsafeProbability) }}
+                  </span>
+                </div>
+                <div class="w-full bg-slate-200 h-1 rounded-full overflow-hidden">
+                  <div class="h-full bg-red-500 transition-all" [style.width]="asPercent(ev.unsafeProbability)"></div>
+                </div>
+
+                <div class="flex items-center justify-between pt-1">
+                  <span class="text-[10px] font-bold uppercase text-slate-400">Score Risque Texte</span>
+                  <span [class]="ev.textRiskScore > 0.5 ? 'text-red-600' : 'text-emerald-600'" class="text-xs font-black">
+                    {{ asPercent(ev.textRiskScore) }}
+                  </span>
+                </div>
+                <div class="w-full bg-slate-200 h-1 rounded-full overflow-hidden">
+                  <div class="h-full bg-amber-500 transition-all" [style.width]="asPercent(ev.textRiskScore)"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3" *ngIf="record.reasons.length">
+              <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">Reasons</p>
+              <p class="text-sm text-slate-700">{{ record.reasons.join(', ') }}</p>
+            </div>
+
+            <div class="mb-4 grid gap-3 sm:grid-cols-2" *ngIf="record.imageUrls?.length">
+              <a
+                *ngFor="let imageUrl of record.imageUrls"
+                class="block overflow-hidden rounded-lg border border-slate-200"
+                [href]="resolveImageUrl(imageUrl)"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img [src]="resolveImageUrl(imageUrl)" alt="Moderation image" class="h-40 w-full object-cover" />
+              </a>
+            </div>
+
+            <!-- Masquer les contrôles si déjà rejeté -->
+            <ng-container *ngIf="!isRejected(record.id)">
+              <div class="mb-3 grid gap-3 md:grid-cols-2">
+                <textarea
+                  class="min-h-[80px] rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+                  placeholder="Admin note (optional)"
+                  [(ngModel)]="reviewNotes[record.id]"
+                ></textarea>
+                <label class="flex items-start gap-2 rounded-lg border border-slate-200 p-3 text-sm text-slate-700">
+                  <input type="checkbox" [(ngModel)]="rejectAndBan[record.id]" class="mt-1" />
+                  Ban this user when rejecting
+                </label>
+              </div>
+
+              <div class="flex flex-wrap gap-2">
+                <app-button
+                  size="sm"
+                  [isLoading]="actionLoadingId === record.id"
+                  (click)="approveRecord(record.id)"
+                >
+                  Approve
+                </app-button>
+                <app-button
+                  size="sm"
+                  variant="outline"
+                  [isLoading]="actionLoadingId === record.id"
+                  (click)="rejectRecord(record.id)"
+                >
+                  Reject
+                </app-button>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </app-card-content>
+    </app-card>
+
+    <!-- 🔴 ONGLET 2: Audit Logs (Cleanup Automatisé - Règle 2 & 3) -->
+    <app-card variant="elevated" *ngIf="activeTab === 'AUDIT'">
+        <app-card-content customClass="p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="flex items-center gap-2">
+                    <span class="text-xl">📜</span>
+                    Audit de Nettoyage Automatique
+                </h3>
+                <app-button variant="outline" size="sm" (click)="loadModerationLogs()">
+                    Actualiser les logs
+                </app-button>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-slate-200">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-50 text-xs uppercase text-slate-500">
+                        <tr>
+                            <th class="px-4 py-4 font-semibold">Date</th>
+                            <th class="px-4 py-4 font-semibold">Utilisateur</th>
+                            <th class="px-4 py-4 font-semibold">Strikes Actuels</th>
+                            <th class="px-4 py-4 font-semibold">Commentaire Supprimé</th>
+                            <th class="px-4 py-4 font-semibold">Raison IA</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr *ngFor="let log of moderationLogs" class="hover:bg-slate-50 transition-colors">
+                            <td class="px-4 py-4 whitespace-nowrap text-slate-500">
+                                {{ log.createdAt | date:'short' }}
+                            </td>
+                            <td class="px-4 py-4">
+                                <div class="font-bold text-emerald-700">{{ log.username }}</div>
+                                <div class="text-[10px] text-slate-400">ID: {{ log.userId }}</div>
+                            </td>
+                            <td class="px-4 py-4">
+                                <span [class]="log.strikeCount >= 3 ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'"
+                                      class="rounded-full px-3 py-1 text-xs font-black">
+                                    {{ log.strikeCount }} / 3
+                                </span>
+                            </td>
+                            <td class="px-4 py-4 italic text-slate-600 max-w-xs truncate">
+                                "{{ log.originalContent }}"
+                            </td>
+                            <td class="px-4 py-4">
+                                <span class="inline-flex items-center gap-1 rounded bg-slate-100 px-2 py-1 text-[10px] font-medium text-slate-600">
+                                    ⚠️ {{ log.reason }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr *ngIf="moderationLogs.length === 0">
+                            <td colspan="5" class="px-4 py-12 text-center text-slate-400">
+                                <div class="text-3xl mb-2">🍃</div>
+                                Aucun contenu inapproprié n'a été détecté par le scheduler récemment.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </app-card-content>
     </app-card>
   </div>
 </div>

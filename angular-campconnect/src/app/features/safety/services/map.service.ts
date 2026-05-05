@@ -1,11 +1,17 @@
 import { Injectable } from '@angular/core';
 import * as L from 'leaflet';
+import { HttpClient } from '@angular/common/http';
+import { map as rxMap } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
 import { SafetyAlert } from '../models/safety.model';
 
 @Injectable({
     providedIn: 'root'
 })
 export class MapService {
+    private readonly API_KEY = environment.mapsApiKey;
+
+    constructor(private http: HttpClient) {}
 
     /** Maps alert severity → Leaflet marker color */
     getRiskColor(severity: string): string {
@@ -30,25 +36,42 @@ export class MapService {
     }
 
     /** Initialize a Leaflet map inside the given HTML element id */
-    initMap(elementId: string): L.Map {
+    initMap(elementId: string, center: [number, number] = [33.8869, 9.5375], zoom: number = 6): L.Map {
         const map = L.map(elementId, {
-            center: [38.5, -98.35],
-            zoom: 4,
+            center: center,
+            zoom: zoom,
             zoomControl: true
         });
 
+        // Fallback to standard OpenStreetMap tiles
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            maxZoom: 18
+            maxZoom: 19
         }).addTo(map);
 
-        // Force Leaflet to recalculate the container size, then refresh the view
+        // Force Leaflet to recalculate the container size
         setTimeout(() => {
-            map.invalidateSize(true);
-            map.setView([38.5, -98.35], 4);
-        }, 400);
+            map.invalidateSize();
+        }, 200);
 
         return map;
+    }
+
+    /** Geocode a location string to coordinates using Nominatim (OpenStreetMap) */
+    geocode(query: string) {
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
+        return this.http.get<any[]>(url).pipe(
+            rxMap(results => {
+                if (results && results.length > 0) {
+                    return {
+                        lat: parseFloat(results[0].lat),
+                        lng: parseFloat(results[0].lon),
+                        displayName: results[0].display_name
+                    };
+                }
+                return null;
+            })
+        );
     }
 
     /** Create and add color-coded markers for each alert that has coordinates */

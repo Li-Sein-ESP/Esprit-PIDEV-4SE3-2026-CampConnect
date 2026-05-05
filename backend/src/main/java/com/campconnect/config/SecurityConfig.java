@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -79,6 +80,7 @@ public class SecurityConfig {
             // Public
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/test/**").permitAll()
+            .requestMatchers("/api/external/**").permitAll()
             // Swagger UI
             .requestMatchers("/swagger-ui/**", "/swagger-ui.html",
                 "/v3/api-docs/**", "/v3/api-docs")
@@ -87,6 +89,11 @@ public class SecurityConfig {
             .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/gear/**").permitAll()
             .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/categories/**").permitAll()
             .requestMatchers(org.springframework.http.HttpMethod.GET, "/uploads/**").permitAll()
+            // Fil communautaire : lecture publique des posts (détail, liste) — « Mon feed » reste protégé ci‑dessous
+            .requestMatchers(HttpMethod.GET, "/api/posts/following").authenticated()
+            .requestMatchers(HttpMethod.GET, "/api/posts").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/comments/post/**").permitAll()
             // Admin
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             // Gear management — provider or admin (method security via @PreAuthorize)

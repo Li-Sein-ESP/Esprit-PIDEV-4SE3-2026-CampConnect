@@ -33,7 +33,7 @@ public class CertificationStatsDTO {
         this.expiredCount = expiredCount;
     }
 
-    // ─── Getters & Setters ───
+    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Getters & Setters Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
     public String getCertificationId() { return certificationId; }
     public void setCertificationId(String certificationId) { this.certificationId = certificationId; }

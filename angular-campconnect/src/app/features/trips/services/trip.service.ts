@@ -58,7 +58,7 @@ export class TripService {
     if (s === "planned" || s === "planning") return "planning";
     if (s === "ongoing" || s === "active") return "active";
     if (s === "confirmed" || s === "upcoming") return "upcoming";
-    if (s === "completed" || s === "finished") return "completed";
+    if (s === "completed" || s === "finished" || s === "complted") return "completed";
     if (s === "cancelled" || s === "inactive") return "cancelled";
     return "planning";
   }
@@ -205,6 +205,10 @@ export class TripService {
     );
   }
 
+  getFullItinerary(tripId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${tripId}/full-itinerary`);
+  }
+
   /**
    * Recherche avancée (Keywords) sur Titre ou Destination
    */
@@ -228,6 +232,19 @@ export class TripService {
     return this.http.get<any[]>(`${this.apiUrl}/advanced-search`, {
       params: { difficulty, address },
     });
+  }
+
+  /** Smart reschedule manuel : décale les activités du voyage (keywords optionnels). */
+  rescheduleTripActivities(
+    tripId: string,
+    delayMinutes: number,
+    keyword?: string,
+  ): Observable<void> {
+    let url = `${this.apiUrl}/${tripId}/reschedule?delay=${delayMinutes}`;
+    if (keyword != null && keyword !== "") {
+      url += `&keyword=${encodeURIComponent(keyword)}`;
+    }
+    return this.http.post<void>(url, {});
   }
 
   getMockBudget(tripId: string): TripBudget {

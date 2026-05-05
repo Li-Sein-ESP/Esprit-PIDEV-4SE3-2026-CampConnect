@@ -4,5 +4,6 @@ public enum TripStatus {
     PLANNED,
     ONGOING,
     COMPLETED,
-    CANCELLED
+    CANCELLED,
+    Complted // Fallback pour la faute de frappe dans la base de données
 }

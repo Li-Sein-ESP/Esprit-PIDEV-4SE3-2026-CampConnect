@@ -11,7 +11,7 @@ import com.campconnect.model.Campsite;
 import com.campconnect.repository.CampsiteRepository;
 
 /**
- * REST Controller pour gérer les opérations CRUD sur les campings.
+ * REST Controller pour gÃƒÂ©rer les opÃƒÂ©rations CRUD sur les campings.
  * Endpoint: /api/campsites
  */
 @RestController
@@ -24,7 +24,7 @@ public class CampsiteController {
 
     /**
      * GET /api/campsites
-     * Récupère tous les campings.
+     * RÃƒÂ©cupÃƒÂ¨re tous les campings.
      */
     @GetMapping
     public ResponseEntity<List<Campsite>> getAllCampsites() {
@@ -34,7 +34,7 @@ public class CampsiteController {
 
     /**
      * GET /api/campsites/{id}
-     * Récupère un camping par son identifiant.
+     * RÃƒÂ©cupÃƒÂ¨re un camping par son identifiant.
      */
     @GetMapping("/{id}")
     public ResponseEntity<Campsite> getCampsiteById(@PathVariable String id) {
@@ -48,7 +48,7 @@ public class CampsiteController {
 
     /**
      * POST /api/campsites
-     * Crée un nouveau camping.
+     * CrÃƒÂ©e un nouveau camping.
      */
     @PostMapping
     public ResponseEntity<Campsite> createCampsite(@RequestBody Campsite campsite) {
@@ -58,7 +58,7 @@ public class CampsiteController {
 
     /**
      * PUT /api/campsites/{id}
-     * Met à jour un camping existant.
+     * Met ÃƒÂ  jour un camping existant.
      */
     @PutMapping("/{id}")
     public ResponseEntity<Campsite> updateCampsite(@PathVariable String id, @RequestBody Campsite campsiteDetails) {

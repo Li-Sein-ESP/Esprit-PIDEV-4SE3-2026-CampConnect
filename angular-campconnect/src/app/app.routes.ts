@@ -1,6 +1,7 @@
 import { Routes } from "@angular/router";
 import { MainLayoutComponent } from "./core/layouts/main-layout.component";
 import { authGuard } from "./core/guards/auth.guard";
+import { notBannedGuard } from "./core/guards/not-banned.guard";
 import { RoleDashboardComponent } from "./features/dashboard/role-dashboard.component";
 import { DashboardRedirectComponent } from "./features/dashboard/dashboard-redirect.component";
 
@@ -417,11 +418,28 @@ export const routes: Routes = [
         canActivate: [authGuard],
       },
       {
+        path: "trips/planning-lab",
+        loadComponent: () =>
+          import("./features/trips/trip-planning-lab/trip-planning-lab.component").then(
+            (m) => m.TripPlanningLabComponent,
+          ),
+        canActivate: [authGuard],
+      },
+      {
         path: "trips/:id",
         loadComponent: () =>
           import("./features/trips/trip-detail/trip-detail.component").then(
             (m) => m.TripDetailComponent,
           ),
+      },
+      // Itinerary Planner
+      {
+        path: "itinerary-planner",
+        loadComponent: () =>
+          import("./features/itinerary/components/itinerary-planner.component").then(
+            (m) => m.ItineraryPlannerComponent,
+          ),
+        canActivate: [authGuard],
       },
       // Campsites
       {
@@ -574,12 +592,20 @@ export const routes: Routes = [
           ),
       },
       {
+        path: "community/create",
+        loadComponent: () =>
+          import("./features/community/create-post/create-post.component").then(
+            (m) => m.CreatePostComponent,
+          ),
+        canActivate: [authGuard, notBannedGuard],
+      },
+      {
         path: "community/create-post",
         loadComponent: () =>
           import("./features/community/create-post/create-post.component").then(
             (m) => m.CreatePostComponent,
           ),
-        canActivate: [authGuard],
+        canActivate: [authGuard, notBannedGuard],
       },
       {
         path: "community/profile/:id",
@@ -600,6 +626,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import("./features/community/moderation-dashboard/moderation-dashboard.component").then(
             (m) => m.ModerationDashboardComponent,
+          ),
+      },
+      {
+        path: "community/safety-quiz",
+        loadComponent: () =>
+          import("./features/community/safety-quiz/safety-quiz.component").then(
+            (m) => m.SafetyQuizComponent,
           ),
       },
       {
@@ -675,10 +708,38 @@ export const routes: Routes = [
           ),
       },
       {
+        path: "safety/map",
+        loadComponent: () =>
+          import("./features/safety/safety-map/safety-map.component").then(
+            (m) => m.SafetyMapComponent,
+          ),
+      },
+      {
         path: "safety/active-alerts",
         loadComponent: () =>
           import("./features/safety/active-alerts/active-alerts.component").then(
             (m) => m.ActiveAlertsComponent,
+          ),
+      },
+      {
+        path: "safety/report",
+        loadComponent: () =>
+          import("./features/safety/report-incident/report-incident.component").then(
+            (m) => m.ReportIncidentComponent,
+          ),
+      },
+      {
+        path: "safety/report-incident",
+        loadComponent: () =>
+          import("./features/safety/report-incident/report-incident.component").then(
+            (m) => m.ReportIncidentComponent,
+          ),
+      },
+      {
+        path: "safety/analytics",
+        loadComponent: () =>
+          import("./features/safety/safety-analytics/safety-analytics.component").then(
+            (m) => m.SafetyAnalyticsComponent,
           ),
       },
       {

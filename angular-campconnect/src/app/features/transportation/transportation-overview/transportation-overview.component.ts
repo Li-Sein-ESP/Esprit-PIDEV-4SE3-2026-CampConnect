@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
@@ -11,6 +11,8 @@ import {
 import { TransportationService } from '../services/transportation.service';
 import { ButtonComponent } from '../../../shared/components/button.component';
 import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
+import { MapService } from '../../safety/services/map.service';
+import * as L from 'leaflet';
 
 @Component({
   selector: 'app-transportation-overview',
@@ -112,6 +114,38 @@ import { CardComponent, CardContentComponent } from '../../../shared/components/
               placeholder="Search provider or mode..."
               class="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm w-64 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all">
           </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════
+           FLEET COMMAND MAP — Creative Visualizer
+      ══════════════════════════════════════════════ -->
+      <section class="max-w-7xl mx-auto px-6 py-12">
+        <div class="relative bg-white rounded-[3rem] shadow-2xl shadow-emerald-900/10 overflow-hidden border border-slate-100">
+           <!-- Map Header -->
+           <div class="absolute top-6 left-6 z-20 bg-slate-950/90 backdrop-blur-md px-5 py-3 rounded-2xl border border-white/10 shadow-2xl">
+              <div class="flex items-center gap-3">
+                 <div class="w-3 h-3 bg-emerald-500 rounded-full animate-ping"></div>
+                 <div>
+                    <h4 class="text-white text-sm font-black uppercase tracking-widest leading-none">Fleet Command</h4>
+                    <p class="text-emerald-400 text-[10px] font-bold mt-1 uppercase">Live Node Network • Tunisia</p>
+                 </div>
+              </div>
+           </div>
+
+           <!-- Map Container -->
+           <div id="transport-fleet-map" class="h-[500px] w-full z-10 transition-all duration-700"></div>
+
+           <!-- Map Footer Stats -->
+           <div class="absolute bottom-6 right-6 z-20 flex gap-3">
+              <div class="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-slate-100">
+                 <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Global Coverage</p>
+                 <p class="text-xl font-black text-slate-900 mt-1 leading-none">24 Govs</p>
+              </div>
+              <div class="bg-emerald-600 p-4 rounded-2xl shadow-xl shadow-emerald-200">
+                 <lucide-icon [img]="GlobeIcon" class="text-white w-6 h-6"></lucide-icon>
+              </div>
+           </div>
         </div>
       </section>
 
@@ -295,7 +329,10 @@ import { CardComponent, CardContentComponent } from '../../../shared/components/
     :host { display: block; }
   `]
 })
-export class TransportationOverviewComponent implements OnInit {
+export class TransportationOverviewComponent implements OnInit, AfterViewInit, OnDestroy {
+  private map!: L.Map;
+  private markers: L.Marker[] = [];
+
   SearchIcon = Search;
   MapPinIcon = MapPin;
   CarIcon = Car;
@@ -330,7 +367,8 @@ export class TransportationOverviewComponent implements OnInit {
 
   constructor(
     private transportService: TransportationService,
-    private router: Router
+    private router: Router,
+    private mapService: MapService
   ) { }
 
   ngOnInit(): void {
@@ -339,11 +377,68 @@ export class TransportationOverviewComponent implements OnInit {
         this.transports.set(data || []);
         this.filteredTransports.set(data || []);
         this.isLoading.set(false);
+        this.updateMapMarkers();
       },
       error: (err) => {
         console.error('Failed to load transports', err);
         this.isLoading.set(false);
       }
+    });
+  }
+
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      this.initMap();
+    }, 500);
+  }
+
+  ngOnDestroy(): void {
+    if (this.map) {
+      this.map.remove();
+    }
+  }
+
+  private initMap(): void {
+    this.map = this.mapService.initMap('transport-fleet-map', [33.8869, 9.5375], 6);
+    this.updateMapMarkers();
+  }
+
+  private updateMapMarkers(): void {
+    if (!this.map || this.transports().length === 0) return;
+
+    // Clear existing
+    this.markers.forEach(m => m.remove());
+    this.markers = [];
+
+    // Add some random/simulated markers for Tunisia Govs to show a "network"
+    const tunisiaPopulatedPlaces = [
+      { lat: 36.8065, lng: 10.1815, name: 'Tunis Hub' },
+      { lat: 35.8256, lng: 10.6369, name: 'Sousse Depot' },
+      { lat: 34.7406, lng: 10.7603, name: 'Sfax Logistics' },
+      { lat: 37.2744, lng: 9.8739, name: 'Bizerte North' },
+      { lat: 33.8815, lng: 10.0982, name: 'Gabes Gateway' },
+      { lat: 33.9197, lng: 8.1336, name: 'Tozeur Desert Center' }
+    ];
+
+    tunisiaPopulatedPlaces.forEach(place => {
+      const marker = L.marker([place.lat, place.lng], {
+        icon: L.divIcon({
+          className: 'custom-marker',
+          html: `<div class="relative">
+                  <div class="absolute -inset-2 bg-emerald-500/20 rounded-full animate-pulse"></div>
+                  <div class="w-4 h-4 bg-emerald-600 rounded-full border-2 border-white shadow-lg"></div>
+                </div>`,
+          iconSize: [20, 20],
+          iconAnchor: [10, 10]
+        })
+      }).addTo(this.map);
+      
+      marker.bindTooltip(`<b>${place.name}</b><br>Active Fleet Node`, {
+        direction: 'top',
+        className: 'bg-slate-900 text-white rounded-lg border-none px-3 py-1 text-xs font-bold'
+      });
+      
+      this.markers.push(marker);
     });
   }
 

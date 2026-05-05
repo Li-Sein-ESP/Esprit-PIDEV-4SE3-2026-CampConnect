@@ -1,39 +1,336 @@
 <div class="min-h-screen bg-[var(--color-background)] py-12">
-  <div class="container max-w-4xl">
-    <h2 class="mb-8">Trip Itinerary</h2>
+  <div class="container max-w-6xl">
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-4">
+        <h2 class="text-3xl font-black text-slate-900 tracking-tight">Strategic Deployment Schedule</h2>
+        <app-badge
+          *ngIf="!isLoading && !error"
+          [variant]="isSaved ? 'success' : 'primary'"
+          size="sm"
+          [customClass]="isSaved ? 'bg-emerald-100 text-emerald-700' : 'bg-purple-100 text-purple-700'"
+        >
+          {{ isSaved ? 'Saved Strategy' : 'AI Generated' }}
+        </app-badge>
+      </div>
+      <button 
+        *ngIf="isSaved && !showOptions" 
+        (click)="loadAiOptions()"
+        class="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-purple-600 transition-all flex items-center gap-2"
+      >
+        <lucide-icon [img]="Zap" class="w-4 h-4"></lucide-icon>
+        Regenerate with AI
+      </button>
+    </div>
 
-    <div class="space-y-6">
-      @for (day of mockDays; track day.dayNumber) {
-      <app-card variant="elevated">
-        <app-card-header>
-          <app-card-title>Day {{ day.dayNumber }} - {{ day.date }}</app-card-title>
-        </app-card-header>
-        <app-card-content>
-          <div class="space-y-4">
-            @for (activity of day.activities; track activity.id) {
-            <div class="flex gap-4 p-4 bg-[var(--color-background)] rounded-lg">
-              <div class="flex flex-col items-center">
-                <div class="w-12 h-12 bg-[var(--color-primary-100)] rounded-full flex items-center justify-center">
-                  <lucide-icon [img]="Clock" class="w-6 h-6 text-[var(--color-primary-600)]"></lucide-icon>
-                </div>
-                <span class="text-sm font-medium mt-2">{{ activity.time }}</span>
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="py-20 text-center">
+      <div class="relative w-20 h-20 mx-auto mb-6">
+        <div
+          class="absolute inset-0 border-4 border-purple-100 rounded-full"
+        ></div>
+        <div
+          class="absolute inset-0 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"
+        ></div>
+        <lucide-icon
+          [img]="Brain"
+          class="absolute inset-0 m-auto w-8 h-8 text-purple-500 animate-pulse"
+        ></lucide-icon>
+      </div>
+      <h3 class="text-purple-900 font-bold mb-2">
+        {{ isSaved === false && !showOptions ? 'Retrieving saved expedition log...' : 'Generating 3 custom itinerary options...' }}
+      </h3>
+      <p class="text-purple-600/70">
+        Our AI is analyzing the best activities and schedules based on different
+        budgets.
+      </p>
+    </div>
+
+    <!-- Error State -->
+    <div
+      *ngIf="error"
+      class="bg-red-50 text-red-600 p-6 rounded-xl border border-red-200 text-center flex flex-col items-center"
+    >
+      <lucide-icon [img]="AlertCircle" class="w-10 h-10 mb-2"></lucide-icon>
+      <h4 class="font-bold mb-1">Oops!</h4>
+      <p>{{ error }}</p>
+    </div>
+
+    <!-- Options Selection View -->
+    <div
+      *ngIf="!isLoading && !error && showOptions && itineraryOptions?.length"
+      class="space-y-8"
+    >
+      <div class="text-center mb-8">
+        <h3 class="text-2xl font-bold text-slate-900 mb-2">
+          Choose Your Perfect Itinerary
+        </h3>
+        <p class="text-slate-600">
+          Select one of three carefully curated options tailored to your budget
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        @for (option of itineraryOptions; track option.programId) {
+          <div
+            (click)="selectOption(option.programId)"
+            [ngClass]="{
+              'border-purple-500 bg-purple-50 shadow-lg':
+                selectedOptionId() === option.programId,
+              'border-slate-200 bg-white hover:border-slate-300':
+                selectedOptionId() !== option.programId,
+            }"
+            class="p-6 rounded-xl border-2 cursor-pointer transition-all transform hover:scale-105"
+          >
+            <div class="mb-4">
+              <div class="text-4xl mb-2">
+                {{ getBudgetIcon(option.budgetLevel) }}
               </div>
-              <div class="flex-1">
-                <div class="flex items-center gap-2 mb-2">
-                  <h5>{{ activity.title }}</h5>
-                  <app-badge variant="outline">{{ activity.type }}</app-badge>
-                </div>
-                <p class="text-sm text-[var(--color-text-secondary)] mb-2">{{ activity.description }}</p>
-                <div class="flex items-center gap-2 text-sm text-[var(--color-text-tertiary)]">
-                  <lucide-icon [img]="MapPin" class="w-4 h-4"></lucide-icon>
-                  <span>{{ activity.location }}</span>
-                </div>
+              <h4 class="text-xl font-bold text-slate-900">
+                {{ option.title }}
+              </h4>
+              <p class="text-sm text-slate-600 mt-1">
+                {{ option.description }}
+              </p>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-lg mb-4 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-slate-600">Total</span>
+                <span class="text-lg font-bold text-slate-900"
+                  >{{ option.totalEstimatedCostTnd | number: "1.2-2" }} DT</span
+                >
+              </div>
+              <div
+                class="flex items-center justify-between border-t border-slate-200 pt-2"
+              >
+                <span class="text-sm text-slate-600">Per Person</span>
+                <span class="text-lg font-bold text-purple-600"
+                  >{{ option.averagePerPersonTnd | number: "1.2-2" }} DT</span
+                >
               </div>
             </div>
-            }
+
+            <button
+              [ngClass]="{
+                'bg-purple-600 text-white':
+                  selectedOptionId() === option.programId,
+                'bg-slate-100 text-slate-900 hover:bg-slate-200':
+                  selectedOptionId() !== option.programId,
+              }"
+              class="w-full py-2 px-4 rounded-lg font-bold transition-all"
+            >
+              <lucide-icon
+                *ngIf="selectedOptionId() === option.programId"
+                [img]="Check"
+                [size]="16"
+                class="inline mr-1"
+              ></lucide-icon>
+              {{
+                selectedOptionId() === option.programId ? "Selected" : "Choose"
+              }}
+            </button>
+          </div>
+        }
+      </div>
+
+      <div class="flex justify-center mt-8">
+        <button
+          (click)="confirmSelection()"
+          [disabled]="!selectedOptionId()"
+          class="px-8 py-3 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Confirm & View Itinerary
+        </button>
+      </div>
+    </div>
+
+    <!-- Itinerary Content -->
+    <div
+      class="space-y-6"
+      *ngIf="!isLoading && !error && !showOptions && itineraryDays?.length"
+    >
+      <div class="flex justify-between items-center mb-6">
+        <button
+          (click)="showOptions = true"
+          class="text-purple-600 hover:text-purple-700 font-medium"
+        >
+          ← Change Selection
+        </button>
+        <div *ngIf="selectedItinerary" class="text-right">
+          <div class="text-sm font-bold text-slate-700">
+            {{ selectedItinerary.title }}
+          </div>
+          <div class="text-xs text-slate-500">
+            {{ selectedItinerary.totalEstimatedCostTnd | number: "1.2-2" }} DT
+          </div>
+        </div>
+      </div>
+
+      <!-- Budget prediction panel for selected itinerary -->
+      <app-card variant="elevated" customClass="border-l-4 border-l-emerald-500">
+        <app-card-header>
+          <app-card-title class="text-emerald-900">
+            <lucide-icon [img]="Wallet" class="inline w-5 h-5 mr-2"></lucide-icon>
+            Predictive Budget (Group Total - {{ numPeople() }} Person{{ numPeople() > 1 ? 's' : '' }})
+          </app-card-title>
+        </app-card-header>
+        <app-card-content>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs text-slate-600 mb-1">Group budget (DT)</label>
+              <input
+                type="number"
+                min="0"
+                [value]="userProposedBudgetTnd() ?? ''"
+                (input)="userProposedBudgetTnd.set(+$any($event.target).value || null); predictSelectedBudget()"
+                class="w-full border border-slate-300 rounded-lg px-3 py-2"
+              />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label class="flex items-center gap-2 text-xs text-slate-600">
+                <input type="checkbox" [checked]="includeFood()" (change)="includeFood.set($any($event.target).checked); predictSelectedBudget()" />
+                Include Food
+              </label>
+              <label class="flex items-center gap-2 text-xs text-slate-600">
+                <input type="checkbox" [checked]="includeAccommodation()" (change)="includeAccommodation.set($any($event.target).checked); predictSelectedBudget()" />
+                Include Accommodation
+              </label>
+            </div>
+            <div class="flex items-end">
+              <button
+                (click)="predictSelectedBudget()"
+                [disabled]="isPredictingBudget() || !selectedOptionId()"
+                class="w-full px-4 py-2 rounded-lg font-bold bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50"
+              >
+                {{ isPredictingBudget() ? "Predicting..." : "Predict Budget" }}
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="budgetPrediction()" class="mt-4 bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
+              <div>
+                <p class="text-xs text-slate-600">Calculated Total</p>
+                <p class="text-xl font-bold text-emerald-700">
+                  {{ budgetPrediction()!.totalBudgetTnd | number: "1.0-0" }} DT
+                </p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-600">AI Prediction</p>
+                <p class="text-xl font-bold text-purple-600">
+                  {{ (budgetPrediction()!.predictedTotalBudgetTnd) | number: "1.0-0" }} DT
+                </p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-600">Per person</p>
+                <p class="text-xl font-bold text-slate-900">
+                  {{ budgetPrediction()!.perPersonTnd | number: "1.0-0" }} DT
+                </p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-600">Risk level</p>
+                <p class="text-xl font-bold text-slate-900">
+                  {{ budgetPrediction()!.riskLevel || "N/A" }}
+                </p>
+              </div>
+            </div>
+
+            <div class="text-sm text-slate-700 mb-2">
+              <strong>Status:</strong> {{ budgetPrediction()!.budgetStatus }}
+            </div>
+            <div class="text-sm text-slate-700 mb-3">
+              {{ budgetPrediction()!.budgetAdvice }}
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-slate-700 border-t border-emerald-200 pt-3">
+              <div>Transport: <strong>{{ budgetPrediction()!.breakdown.transport | number: "1.0-0" }} DT</strong></div>
+              <div>Accommodation: <strong>{{ budgetPrediction()!.breakdown.hebergement | number: "1.0-0" }} DT</strong></div>
+              <div>Food: <strong>{{ budgetPrediction()!.breakdown.nourriture | number: "1.0-0" }} DT</strong></div>
+              <div>Activities: <strong>{{ budgetPrediction()!.breakdown.activites | number: "1.0-0" }} DT</strong></div>
+            </div>
           </div>
         </app-card-content>
       </app-card>
+
+      @for (day of itineraryDays; track day.day) {
+        <app-card
+          variant="elevated"
+          customClass="border-l-4 border-l-purple-500"
+        >
+          <app-card-header>
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <app-card-title class="text-purple-900"
+                >Day {{ day.day }} - {{ day.title }}</app-card-title
+              >
+            </div>
+          </app-card-header>
+          <app-card-content>
+            <div class="space-y-4">
+              @for (activity of day.activities; track activity.name) {
+                <div
+                  class="flex gap-4 p-4 bg-slate-50/50 hover:bg-slate-50 transition-colors rounded-lg border border-slate-100"
+                >
+                  <div class="flex flex-col items-center">
+                    <div
+                      class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center"
+                    >
+                      <lucide-icon
+                        [img]="Clock"
+                        class="w-5 h-5 text-purple-600"
+                      ></lucide-icon>
+                    </div>
+                  </div>
+                  <div class="flex-1">
+                    <div
+                      class="flex items-center justify-between gap-2 mb-1 flex-wrap"
+                    >
+                      <h5 class="text-slate-800 m-0">{{ activity.name }}</h5>
+                      <div class="flex items-center gap-2">
+                        <span
+                          *ngIf="activity.price !== undefined"
+                          [class]="
+                            activity.price === 0
+                              ? 'text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold'
+                              : 'text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-bold'
+                          "
+                        >
+                          {{
+                            activity.price === 0
+                              ? "Gratuit"
+                              : activity.price + " DT"
+                          }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="mb-2">
+                      <button
+                        type="button"
+                        (click)="toggleActivitySelection(day.day, $index, activity.name)"
+                        class="text-xs px-2 py-1 rounded-md border font-semibold"
+                        [ngClass]="
+                          isActivitySelected(day.day, $index, activity.name)
+                            ? 'bg-emerald-100 text-emerald-700 border-emerald-300'
+                            : 'bg-white text-slate-600 border-slate-300'
+                        "
+                      >
+                        {{
+                          isActivitySelected(day.day, $index, activity.name)
+                            ? "Selected for budget"
+                            : "Select for budget"
+                        }}
+                      </button>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-2 leading-relaxed">
+                      {{ activity.description }}
+                    </p>
+                    <div class="text-xs text-slate-500">
+                      {{ activity.duration }}h | {{ activity.type }}
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </app-card-content>
+        </app-card>
       }
     </div>
   </div>

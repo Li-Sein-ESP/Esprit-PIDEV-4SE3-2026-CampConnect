@@ -1,6 +1,7 @@
 package com.campconnect.transport.service;
 
 import com.campconnect.transport.dto.TransportDTO;
+import com.campconnect.transport.dto.TransportDelayTestRequest;
 import com.campconnect.transport.entity.Transport;
 import java.util.List;
 
@@ -20,4 +21,7 @@ public interface ITransportService {
     void assignToTrip(String transportId, String tripId);
 
     List<java.util.Map<String, Object>> getPopularityStats();
+
+    /** Simulation retard / reset pour tests (Smart Reschedule scheduler). */
+    Transport applyDelayForTesting(String id, TransportDelayTestRequest body);
 }

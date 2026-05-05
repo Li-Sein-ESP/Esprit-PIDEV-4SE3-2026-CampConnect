@@ -24,6 +24,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.time.ZoneId;
+import com.campconnect.trip.entity.Activity;
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Service("itineraryTripService")
@@ -32,6 +34,7 @@ public class TripServiceImpl implements ITripService {
     private final TripRepository repository;
     private final TransportRepository transportRepository;
     private final TripItineraryRepository itineraryRepository;
+    private final com.campconnect.trip.repository.ActivityRepository activityRepository;
     private final MongoTemplate mongoTemplate;
     private static final Logger logger = LoggerFactory.getLogger(TripServiceImpl.class);
 
@@ -39,56 +42,93 @@ public class TripServiceImpl implements ITripService {
             @Qualifier("itineraryTripRepository") TripRepository repository,
             TransportRepository transportRepository,
             TripItineraryRepository itineraryRepository,
+            com.campconnect.trip.repository.ActivityRepository activityRepository,
             MongoTemplate mongoTemplate) {
         this.repository = repository;
         this.transportRepository = transportRepository;
         this.itineraryRepository = itineraryRepository;
+        this.activityRepository = activityRepository;
         this.mongoTemplate = mongoTemplate;
     }
 
     @Override
-    public List<Trip> findAll() {
-        logger.info("[ADMIN_OMNI_SCAN] Starting full diagnostic discovery for Admin Portal");
-        List<Trip> allFound = new ArrayList<>();
-        
-        try {
-            java.util.Set<String> collections = mongoTemplate.getCollectionNames();
-            logger.info("[ADMIN_OMNI_SCAN] Discovery phase active. Assessing {} collections.", collections.size());
-            
-            for (String col : collections) {
-                // Ignore system, user, auth, and technical collections to reduce clutter
-                if (col.startsWith("system.") || col.equals("users") || col.equals("roles") || col.equals("token") || col.endsWith("_logs")) {
-                    continue;
-                }
-                
-                try {
-                    List<java.util.Map> raw = mongoTemplate.findAll(java.util.Map.class, col);
-                    for (java.util.Map doc : raw) {
-                        // Strict validation: must have a title or name, AND look like a trip document
-                        boolean hasTripFields = doc.containsKey("title") || doc.containsKey("name");
-                        boolean hasContextFields = doc.containsKey("destination") || doc.containsKey("startDate") || doc.containsKey("itineraryIds");
-                        
-                        if (hasTripFields && hasContextFields) {
-                            Trip t = mapGenericDocToTrip(doc, col);
-                            if (t != null) {
-                                // If it was already in our main repository, let the distinct filter handle it later
-                                allFound.add(t);
-                            }
-                        }
-                    }
-                } catch (Exception e) {}
-            }
-        } catch (Exception e) {
-            logger.error("Admin Omni-Scan failed", e);
-        }
-        
-        // If omni-scan found nothing, fallback to standard repository call
-        if (allFound.isEmpty()) return repository.findAll();
+    public Trip saveAiGeneratedItinerary(String tripId, com.campconnect.predict.dto.ItineraryOptionDto selectedProgram) {
+        Trip trip = findById(tripId);
+        logger.info("Saving AI generated itinerary for trip: {} - Program: {}", tripId, selectedProgram.getTitle());
 
-        return allFound.stream()
-            .filter(java.util.Objects::nonNull)
-            .distinct()
-            .collect(Collectors.toList());
+        // 1. Clear existing itinerary if any (optional, but requested for "saving choice")
+        // Note: For now we just add, but typically a user choice replaces previous ones
+        trip.getItineraryIds().clear();
+
+        // 2. Process each day
+        if (selectedProgram.getDays() != null) {
+            for (com.campconnect.predict.dto.ItineraryDayDto dayDto : selectedProgram.getDays()) {
+                TripItinerary itinerary = new TripItinerary(tripId, dayDto.getDay(), dayDto.getTitle());
+                itineraryRepository.save(itinerary);
+                trip.getItineraryIds().add(itinerary.getId());
+
+                // 3. Process activities for this day
+                if (dayDto.getActivities() != null) {
+                    for (com.campconnect.predict.dto.ItineraryActivityDto actDto : dayDto.getActivities()) {
+                        Activity activity = new Activity(itinerary.getId(), actDto.getName(), actDto.getDescription());
+                        activity.setCost(BigDecimal.valueOf(actDto.getPrice() != null ? actDto.getPrice() : 0.0));
+                        
+                        // Set location if available
+                        if (actDto.getLocation() != null && !actDto.getLocation().isEmpty()) {
+                            com.campconnect.model.common.LocationPoint lp = new com.campconnect.model.common.LocationPoint();
+                            lp.setAddress(actDto.getLocation());
+                            activity.setLocation(lp);
+                        }
+
+                        activityRepository.save(activity);
+                        itinerary.getActivityIds().add(activity.getId());
+                    }
+                    itineraryRepository.save(itinerary);
+                }
+            }
+        }
+
+        // 4. Update Trip Budget with AI estimated cost
+        trip.setTotalBudget(BigDecimal.valueOf(selectedProgram.getTotalEstimatedCostTnd()));
+        
+        return repository.save(trip);
+    }
+
+    @Override
+    public List<com.campconnect.predict.dto.ItineraryDayDto> getFullItinerary(String tripId) {
+        List<TripItinerary> itineraries = itineraryRepository.findByTripId(tripId);
+        List<com.campconnect.predict.dto.ItineraryDayDto> result = new ArrayList<>();
+
+        for (TripItinerary it : itineraries) {
+            com.campconnect.predict.dto.ItineraryDayDto dayDto = new com.campconnect.predict.dto.ItineraryDayDto();
+            dayDto.setDay(it.getDayNumber());
+            dayDto.setTitle(it.getDailyDescription());
+            
+            List<com.campconnect.predict.dto.ItineraryActivityDto> activities = new ArrayList<>();
+            for (String actId : it.getActivityIds()) {
+                activityRepository.findById(actId).ifPresent(act -> {
+                    com.campconnect.predict.dto.ItineraryActivityDto actDto = new com.campconnect.predict.dto.ItineraryActivityDto();
+                    actDto.setId(null); // String ID vs Long AI ID
+                    actDto.setName(act.getName());
+                    actDto.setDescription(act.getDescription());
+                    actDto.setLocation(act.getLocation() != null ? act.getLocation().getAddress() : "");
+                    actDto.setPrice(act.getCost() != null ? act.getCost().doubleValue() : 0.0);
+                    activities.add(actDto);
+                });
+            }
+            dayDto.setActivities(activities);
+            result.add(dayDto);
+        }
+
+        // Sort by day number
+        result.sort((a, b) -> a.getDay().compareTo(b.getDay()));
+        return result;
+    }
+
+    @Override
+    public List<Trip> findAll() {
+        logger.info("Fetching all trips from primary repository");
+        return repository.findAll();
     }
 
     @Override
@@ -130,115 +170,14 @@ public class TripServiceImpl implements ITripService {
 
     @Override
     public List<Trip> findByUserId(String userId) {
-        logger.info("[OMNI_SCAN] Commencing full database scan for ID: '{}'", userId);
-        
-        List<Trip> results = new ArrayList<>();
-        String searchId = userId.trim();
-        
-        try {
-            // Get EVERY collection name in the database
-            java.util.Set<String> collections = mongoTemplate.getCollectionNames();
-            logger.info("[OMNI_SCAN] Searching through {} collections", collections.size());
-
-            for (String collectionName : collections) {
-                // Skip system and huge non-trip collections
-                if (collectionName.startsWith("system.") || collectionName.equals("users")) continue;
-
-                logger.info("[OMNI_SCAN] Scanning collection: {}", collectionName);
-                
-                // Generic query: look for this ID in any common field
-                Query query = new Query(new Criteria().orOperator(
-                    Criteria.where("userId").is(searchId),
-                    Criteria.where("creatorId").is(searchId),
-                    Criteria.where("createdBy").is(searchId),
-                    Criteria.where("_id").is(searchId),
-                    Criteria.where("id").is(searchId),
-                    Criteria.where("username").is(searchId)
-                ));
-
-                try {
-                    // Search for documents as generic Maps to avoid POJO mapping errors
-                    List<java.util.Map> rawDocs = mongoTemplate.find(query, java.util.Map.class, collectionName);
-                    for (java.util.Map doc : rawDocs) {
-                        Trip t = mapGenericDocToTrip(doc, collectionName);
-                        if (t != null) results.add(t);
-                    }
-                } catch (Exception inner) {
-                    logger.warn("[OMNI_SCAN] Could not scan {}: {}", collectionName, inner.getMessage());
-                }
-            }
-        } catch (Exception e) {
-            logger.error("[OMNI_SCAN] Critical failure", e);
-        }
-        
-        logger.info("[OMNI_SCAN] Complete. Found {} potential missions.", results.size());
-        
-        return results.stream()
-            .filter(java.util.Objects::nonNull)
-            .distinct()
-            .sorted((a, b) -> {
-                Instant startA = a.getStartDate() != null ? a.getStartDate() : Instant.EPOCH;
-                Instant startB = b.getStartDate() != null ? b.getStartDate() : Instant.EPOCH;
-                return startB.compareTo(startA);
-            })
-            .collect(Collectors.toList());
+        logger.info("Fetching trips for userId: '{}' from primary repository", userId);
+        return repository.findByUserId(userId);
     }
 
-    private Trip mapGenericDocToTrip(java.util.Map doc, String collectionName) {
-        try {
-            Trip t = new Trip();
-            Object id = doc.get("_id") != null ? doc.get("_id") : doc.get("id");
-            t.setId(id != null ? id.toString() : java.util.UUID.randomUUID().toString());
-            
-            Object title = doc.get("title") != null ? doc.get("title") : (doc.get("name") != null ? doc.get("name") : "Recovered mission (" + collectionName + ")");
-            t.setTitle(title.toString());
-            
-            Object uId = doc.get("userId") != null ? doc.get("userId") : (doc.get("creatorId") != null ? doc.get("creatorId") : null);
-            t.setUserId(uId != null ? uId.toString() : null);
-            
-            // Map Dates
-            if (doc.get("startDate") != null) {
-                try {
-                    Object sd = doc.get("startDate");
-                    if (sd instanceof java.util.Date) {
-                        t.setStartDate(((java.util.Date) sd).toInstant());
-                    } else {
-                        t.setStartDate(Instant.parse(sd.toString()));
-                    }
-                } catch (Exception e) {
-                    System.out.println("Error parsing startDate: " + e.getMessage());
-                }
-            }
-            if (doc.get("endDate") != null) {
-                try {
-                    Object ed = doc.get("endDate");
-                    if (ed instanceof java.util.Date) {
-                        t.setEndDate(((java.util.Date) ed).toInstant());
-                    } else {
-                        t.setEndDate(Instant.parse(ed.toString()));
-                    }
-                } catch (Exception e) {
-                    System.out.println("Error parsing endDate: " + e.getMessage());
-                }
-            }
-            
-            // Map Destination
-            Object dest = doc.get("destination");
-            if (dest != null) {
-                com.campconnect.model.common.LocationPoint lp = new com.campconnect.model.common.LocationPoint();
-                if (dest instanceof java.util.Map) {
-                    lp.setAddress(((java.util.Map) dest).get("address") != null ? ((java.util.Map) dest).get("address").toString() : "Address recovered");
-                } else {
-                    lp.setAddress(dest.toString());
-                }
-                t.setDestination(lp);
-            }
-            
-            t.setStatus(com.campconnect.trip.enums.TripStatus.PLANNED);
-            return t;
-        } catch (Exception e) {
-            return null;
-        }
+    @Override
+    public List<Trip> findTemplateTrips() {
+        logger.info("Fetching all official mission templates");
+        return repository.findByTemplate(true);
     }
 
     private Trip mapLegacyToModern(com.campconnect.model.Trip legacy) {
@@ -284,10 +223,6 @@ public class TripServiceImpl implements ITripService {
         return modern;
     }
 
-    @Override
-    public List<Trip> findTemplateTrips() {
-        return repository.findByTemplate(true);
-    }
 
     @Override
     public void addTransportToTrip(String tripId, String transportId) {

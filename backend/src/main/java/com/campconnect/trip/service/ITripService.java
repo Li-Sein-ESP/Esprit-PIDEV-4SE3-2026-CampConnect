@@ -33,4 +33,8 @@ public interface ITripService {
     List<java.util.Map<String, Object>> getDifficultyStats();
 
     Set<String> getDatabaseCollections();
+    
+    Trip saveAiGeneratedItinerary(String tripId, com.campconnect.predict.dto.ItineraryOptionDto selectedProgram);
+    
+    List<com.campconnect.predict.dto.ItineraryDayDto> getFullItinerary(String tripId);
 }

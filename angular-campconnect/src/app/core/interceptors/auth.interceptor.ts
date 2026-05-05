@@ -46,7 +46,9 @@ export class AuthInterceptor implements HttpInterceptor {
 
         return next.handle(request).pipe(
             catchError((error: HttpErrorResponse) => {
-                if (!isAuthEndpoint && error.status === 401) {
+                const hasAuthHeader = request.headers.keys().some(key => key.toLowerCase() === 'authorization');
+
+                if (!isAuthEndpoint && error.status === 401 && hasAuthHeader) {
                     console.warn('Auth error (401) detected, clearing session');
                     this.authService.logout();
                     this.router.navigate(['/login']);

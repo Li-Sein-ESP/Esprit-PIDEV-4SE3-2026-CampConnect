@@ -36,6 +36,7 @@
                     {{ p.label }}
                 </button>
             </div>
+            <p *ngIf="loading" class="lb-hero__subtitle" style="margin-top: 10px; opacity: 0.85;">Loading leaderboard...</p>
         </div>
     </section>
 
@@ -301,7 +302,7 @@
                 </svg>
             </div>
             <div>
-                <div class="lb-stats-card__value">2,847</div>
+                <div class="lb-stats-card__value">{{ stats.activeCampers | number }}</div>
                 <div class="lb-stats-card__label">Active Campers</div>
             </div>
         </div>
@@ -313,7 +314,7 @@
                 </svg>
             </div>
             <div>
-                <div class="lb-stats-card__value">12,430</div>
+                <div class="lb-stats-card__value">{{ stats.totalBadges | number }}</div>
                 <div class="lb-stats-card__label">Badges Earned</div>
             </div>
         </div>
@@ -325,7 +326,7 @@
                 </svg>
             </div>
             <div>
-                <div class="lb-stats-card__value">5,621</div>
+                <div class="lb-stats-card__value">{{ stats.totalTrips | number }}</div>
                 <div class="lb-stats-card__label">Trips Completed</div>
             </div>
         </div>
@@ -336,7 +337,7 @@
                 </svg>
             </div>
             <div>
-                <div class="lb-stats-card__value">4.8</div>
+                <div class="lb-stats-card__value">{{ stats.avgTrustScore }}</div>
                 <div class="lb-stats-card__label">Avg Trust Score</div>
             </div>
         </div>
@@ -377,7 +378,7 @@
 
                 <!-- Rank number -->
                 <div>
-                    <div class="lb-table__rank lb-table__rank--default">{{ i + 4 }}</div>
+                    <div class="lb-table__rank lb-table__rank--default">{{ camper.id }}</div>
                 </div>
 
                 <!-- User Info -->

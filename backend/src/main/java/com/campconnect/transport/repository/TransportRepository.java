@@ -7,6 +7,9 @@ import java.util.List;
 public interface TransportRepository extends MongoRepository<Transport, String> {
     List<Transport> findByTripId(String tripId);
 
+    // TÂCHE PROPOSITION : Fonction Keywords impliquant plusieurs champs
+    List<Transport> findByStatusAndDelayMinutesGreaterThan(com.campconnect.transport.enums.TransportStatus status, int delayMinutes);
+
     // TÂCHE PROPOSITION 2 : Jointure complexe (Aggregation lookup) pour la popularité
     @org.springframework.data.mongodb.repository.Aggregation(pipeline = {
         "{ '$lookup': { 'from': 'trip_itineraries_main', 'localField': 'tripId', 'foreignField': '_id', 'as': 'tripDetails' } }",

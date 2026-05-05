@@ -14,14 +14,10 @@ public class SafetyAlertDTO {
     private String description;
     private String type;
     private String severity;
-    private String location;
+    private String status;
     private String locationName;
     private String regionName;
-    private Double latitude;
-    private Double longitude;
     private String tripId;
-    private String tripName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private boolean active;
 }

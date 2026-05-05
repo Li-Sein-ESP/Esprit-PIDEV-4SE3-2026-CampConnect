@@ -1,24 +1,26 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-    selector: 'app-filter-chip',
-    standalone: true,
-    imports: [CommonModule],
-    template: `
+  selector: 'app-filter-chip',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
     <button
-      type="button"
       (click)="onClick.emit()"
-      class="rounded-full px-3 py-1 text-xs font-medium transition-colors"
-      [ngClass]="active ? 'bg-emerald-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
-    >
+      [class]="'whitespace-nowrap rounded-xl px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ' + 
+               (active ? 
+                'bg-[#2D4A3E] text-white shadow-lg shadow-emerald-900/10' : 
+                'bg-white text-slate-400 hover:text-[#2D4A3E] border border-slate-200 hover:border-[#2D4A3E]')">
       {{ label }}
     </button>
   `,
-    styles: []
+  styles: [`
+    :host { display: inline-block; }
+  `]
 })
 export class FilterChipComponent {
-    @Input() label: string = '';
-    @Input() active: boolean = false;
-    @Output() onClick = new EventEmitter<void>();
+  @Input() label: string = '';
+  @Input() active: boolean = false;
+  @Output() onClick = new EventEmitter<void>();
 }

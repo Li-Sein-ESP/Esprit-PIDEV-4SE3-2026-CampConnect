@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, of, tap } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { User, LoginRequest, LoginResponse, SignupRequest, JwtPayload } from '../models/auth.models';
 
@@ -56,6 +57,13 @@ export class AuthService {
         return this.isAuthenticated$.asObservable();
     }
 
+    updateCurrentUser(user: User): void {
+        const token = this.getToken();
+        if (token) {
+            this.setSession(user, token);
+        }
+    }
+
     // ─── Token Utilities ───────────────────────────────────────────
 
     getToken(): string | undefined {
@@ -71,10 +79,60 @@ export class AuthService {
         return this.currentUser$.value?.roles ?? this.getRolesFromToken();
     }
 
+    /** Compte suspendu : pas de publication (aligné sur profileDetails.moderationStatus du backend). */
+    isAccountBanned(): boolean {
+        const s = this.currentUserValue?.profileDetails?.['moderationStatus'];
+        return s === 'BANNED' || s === 'PERMANENTLY_BANNED';
+    }
+
+    /** Met à jour profil + moderationStatus depuis GET /api/users/me (ex. après bannissement admin). */
+    refreshProfileFromServer(): Observable<void> {
+        const token = this.getToken();
+        if (!token || !this.currentUser$.value) {
+            return of(undefined);
+        }
+        return this.http
+            .get<{
+                username: string;
+                email: string;
+                profileDetails?: Record<string, unknown>;
+            }>(`${environment.apiUrl}/users/me`)
+            .pipe(
+                tap((profile) => {
+                    const u = this.currentUser$.value;
+                    if (!u) {
+                        return;
+                    }
+                    const updated: User = {
+                        ...u,
+                        username: profile.username ?? u.username,
+                        email: profile.email ?? u.email,
+                        profileDetails: profile.profileDetails ?? u.profileDetails
+                    };
+                    this.setSession(updated, token);
+                }),
+                map(() => undefined),
+                catchError(() => of(undefined))
+            );
+    }
+
     hasRole(role: string): boolean {
-        const roles = this.getRoles().map(r => r.toUpperCase());
         const normalized = role.toUpperCase().startsWith('ROLE_') ? role.toUpperCase() : `ROLE_${role.toUpperCase()}`;
-        return roles.includes(normalized) || roles.includes('ROLE_ADMIN');
+        const expandedRoles = new Set(this.getRoles().map(r => r.toUpperCase()));
+
+        if (expandedRoles.has('ROLE_ADMIN')) {
+            return true;
+        }
+
+        if (expandedRoles.has('ROLE_USER')) {
+            expandedRoles.add('ROLE_CAMPER');
+        }
+
+        if (expandedRoles.has('ROLE_CAMPER')) {
+            expandedRoles.add('ROLE_USER');
+        }
+
+        return expandedRoles.has(normalized);
     }
 
     // Public method for interceptor to check current token
@@ -96,7 +154,8 @@ export class AuthService {
                     username: data.username,
                     email: data.email,
                     roles: data.roles,
-                    token
+                    token,
+                    profileDetails: data.profileDetails
                 };
                 this.setSession(user, token);
             })

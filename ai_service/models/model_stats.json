@@ -1,0 +1,31 @@
+{
+  "budget": {
+    "mean": 4441.376740469796,
+    "std": 4017.0271201485984,
+    "min": 107.60265068487708,
+    "max": 30333.25462580961
+  },
+  "features": [
+    "user_proposed_budget",
+    "location",
+    "season",
+    "duration_days",
+    "group_size",
+    "trip_type",
+    "distance_km",
+    "hotel_quality",
+    "rating_1_5",
+    "review_polarity",
+    "weather_score",
+    "time_flexibility",
+    "has_paid_activities",
+    "paid_activities_count",
+    "avg_activity_cost",
+    "has_paid_visits",
+    "paid_visits_count",
+    "avg_visit_cost",
+    "ambiguity_level"
+  ],
+  "training_samples": 3000,
+  "timestamp": "2026-05-03T16:15:13.178672"
+}

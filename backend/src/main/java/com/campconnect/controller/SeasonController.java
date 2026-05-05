@@ -11,7 +11,7 @@ import com.campconnect.model.Season;
 import com.campconnect.repository.SeasonRepository;
 
 /**
- * REST Controller pour gérer les opérations CRUD sur les saisons.
+ * REST Controller pour gÃƒÂ©rer les opÃƒÂ©rations CRUD sur les saisons.
  * Endpoint: /api/seasons
  */
 @RestController
@@ -24,7 +24,7 @@ public class SeasonController {
 
     /**
      * GET /api/seasons
-     * Récupère toutes les saisons.
+     * RÃƒÂ©cupÃƒÂ¨re toutes les saisons.
      */
     @GetMapping
     public ResponseEntity<List<Season>> getAllSeasons() {
@@ -34,7 +34,7 @@ public class SeasonController {
 
     /**
      * GET /api/seasons/{id}
-     * Récupère une saison par son identifiant.
+     * RÃƒÂ©cupÃƒÂ¨re une saison par son identifiant.
      */
     @GetMapping("/{id}")
     public ResponseEntity<Season> getSeasonById(@PathVariable String id) {
@@ -48,7 +48,7 @@ public class SeasonController {
 
     /**
      * POST /api/seasons
-     * Crée une nouvelle saison.
+     * CrÃƒÂ©e une nouvelle saison.
      */
     @PostMapping
     public ResponseEntity<Season> createSeason(@RequestBody Season season) {
@@ -58,7 +58,7 @@ public class SeasonController {
 
     /**
      * PUT /api/seasons/{id}
-     * Met à jour une saison existante.
+     * Met ÃƒÂ  jour une saison existante.
      */
     @PutMapping("/{id}")
     public ResponseEntity<Season> updateSeason(@PathVariable String id, @RequestBody Season seasonDetails) {

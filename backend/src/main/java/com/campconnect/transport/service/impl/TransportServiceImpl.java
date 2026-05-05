@@ -1,7 +1,9 @@
 package com.campconnect.transport.service.impl;
 
 import com.campconnect.transport.dto.TransportDTO;
+import com.campconnect.transport.dto.TransportDelayTestRequest;
 import com.campconnect.transport.entity.Transport;
+import com.campconnect.transport.enums.TransportStatus;
 import com.campconnect.transport.repository.TransportRepository;
 import com.campconnect.transport.service.ITransportService;
 import com.campconnect.trip.repository.TripRepository;
@@ -10,7 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import lombok.RequiredArgsConstructor;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -59,9 +64,45 @@ public class TransportServiceImpl implements ITransportService {
         repository.deleteById(id);
     }
 
+    /**
+     * Transports rattachés au voyage : par champ {@code tripId} sur le document transport,
+     * et par les {@code transportIds} stockés sur le voyage (les deux doivent rester alignés).
+     * Si un transport n'a pas encore {@code tripId} mais figure sur le voyage, on répare le lien.
+     */
     @Override
     public List<Transport> findByTripId(String tripId) {
-        return repository.findByTripId(tripId);
+        Map<String, Transport> merged = new LinkedHashMap<>();
+        for (Transport t : repository.findByTripId(tripId)) {
+            if (t != null && t.getId() != null) {
+                merged.put(t.getId(), t);
+            }
+        }
+        tripRepository.findById(tripId).ifPresent(trip -> {
+            List<String> ids = trip.getTransportIds();
+            if (ids == null) {
+                return;
+            }
+            for (String tid : ids) {
+                if (tid == null || tid.isBlank()) {
+                    continue;
+                }
+                Transport existing = merged.get(tid);
+                if (existing != null) {
+                    merged.put(tid, ensureTransportLinkedToTrip(existing, tripId));
+                } else {
+                    repository.findById(tid).ifPresent(tr -> merged.put(tr.getId(), ensureTransportLinkedToTrip(tr, tripId)));
+                }
+            }
+        });
+        return new ArrayList<>(merged.values());
+    }
+
+    private Transport ensureTransportLinkedToTrip(Transport tr, String tripId) {
+        if (tripId != null && (tr.getTripId() == null || !tripId.equals(tr.getTripId()))) {
+            tr.setTripId(tripId);
+            return repository.save(tr);
+        }
+        return tr;
     }
 
     @Override
@@ -84,6 +125,23 @@ public class TransportServiceImpl implements ITransportService {
     @Override
     public java.util.List<java.util.Map<String, Object>> getPopularityStats() {
         return repository.getTransportPopularityStats();
+    }
+
+    @Override
+    public Transport applyDelayForTesting(String id, TransportDelayTestRequest body) {
+        Transport t = findById(id);
+        int dm = body != null ? body.getDelayMinutes() : 0;
+        if (dm <= 0) {
+            t.setStatus(TransportStatus.AVAILABLE);
+            t.setDelayMinutes(0);
+        } else {
+            t.setStatus(TransportStatus.DELAYED);
+            t.setDelayMinutes(dm);
+        }
+        if (body != null && body.getDepartureTime() != null) {
+            t.setDepartureTime(body.getDepartureTime());
+        }
+        return repository.save(t);
     }
 
     private void mapDtoToEntity(TransportDTO dto, Transport transport) {

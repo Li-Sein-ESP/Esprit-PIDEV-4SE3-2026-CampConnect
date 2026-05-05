@@ -3,14 +3,21 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, map } from 'rxjs';
 import { IncidentReport, SafetyAlert } from '../models/safety.model';
 
+import { environment } from '../../../../environments/environment';
+
 @Injectable({
     providedIn: 'root'
 })
 export class SafetyService {
-    private apiUrl = 'http://localhost:8080/api/incidents';
-    private apiUrlAlerts = 'http://localhost:8080/api/alerts';
+    private apiUrl = `${environment.apiUrl}/incidents`;
+    private apiUrlAlerts = `${environment.apiUrl}/alerts`;
+    private adminModerationUrl = `${environment.apiUrl}/admin/moderation`;
 
     constructor(private http: HttpClient) { }
+
+    getModerationLogs(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.adminModerationUrl}/logs`);
+    }
 
     submitIncident(reportData: Omit<IncidentReport, 'id' | 'createdAt' | 'status'>): Observable<IncidentReport> {
         // Map frontend IncidentReport model to backend IncidentDTO

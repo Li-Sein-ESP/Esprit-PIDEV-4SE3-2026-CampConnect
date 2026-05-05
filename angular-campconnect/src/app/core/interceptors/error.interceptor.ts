@@ -1,12 +1,18 @@
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
+import { AuthService } from '../services/auth.service';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
   private router = inject(Router);
+  private authService = inject(AuthService);
+
+  private hasAuthHeader(headers: HttpHeaders): boolean {
+    return headers.keys().some(key => key.toLowerCase() === 'authorization');
+  }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
@@ -44,9 +50,10 @@ export class ErrorInterceptor implements HttpInterceptor {
               break;
             case 401:
               errorMessage = 'Session expired. Please login again.';
-              // Clear token and redirect to login
-              localStorage.removeItem('cc_token');
-              this.router.navigate(['/login']);
+              if (this.hasAuthHeader(req.headers)) {
+                this.authService.logout();
+                this.router.navigate(['/login']);
+              }
               break;
             case 403:
               errorMessage = 'You do not have permission to access this resource.';

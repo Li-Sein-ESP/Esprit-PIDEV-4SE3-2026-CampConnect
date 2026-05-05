@@ -8,6 +8,7 @@ export interface User {
     email: string;
     roles: string[];
     token?: string;
+    profileDetails?: any;
 }
 
 export interface LoginRequest {
@@ -22,6 +23,8 @@ export interface LoginResponse {
     roles: string[];
     token?: string;
     accessToken?: string;
+    /** État modération (BANNED, etc.) — renvoyé par le backend au signin */
+    profileDetails?: Record<string, unknown>;
 }
 
 export interface SignupRequest {

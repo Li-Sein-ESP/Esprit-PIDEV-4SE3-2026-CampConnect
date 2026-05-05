@@ -2,6 +2,7 @@ package com.campconnect.trip.controller;
 
 import com.campconnect.trip.dto.TripDTO;
 import com.campconnect.trip.entity.Trip;
+import com.campconnect.trip.service.ISmartRescheduleService;
 import com.campconnect.trip.service.ITripService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
@@ -19,12 +20,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @CrossOrigin(origins = "http://localhost:4200")
 public class TripController {
     private final ITripService service;
+    private final ISmartRescheduleService rescheduleService;
     private final com.fasterxml.jackson.databind.ObjectMapper mapper;
     private static final Logger logger = LoggerFactory.getLogger(TripController.class);
 
     public TripController(@Qualifier("itineraryTripService") ITripService service,
+                          com.campconnect.trip.service.ISmartRescheduleService rescheduleService,
                           com.fasterxml.jackson.databind.ObjectMapper mapper) {
         this.service = service;
+        this.rescheduleService = rescheduleService;
         this.mapper = mapper;
     }
 
@@ -124,6 +128,11 @@ public class TripController {
         service.addItineraryToTrip(tripId, itineraryId);
     }
 
+    @GetMapping("/{tripId}/full-itinerary")
+    public List<com.campconnect.predict.dto.ItineraryDayDto> getFullItinerary(@PathVariable("tripId") String tripId) {
+        return service.getFullItinerary(tripId);
+    }
+
     @GetMapping("/search")
     public List<Trip> search(@RequestParam("q") String query) {
         return service.searchByKeywords(query);
@@ -142,5 +151,13 @@ public class TripController {
     @GetMapping("/admin/debug-collections")
     public java.util.Set<String> debugCollections() {
         return service.getDatabaseCollections();
+    }
+
+    @PostMapping("/{tripId}/reschedule")
+    public void reschedule(@PathVariable("tripId") String tripId,
+                           @RequestParam("delay") int delay,
+                           @RequestParam(value = "keyword", required = false) String keyword) {
+        logger.info("Manual reschedule request for tripId='{}', delay={}min, keyword='{}'", tripId, delay, keyword);
+        rescheduleService.rescheduleTripActivities(tripId, delay, keyword);
     }
 }

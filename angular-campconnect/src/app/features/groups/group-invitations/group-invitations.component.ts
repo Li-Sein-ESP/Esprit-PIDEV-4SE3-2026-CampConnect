@@ -87,14 +87,14 @@ import { GroupInvite } from "../models/group-invite.model";
               </div>
               <div class="flex items-center gap-2 text-slate-500 mt-2">
                 <lucide-icon [img]="ClockIcon" [size]="16"></lucide-icon>
-                <span>Invited {{ formatDate(invite.invitedAt) }}</span>
+                <span>Invited {{ formatDate(invite.invitedAt || '') }}</span>
               </div>
             </div>
 
             <!-- Actions -->
             <div class="flex gap-2">
               <button
-                (click)="acceptInvitation(invite.id)"
+                (click)="acceptInvitation(invite.id || '')"
                 [disabled]="processingId === invite.id"
                 class="px-4 py-2.5 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50 flex items-center gap-2"
               >
@@ -102,7 +102,7 @@ import { GroupInvite } from "../models/group-invite.model";
                 <span>Accept</span>
               </button>
               <button
-                (click)="declineInvitation(invite.id)"
+                (click)="declineInvitation(invite.id || '')"
                 [disabled]="processingId === invite.id"
                 class="px-4 py-2.5 bg-slate-200 text-slate-700 rounded-lg font-medium hover:bg-slate-300 transition-colors disabled:opacity-50 flex items-center gap-2"
               >

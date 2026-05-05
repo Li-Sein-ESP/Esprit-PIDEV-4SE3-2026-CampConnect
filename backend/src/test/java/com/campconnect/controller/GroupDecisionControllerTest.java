@@ -41,9 +41,9 @@ class GroupDecisionControllerTest {
     void createDecision_Success() throws Exception {
         GroupDecisionDTO dto = new GroupDecisionDTO();
         dto.setGroupId("group-1");
-        dto.setTitle("Lunch Place");
-        dto.setOptions(List.of("Pizza", "Burgers"));
-        dto.setType("CHOICE");
+        dto.setQuestion("Lunch Place");
+        dto.setOptions(java.util.List.of("Pizza", "Burgers"));
+        dto.setType(com.campconnect.model.GroupDecisionType.ACTIVITY);
         GroupDecision created = GroupDecision.builder().id("dec-1").question("Quoi manger ?").build();
         when(groupDecisionService.createDecision(any(GroupDecision.class))).thenReturn(created);
 

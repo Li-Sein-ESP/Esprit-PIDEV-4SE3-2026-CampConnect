@@ -30,7 +30,7 @@ public class User {
 	private Set<Role> roles = new HashSet<>();
 
 	private boolean verifiedExpert = false;
-
+	private int banCount = 0;
 	private Map<String, Object> profileDetails;
 
 	private java.time.LocalDateTime createdAt;

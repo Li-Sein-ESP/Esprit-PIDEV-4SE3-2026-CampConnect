@@ -36,6 +36,7 @@ import {
   Clock,
   AlertCircle,
   Share2,
+  Wallet,
 } from "lucide-angular";
 import { TripService } from "./services/trip.service";
 import { AuthService } from "../../core/services/auth.service";
@@ -194,9 +195,13 @@ import { TransportRoute } from "../transportation/models/transportation.model";
                     <input
                       type="text"
                       [(ngModel)]="tripModel.destinationName"
+                      list="camping-destinations"
                       placeholder="Search campsites or regions..."
                       class="w-full h-full pl-16 pr-6 bg-slate-50 border-2 border-transparent focus:bg-white focus:border-emerald-500/30 rounded-2xl font-bold transition-all outline-none"
                     />
+                    <datalist id="camping-destinations">
+                      <option *ngFor="let place of campingPlaces" [value]="place"></option>
+                    </datalist>
                   </div>
                 </div>
 
@@ -247,6 +252,29 @@ import { TransportRoute } from "../transportation/models/transportation.model";
                       [(ngModel)]="tripModel.participants"
                       class="w-full h-full pl-16 pr-6 bg-slate-50 border-2 border-transparent focus:bg-white focus:border-emerald-500/30 rounded-2xl font-bold transition-all outline-none"
                     />
+                  </div>
+                </div>
+
+                <div class="group">
+                  <label
+                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1"
+                    >Mission Budget (TND)</label
+                  >
+                  <div class="relative h-16">
+                    <lucide-icon
+                      [img]="WalletIcon"
+                      [size]="18"
+                      class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500"
+                    ></lucide-icon>
+                    <input
+                      type="number"
+                      [(ngModel)]="tripModel.budget"
+                      placeholder="e.g., 500"
+                      class="w-full h-full pl-16 pr-16 bg-slate-50 border-2 border-transparent focus:bg-white focus:border-emerald-500/30 rounded-2xl font-bold transition-all outline-none"
+                    />
+                    <div class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 font-black text-xs">
+                      TND
+                    </div>
                   </div>
                 </div>
 
@@ -672,6 +700,7 @@ export class PlanTripComponent implements OnInit {
   MapPinIcon = MapPin;
   UsersIcon = Users;
   DollarSignIcon = DollarSign;
+  WalletIcon = Wallet;
   PlusIcon = Plus;
   ArrowLeftIcon = ArrowLeft;
   ArrowRightIcon = ArrowRight;
@@ -687,6 +716,22 @@ export class PlanTripComponent implements OnInit {
   isSubmitting = false;
   isGenerating = false; // Alias for template
   isLoadingTransports = false;
+
+  campingPlaces = [
+    "Camping Bouhertma (Jendouba)",
+    "Camping Bni Mtir (Aïn Draham)",
+    "Zen Camp Aïn Draham",
+    "Camping El Mrij (Aïn Draham)",
+    "Camping Les Jasmins (Nabeul)",
+    "Camping Rtiba (Nabeul)",
+    "Camping Borj Cédria (Tunis)",
+    "Parc du Belvédère (Tunis)",
+    "Camping Ksar Ghilane (Désert)",
+    "Camping Douz Sahara",
+    "Sahara Camping El Faouar",
+    "Camping Sidi Mechreg (Bizerte)",
+    "Camping Cap Serrat (Béja)"
+  ];
 
   tripModel = {
     title: "",
@@ -1002,7 +1047,7 @@ export class PlanTripComponent implements OnInit {
         startDate: new Date(this.tripModel.startDate).toISOString(),
         endDate: new Date(this.tripModel.endDate).toISOString(),
         difficulty: this.tripModel.adventureLevel,
-        totalBudget:
+        totalBudget: this.tripModel.budget ||
           (this.getSelectedTransport()?.price || 0) *
           this.tripModel.participants,
         status: "PLANNED",
@@ -1028,7 +1073,7 @@ export class PlanTripComponent implements OnInit {
           this.isSubmitting = false;
           this.isGenerating = false;
           console.log("Saved trip:", response);
-          this.router.navigate(["/trips", response.id]);
+          this.router.navigate(["/trips", response.id], { queryParams: { autoGenerate: true } });
         },
         error: (err: any) => {
           this.isSubmitting = false;

@@ -24,6 +24,7 @@ import {
   Mountain
 } from 'lucide-angular';
 import { ButtonComponent } from '../../../shared/components/button.component';
+import { AuthService } from '../../../core/services/auth.service';
 import { CardComponent, CardContentComponent } from '../../../shared/components/card.component';
 import { BadgeComponent } from '../../../shared/components/badge.component';
 
@@ -278,7 +279,10 @@ export class TripStoriesComponent {
     },
   ];
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private auth: AuthService
+  ) { }
 
   get filteredStories(): Story[] {
     return this.tripStories.filter((story) => {
@@ -329,6 +333,10 @@ export class TripStoriesComponent {
   }
 
   navigateToCreate(): void {
+    if (this.auth.isAccountBanned()) {
+      this.router.navigate(['/community/feed'], { queryParams: { postingBlocked: '1' } });
+      return;
+    }
     this.router.navigate(['/community/create']);
   }
 

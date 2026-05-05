@@ -12,12 +12,15 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-2">Destination</label>
+            <label class="block text-sm font-medium mb-2">Destination (Camping)</label>
             <div class="relative">
               <lucide-icon [img]="MapPin"
                 class="absolute left-3 top-3 w-5 h-5 text-[var(--color-text-tertiary)]"></lucide-icon>
-              <input [(ngModel)]="tripData.destination" placeholder="Where are you going?"
+              <input [(ngModel)]="tripData.destination" list="camping-destinations" placeholder="Where are you going?"
                 class="w-full pl-10 pr-4 py-2 rounded-lg border-2 border-[var(--color-border-light)] focus:border-[var(--color-primary-600)]" />
+              <datalist id="camping-destinations">
+                <option *ngFor="let place of campingPlaces" [value]="place"></option>
+              </datalist>
             </div>
           </div>
 

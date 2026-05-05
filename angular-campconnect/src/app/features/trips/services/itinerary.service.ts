@@ -1,39 +1,21 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AuthService } from '../../../core/services/auth.service';
+import { environment } from '../../../../environments/environment';
 
-const API_URL = 'http://localhost:8080/api/itineraries';
+const API_URL = `${environment.apiUrl}/itineraries`;
 
 @Injectable({
     providedIn: 'root'
 })
 export class ItineraryService {
-    constructor(
-        private http: HttpClient,
-        private authService: AuthService
-    ) { }
-
-    private getHttpOptions() {
-        const token = this.authService.getToken();
-        if (token) {
-            return {
-                headers: new HttpHeaders({
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                })
-            };
-        }
-        return {
-            headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-        };
-    }
+    constructor(private http: HttpClient) { }
 
     getItinerariesByTrip(tripId: string): Observable<any[]> {
-        return this.http.get<any[]>(`${API_URL}/trip/${tripId}`, this.getHttpOptions());
+        return this.http.get<any[]>(`${API_URL}/trip/${tripId}`);
     }
 
     createItinerary(itinerary: any): Observable<any> {
-        return this.http.post<any>(API_URL, itinerary, this.getHttpOptions());
+        return this.http.post<any>(API_URL, itinerary);
     }
 }

@@ -25,7 +25,21 @@ public class Post {
     private String authorName;
     private String authorUsername;
 
+    private String title;
+    private String category;
+    private List<String> tags = new ArrayList<>();
+    private List<String> imageUrls = new ArrayList<>();
+    private String location;
+
     private LocalDateTime createdAt = LocalDateTime.now();
+    private Integer likes = 0;
+    private List<String> likedByUsers = new ArrayList<>();
+
+    // Moderation Fields
+    private String moderationStatus;
+    private String moderationDecision;
+    private Double moderationScore;
+    private List<String> moderationReasons = new ArrayList<>();
 
     private List<Comment> comments = new ArrayList<>();
 

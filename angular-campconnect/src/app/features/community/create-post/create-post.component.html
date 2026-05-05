@@ -70,6 +70,42 @@
             Content exceeds {{ MAX_CHARS }} characters ({{ charCount }}/{{ MAX_CHARS }})
           </p>
 
+          <section class="cc-story-generator" aria-label="AI story generator">
+            <div class="cc-story-generator__copy">
+              <h3>Community Story Generator</h3>
+              <p>Transform your draft into an immersive adventure story.</p>
+            </div>
+            <button
+              type="button"
+              class="cc-btn cc-btn--ai"
+              (click)="onGenerateStory()"
+              [disabled]="isGeneratingStory || charCount > MAX_CHARS">
+              <span *ngIf="isGeneratingStory" class="cc-btn__spinner"></span>
+              <span *ngIf="!isGeneratingStory">✨ Generate Story</span>
+              <span *ngIf="isGeneratingStory">Generating...</span>
+            </button>
+          </section>
+
+          <section class="cc-story-preview" *ngIf="generatedStory">
+            <div class="cc-story-preview__header">
+              <h4>Generated Story</h4>
+              <span class="cc-story-preview__badge" *ngIf="generatedStoryMeta?.mocked">Fallback</span>
+            </div>
+            <div class="cc-story-preview__origin" *ngIf="generatedStoryMeta?.sourceContent">
+              <strong>Original:</strong>
+              <p>{{ generatedStoryMeta?.sourceContent }}</p>
+            </div>
+            <div class="cc-story-preview__generated">
+              <strong>Story:</strong>
+              <p>{{ generatedStory }}</p>
+            </div>
+            <div class="cc-story-preview__actions">
+              <button type="button" class="cc-btn cc-btn--primary" (click)="useGeneratedStory()">Use this story</button>
+              <button type="button" class="cc-btn cc-btn--ghost" (click)="onGenerateStory()" [disabled]="isGeneratingStory">Regenerate</button>
+              <button type="button" class="cc-btn cc-btn--ghost cc-btn--danger" (click)="discardGeneratedStory()">Discard</button>
+            </div>
+          </section>
+
           <!-- Media upload -->
           <div class="cc-upload">
             <div class="cc-upload__dropzone" [class.cc-upload__dropzone--active]="isDragging"
@@ -110,20 +146,12 @@
               Location
               <span class="cc-field__label-optional">— optional</span>
             </label>
-            <input id="locationInput" type="text" class="cc-input" formControlName="location"
-              placeholder="e.g. Yosemite Valley, California" autocomplete="off" (focus)="onLocationFocus()"
-              aria-autocomplete="list">
-            <!-- Location suggestions dropdown -->
-            <div class="cc-dropdown" *ngIf="showLocationSuggestions" role="listbox">
-              <button type="button" class="cc-dropdown__item" *ngFor="let loc of filteredLocations"
-                (click)="selectLocation(loc.name)" role="option">
-                <span class="cc-dropdown__icon">📍</span>
-                <span>
-                  <strong>{{ loc.name }}</strong>
-                  <small>{{ loc.region }}</small>
-                </span>
-              </button>
-            </div>
+            <select id="locationInput" class="cc-input cc-select" formControlName="location" aria-label="Location">
+              <option value="">Choisir un gouvernorat</option>
+              <option *ngFor="let loc of locationSuggestions" [value]="loc.name">
+                {{ loc.name }} — {{ loc.region }}
+              </option>
+            </select>
           </div>
 
           <!-- Tags -->

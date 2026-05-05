@@ -1,6 +1,7 @@
 package com.campconnect.transport.controller;
 
 import com.campconnect.transport.dto.TransportDTO;
+import com.campconnect.transport.dto.TransportDelayTestRequest;
 import com.campconnect.transport.entity.Transport;
 import com.campconnect.transport.service.ITransportService;
 import org.springframework.web.bind.annotation.*;
@@ -47,6 +48,21 @@ public class TransportController {
     @PostMapping("/{transportId}/assign-trip/{tripId}")
     public void assignTrip(@PathVariable("transportId") String transportId, @PathVariable("tripId") String tripId) {
         service.assignToTrip(transportId, tripId);
+    }
+
+    /**
+     * Lab / PIDEV : simule un retard (DELAYED + minutes) ou réinitialise (delayMinutes ≤ 0).
+     * Le scheduler Smart Reschedule traitera les transports DELAYED toutes les 30 s.
+     */
+    @PatchMapping("/{id}/testing/delay")
+    public Transport applyTestingDelay(
+            @PathVariable("id") String id,
+            @RequestBody(required = false) TransportDelayTestRequest body) {
+        TransportDelayTestRequest req = body != null ? body : new TransportDelayTestRequest();
+        if (body == null) {
+            req.setDelayMinutes(0);
+        }
+        return service.applyDelayForTesting(id, req);
     }
 
     @GetMapping("/popularity-stats")
