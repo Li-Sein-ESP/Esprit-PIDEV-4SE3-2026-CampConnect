@@ -13,4 +13,5 @@ public interface IEventServices {
     
     EventRegistrationDTO registerUser(String eventId, String userId, int participants);
     List<EventRegistrationDTO> getEventParticipants(String eventId);
+    java.util.List<java.util.Map<String, Object>> getAiRecommendations(String preferences, java.util.List<String> history);
 }

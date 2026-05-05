@@ -52,11 +52,9 @@ public class EventDTO {
     private List<String> tags;
     private String imageUrl;
     private EventStatus status;
-    private List<String> whatToExpect;
-    private List<String> whatToBring;
-    private List<String> whatsIncluded;
-    private List<String> safetyNotes;
-    private String cancellationPolicy;
+    private List<String> sdgs;
+    private Integer sustainabilityScore;
+    private List<String> activities;
     private String creatorId;
     private String creatorName;
 }

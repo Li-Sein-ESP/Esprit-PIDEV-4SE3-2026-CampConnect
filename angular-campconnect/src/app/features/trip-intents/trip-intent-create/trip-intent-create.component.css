@@ -1,12 +1,11 @@
 .create-container {
     max-width: 800px;
     margin: 0 auto;
-    padding: 2rem;
-    padding-bottom: 5rem;
+    padding: 4rem 2rem 5rem;
 }
 
 .nav-header {
-    margin-bottom: 2rem;
+    margin-bottom: 4rem;
 }
 
 .btn-icon {
@@ -15,75 +14,77 @@
     gap: 0.5rem;
     background: transparent;
     border: none;
-    color: var(--color-muted-foreground);
-    font-weight: 500;
+    color: #1f2937;
+    font-weight: 600;
     cursor: pointer;
     padding: 0;
+    font-size: 1rem;
     transition: color 0.2s;
 }
 
 .btn-icon:hover {
-    color: var(--color-foreground);
+    color: var(--color-primary, #0a6e4f);
 }
 
 .form-wrapper {
-    background: var(--color-card);
-    border-radius: 1.5rem;
-    padding: 3rem;
-    box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.1);
-    border: 1px solid var(--color-border);
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+    border: none;
 }
 
 .form-header {
-    margin-bottom: 3rem;
+    margin-bottom: 4rem;
     text-align: center;
 }
 
 .page-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--color-foreground);
-    margin-bottom: 0.5rem;
+    font-size: 2.75rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin-bottom: 0.75rem;
     letter-spacing: -0.025em;
 }
 
 .page-subtitle {
     font-size: 1.125rem;
-    color: var(--color-muted-foreground);
+    color: #4b5563;
 }
 
 .section-title {
     font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: var(--color-foreground);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #1f2937;
 }
 
 .section-desc {
-    color: var(--color-muted-foreground);
-    margin-bottom: 1.5rem;
+    color: #4b5563;
+    margin-bottom: 2rem;
     font-size: 0.95rem;
 }
 
 .form-section {
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
 }
 
 .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 .form-group>label {
     display: block;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    color: var(--color-foreground);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: #1f2937;
     font-size: 0.95rem;
 }
 
 .form-row {
     display: flex;
-    gap: 1.5rem;
+    gap: 2rem;
+    margin-bottom: 1rem;
 }
 
 .half {
@@ -101,24 +102,30 @@ input[type="date"],
 input[type="number"],
 select {
     width: 100%;
-    padding: 0.75rem 1rem;
-    border-radius: 0.75rem;
-    border: 1px solid var(--color-border);
-    background: var(--color-background);
-    color: var(--color-foreground);
+    padding: 0.5rem 0;
+    border: none;
+    border-bottom: 1px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    color: #1f2937;
     font-size: 1rem;
     transition: all 0.2s;
     outline: none;
 }
 
+input::placeholder,
+select::placeholder {
+    color: #9ca3af;
+}
+
 input:focus,
 select:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(10, 110, 79, 0.1);
+    border-bottom-color: var(--color-primary, #0a6e4f);
+    box-shadow: none;
 }
 
 .is-invalid {
-    border-color: #ef4444 !important;
+    border-bottom-color: #ef4444 !important;
 }
 
 .error-msg {
@@ -130,22 +137,22 @@ select:focus {
 /* Icon inputs */
 .icon-input input,
 .icon-input select {
-    padding-left: 2.75rem;
+    padding-left: 2rem;
 }
 
 .input-icon {
     position: absolute;
-    left: 1rem;
-    color: var(--color-muted-foreground);
+    left: 0;
+    color: #1f2937;
     pointer-events: none;
 }
 
 .currency {
     position: absolute;
-    right: 1rem;
-    color: var(--color-muted-foreground);
+    right: 0;
+    color: #1f2937;
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .divider {

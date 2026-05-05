@@ -141,6 +141,11 @@
                             <span class="text-2xl group-hover:scale-110 transition-transform">📅</span>
                             <span class="text-xs font-bold text-stone-300 uppercase tracking-wider">Organizer</span>
                         </button>
+                        <button type="button" (click)="selectRoleForSignUp('expert')"
+                            class="p-4 rounded-xl border border-stone-700 bg-stone-800 hover:bg-stone-700 hover:border-emerald-500/50 transition-all text-center flex flex-col items-center gap-2 group">
+                            <span class="text-2xl group-hover:scale-110 transition-transform">🎓</span>
+                            <span class="text-xs font-bold text-stone-300 uppercase tracking-wider">Academy Expert</span>
+                        </button>
                         <button type="button" (click)="selectRoleForSignUp('delivery_provider')"
                             class="p-4 rounded-xl border border-stone-700 bg-stone-800 hover:bg-stone-700 hover:border-emerald-500/50 transition-all text-center flex flex-col items-center gap-2 group col-span-2">
                             <span class="text-2xl group-hover:scale-110 transition-transform">🚚</span>
@@ -234,6 +239,16 @@
                             <div class="mb-5">
                     <app-wave-input label="License Plate Number" type="text" formControlName="licensePlateNumber"></app-wave-input>
                 </div>
+                        </ng-container>
+                        
+                        <!-- Expert Fields -->
+                        <ng-container *ngIf="selectedSignUpRole === 'expert'">
+                            <div class="mb-5">
+                                <app-wave-input label="Specialization" type="text" formControlName="specialization" placeholder="e.g. Wilderness Survival"></app-wave-input>
+                            </div>
+                            <div class="mb-5">
+                                <app-wave-input label="Years of Experience" type="number" formControlName="yearsOfExperience"></app-wave-input>
+                            </div>
                         </ng-container>
                     </div>
 

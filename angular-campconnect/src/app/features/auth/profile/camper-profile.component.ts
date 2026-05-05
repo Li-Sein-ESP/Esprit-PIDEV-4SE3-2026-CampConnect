@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, AfterViewInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, HostListener, OnInit, AfterViewInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subject, takeUntil, switchMap, of } from 'rxjs';
@@ -6,6 +6,7 @@ import { UserApiService } from '../services/user-api.service';
 import { UserProfileResponse } from '../models/user.model';
 import { GroupInviteService } from '../../groups/services/group-invite.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { AcademyService } from '../../academy/services/academy.service';
 
 @Component({
     selector: 'app-camper-profile',
@@ -74,6 +75,8 @@ export class CamperProfileComponent implements OnInit, AfterViewInit, OnDestroy 
     reviewsGivenAnimated: number = 0;
     gearRentedAnimated: number = 0;
     animated: boolean = false;
+    
+    notifications = signal<any[]>([]);
 
     pendingCount$ = this.authService.getCurrentUser().pipe(
         switchMap(user => user ? this.inviteService.getPendingInvitesCount(user.id) : of(0))
@@ -83,7 +86,8 @@ export class CamperProfileComponent implements OnInit, AfterViewInit, OnDestroy 
         private userApi: UserApiService,
         private cdr: ChangeDetectorRef,
         private inviteService: GroupInviteService,
-        private authService: AuthService
+        private authService: AuthService,
+        private academyService: AcademyService
     ) { }
 
     ngOnInit(): void {
@@ -125,6 +129,43 @@ export class CamperProfileComponent implements OnInit, AfterViewInit, OnDestroy 
                     // Keep the mock stats if API fails
                 }
             });
+
+        this.checkCertifications();
+    }
+
+    private checkCertifications() {
+        const currentUser = JSON.parse(localStorage.getItem('cc_user') || '{}');
+        const userId = currentUser?.id;
+        
+        if (userId) {
+            this.academyService.getUserCertifications(userId).subscribe({
+                next: (certs) => {
+                    const expiredCerts = certs.filter(c => {
+                        // Use backend status or date comparison
+                        if (c.status === 'EXPIRED') return true;
+                        if (!c.expiryDate) return false;
+                        return new Date() > new Date(c.expiryDate);
+                    });
+
+                    if (expiredCerts.length > 0) {
+                        const newNotifications = [...this.notifications()];
+                        expiredCerts.forEach(cert => {
+                            newNotifications.push({
+                                id: `cert-expired-${cert.id}`,
+                                type: 'warning',
+                                title: 'Certification Expired',
+                                message: `Your "${cert.certificationName || 'Wilderness'}" certification has expired. Renew it now to maintain your expert status.`,
+                                icon: '⚠️',
+                                action: 'Renew Now',
+                                link: '/academy'
+                            });
+                        });
+                        this.notifications.set(newNotifications);
+                        this.cdr.markForCheck();
+                    }
+                }
+            });
+        }
     }
 
     setActiveTab(tab: string) {

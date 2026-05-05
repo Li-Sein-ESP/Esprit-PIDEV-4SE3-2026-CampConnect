@@ -26,12 +26,23 @@ export class AcademyService {
     // ─── Courses ───
     getCourses(): Observable<Course[]> {
         return this.http.get<Course[]>(`${API_URL}/courses`).pipe(
+            map(courses => courses.map(c => ({
+                ...c,
+                imageUrl: this.normalizeUrl(c.imageUrl),
+                documentUrl: this.normalizeUrl(c.documentUrl)
+            }))),
             tap(courses => this.coursesCache.set(courses))
         );
     }
 
     getCourseById(id: string): Observable<Course> {
-        return this.http.get<Course>(`${API_URL}/courses/${id}`);
+        return this.http.get<Course>(`${API_URL}/courses/${id}`).pipe(
+            map(c => ({
+                ...c,
+                imageUrl: this.normalizeUrl(c.imageUrl),
+                documentUrl: this.normalizeUrl(c.documentUrl)
+            }))
+        );
     }
 
     createCourse(course: Course): Observable<Course> {
@@ -44,6 +55,18 @@ export class AcademyService {
 
     deleteCourse(id: string): Observable<void> {
         return this.http.delete<void>(`${API_URL}/courses/${id}`);
+    }
+
+    updateCourseStatus(id: string, status: 'PENDING' | 'APPROVED' | 'REJECTED'): Observable<Course> {
+        return this.http.patch<Course>(`${API_URL}/courses/${id}/status`, {}, { params: { status } });
+    }
+
+    generateCourseQuiz(courseId: string): Observable<any> {
+        return this.http.post<any>(`${API_URL}/courses/${courseId}/generate-quiz`, {});
+    }
+
+    generateAiQuiz(topic: string, description: string): Observable<any> {
+        return this.http.post<any>(`${environment.aiUrl}/quiz/generate`, { topic, description });
     }
 
     // ─── Experts ───
@@ -79,6 +102,10 @@ export class AcademyService {
         return this.http.get<Certification[]>(`${API_URL}/certifications`);
     }
 
+    searchCertifications(keyword: string): Observable<Certification[]> {
+        return this.http.get<Certification[]>(`${API_URL}/certifications/search`, { params: { q: keyword } });
+    }
+
     getCertificationById(id: string): Observable<Certification> {
         return this.http.get<Certification>(`${API_URL}/certifications/${id}`);
     }
@@ -101,11 +128,21 @@ export class AcademyService {
 
     // ─── User Certifications ───
     getUserCertifications(userId: string): Observable<UserCertification[]> {
-        return this.http.get<UserCertification[]>(`${API_URL}/users/${userId}/certifications`);
+        return this.http.get<UserCertification[]>(`${API_URL}/users/${userId}/certifications`).pipe(
+            map(certs => certs.map(c => ({
+                ...c,
+                id: (c as any)._id || c.id
+            })))
+        );
     }
 
     earnCertification(userCert: UserCertification): Observable<UserCertification> {
-        return this.http.post<UserCertification>(`${API_URL}/users/certifications`, userCert);
+        return this.http.post<UserCertification>(`${API_URL}/users/certifications`, userCert).pipe(
+            map(c => ({
+                ...c,
+                id: (c as any)._id || c.id
+            }))
+        );
     }
 
     /**
@@ -127,27 +164,29 @@ export class AcademyService {
     getUserCertificationsByStatus(userId: string, status: string): Observable<UserCertification[]> {
         return this.http.get<UserCertification[]>(
             `${API_URL}/users/${userId}/certifications/filter`,
-            { params: { status } }
+            { params: { status, t: new Date().getTime().toString() } }
         );
     }
 
     // ─── Videos ───
-    private normalizeUrl(url: string | undefined): string {
+    public normalizeUrl(url: string | undefined): string {
         if (!url) return '';
+        if (url.startsWith('http')) return url;
 
-        const host = window.location.hostname;
-        // Assuming environment.apiUrl is like 'http://localhost:8089/api'
-        // we want to get the base without the /api part for static files if needed
         const urlObj = new URL(environment.apiUrl);
         const backendBase = `${urlObj.protocol}//${urlObj.host}`;
         const timestamp = new Date().getTime();
 
-        // If it's a relative path OR it's an absolute path containing /uploads/
-        // we force it to use the current host's backend port
+        // If it contains /uploads/, extract filename and reconstruct with current backend host
         if (url.includes('/uploads/')) {
             const pathParts = url.split('/uploads/');
             const filename = pathParts[pathParts.length - 1];
             return `${backendBase}/uploads/${filename}?t=${timestamp}`;
+        }
+
+        // If it's just a filename (no slash, no http), assume it's in /uploads/
+        if (!url.includes('/')) {
+            return `${backendBase}/uploads/${url}?t=${timestamp}`;
         }
 
         return url;

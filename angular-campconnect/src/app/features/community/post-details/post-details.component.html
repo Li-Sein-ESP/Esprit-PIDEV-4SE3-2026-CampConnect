@@ -2,7 +2,7 @@
 <div class="cc-breadcrumb">
     <a routerLink="/community" class="cc-breadcrumb__link">Community</a>
     <span class="cc-breadcrumb__sep">›</span>
-    <a [routerLink]="['/community/profile', post?.author?.id]" class="cc-breadcrumb__link">{{post?.author?.name}}</a>
+    <a [routerLink]="['/community/profile', post.author.id]" class="cc-breadcrumb__link">{{post.author.name}}</a>
     <span class="cc-breadcrumb__sep">›</span>
     <span class="cc-breadcrumb__current">Post</span>
 </div>
@@ -15,16 +15,16 @@
 
         <!-- Post Header -->
         <div class="cc-post__header">
-            <a [routerLink]="['/community/profile', post?.author?.id]" class="cc-post__author">
+            <a [routerLink]="['/community/profile', post.author.id]" class="cc-post__author">
                 <div class="cc-post__avatar-wrap">
-                    <img class="cc-post__avatar" [src]="post?.author?.avatar" [alt]="post?.author?.name">
+                    <img class="cc-post__avatar" [src]="post.author.avatar" [alt]="post.author.name">
                     <div class="cc-post__online"></div>
                 </div>
                 <div class="cc-post__author-info">
                     <div class="cc-post__author-row">
-                        <span class="cc-post__author-name">{{post?.author?.name}}</span>
+                        <span class="cc-post__author-name">{{post.author.name}}</span>
                         <span class="cc-post__verified"
-                            *ngIf="post?.author?.role === 'Verified Camper' || post?.author?.role === 'Admin'">
+                            *ngIf="post.author.role === 'Verified Camper' || post.author.role === 'Admin'">
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
                             </svg>
@@ -44,14 +44,14 @@
                         </span>
                     </div>
 
-                    <div style="display: flex; gap: 10px; margin-top: 12px;" *ngIf="post?.author?.badges?.length">
-                        <app-camp-badge *ngFor="let b of post?.author?.badges" [title]="b.title"
+                    <div style="display: flex; gap: 10px; margin-top: 12px;" *ngIf="post.author.badges?.length">
+                        <app-camp-badge *ngFor="let b of post.author.badges" [title]="b.title"
                             [description]="b.description" [icon]="b.icon" [unlocked]="b.unlocked" size="medium">
                         </app-camp-badge>
                     </div>
                 </div>
             </a>
-            <app-trust-score *ngIf="post?.author?.trustScore !== undefined" [score]="post?.author?.trustScore ?? 0"
+            <app-trust-score *ngIf="post.author.trustScore !== undefined" [score]="post.author.trustScore"
                 variant="default"
                 style="margin-left: auto; margin-right: 20px; align-self: flex-start; transform: scale(0.65); transform-origin: top right;"></app-trust-score>
             <div class="cc-post__header-actions">
@@ -219,7 +219,7 @@
 
         <!-- Comment Input -->
         <div class="cc-comment-input">
-            <img [src]="post?.author?.avatar" alt="You" class="cc-comment-input__avatar">
+            <img [src]="post.author.avatar" alt="You" class="cc-comment-input__avatar">
             <div class="cc-comment-input__body">
                 <textarea #commentField class="cc-comment-input__field" [(ngModel)]="newCommentText"
                     (keydown.enter)="handleEnter($event)" placeholder="Share your thoughts..." rows="1"></textarea>

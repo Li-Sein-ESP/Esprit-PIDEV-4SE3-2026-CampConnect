@@ -16,4 +16,5 @@ public interface ICertificationServices {
     List<CertificationStatsDTO> getCertificationStats();
     List<UserCertificationDTO> getUserCertificationsByStatus(String userId, String status);
     CertificationDTO getCertificationByCourseId(String courseId);
+    List<CertificationDTO> searchCertifications(String keyword);
 }

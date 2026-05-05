@@ -63,11 +63,9 @@ public class Event {
     private List<String> tags;
     private String imageUrl;
     private String status;
-    private List<String> whatToExpect;
-    private List<String> whatToBring;
-    private List<String> whatsIncluded;
-    private List<String> safetyNotes;
-    private String cancellationPolicy;
+    private List<String> sdgs;
+    private Integer sustainabilityScore;
+    private List<String> activities;
 
     @DBRef
     private Category category;

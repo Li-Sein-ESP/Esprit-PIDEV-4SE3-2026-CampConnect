@@ -15,8 +15,11 @@ export class DashboardRedirectComponent implements OnInit {
     console.log('DashboardRedirect: Roles detected:', roles);
     
     if (roles.includes('ROLE_ADMIN')) {
-      console.log('DashboardRedirect: Redirecting to Admin');
+      console.log('DashboardRedirect: Redirecting to Admin Dashboard');
       this.router.navigate(['/admin/dashboard']);
+    } else if (roles.includes('ROLE_EXPERT') || roles.includes('ROLE_ORGANIZER')) {
+      console.log('DashboardRedirect: Redirecting to Academy Expert Space');
+      this.router.navigate(['/admin/academy']);
     } else if (roles.includes('ROLE_SITE_OWNER')) {
       console.log('DashboardRedirect: Redirecting to Site Owner');
       this.router.navigate(['/site-dashboard']);

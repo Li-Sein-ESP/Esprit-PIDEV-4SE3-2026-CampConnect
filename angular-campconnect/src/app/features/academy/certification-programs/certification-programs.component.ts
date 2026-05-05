@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { LucideAngularModule, ChevronLeft, Clock, BookOpen, Star, CheckCircle, Award, Users, ShieldCheck, Medal, Play, ChevronRight, TrendingUp, Target, Briefcase, FileText, GraduationCap, ArrowRight } from 'lucide-angular';
+import { LucideAngularModule, ChevronLeft, Clock, BookOpen, Star, CheckCircle, Award, Users, ShieldCheck, Medal, Play, ChevronRight, TrendingUp, Target, Briefcase, FileText, GraduationCap, ArrowRight, AlertTriangle, RefreshCw } from 'lucide-angular';
 import { AcademyService } from '../services/academy.service';
 import { Certification } from '../models/academy.model';
 
@@ -55,6 +55,8 @@ export class CertificationProgramsComponent implements OnInit {
   readonly GraduationCap = GraduationCap;
   readonly ArrowRight = ArrowRight;
   readonly Play = Play;
+  readonly AlertTriangle = AlertTriangle;
+  readonly RefreshCw = RefreshCw;
 
   selectedCategory = 'all';
 
@@ -79,32 +81,49 @@ export class CertificationProgramsComponent implements OnInit {
     private academyService: AcademyService
   ) { }
 
+  earnedHistory = signal<any[]>([]);
+
   ngOnInit(): void {
+    this.loadEarnedHistory();
     this.loadCertifications();
+  }
+
+  loadEarnedHistory() {
+    try {
+      const history = JSON.parse(localStorage.getItem('academy_earned_certs') || '[]');
+      this.earnedHistory.set(history);
+    } catch (e) {
+      this.earnedHistory.set([]);
+    }
   }
 
   loadCertifications(): void {
     this.loading.set(true);
     this.academyService.getCertifications().subscribe({
       next: (certs: Certification[]) => {
-        const mappedCerts = certs.map(c => ({
-          id: c.id,
-          title: c.name,
-          level: this.deriveLevel(c),
-          icon: this.deriveIcon(c),
-          completed: false,
-          color: this.deriveColor(c),
-          description: c.description,
-          metrics: {
-            lessons: c.requiredCourseIds?.length ? c.requiredCourseIds.length * 4 : 12,
-            assessments: c.requiredCourseIds?.length || 3,
-            enrolled: '0.1K',
-            rating: 5.0
-          },
-          estimated: `${c.validityPeriod} Months Valid`,
-          skills: c.requirements || [],
-          requirements: c.requirements || []
-        }));
+        const mappedCerts = certs.map(c => {
+          const earned = this.earnedHistory().find(h => h.certificationId === c.id);
+          return {
+            id: c.id,
+            title: c.name,
+            level: this.deriveLevel(c),
+            icon: this.deriveIcon(c),
+            completed: !!earned && earned.status !== 'EXPIRED',
+            isExpired: earned?.status === 'EXPIRED',
+            color: this.deriveColor(c),
+            description: c.description,
+            metrics: {
+              lessons: c.requiredCourseIds?.length ? c.requiredCourseIds.length * 4 : 12,
+              assessments: c.requiredCourseIds?.length || 3,
+              enrolled: '0.1K',
+              rating: 5.0
+            },
+            estimated: `${c.validityPeriod} Months Valid`,
+            skills: c.requirements || [],
+            requirements: c.requirements || [],
+            requiredCourseIds: c.requiredCourseIds
+          };
+        });
         this.certifications.set(mappedCerts);
         this.loading.set(false);
       },
@@ -113,6 +132,11 @@ export class CertificationProgramsComponent implements OnInit {
         this.loading.set(false);
       }
     });
+  }
+
+  fastTrackCert(cert: any): void {
+    const courseId = (cert.requiredCourseIds && cert.requiredCourseIds.length > 0) ? cert.requiredCourseIds[0] : cert.id;
+    this.router.navigate(['/academy', courseId], { queryParams: { fastTrack: 'true' } });
   }
 
   private deriveLevel(cert: Certification): string {

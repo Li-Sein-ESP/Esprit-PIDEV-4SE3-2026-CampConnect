@@ -2,6 +2,7 @@ import { Component, OnInit, ElementRef, ViewChild, HostListener } from '@angular
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { AcademyService } from '../../academy/services/academy.service';
 import { EventService } from '../../events/services/event.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -15,6 +16,9 @@ import { forkJoin } from 'rxjs';
 export class AdminDashboardComponent implements OnInit {
 
   @ViewChild('revenueChartCanvas', { static: true }) revenueChartCanvas!: ElementRef<HTMLCanvasElement>;
+
+  isAdmin: boolean = false;
+  portalName: string = 'Expert Portal';
 
   // Stats Data - Initialized with zeros, then populated via API
   stats = {
@@ -78,8 +82,12 @@ export class AdminDashboardComponent implements OnInit {
   constructor(
     private decimalPipe: DecimalPipe,
     private academyService: AcademyService,
-    private eventService: EventService
-  ) { }
+    private eventService: EventService,
+    private authService: AuthService
+  ) { 
+    this.isAdmin = this.authService.hasRole('ADMIN');
+    this.portalName = this.isAdmin ? 'Admin Portal' : 'Expert Portal';
+  }
 
   ngOnInit(): void {
     this.loadStats();

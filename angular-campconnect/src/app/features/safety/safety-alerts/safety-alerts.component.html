@@ -156,7 +156,7 @@
               <div class="flex items-center gap-2 text-xs text-[var(--color-text-tertiary)]">
                 <lucide-icon [img]="MapPin" [size]="14"></lucide-icon>
                 <span class="font-medium text-[var(--color-text-secondary)]">
-                  {{ alert.location?.name || 'Local Area' }}{{ alert.location?.region ? ', ' + alert.location.region : '' }}
+                  {{ alert.location.name || 'Local Area' }}{{ alert.location.region ? ', ' + alert.location.region : '' }}
                 </span>
               </div>
               <div class="flex items-center gap-2 text-xs text-[var(--color-text-tertiary)]">

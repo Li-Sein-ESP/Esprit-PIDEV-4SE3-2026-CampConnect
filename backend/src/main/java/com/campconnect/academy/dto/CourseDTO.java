@@ -10,6 +10,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import com.campconnect.enums.DifficultyLevel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
+import com.campconnect.enums.CourseStatus;
 
 @Data
 @NoArgsConstructor
@@ -41,6 +42,7 @@ public class CourseDTO {
     private String documentUrl;
     private List<String> tags;
     private List<String> prerequisites;
+    private List<String> sdgs;
     
     @Min(value = 0, message = "Passing score must be at least 0")
     private int passingScore;
@@ -50,4 +52,5 @@ public class CourseDTO {
 
     private String instructorId;
     private String instructorName;
+    private CourseStatus status;
 }

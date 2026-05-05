@@ -1,9 +1,10 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
-import { LucideAngularModule, Menu, X, User, Sun, Moon, ChevronDown, Truck } from 'lucide-angular';
+import { LucideAngularModule, Menu, X, User, Sun, Moon, ChevronDown, Truck, Bell } from 'lucide-angular';
 import { AuthService } from '../services/auth.service';
 import { filter } from 'rxjs/operators';
+import { AcademyService } from '../../features/academy/services/academy.service';
 
 @Component({
   selector: 'app-navigation',
@@ -21,11 +22,14 @@ export class NavigationComponent implements OnInit {
   readonly XIcon = X;
   readonly ChevronDown = ChevronDown;
   readonly TruckIcon = Truck;
+  readonly BellIcon = Bell;
 
   // State
+  hasExpiredCerts = false;
   isScrolled = false;
   isLandingPage = false;
   isUserMenuOpen = false;
+  isNotificationsOpen = false;
   isMobileMenuOpen = false;
   isDarkMode = false;
   currentUser$ = this.authService.getCurrentUser();
@@ -37,7 +41,11 @@ export class NavigationComponent implements OnInit {
   menuItems: any[] = [];
   activeDropdown: string | null = null;
 
-  constructor(private router: Router, private authService: AuthService) {
+  constructor(
+    private router: Router, 
+    private authService: AuthService,
+    private academyService: AcademyService
+  ) {
     // Listen to route changes to determine if we are on a landing page
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
@@ -60,14 +68,44 @@ export class NavigationComponent implements OnInit {
     this.currentUser$.subscribe(user => {
       if (user) {
         this.userRoles = user.roles || [];
+        this.checkExpiredCertifications(user.id);
       } else {
         this.userRoles = [];
+        this.hasExpiredCerts = false;
       }
       this.updateNavigationForRole();
     });
 
     // Initial check
     this.checkLandingPage(this.router.url);
+  }
+
+  private checkExpiredCertifications(userId: string): void {
+    this.academyService.getUserCertificationsByStatus(userId, 'EXPIRED').subscribe({
+      next: (certs) => {
+        if (certs && certs.length > 0) {
+          this.hasExpiredCerts = true;
+          this.playNotificationSound();
+        } else {
+          this.hasExpiredCerts = false;
+        }
+      },
+      error: () => {
+        this.hasExpiredCerts = false;
+      }
+    });
+  }
+
+  private playNotificationSound() {
+    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+    audio.play().catch(e => console.log('Audio play failed:', e));
+  }
+
+  toggleNotifications() {
+    this.isNotificationsOpen = !this.isNotificationsOpen;
+    if (this.isNotificationsOpen) {
+      this.isUserMenuOpen = false;
+    }
   }
 
   @HostListener('window:scroll', [])
@@ -148,6 +186,9 @@ export class NavigationComponent implements OnInit {
         children: [
           { label: 'Feed', link: '/community/feed' },
           { label: 'Forums', link: '/community/forums' },
+          { label: 'My Groups', link: '/companions/groups' },
+          { label: 'Create Group', link: '/companions/create-group' },
+          { label: 'Group Invitations', link: '/invites' },
           { label: 'Trip Stories', link: '/community/stories' },
           { label: 'Leaderboard', link: '/community/leaderboard' },
           { label: 'Events', link: '/community/events' },

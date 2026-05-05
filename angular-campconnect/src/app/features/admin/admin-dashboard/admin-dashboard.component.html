@@ -1,16 +1,16 @@
 <!-- Title Section -->
 <div class="cc-content__title-section cc-animate-in cc-animate-in--d1">
   <p class="cc-content__greeting" id="greeting-text">Dashboard Overview</p>
-  <h1 class="cc-content__title">Welcome to Admin Portal</h1>
-  <p class="cc-content__title-sub">Here's what's happening across the CampConnect platform today.</p>
+  <h1 class="cc-content__title">Welcome to {{ portalName }}</h1>
+  <p class="cc-content__title-sub">Here's what's happening across the platform today.</p>
 </div>
 
 <!-- ============================================
      KPI CARDS
      ============================================ -->
 <div class="cc-kpi-grid">
-  <!-- Total Users -->
-  <article class="cc-kpi-card cc-kpi-card--users cc-animate-in cc-animate-in--d2">
+  <!-- Total Users (Admin Only) -->
+  <article *ngIf="isAdmin" class="cc-kpi-card cc-kpi-card--users cc-animate-in cc-animate-in--d2">
     <div class="cc-kpi-card__header">
       <div class="cc-kpi-card__icon">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -34,8 +34,8 @@
     </div>
   </article>
 
-  <!-- Active Campsites -->
-  <article class="cc-kpi-card cc-kpi-card--campsites cc-animate-in cc-animate-in--d3">
+  <!-- Active Campsites (Admin Only) -->
+  <article *ngIf="isAdmin" class="cc-kpi-card cc-kpi-card--campsites cc-animate-in cc-animate-in--d3">
     <div class="cc-kpi-card__header">
       <div class="cc-kpi-card__icon">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -57,8 +57,8 @@
     </div>
   </article>
 
-  <!-- Marketplace Revenue -->
-  <article class="cc-kpi-card cc-kpi-card--revenue cc-animate-in cc-animate-in--d4">
+  <!-- Marketplace Revenue (Admin Only) -->
+  <article *ngIf="isAdmin" class="cc-kpi-card cc-kpi-card--revenue cc-animate-in cc-animate-in--d4">
     <div class="cc-kpi-card__header">
       <div class="cc-kpi-card__icon">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -80,8 +80,8 @@
     </div>
   </article>
 
-  <!-- Active Deliveries -->
-  <article class="cc-kpi-card cc-kpi-card--deliveries cc-animate-in cc-animate-in--d5">
+  <!-- Active Deliveries (Admin Only) -->
+  <article *ngIf="isAdmin" class="cc-kpi-card cc-kpi-card--deliveries cc-animate-in cc-animate-in--d5">
     <div class="cc-kpi-card__header">
       <div class="cc-kpi-card__icon">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -105,8 +105,8 @@
     </div>
   </article>
 
-  <!-- Active Bookings -->
-  <article class="cc-kpi-card cc-kpi-card--bookings cc-animate-in cc-animate-in--d5">
+  <!-- Active Bookings (Admin Only) -->
+  <article *ngIf="isAdmin" class="cc-kpi-card cc-kpi-card--bookings cc-animate-in cc-animate-in--d5">
     <div class="cc-kpi-card__header">
       <div class="cc-kpi-card__icon">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -130,8 +130,8 @@
     </div>
   </article>
 
-  <!-- Environmental Alerts -->
-  <article class="cc-kpi-card cc-kpi-card--alerts cc-animate-in cc-animate-in--d6">
+  <!-- Environmental Alerts (Admin Only) -->
+  <article *ngIf="isAdmin" class="cc-kpi-card cc-kpi-card--alerts cc-animate-in cc-animate-in--d6">
     <div class="cc-kpi-card__header">
       <div class="cc-kpi-card__icon">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -203,10 +203,8 @@
   </article>
 </div>
 
-<!-- ============================================
-     REVENUE CHART
-     ============================================ -->
-<div class="cc-chart-section cc-animate-in cc-animate-in--d6">
+<!-- REVENUE CHART (Admin Only) -->
+<div *ngIf="isAdmin" class="cc-chart-section cc-animate-in cc-animate-in--d6">
   <div class="cc-chart-section__header">
     <div>
       <h2 class="cc-chart-section__title">Platform Revenue</h2>
@@ -273,8 +271,8 @@
       </ul>
     </article>
 
-    <!-- Recent Marketplace Orders -->
-    <article class="cc-activity-card cc-animate-in cc-animate-in--d8">
+    <!-- Recent Marketplace Orders (Admin Only) -->
+    <article *ngIf="isAdmin" class="cc-activity-card cc-animate-in cc-animate-in--d8">
       <div class="cc-activity-card__header">
         <h3 class="cc-activity-card__title">Recent Marketplace Orders</h3>
         <button class="cc-activity-card__view-all">View All →</button>
@@ -301,8 +299,8 @@
 
   <!-- Right Column -->
   <div>
-    <!-- Recent Delivery Incidents -->
-    <article class="cc-activity-card cc-animate-in cc-animate-in--d7" style="margin-bottom: 24px;">
+    <!-- Recent Delivery Incidents (Admin Only) -->
+    <article *ngIf="isAdmin" class="cc-activity-card cc-animate-in cc-animate-in--d7" style="margin-bottom: 24px;">
       <div class="cc-activity-card__header">
         <h3 class="cc-activity-card__title">Recent Delivery Incidents</h3>
         <button class="cc-activity-card__view-all">View All →</button>
@@ -328,8 +326,8 @@
       </ul>
     </article>
 
-    <!-- Compliance Alerts -->
-    <article class="cc-activity-card cc-animate-in cc-animate-in--d8">
+    <!-- Compliance Alerts (Admin Only) -->
+    <article *ngIf="isAdmin" class="cc-activity-card cc-animate-in cc-animate-in--d8">
       <div class="cc-activity-card__header">
         <h3 class="cc-activity-card__title">Compliance Alerts</h3>
         <button class="cc-activity-card__view-all">View All →</button>
@@ -354,10 +352,8 @@
   </div>
 </div>
 
-<!-- ============================================
-     SYSTEM HEALTH
-     ============================================ -->
-<div class="cc-health-grid">
+<!-- SYSTEM HEALTH (Admin Only) -->
+<div *ngIf="isAdmin" class="cc-health-grid">
   <article class="cc-health-card cc-animate-in cc-animate-in--d7">
     <div class="cc-health-card__header">
       <h4 class="cc-health-card__title">Server Status</h4>

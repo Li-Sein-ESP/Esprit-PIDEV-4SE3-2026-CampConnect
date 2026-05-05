@@ -1,0 +1,463 @@
+{
+  "info": {
+    "name": "CampConnect Academy - Tests Complets",
+    "_postman_id": "campconnect-academy-2026",
+    "description": "Collection de tests pour le Module Academy CampConnect (Backend: :8089, AI: :5000)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "BASE_URL", "value": "http://localhost:8089/api" },
+    { "key": "AI_URL",   "value": "http://localhost:5000/api/ai" },
+    { "key": "TOKEN",    "value": "PASTE_YOUR_JWT_TOKEN_HERE" },
+    { "key": "COURSE_ID","value": "WILL_BE_SET_AFTER_CREATE_COURSE" },
+    { "key": "CERT_ID",  "value": "WILL_BE_SET_AFTER_CREATE_CERT" },
+    { "key": "USER_ID",  "value": "PASTE_USER_ID_FROM_LOGIN" }
+  ],
+  "item": [
+
+    {
+      "name": "🟢 COURS - Créer un cours (ADMIN/EXPERT)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+        ],
+        "url": "{{BASE_URL}}/academy/courses",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Wilderness Survival Essentials\",\n  \"description\": \"Master the fundamental skills of fire, shelter, water and navigation in extreme wilderness conditions. This comprehensive program covers survival psychology, foraging edible plants, emergency signaling, and building emergency shelters from natural materials.\",\n  \"categoryName\": \"Outdoor Skills\",\n  \"difficulty\": \"INTERMEDIATE\",\n  \"duration\": 12,\n  \"price\": 0,\n  \"rating\": 4.8,\n  \"reviews\": 142,\n  \"enrolledCount\": 328,\n  \"passingScore\": 60,\n  \"tags\": [\"survival\", \"fire\", \"shelter\", \"navigation\", \"wilderness\"],\n  \"prerequisites\": [\"Basic outdoor experience\"],\n  \"imageUrl\": \"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=80\",\n  \"documentUrl\": \"https://campconnect.io/docs/survival-syllabus.pdf\",\n  \"status\": \"APPROVED\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "if (jsonData.id) { pm.collectionVariables.set('COURSE_ID', jsonData.id); }",
+              "pm.test('Course created with APPROVED status', function() {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(jsonData.title).to.include('Survival');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🟢 COURS - Créer cours First Aid",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+        ],
+        "url": "{{BASE_URL}}/academy/courses",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Wilderness First Aid & Emergency Medicine\",\n  \"description\": \"Comprehensive wilderness first aid covering wound management, fracture stabilization, hypothermia treatment, anaphylaxis response, improvised splinting, and patient evacuation in remote environments where medical help is hours away.\",\n  \"categoryName\": \"First Aid\",\n  \"difficulty\": \"INTERMEDIATE\",\n  \"duration\": 16,\n  \"price\": 0,\n  \"rating\": 5.0,\n  \"reviews\": 203,\n  \"enrolledCount\": 512,\n  \"passingScore\": 70,\n  \"tags\": [\"first aid\", \"medical\", \"emergency\", \"wilderness\", \"CPR\"],\n  \"prerequisites\": [],\n  \"imageUrl\": \"https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=800&q=80\",\n  \"status\": \"APPROVED\"\n}"
+        }
+      }
+    },
+
+    {
+      "name": "🔵 COURS - Lister tous les cours",
+      "request": {
+        "method": "GET",
+        "url": "{{BASE_URL}}/academy/courses"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', function() { pm.response.to.have.status(200); });",
+              "var data = pm.response.json();",
+              "pm.test('At least 1 course exists', function() { pm.expect(data.length).to.be.above(0); });",
+              "if (data.length > 0) { pm.collectionVariables.set('COURSE_ID', data[0].id); }"
+            ]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🔵 COURS - Voir un cours par ID",
+      "request": {
+        "method": "GET",
+        "url": "{{BASE_URL}}/academy/courses/{{COURSE_ID}}"
+      }
+    },
+
+    {
+      "name": "🟠 COURS - Approuver un cours [TÂCHE ADMIN] ⭐",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+        ],
+        "url": {
+          "raw": "{{BASE_URL}}/academy/courses/{{COURSE_ID}}/status?status=APPROVED",
+          "query": [{ "key": "status", "value": "APPROVED" }]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Course approved', function() {",
+              "  var data = pm.response.json();",
+              "  pm.expect(data.status).to.equal('APPROVED');",
+              "});",
+              "console.log('📧 Email should be sent to the expert now!');"
+            ]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🟠 COURS - Rejeter un cours [ADMIN]",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+        ],
+        "url": {
+          "raw": "{{BASE_URL}}/academy/courses/{{COURSE_ID}}/status?status=REJECTED",
+          "query": [{ "key": "status", "value": "REJECTED" }]
+        }
+      }
+    },
+
+    {
+      "name": "🤖 IA - Générer Quiz pour un cours [TÂCHE IA] ⭐",
+      "request": {
+        "method": "POST",
+        "url": "{{BASE_URL}}/academy/courses/{{COURSE_ID}}/generate-quiz"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Quiz generated', function() {",
+              "  var data = pm.response.json();",
+              "  pm.expect(data).to.have.property('questions');",
+              "  pm.expect(data.questions.length).to.be.above(0);",
+              "  console.log('Questions:', JSON.stringify(data.questions));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🤖 IA Direct - Générer Quiz Python (port 5000) ⭐",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{AI_URL}}/quiz/generate",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"topic\": \"Wilderness Survival Essentials\",\n  \"description\": \"fire shelter water navigation emergency signals foraging edible plants\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('AI Quiz has 3 questions', function() {",
+              "  var data = pm.response.json();",
+              "  pm.expect(data.questions.length).to.equal(3);",
+              "  data.questions.forEach(function(q, i) {",
+              "    console.log('Q' + (i+1) + ': ' + q.q);",
+              "    console.log('Correct answer: ' + q.options[q.correct]);",
+              "  });",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🟢 CERTIFICATION - Créer un programme [ADMIN] ⭐",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+        ],
+        "url": "{{BASE_URL}}/academy/certifications",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Certified Wilderness Expert\",\n  \"description\": \"The highest recognition for wilderness survival mastery. Holders of this certification have demonstrated exceptional proficiency in fire, shelter, water sourcing, navigation, and first aid in extreme environments.\",\n  \"requirements\": [\n    \"Complete Wilderness Survival course\",\n    \"Pass AI-generated quiz with 60%+\",\n    \"Demonstrate practical fire-starting skills\",\n    \"Navigate a 5km course without GPS\"\n  ],\n  \"validityPeriod\": 12,\n  \"imageUrl\": \"🏆\",\n  \"issuer\": \"CampConnect Wilderness Academy\",\n  \"requiredCourseIds\": [\"{{COURSE_ID}}\"]\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var data = pm.response.json();",
+              "if (data.id) { pm.collectionVariables.set('CERT_ID', data.id); }",
+              "pm.test('Certification program created', function() {",
+              "  pm.response.to.have.status(200);",
+              "  pm.expect(data.name).to.include('Wilderness');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🔵 CERTIFICATION - Lister tous les programmes",
+      "request": {
+        "method": "GET",
+        "url": "{{BASE_URL}}/academy/certifications"
+      }
+    },
+
+    {
+      "name": "🔵 CERTIFICATION - Recherche par mot-clé [TÂCHE 3 Query] ⭐",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{BASE_URL}}/academy/certifications/search?q=survival",
+          "query": [{ "key": "q", "value": "survival" }]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Search returns results', function() {",
+              "  var data = pm.response.json();",
+              "  pm.expect(data).to.be.an('array');",
+              "  console.log('Found', data.length, 'certifications matching survival');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🔵 CERTIFICATION - Stats Agrégation MongoDB [TÂCHE 2 JPQL] ⭐⭐",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+        "url": "{{BASE_URL}}/academy/certifications/stats"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Aggregation stats returned', function() {",
+              "  var data = pm.response.json();",
+              "  pm.expect(data).to.be.an('array');",
+              "  if (data.length > 0) {",
+              "    console.log('=== MongoDB Aggregation Results ===');",
+              "    data.forEach(function(stat) {",
+              "      console.log(stat.certificationName + ': ' + stat.totalIssued + ' issued, ' + stat.activeCount + ' active, ' + stat.expiredCount + ' expired');",
+              "    });",
+              "  }",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🟢 USER CERT - Gagner une certification (après quiz) ⭐",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{BASE_URL}}/academy/users/certifications",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"certificationId\": \"{{CERT_ID}}\",\n  \"certificationName\": \"Certified Wilderness Expert\",\n  \"userId\": \"{{USER_ID}}\",\n  \"username\": \"Yassin Camper\",\n  \"status\": \"ACTIVE\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('UserCertification created', function() {",
+              "  var data = pm.response.json();",
+              "  pm.expect(data.status).to.equal('ACTIVE');",
+              "  pm.expect(data.certificationName).to.include('Wilderness');",
+              "  console.log('Certificate ID:', data.id);",
+              "  console.log('Earned:', data.earnedDate);",
+              "  console.log('Expires:', data.expiryDate);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🔵 USER CERT - Mes certifications",
+      "request": {
+        "method": "GET",
+        "url": "{{BASE_URL}}/academy/users/{{USER_ID}}/certifications"
+      }
+    },
+
+    {
+      "name": "🔵 USER CERT - Filtrer par status ACTIVE [TÂCHE 3 Multi-entité] ⭐⭐",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{BASE_URL}}/academy/users/{{USER_ID}}/certifications/filter?status=ACTIVE",
+          "query": [{ "key": "status", "value": "ACTIVE" }]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Filter by status works', function() {",
+              "  var data = pm.response.json();",
+              "  data.forEach(function(c) {",
+              "    pm.expect(c.status).to.equal('ACTIVE');",
+              "  });",
+              "  console.log('Active certs:', data.length);",
+              "  console.log('⭐ TÂCHE 3: findByUser_IdAndStatus traverses @DBRef User + CertificationStatus');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🔵 USER CERT - Filtrer par status EXPIRED [TÂCHE 3] ⭐⭐",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{BASE_URL}}/academy/users/{{USER_ID}}/certifications/filter?status=EXPIRED",
+          "query": [{ "key": "status", "value": "EXPIRED" }]
+        }
+      }
+    },
+
+    {
+      "name": "🟢 VIDEO - Créer une vidéo tutoriel",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+        ],
+        "url": "{{BASE_URL}}/academy/videos",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Building a Debris Hut in 30 Minutes\",\n  \"description\": \"Watch our expert show you how to build a debris hut shelter using only natural materials found in a temperate forest. No tools required!\",\n  \"videoUrl\": \"https://www.youtube.com/embed/GZWK3KjFRpk\",\n  \"thumbnailUrl\": \"https://images.unsplash.com/photo-1445307806294-bff7f67ff225?w=800&q=80\",\n  \"category\": \"Outdoor Skills\",\n  \"type\": \"TUTORIAL\",\n  \"views\": 4821,\n  \"helpfulCount\": 312,\n  \"takeaways\": [\n    \"Choose dry, dead leaves for insulation\",\n    \"The hut should be barely bigger than your body\",\n    \"Cover with 2+ feet of debris for warmth\"\n  ]\n}"
+        }
+      }
+    },
+
+    {
+      "name": "🔵 VIDEO - Lister toutes les vidéos",
+      "request": {
+        "method": "GET",
+        "url": "{{BASE_URL}}/academy/videos"
+      }
+    },
+
+    {
+      "name": "🔵 BADGE - Lister tous les badges",
+      "request": {
+        "method": "GET",
+        "url": "{{BASE_URL}}/academy/badges"
+      }
+    },
+
+    {
+      "name": "🟢 BADGE - Créer un badge [ADMIN]",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+        ],
+        "url": "{{BASE_URL}}/academy/badges",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Fire Master\",\n  \"description\": \"Awarded for demonstrating expert-level fire-starting skills using primitive methods\",\n  \"icon\": \"🔥\",\n  \"categoryName\": \"Bushcraft\",\n  \"rarity\": \"RARE\",\n  \"requirements\": [\"Complete Fire Crafting course\", \"Start fire with 3 different methods\"]\n}"
+        }
+      }
+    },
+
+    {
+      "name": "🔵 EXPERTS - Lister les experts",
+      "request": {
+        "method": "GET",
+        "url": "{{BASE_URL}}/academy/experts"
+      }
+    },
+
+    {
+      "name": "🤖 IA - Test service Python (Health Check)",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:5000/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('AI Service is Online', function() {",
+              "  pm.response.to.have.status(200);",
+              "  var data = pm.response.json();",
+              "  pm.expect(data.status).to.equal('online');",
+              "  console.log('AI Models:', JSON.stringify(data.ai_models));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🤖 IA - Test quiz avec sujet First Aid",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{AI_URL}}/quiz/generate",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"topic\": \"Wilderness First Aid & Emergency Medicine\",\n  \"description\": \"wound management fracture stabilization hypothermia treatment anaphylaxis response wilderness emergency\"\n}"
+        }
+      }
+    },
+
+    {
+      "name": "🤖 IA - Test quiz avec sujet Navigation",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{AI_URL}}/quiz/generate",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"topic\": \"GPS Navigation & Orienteering\",\n  \"description\": \"topographic maps compass declination coordinate systems waypoints night navigation stars\"\n}"
+        }
+      }
+    }
+  ]
+}

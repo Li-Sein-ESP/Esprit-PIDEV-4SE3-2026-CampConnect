@@ -64,6 +64,61 @@
                 </a>
             </ng-container>
 
+            <!-- User Notifications -->
+            <div *ngIf="isLoggedIn" class="relative">
+                <button (click)="toggleNotifications()" 
+                    [ngClass]="{'text-stone-600 hover:bg-stone-100': isScrolled || !isLandingPage, 'text-white/80 hover:bg-white/10': !isScrolled && isLandingPage}"
+                    class="flex items-center justify-center w-10 h-10 rounded-full transition-colors relative">
+                    <lucide-icon [name]="BellIcon" class="w-5 h-5"></lucide-icon>
+                    <span *ngIf="hasExpiredCerts" class="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white shadow-sm" title="You have an expired certification"></span>
+                </button>
+
+                <!-- Notifications Dropdown -->
+                <div *ngIf="isNotificationsOpen" (mouseleave)="isNotificationsOpen = false"
+                    class="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-stone-100 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div class="px-4 py-3 border-b border-stone-100 flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-stone-900">Notifications</h3>
+                        <span *ngIf="hasExpiredCerts" class="px-2 py-0.5 bg-red-50 text-red-600 text-[10px] font-black uppercase rounded-full">Action Required</span>
+                    </div>
+
+                    <div class="max-h-[300px] overflow-y-auto">
+                        <div *ngIf="!hasExpiredCerts" class="px-8 py-12 text-center">
+                            <div class="w-12 h-12 bg-stone-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <lucide-icon [name]="BellIcon" class="w-6 h-6 text-stone-300"></lucide-icon>
+                            </div>
+                            <p class="text-sm text-stone-500">All caught up!</p>
+                            <p class="text-[10px] text-stone-400 mt-1">No new notifications at this time.</p>
+                        </div>
+
+                        <div *ngIf="hasExpiredCerts" class="p-2">
+                            <div class="group flex gap-3 p-3 rounded-xl hover:bg-stone-50 transition-colors border border-transparent hover:border-stone-100">
+                                <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span class="text-xl">⚠️</span>
+                                </div>
+                                <div class="flex-grow">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <p class="text-sm font-bold text-stone-900">Certification Expired</p>
+                                        <span class="text-[9px] font-medium text-stone-400">Just now</span>
+                                    </div>
+                                    <p class="text-xs text-stone-500 leading-relaxed mb-3">One or more of your certifications have expired. Renew them to keep your expert badge.</p>
+                                    <a routerLink="/academy" (click)="isNotificationsOpen = false" 
+                                       class="inline-flex items-center gap-2 text-[10px] font-black text-emerald-700 uppercase tracking-widest hover:gap-3 transition-all">
+                                        Go to Academy →
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-2 border-t border-stone-100">
+                        <a routerLink="/profile" (click)="isNotificationsOpen = false" 
+                           class="block w-full py-2 text-center text-xs font-bold text-stone-400 hover:text-emerald-700 transition-colors uppercase tracking-widest">
+                            View All Notifications
+                        </a>
+                    </div>
+                </div>
+            </div>
+
             <!-- User Menu -->
             <div *ngIf="isLoggedIn" class="relative ml-2">
                 <button (click)="toggleUserMenu()"

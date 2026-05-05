@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -6,7 +6,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
   LucideAngularModule,
   Clock, Users, ThumbsUp, ChevronLeft, Share2, Bookmark,
-  MessageSquare, CheckCircle, Send, Play, Eye, Award, ShieldCheck, GraduationCap, ArrowRight
+  MessageSquare, CheckCircle, Send, Play, Eye, Award, ShieldCheck, GraduationCap, ArrowRight, Library, BookOpen, AlertCircle
 } from 'lucide-angular';
 import { AcademyService } from '../services/academy.service';
 import { Video } from '../models/academy.model';
@@ -58,6 +58,9 @@ export class KnowledgeVideoComponent implements OnInit {
   readonly ShieldCheck = ShieldCheck;
   readonly GraduationCap = GraduationCap;
   readonly ArrowRight = ArrowRight;
+  readonly Library = Library;
+  readonly BookOpen = BookOpen;
+  readonly AlertCircle = AlertCircle;
 
   videoId: string = '';
   video: Video | null = null;
@@ -72,13 +75,15 @@ export class KnowledgeVideoComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private academyService: AcademyService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.videoId = params['videoId'];
       if (this.videoId) {
+        window.scrollTo(0, 0);
         this.loadVideo(this.videoId);
       }
     });
@@ -98,16 +103,19 @@ export class KnowledgeVideoComponent implements OnInit {
       next: (video) => {
         this.video = video;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.academyService.getVideos().subscribe({
           next: (videos) => {
             this.video = videos.length > 0 ? videos[0] : null;
             this.isLoading = false;
+            this.cdr.detectChanges();
           },
           error: (err2) => {
             this.video = null;
             this.isLoading = false;
+            this.cdr.detectChanges();
           }
         });
       }
@@ -132,12 +140,13 @@ export class KnowledgeVideoComponent implements OnInit {
 
     let transformedUrl = url;
 
-    // YouTube Detection & Extraction
+    // YouTube Detection & Extraction (Enhanced)
     const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([^"&?\/\s]{11})/;
     const ytMatch = url.match(ytRegex);
     
     if (ytMatch && ytMatch[1]) {
-      transformedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
+      // Use youtube-nocookie for better compatibility on localhost
+      transformedUrl = `https://www.youtube-nocookie.com/embed/${ytMatch[1]}`;
     } else if (url.includes('vimeo.com/')) {
       // Vimeo Detection & Extraction
       const vimeoRegex = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/;
@@ -147,15 +156,10 @@ export class KnowledgeVideoComponent implements OnInit {
       }
     }
 
-    // Add necessary parameters
+    // Add necessary parameters (mute=1 is often required for autoplay to work on modern browsers)
     const separator = transformedUrl.includes('?') ? '&' : '?';
-    transformedUrl = `${transformedUrl}${separator}autoplay=1&rel=0`;
+    transformedUrl = `${transformedUrl}${separator}autoplay=1&mute=1&rel=0&modestbranding=1`;
     
-    // Only add origin if it's an external embed
-    if (transformedUrl.includes('youtube.com') || transformedUrl.includes('vimeo.com')) {
-      transformedUrl += `&origin=${window.location.origin}`;
-    }
-
     return this.sanitizer.bypassSecurityTrustResourceUrl(transformedUrl);
   }
 

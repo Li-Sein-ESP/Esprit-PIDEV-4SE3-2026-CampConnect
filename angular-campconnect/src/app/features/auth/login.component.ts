@@ -77,6 +77,10 @@ export class LoginComponent implements OnInit, OnDestroy {
         detailsGroup.addControl('vehicleType', this.fb.control('', Validators.required));
         detailsGroup.addControl('licensePlateNumber', this.fb.control('', Validators.required));
         break;
+      case 'expert':
+        detailsGroup.addControl('specialization', this.fb.control('', Validators.required));
+        detailsGroup.addControl('yearsOfExperience', this.fb.control('', Validators.required));
+        break;
     }
 
     this.signupForm.setControl('profileDetails', detailsGroup);
@@ -163,7 +167,9 @@ export class LoginComponent implements OnInit, OnDestroy {
         const roles = this.authService.getRoles();
         // Assuming user has one main role, or priority: Admin > others
         if (roles.includes('ROLE_ADMIN')) {
-          this.router.navigate(['/admin']);
+          this.router.navigate(['/admin/dashboard']);
+        } else if (roles.includes('ROLE_EXPERT') || roles.includes('ROLE_ORGANIZER')) {
+          this.router.navigate(['/admin/academy']);
         } else if (roles.length > 0) {
           // Redirect to the first specific role dashboard found
           this.router.navigate([this.getRedirectUrlForRole(roles[0])]);
@@ -216,14 +222,15 @@ export class LoginComponent implements OnInit, OnDestroy {
   // Helper to map roles to routes
   private getRedirectUrlForRole(role: string): string {
     switch (role) {
-      case 'ROLE_ADMIN': return '/admin';
+      case 'ROLE_ADMIN': return '/admin/dashboard';
+      case 'ROLE_EXPERT': return '/admin/academy';
+      case 'ROLE_ORGANIZER': return '/admin/academy';
       case 'ROLE_SITE_OWNER': return '/site-dashboard';
       case 'ROLE_EQUIPMENT_PROVIDER': return '/provider/dashboard';
-      case 'ROLE_ORGANIZER': return '/organizer-dashboard';
       case 'ROLE_DELIVERY_PROVIDER': return '/delivery/dashboard';
-      case 'ROLE_CAMPER': return '/profile'; // User asked for /profile for CAMPER
+      case 'ROLE_CAMPER': return '/profile';
       case 'ROLE_USER': return '/marketplace';
-      default: return '/marketplace'; // Fallback
+      default: return '/marketplace';
     }
   }
 }

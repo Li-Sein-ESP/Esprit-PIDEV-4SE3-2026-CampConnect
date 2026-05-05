@@ -4,11 +4,11 @@ import { RouterModule } from '@angular/router';
 import {
   LucideAngularModule, Calendar, Users, MapPin, Star, Filter, Search,
   ChevronRight, Clock, Mountain, Tent, ArrowRight, Compass, Flame,
-  Award, TrendingUp, Eye, BookOpen, Plus, X, CheckSquare, AlertCircle, Ban
+  Award, TrendingUp, Eye, BookOpen, Plus, X, CheckSquare, AlertCircle, Ban, BadgeCheck, Zap, Wind, Sun, Cloud, Sparkles, ShieldCheck
 } from 'lucide-angular';
 import { EventService } from '../services/event.service';
 import { Event } from '../models/event.model';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-events-home',
@@ -17,6 +17,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
+    FormsModule,
     LucideAngularModule
   ],
   templateUrl: './events-home.component.html',
@@ -58,11 +59,38 @@ export class EventsHomeComponent implements OnInit {
   readonly CheckSquare = CheckSquare;
   readonly AlertCircle = AlertCircle;
   readonly Ban = Ban;
+  readonly BadgeCheck = BadgeCheck;
+  readonly Zap = Zap;
+  readonly Wind = Wind;
+  readonly Sun = Sun;
+  readonly Cloud = Cloud;
+  readonly Sparkles = Sparkles;
+  readonly X = X;
+  readonly ShieldCheck = ShieldCheck;
 
   allEvents = signal<Event[]>([]);
   selectedType = signal<string>('all');
   searchQuery = signal<string>('');
+  aiPrompt = signal<string>('');
+  isAiSearching = signal<boolean>(false);
+  aiResult: { categoryName: string; confidenceScore: number } | null = null;
   toast: { message: string; type: 'success' | 'error' } | null = null;
+
+  // IA Recommender System State
+  isRecommending = signal<boolean>(false);
+  showAiDashboard = signal<boolean>(false);
+  isScanning = signal<boolean>(false);
+  aiAnalysis = signal<any>(null);
+  aiRecommendations = signal<any[]>([]); // Store full match objects: {eventId, matchScore, title, ...}
+  aiRecommendationsMap = signal<Map<string, number>>(new Map()); // Maps eventId -> matchScore
+
+  quickPrompts = [
+    { emoji: '🏕️', label: 'Beginner Camping', text: 'Looking for a camping activity for beginners' },
+    { emoji: '🧗', label: 'Advanced Expedition', text: 'Challenging mountain expedition for athletes' },
+    { emoji: '🌿', label: 'Nature Retreat', text: 'Quiet retreat in nature to recharge' },
+    { emoji: '👨‍👩‍👧', label: 'Family Friendly', text: 'Outdoor activity for family with children' },
+    { emoji: '🎓', label: 'Survival Workshop', text: 'Survival workshop and wilderness survival techniques' },
+  ];
 
   categories = [
     { id: 'all', label: 'All Events' },
@@ -96,10 +124,24 @@ export class EventsHomeComponent implements OnInit {
         e.location.name.toLowerCase().includes(query)
       );
     }
+
+    // Apply AI Recommendation filter (if active, only show recommended events)
+    const recs = this.aiRecommendations();
+    if (recs.length > 0) {
+      const recIds = recs.map(r => r.eventId.toString());
+      events = events.filter(event => recIds.includes(event.id.toString()));
+      const map = this.aiRecommendationsMap();
+      events.sort((a, b) => {
+        const scoreA = map.get(a.id.toString()) || 0;
+        const scoreB = map.get(b.id.toString()) || 0;
+        return scoreB - scoreA;
+      });
+    }
+
     return events;
   });
 
-  constructor(private eventService: EventService) { }
+  constructor(private eventService: EventService) {}
 
   ngOnInit(): void {
     this.loadEvents();
@@ -119,6 +161,67 @@ export class EventsHomeComponent implements OnInit {
   showToast(message: string, type: 'success' | 'error'): void {
     this.toast = { message, type };
     setTimeout(() => this.toast = null, 3000);
+  }
+
+  // --- IA RECOMMENDER SYSTEM ---
+  aiSmartSearch(): void {
+    const prompt = this.aiPrompt().trim();
+    if (!prompt || prompt.length < 5) {
+      this.clearAiResult();
+      return;
+    }
+
+    this.isRecommending.set(true);
+    this.isScanning.set(true);
+    this.aiResult = null;
+    this.showAiDashboard.set(true);
+    
+    // Simulation historique croisée (Academy + Profil)
+    const userHistory = ['Astronomie', 'Survie', 'Feu de camp']; 
+
+    this.eventService.recommendAiEvents(prompt, this.allEvents(), userHistory).subscribe({
+      next: (res: any) => {
+        const results = res.recommendations;
+        this.aiAnalysis.set(res.analysis);
+        
+        setTimeout(() => { // Effet Scanner Cyber-Premium
+            this.isRecommending.set(false);
+            this.isScanning.set(false);
+            
+            if (!results || results.length === 0) {
+              this.showToast('AI could not find an exact match.', 'error');
+              return;
+            }
+
+            this.aiRecommendations.set(results);
+            
+            const matchMap = new Map<string, number>();
+            results.forEach((r: any) => matchMap.set(r.eventId.toString(), r.matchScore));
+            this.aiRecommendationsMap.set(matchMap);
+
+            this.showToast(`Analysis complete: ${results.length} opportunities detected.`, 'success');
+        }, 1500);
+      },
+      error: (err) => {
+        this.isRecommending.set(false);
+        this.isScanning.set(false);
+        this.showToast('AI Server unavailable.', 'error');
+      }
+    });
+  }
+
+  clearAiResult(): void {
+    this.aiResult = null;
+    this.aiPrompt.set('');
+    this.setType('all');
+    this.aiRecommendations.set([]);
+    this.showAiDashboard.set(false);
+    this.aiRecommendationsMap.set(new Map());
+  }
+
+  applyQuickPrompt(text: string): void {
+    this.aiPrompt.set(text);
+    this.aiSmartSearch();
   }
 
   formatDate(dateString: string): string {

@@ -10,6 +10,7 @@ import com.campconnect.academy.repository.CourseRepository;
 import com.campconnect.repository.CategoryRepository;
 import com.campconnect.repository.UserRepository;
 import com.campconnect.model.Category;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class CourseServicesImpl implements ICourseServices {
 
     @Autowired
@@ -25,6 +27,9 @@ public class CourseServicesImpl implements ICourseServices {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private com.campconnect.service.EmailService emailService;
 
     @Autowired
     private UserRepository userRepository;
@@ -54,6 +59,18 @@ public class CourseServicesImpl implements ICourseServices {
     public CourseDTO createCourse(CourseDTO courseDTO) {
         Course course = convertToEntity(courseDTO);
         Course savedCourse = courseRepository.save(course);
+        
+        // Send email to expert telling them it's pending approval
+        if (savedCourse.getCreator() != null && savedCourse.getCreator().getEmail() != null) {
+            String subject = "Course Submitted for Review: " + savedCourse.getTitle();
+            String body = "Hello " + savedCourse.getCreator().getName() + ",\n\n" +
+                         "Your course '" + savedCourse.getTitle() + "' has been successfully submitted.\n" +
+                         "It is currently PENDING review by an administrator.\n\n" +
+                         "You will receive another email once it has been approved and published.\n\n" +
+                         "Best regards,\nCampConnect Academy Team";
+            emailService.sendEmail(savedCourse.getCreator().getEmail(), subject, body);
+        }
+        
         return convertToDTO(savedCourse);
     }
 
@@ -64,6 +81,28 @@ public class CourseServicesImpl implements ICourseServices {
         course.setId(id);
         Course updatedCourse = courseRepository.save(course);
         return convertToDTO(updatedCourse);
+    }
+
+    @Override
+    public CourseDTO updateCourseStatus(String id, com.campconnect.enums.CourseStatus status) {
+        return courseRepository.findById(id).map(course -> {
+            course.setStatus(status);
+            Course saved = courseRepository.save(course);
+            
+            // Send Email to Expert
+            if (saved.getCreator() != null && saved.getCreator().getEmail() != null) {
+                String subject = "Course Status Update: " + saved.getTitle();
+                String body = "Hello " + saved.getCreator().getName() + ",\n\n" +
+                             "Your course '" + saved.getTitle() + "' has been " + status.name().toLowerCase() + " by the administrator.\n\n" +
+                             (status == com.campconnect.enums.CourseStatus.APPROVED ? 
+                              "It is now live on the Academy platform!" : 
+                              "Please review your course content and contact support if you have questions.") +
+                             "\n\nBest regards,\nCampConnect Team";
+                emailService.sendEmail(saved.getCreator().getEmail(), subject, body);
+            }
+            
+            return convertToDTO(saved);
+        }).orElse(null);
     }
 
     @Override
@@ -80,7 +119,7 @@ public class CourseServicesImpl implements ICourseServices {
                 dto.setCategoryName(course.getCategory().getName());
             }
         } catch (Exception e) {
-            // Handle dangling DBRef
+            log.warn("Dangling category DBRef for course {}: {}", course.getId(), e.getMessage());
         }
 
         dto.setDifficulty(com.campconnect.enums.DifficultyLevel.fromString(course.getDifficulty()));
@@ -102,7 +141,7 @@ public class CourseServicesImpl implements ICourseServices {
                 dto.setCreatorName(course.getCreator().getName());
             }
         } catch (Exception e) {
-            // Handle dangling DBRef
+            log.warn("Dangling creator DBRef for course {}: {}", course.getId(), e.getMessage());
         }
         
         try {
@@ -111,8 +150,9 @@ public class CourseServicesImpl implements ICourseServices {
                 dto.setInstructorName(course.getInstructor().getName());
             }
         } catch (Exception e) {
-            // Handle dangling DBRef
+            log.warn("Dangling instructor DBRef for course {}: {}", course.getId(), e.getMessage());
         }
+        dto.setStatus(course.getStatus());
         return dto;
     }
 
@@ -136,6 +176,7 @@ public class CourseServicesImpl implements ICourseServices {
         course.setTags(dto.getTags());
         course.setPrerequisites(dto.getPrerequisites());
         course.setPassingScore(dto.getPassingScore());
+        course.setStatus(dto.getStatus() != null ? dto.getStatus() : com.campconnect.enums.CourseStatus.PENDING);
         
         // Handle traceability: assign creator safely
         org.springframework.security.core.Authentication auth = SecurityContextHolder.getContext().getAuthentication();

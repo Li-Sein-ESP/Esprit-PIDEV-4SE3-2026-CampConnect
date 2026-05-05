@@ -20,6 +20,10 @@ import java.util.stream.Collectors;
 import com.campconnect.events.dto.EventRegistrationDTO;
 import com.campconnect.events.entity.EventRegistration;
 import com.campconnect.events.repository.EventRegistrationRepository;
+import com.campconnect.service.AiIntegrationService;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
 
 @Service
 public class EventServicesImpl implements IEventServices {
@@ -35,6 +39,12 @@ public class EventServicesImpl implements IEventServices {
 
     @Autowired
     private EventRegistrationRepository eventRegistrationRepository;
+
+    @Autowired
+    private AiIntegrationService aiIntegrationService;
+
+    @Autowired
+    private com.campconnect.service.EmailService emailService;
 
     @Override
     public List<EventDTO> getAllEvents() {
@@ -84,7 +94,14 @@ public class EventServicesImpl implements IEventServices {
         Event event = eventRepository.findById(eventId).orElse(null);
         User user = userRepository.findById(userId).orElse(null);
         
-        if (event == null || user == null) return null;
+        if (event == null) {
+            System.err.println("[REGISTRATION ERROR] Event not found: " + eventId);
+            return null;
+        }
+        if (user == null) {
+            System.err.println("[REGISTRATION ERROR] User not found: " + userId);
+            return null;
+        }
         
         EventRegistration registration = new EventRegistration();
         registration.setEvent(event);
@@ -93,11 +110,12 @@ public class EventServicesImpl implements IEventServices {
         registration.setStatus("CONFIRMED");
         registration.setParticipants(participants);
         
-        // Update registered count in event
-        event.setRegistered(event.getRegistered() + participants);
-        eventRepository.save(event);
+        EventRegistration savedRegistration = eventRegistrationRepository.save(registration);
         
-        return convertToRegistrationDTO(eventRegistrationRepository.save(registration));
+        // REAL Email Dispatch after save to have the ID
+        emailService.sendEventConfirmation(user.getEmail(), event.getTitle(), "TKT-" + savedRegistration.getId());
+        
+        return convertToRegistrationDTO(savedRegistration);
     }
 
     @Override
@@ -142,11 +160,7 @@ public class EventServicesImpl implements IEventServices {
         dto.setTags(event.getTags());
         dto.setImageUrl(event.getImageUrl());
         dto.setStatus(com.campconnect.enums.EventStatus.fromString(event.getStatus()));
-        dto.setWhatToExpect(event.getWhatToExpect());
-        dto.setWhatToBring(event.getWhatToBring());
-        dto.setWhatsIncluded(event.getWhatsIncluded());
-        dto.setSafetyNotes(event.getSafetyNotes());
-        dto.setCancellationPolicy(event.getCancellationPolicy());
+        dto.setActivities(event.getActivities());
         
         if (event.getCreator() != null) {
             dto.setCreatorId(event.getCreator().getId());
@@ -179,11 +193,7 @@ public class EventServicesImpl implements IEventServices {
         event.setTags(dto.getTags());
         event.setImageUrl(dto.getImageUrl());
         event.setStatus(dto.getStatus() != null ? dto.getStatus().name() : null);
-        event.setWhatToExpect(dto.getWhatToExpect());
-        event.setWhatToBring(dto.getWhatToBring());
-        event.setWhatsIncluded(dto.getWhatsIncluded());
-        event.setSafetyNotes(dto.getSafetyNotes());
-        event.setCancellationPolicy(dto.getCancellationPolicy());
+        event.setActivities(dto.getActivities());
         
         // Handle Traceability: assign creator safely
         org.springframework.security.core.Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -193,5 +203,22 @@ public class EventServicesImpl implements IEventServices {
         }
         
         return event;
+    }
+    public List<Map<String, Object>> getAiRecommendations(String preferences, List<String> history) {
+        List<Event> allEvents = eventRepository.findAll();
+        List<Map<String, Object>> eventMaps = new ArrayList<>();
+        
+        for (Event e : allEvents) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", e.getId());
+            map.put("title", e.getTitle());
+            map.put("description", e.getDescription());
+            map.put("category", e.getCategory() != null ? e.getCategory().getName() : "General");
+            map.put("type", e.getType());
+            map.put("activities", e.getActivities() != null ? e.getActivities() : new ArrayList<>());
+            eventMaps.add(map);
+        }
+        
+        return aiIntegrationService.getEventRecommendations(preferences, history, eventMaps);
     }
 }

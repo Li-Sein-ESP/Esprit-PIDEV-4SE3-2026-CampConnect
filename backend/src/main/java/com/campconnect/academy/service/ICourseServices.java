@@ -10,5 +10,6 @@ public interface ICourseServices {
     CourseDTO getCourseById(String id);
     CourseDTO createCourse(CourseDTO courseDTO);
     CourseDTO updateCourse(String id, CourseDTO courseDTO);
+    CourseDTO updateCourseStatus(String id, com.campconnect.enums.CourseStatus status);
     void deleteCourse(String id);
 }

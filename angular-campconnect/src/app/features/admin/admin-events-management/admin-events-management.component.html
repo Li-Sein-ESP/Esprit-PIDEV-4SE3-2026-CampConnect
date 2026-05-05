@@ -1,18 +1,16 @@
 <div class="min-h-screen bg-[var(--color-background)] flex">
     <!-- Main Content -->
-    <main class="flex-1 p-8 lg:p-12 overflow-y-auto">
-        <div class="max-w-6xl mx-auto">
-            <!-- Header -->
-            <header class="flex justify-between items-end mb-12">
+    <main class="flex-1 p-4 lg:p-6 overflow-y-auto">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header (Ultra-Compact) -->
+            <header class="flex justify-between items-center mb-6">
                 <div>
-                    <h2 class="text-4xl font-bold text-[var(--color-text-heading)] mb-2">Events Management</h2>
-                    <p class="text-[var(--color-text-secondary)] text-lg">Manage expeditions, workshops, and participant
-                        assignments.</p>
+                    <h2 class="text-3xl font-bold text-[#1A1A1A]">Events Management</h2>
                 </div>
                 <app-button variant="primary" (click)="openAddForm()"
-                    customClass="shadow-xl shadow-[var(--color-primary-500)]/20">
-                    <lucide-icon [img]="PlusIcon" [size]="18" class="mr-2"></lucide-icon>
-                    Create New Event
+                    customClass="shadow-lg shadow-[var(--color-primary-500)]/10 px-6 py-2">
+                    <lucide-icon [img]="PlusIcon" [size]="16" class="mr-2"></lucide-icon>
+                    New Event
                 </app-button>
             </header>
 
@@ -46,67 +44,67 @@
             </div>
 
             <!-- Stats Overview -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                 <app-card variant="elevated"
-                    customClass="border-0 shadow-lg group hover:scale-[1.02] transition-transform">
-                    <app-card-content class="relative z-10 p-8">
-                        <div class="flex justify-between items-start mb-6">
-                            <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center">
-                                <lucide-icon [img]="CalendarIcon" [size]="24" class="text-emerald-500"></lucide-icon>
+                    customClass="border-0 shadow-lg group hover:scale-[1.01] transition-transform">
+                    <app-card-content class="relative z-10 p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center">
+                                <lucide-icon [img]="CalendarIcon" [size]="20" class="text-emerald-500"></lucide-icon>
                             </div>
-                            <span class="text-[10px] font-black bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full uppercase tracking-tighter">Live Ops</span>
+                            <span class="text-xs font-bold bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full uppercase tracking-wide">Live</span>
                         </div>
-                        <h4 class="text-4xl font-bold text-[var(--color-text-heading)] mb-2">{{ stats().totalEvents }}</h4>
-                        <p class="text-[10px] text-[var(--color-text-tertiary)] uppercase font-black tracking-widest">Global Deployments</p>
+                        <h4 class="text-4xl font-bold text-[#1A1A1A] mb-1">{{ stats().totalEvents }}</h4>
+                        <p class="text-xs text-[#5C5C5C] uppercase font-bold tracking-wider">Total Events</p>
                     </app-card-content>
                 </app-card>
 
-                <app-card variant="elevated" customClass="border-0 shadow-lg group hover:scale-[1.02] transition-transform">
-                    <app-card-content class="p-8">
-                        <div class="flex justify-between items-start mb-6">
-                            <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center">
-                                <lucide-icon [img]="UsersIcon" [size]="24" class="text-blue-500"></lucide-icon>
+                <app-card variant="elevated" customClass="border-0 shadow-lg group hover:scale-[1.01] transition-transform">
+                    <app-card-content class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
+                                <lucide-icon [img]="UsersIcon" [size]="20" class="text-blue-500"></lucide-icon>
                             </div>
                         </div>
-                        <h4 class="text-4xl font-bold text-[var(--color-text-heading)] mb-2">{{ stats().totalParticipants }}</h4>
-                        <p class="text-[10px] text-[var(--color-text-tertiary)] uppercase font-black tracking-widest">Active Personnel</p>
+                        <h4 class="text-4xl font-bold text-[#1A1A1A] mb-1">{{ stats().totalParticipants }}</h4>
+                        <p class="text-xs text-[#5C5C5C] uppercase font-bold tracking-wider">Participants</p>
                     </app-card-content>
                 </app-card>
 
-                <app-card variant="elevated" customClass="border-0 shadow-lg group hover:scale-[1.02] transition-transform">
-                    <app-card-content class="p-8">
-                        <div class="flex justify-between items-start mb-6">
-                            <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center">
-                                <lucide-icon [img]="DashboardIcon" [size]="24" class="text-amber-500"></lucide-icon>
+                <app-card variant="elevated" customClass="border-0 shadow-lg group hover:scale-[1.01] transition-transform">
+                    <app-card-content class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center">
+                                <lucide-icon [img]="DashboardIcon" [size]="20" class="text-amber-500"></lucide-icon>
                             </div>
                         </div>
-                        <h4 class="text-4xl font-bold text-[var(--color-text-heading)] mb-2">{{ stats().availableCapacity }}</h4>
-                        <p class="text-[10px] text-[var(--color-text-tertiary)] uppercase font-black tracking-widest">Tactical Capacity</p>
+                        <h4 class="text-4xl font-bold text-[#1A1A1A] mb-1">{{ stats().availableCapacity }}</h4>
+                        <p class="text-xs text-[#5C5C5C] uppercase font-bold tracking-wider">Capacity Available</p>
                     </app-card-content>
                 </app-card>
 
-                <app-card variant="elevated" customClass="border-0 shadow-lg group hover:scale-[1.02] transition-transform">
-                    <app-card-content class="p-8">
-                        <div class="flex justify-between items-start mb-6">
-                            <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center">
-                                <span class="text-xl font-black text-emerald-600">DT</span>
+                <app-card variant="elevated" customClass="border-0 shadow-lg group hover:scale-[1.01] transition-transform">
+                    <app-card-content class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center">
+                                <span class="text-lg font-bold text-emerald-600">DT</span>
                             </div>
                         </div>
-                        <h4 class="text-4xl font-bold text-[var(--color-text-heading)] mb-2">{{ stats().totalRevenue | number:'1.0-0' }}</h4>
-                        <p class="text-[10px] text-[var(--color-text-tertiary)] uppercase font-black tracking-widest">War Chest (TND)</p>
+                        <h4 class="text-4xl font-bold text-[#1A1A1A] mb-1">{{ stats().totalRevenue | number:'1.0-0' }}</h4>
+                        <p class="text-xs text-[#5C5C5C] uppercase font-bold tracking-wider">Revenue (TND)</p>
                     </app-card-content>
                 </app-card>
             </div>
 
-            <!-- TAC-COM Filtering Center -->
-            <div class="bg-white rounded-[2rem] p-4 shadow-lg border border-[var(--color-neutral-100)] mb-8 flex flex-wrap items-center gap-4">
+            <!-- TAC-COM Filtering Center (Compact) -->
+            <div class="bg-white rounded-2xl p-3 shadow-md border border-[var(--color-neutral-100)] mb-6 flex items-center gap-4">
                 <div class="flex-1 min-w-[300px] relative">
-                    <lucide-icon [img]="SearchIcon" [size]="18" class="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]"></lucide-icon>
+                    <lucide-icon [img]="SearchIcon" [size]="18" class="absolute left-5 top-1/2 -translate-y-1/2 text-[#5C5C5C]"></lucide-icon>
                     <input type="text" 
                            [ngModel]="searchTerm()" 
                            (ngModelChange)="searchTerm.set($event)"
-                           placeholder="Search mission objectives, locations or categories..."
-                           class="w-full pl-14 pr-6 py-4 bg-[var(--color-background)] rounded-2xl border-0 focus:ring-4 focus:ring-[var(--color-primary-100)] font-medium text-sm transition-all shadow-inner">
+                           placeholder="Search events, locations or categories..."
+                           class="w-full pl-14 pr-6 py-4 bg-[#F7F4EF] rounded-2xl border-0 focus:ring-4 focus:ring-[#E8F5E2] font-medium text-sm transition-all shadow-inner text-[#1A1A1A]">
                 </div>
                 
                 <div class="flex items-center gap-3 bg-[var(--color-background)] p-1.5 rounded-2xl shadow-inner overflow-x-auto max-w-sm">
@@ -190,7 +188,7 @@
                         </div>
                         <div *ngIf="participants().length === 0" class="col-span-full py-12 text-center opacity-40">
                             <lucide-icon [img]="UsersIcon" [size]="48" class="mx-auto mb-2"></lucide-icon>
-                            <p class="font-bold">No participants yet for this mission.</p>
+                            <p class="font-bold">No participants yet for this event.</p>
                         </div>
                     </div>
                 </app-card-content>
@@ -201,15 +199,15 @@
                 <div class="bg-emerald-950 p-8 flex items-center gap-4">
                     <div class="w-1.5 h-10 bg-emerald-500 rounded-full"></div>
                     <div>
-                        <h3 class="text-xl font-black text-white italic tracking-tight leading-none mb-1">{{ editingEvent ? 'Mission Details' : 'New Mission' }}</h3>
-                        <p class="text-[9px] text-emerald-400/50 font-black uppercase tracking-widest">Sector Operations</p>
+                        <h3 class="text-xl font-bold text-white tracking-tight leading-none mb-1">{{ editingEvent ? 'Edit Event' : 'New Event' }}</h3>
+                        <p class="text-xs text-emerald-400/70 font-bold uppercase tracking-wide">Event Details</p>
                     </div>
                 </div>
                 <div class="p-8">
                     <form #eventF="ngForm" (ngSubmit)="eventF.form.valid && saveEvent()" class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="space-y-6">
                             <div>
-                                <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Event Title</label>
+                                <label class="block text-sm font-bold uppercase text-[#5C5C5C] mb-2">Event Title</label>
                                 <input type="text" [(ngModel)]="eventForm.title" name="title" #eTitle="ngModel" required minlength="5"
                                     class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all font-medium"
                                     [class.ring-2]="formErrors['title'] || (eTitle.invalid && eTitle.touched)" [class.ring-red-500]="formErrors['title'] || (eTitle.invalid && eTitle.touched)">
@@ -221,13 +219,35 @@
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Category</label>
-                                    <input type="text" [(ngModel)]="eventForm.categoryName" name="category" #eCat="ngModel" required 
-                                        class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0"
-                                        [class.ring-2]="eCat.invalid && eCat.touched" [class.ring-red-500]="eCat.invalid && eCat.touched">
-                                </div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <label class="block text-sm font-bold uppercase text-[#5C5C5C]">Category</label>
+                                        <button type="button" (click)="predictCategory()" [disabled]="isPredictingCategory()"
+                                         class="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-br from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 px-3 py-1.5 rounded-lg shadow-md transition-all disabled:opacity-50">
+                                             <lucide-icon [img]="BadgeCheckIcon" [size]="12" class="mr-1"></lucide-icon>
+                                             <span *ngIf="!isPredictingCategory()">✨ Predict (AI)</span>
+                                             <span *ngIf="isPredictingCategory()">⏳ Analyzing...</span>
+                                     </button>
+                                 </div>
+                                 <input type="text" [(ngModel)]="eventForm.categoryName" name="category" #eCat="ngModel" required 
+                                     class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0"
+                                     [class.ring-2]="eCat.invalid && eCat.touched" [class.ring-red-500]="eCat.invalid && eCat.touched">
+                                 
+                                 <!-- AI Category Suggestion -->
+                                 <div *ngIf="aiCategorySuggestion()" class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-between">
+                                     <div>
+                                         <p class="text-[10px] font-bold text-blue-700 uppercase tracking-wider">Suggested Category</p>
+                                         <p class="text-sm font-bold text-blue-900">{{ aiCategorySuggestion()?.categoryName }} <span class="text-[10px] bg-blue-200 text-blue-800 px-1 rounded">{{ aiCategorySuggestion()?.confidence }}%</span></p>
+                                     </div>
+                                     <div class="flex gap-2">
+                                         <button type="button" (click)="applyAiCategory()"
+                                             class="px-2 py-1 bg-blue-600 text-white text-[10px] font-bold rounded-lg hover:bg-blue-700">Apply</button>
+                                         <button type="button" (click)="aiCategorySuggestion.set(null)"
+                                             class="px-2 py-1 bg-white border border-blue-200 text-blue-600 text-[10px] font-bold rounded-lg hover:bg-blue-50">Ignore</button>
+                                     </div>
+                                 </div>
+                             </div>
                                 <div>
-                                    <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Type</label>
+                                    <label class="block text-sm font-bold uppercase text-[#5C5C5C] mb-2 mt-[1.8rem]">Type</label>
                                     <select [(ngModel)]="eventForm.type" name="type" #eType="ngModel" required 
                                         class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0"
                                         [class.ring-2]="eType.invalid && eType.touched" [class.ring-red-500]="eType.invalid && eType.touched">
@@ -238,57 +258,42 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Mission Intelligence Image (URL)</label>
-                                <input type="text" [(ngModel)]="eventForm.imageUrl" name="imageUrl" #eImg="ngModel" required pattern="https?://.+"
-                                    placeholder="HTTPS highly recommended" class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0"
-                                    [class.ring-2]="eImg.invalid && eImg.touched" [class.ring-red-500]="eImg.invalid && eImg.touched">
+                                <label class="block text-sm font-bold uppercase text-[#5C5C5C] mb-2">Event Image (URL)</label>
+                                <input type="text" [(ngModel)]="eventForm.imageUrl" name="imageUrl" #eImg="ngModel"
+                                    placeholder="Lien de l'image (optionnel)" class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0">
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Start Date</label>
+                                    <label class="block text-sm font-bold uppercase text-[#5C5C5C] mb-2">Start Date</label>
                                     <input type="datetime-local" [(ngModel)]="eventForm.startDate" name="start" #eStart="ngModel" required
                                         class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0"
                                         [class.ring-2]="eStart.invalid && eStart.touched" [class.ring-red-500]="eStart.invalid && eStart.touched">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">End Date</label>
+                                    <label class="block text-sm font-bold uppercase text-[#5C5C5C] mb-2">End Date</label>
                                     <input type="datetime-local" [(ngModel)]="eventForm.endDate" name="end" #eEnd="ngModel" required
                                         class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0"
                                         [class.ring-2]="eEnd.invalid && eEnd.touched" [class.ring-red-500]="eEnd.invalid && eEnd.touched">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Deployment Site & Address</label>
+                                <label class="block text-sm font-bold uppercase text-[#5C5C5C] mb-2">Location & Address</label>
                                 <div *ngIf="eventForm.location" class="flex flex-col gap-3">
                                     <div>
-                                        <input type="text" [(ngModel)]="eventForm.location.name" name="locName" #eLoc="ngModel" required placeholder="Site Name (ex: sector D5)" 
+                                        <input type="text" [(ngModel)]="eventForm.location.name" name="locName" #eLoc="ngModel" required placeholder="Location name (ex: Parc National)" 
                                             class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all"
                                             [class.ring-2]="formErrors['locationName'] || (eLoc.invalid && eLoc.touched)" [class.ring-red-500]="formErrors['locationName'] || (eLoc.invalid && eLoc.touched)">
                                         <span *ngIf="formErrors['locationName'] || (eLoc.invalid && eLoc.touched)" class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{ formErrors['locationName'] || 'Location name required' }}</span>
                                     </div>
-                                    <input type="text" [(ngModel)]="eventForm.location.address" name="locAddress" #eAddr="ngModel" required placeholder="Full Postal Protocol" 
+                                    <input type="text" [(ngModel)]="eventForm.location.address" name="locAddress" #eAddr="ngModel" required placeholder="Full address" 
                                         class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0"
                                         [class.ring-2]="eAddr.invalid && eAddr.touched" [class.ring-red-500]="eAddr.invalid && eAddr.touched">
                                 </div>
                             </div>
                         </div>
                         <div class="space-y-6">
-                            <div class="grid grid-cols-1 gap-4">
-                                <div>
-                                    <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Operational Objectives (One per line)</label>
-                                    <textarea [ngModel]="(eventForm.whatToExpect || []).join('\n')" (ngModelChange)="eventForm.whatToExpect = $event.split('\n')" name="expect" rows="2" class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 text-xs"></textarea>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Required Assets (One per line)</label>
-                                    <textarea [ngModel]="(eventForm.whatToBring || []).join('\n')" (ngModelChange)="eventForm.whatToBring = $event.split('\n')" name="bring" rows="2" class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 text-xs"></textarea>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Verified Deliverables (One per line)</label>
-                                    <textarea [ngModel]="(eventForm.whatsIncluded || []).join('\n')" (ngModelChange)="eventForm.whatsIncluded = $event.split('\n')" name="included" rows="2" class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 text-xs"></textarea>
-                                </div>
-                            </div>
                             <div>
-                                <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Mission Briefing</label>
+                                <label class="block text-sm font-bold uppercase text-[#5C5C5C] mb-2">Description</label>
                                 <textarea [(ngModel)]="eventForm.description" name="description" #eDesc="ngModel" required minlength="20" rows="3" 
                                     class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all"
                                     [class.ring-2]="formErrors['description'] || (eDesc.invalid && eDesc.touched)" [class.ring-red-500]="formErrors['description'] || (eDesc.invalid && eDesc.touched)"></textarea>
@@ -300,14 +305,14 @@
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Capacity</label>
+                                    <label class="block text-sm font-bold uppercase text-[#5C5C5C] mb-2">Capacity</label>
                                     <input type="number" [(ngModel)]="eventForm.capacity" name="capacity" #eCap="ngModel" required min="1"
                                         class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all"
                                         [class.ring-2]="formErrors['capacity'] || (eCap.invalid && eCap.touched)" [class.ring-red-500]="formErrors['capacity'] || (eCap.invalid && eCap.touched)">
                                     <span *ngIf="formErrors['capacity'] || (eCap.invalid && eCap.touched)" class="text-[10px] text-red-500 font-bold uppercase mt-1 block tracking-wider">{{ formErrors['capacity'] || 'Capacity min 1' }}</span>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Investment (DT)</label>
+                                    <label class="block text-sm font-bold uppercase text-[#5C5C5C] mb-2">Price (DT)</label>
                                     <input type="number" [(ngModel)]="eventForm.price" name="price" #ePrice="ngModel" required min="0"
                                         class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all"
                                         [class.ring-2]="formErrors['price'] || (ePrice.invalid && ePrice.touched)" [class.ring-red-500]="formErrors['price'] || (ePrice.invalid && ePrice.touched)">
@@ -315,15 +320,73 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2">Difficulty</label>
+                                <label class="block text-sm font-bold uppercase text-[#5C5C5C] mb-2 flex items-center gap-2">
+                                    <span>Specific Activities</span>
+                                    <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">For AI Matching</span>
+                                </label>
+                                <input type="text" [(ngModel)]="activitiesInput" name="activitiesInput" 
+                                    placeholder="Ex: Hiking, Yoga, Photography, Survival (comma separated)"
+                                    class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 font-medium placeholder:text-gray-400">
+                                <p class="text-[10px] text-gray-400 mt-1 italic">These activities allow the AI to calculate the compatibility percentage with users.</p>
+                            </div>
+                            <!-- AI Popularity Banner & Button -->
+                            <div class="bg-gradient-to-br from-[#2D5016] to-[#4A7C24] rounded-[20px] p-6 text-white shadow-xl relative overflow-hidden mt-6">
+                                <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+                                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                                    <div class="flex-1">
+                                        <h4 class="font-bold text-lg mb-1 flex items-center gap-2">
+                                            <span>📈 Attendance Prediction (Random Forest)</span>
+                                        </h4>
+                                        <p class="text-sm text-emerald-100/80">AI analyzes parameters (difficulty, capacity, season, category) to predict the success of the event.</p>
+                                    </div>
+                                    <button type="button" (click)="predictPopularity()" [disabled]="isPredictingPopularity()"
+                                        class="px-6 py-3 bg-white text-[#2D5016] hover:bg-emerald-50 rounded-xl font-bold shadow-lg transition-all disabled:opacity-50 whitespace-nowrap flex items-center gap-2">
+                                        <span *ngIf="!isPredictingPopularity()">✨ Predict Success</span>
+                                        <span *ngIf="isPredictingPopularity()">⏳ Calculating...</span>
+                                    </button>
+                                </div>
+                                
+                                <div *ngIf="aiPopularitySuggestion()" class="mt-6 p-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl animate-in slide-in-from-top-4 duration-500">
+                                    <div class="flex justify-between items-end mb-3">
+                                        <div>
+                                            <span class="text-[10px] font-black uppercase tracking-widest text-emerald-200 block mb-1">Estimated Attendees</span>
+                                            <span class="text-3xl font-black">{{ aiPopularitySuggestion()?.expected }}</span>
+                                            <span class="text-sm font-bold text-emerald-100 ml-1">/ {{ eventForm.capacity }}</span>
+                                        </div>
+                                        <div class="text-right">
+                                            <span class="text-[10px] font-black uppercase tracking-widest text-emerald-200 block mb-1">Fill Rate</span>
+                                            <span class="text-xl font-bold" [ngClass]="(aiPopularitySuggestion()?.fillRate || 0) > 80 ? 'text-green-400' : 'text-amber-300'">
+                                                {{ aiPopularitySuggestion()?.fillRate }}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="w-full h-3 bg-black/20 rounded-full overflow-hidden shadow-inner mb-4">
+                                        <div class="h-full rounded-full transition-all duration-1000"
+                                            [ngClass]="(aiPopularitySuggestion()?.fillRate || 0) > 80 ? 'bg-gradient-to-r from-emerald-400 to-green-300' : 'bg-gradient-to-r from-amber-400 to-yellow-300'"
+                                            [style.width.%]="aiPopularitySuggestion()?.fillRate">
+                                        </div>
+                                    </div>
+
+                                    <!-- Decision Support Added Value -->
+                                    <div class="p-3 bg-black/30 rounded-lg border-l-4 border-emerald-400">
+                                        <p class="text-[10px] font-black uppercase tracking-widest text-emerald-300 mb-1">AI Strategic Insight</p>
+                                        <p class="text-sm font-medium leading-relaxed" [ngClass]="aiPopularitySuggestion()?.color">
+                                            "{{ aiPopularitySuggestion()?.recommendation }}"
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-black uppercase text-[var(--color-text-secondary)] mb-2 mt-4">Difficulty</label>
                                 <select [(ngModel)]="eventForm.difficulty" name="difficulty" class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0">
                                     <option value="beginner">Beginner</option><option value="moderate">Moderate</option><option value="advanced">Advanced</option>
                                 </select>
                             </div>
                         </div>
                         <div class="md:col-span-2 flex justify-end gap-4 mt-6">
-                            <app-button variant="ghost" type="button" (click)="closeForm()" customClass="text-red-500">Abort Changes</app-button>
-                            <app-button variant="primary" type="submit" [disabled]="!!eventF.invalid" customClass="px-12 py-3">Commit Mission</app-button>
+                            <app-button variant="ghost" type="button" (click)="closeForm()" customClass="text-red-500">Cancel</app-button>
+                            <app-button variant="primary" type="submit" [disabled]="!!eventF.invalid" customClass="px-12 py-3">Save Event</app-button>
                         </div>
                     </form>
                 </div>
@@ -336,18 +399,18 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-[var(--color-background)] border-b border-[var(--color-neutral-100)]">
-                                <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)]">Status</th>
-                                <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)]">Mission Objective</th>
-                                <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)]">Deployment Site</th>
-                                <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] text-center">Souls / Payload</th>
-                                <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] text-center">Investment</th>
-                                <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] text-right px-10">Command</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#5C5C5C]">Status</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#5C5C5C]">Event Name</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#5C5C5C]">Location</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#5C5C5C] text-center">Participants / Capacity</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#5C5C5C] text-center">Price</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#5C5C5C] text-right px-10">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[var(--color-neutral-50)]">
                             <tr *ngFor="let event of filteredEvents()"
                                 class="group hover:bg-[var(--color-primary-50)]/20 transition-all duration-300">
-                                <td class="px-8 py-7">
+                                <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <span [ngClass]="getEventStatus(event).class"
                                               class="px-3 py-1.5 rounded-lg text-[9px] font-black tracking-widest uppercase shadow-sm">
@@ -355,7 +418,7 @@
                                         </span>
                                     </div>
                                 </td>
-                                <td class="px-8 py-7">
+                                <td class="px-6 py-4">
                                     <div class="flex flex-col">
                                         <div class="flex items-center gap-2 mb-1.5">
                                             <span class="text-xs font-black uppercase text-[var(--color-primary-600)] tracking-tighter bg-[var(--color-primary-50)] px-2 py-0.5 rounded">
@@ -373,45 +436,45 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-8 py-7">
+                                <td class="px-6 py-4">
                                     <div class="flex items-center gap-2 text-sm font-semibold text-[var(--color-text-secondary)]">
                                         <lucide-icon [img]="MapPinIcon" [size]="14" class="text-red-400"></lucide-icon>
                                         {{ event.location.name }}
                                     </div>
                                 </td>
-                                <td class="px-8 py-7">
+                                <td class="px-6 py-4">
                                     <div class="flex flex-col items-center gap-2.5">
                                         <div class="w-32 bg-gray-100 h-2.5 rounded-full overflow-hidden shadow-inner border border-gray-200/50">
                                             <div [ngClass]="(event.registered / event.capacity) > 0.8 ? 'bg-amber-500' : 'bg-emerald-500'"
                                                  class="h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
                                                  [style.width.%]="(event.registered / event.capacity) * 100"></div>
                                         </div>
-                                        <span class="text-[10px] font-black text-[var(--color-text-tertiary)] uppercase tracking-tighter">
-                                            {{ event.registered }} / {{ event.capacity }} Souls Assigned
+                                        <span class="text-xs font-semibold text-[#5C5C5C]">
+                                            {{ event.registered }} / {{ event.capacity }} Registered
                                         </span>
                                     </div>
                                 </td>
-                                <td class="px-8 py-7 text-center">
+                                <td class="px-6 py-4 text-center">
                                     <div class="inline-flex flex-col items-center">
-                                        <span class="text-base font-black text-[var(--color-text-heading)]">
-                                            {{ event.price }} <span class="text-[10px] text-[var(--color-text-tertiary)]">DT</span>
+                                        <span class="text-base font-bold text-[#1A1A1A]">
+                                            {{ event.price === 0 ? 'Free' : event.price + ' DT' }}
                                         </span>
                                     </div>
                                 </td>
-                                <td class="px-8 py-7 text-right px-10">
+                                <td class="px-6 py-4 text-right">
                                     <div class="flex justify-end gap-2 opacity-40 group-hover:opacity-100 transition-all duration-300">
                                         <button (click)="viewParticipants(event)" 
-                                                title="View Personnel"
+                                                title="View Participants"
                                                 class="p-2.5 bg-[var(--color-background)] hover:bg-white hover:text-[var(--color-primary-600)] hover:shadow-lg rounded-xl transition-all border border-transparent hover:border-[var(--color-neutral-100)]">
                                             <lucide-icon [img]="UsersIcon" [size]="18"></lucide-icon>
                                         </button>
                                         <button (click)="editingEvent = event; eventForm = {...event}; showForm = true" 
-                                                title="Edit Specs"
+                                                title="Edit Event"
                                                 class="p-2.5 bg-[var(--color-background)] hover:bg-white hover:text-blue-600 hover:shadow-lg rounded-xl transition-all border border-transparent hover:border-[var(--color-neutral-100)]">
                                             <lucide-icon [img]="PencilIcon" [size]="18"></lucide-icon>
                                         </button>
                                         <button (click)="deleteEvent(event.id)" 
-                                                title="Neutralize"
+                                                title="Delete Event"
                                                 class="p-2.5 bg-[var(--color-background)] hover:bg-red-50 hover:text-red-600 hover:shadow-lg rounded-xl transition-all border border-transparent hover:border-red-100">
                                             <lucide-icon [img]="TrashIcon" [size]="18"></lucide-icon>
                                         </button>
@@ -427,7 +490,7 @@
                         <lucide-icon [img]="FilterIcon" [size]="32" class="text-[var(--color-primary-200)]"></lucide-icon>
                     </div>
                     <h3 class="text-2xl font-black text-[var(--color-text-heading)] mb-2 italic tracking-tight">Sector Clear</h3>
-                    <p class="text-[var(--color-text-secondary)] text-sm max-w-sm mx-auto font-medium">No missions match your current tactical filters. Adjust parameters or authorize a new deployment.</p>
+                    <p class="text-[#5C5C5C] text-sm max-w-sm mx-auto font-medium">No events match your current filters. Adjust parameters or create a new event.</p>
                 </div>
             </div>
         </div>

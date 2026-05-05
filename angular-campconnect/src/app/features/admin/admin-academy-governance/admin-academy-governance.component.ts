@@ -1,11 +1,12 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { LucideAngularModule, Plus, Pencil, Trash2, Search, Filter, BookOpen, GraduationCap, Users, LayoutDashboard, Calendar, Settings, BadgeCheck, AlertTriangle, TrendingUp, UploadCloud, Loader2 } from 'lucide-angular';
+import { LucideAngularModule, Plus, Pencil, Trash2, Search, Filter, BookOpen, GraduationCap, Users, LayoutDashboard, Calendar, Settings, BadgeCheck, AlertTriangle, TrendingUp, UploadCloud, Loader2, Check, X, PieChart, Play, Eye, ThumbsUp } from 'lucide-angular';
 import { ButtonComponent } from '../../../shared/components/button.component';
 import { CardComponent, CardContentComponent, CardHeaderComponent, CardTitleComponent } from '../../../shared/components/card.component';
 import { AcademyService } from '../../academy/services/academy.service';
-import { Course, Certification } from '../../academy/models/academy.model';
+import { AuthService } from '../../../core/services/auth.service';
+import { Course, Certification, CertificationStats, Video } from '../../academy/models/academy.model';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -42,11 +43,22 @@ export class AdminAcademyGovernanceComponent implements OnInit {
   TrendingUpIcon = TrendingUp;
   UploadIcon = UploadCloud;
   LoaderIcon = Loader2;
+  CheckIcon = Check;
+  XIcon = X;
+  PieChartIcon = PieChart;
+  PlayIcon = Play;
+  EyeIcon = Eye;
+  ThumbsUpIcon = ThumbsUp;
+  
+  isAdmin = false;
   isUploadingImage = signal<boolean>(false);
   isUploadingPdf = signal<boolean>(false);
+  isUploadingVideoThumbnail = signal<boolean>(false);
   courses = signal<Course[]>([]);
   certifications = signal<Certification[]>([]);
+  videos = signal<Video[]>([]);
   experts = signal<any[]>([]);
+  certStats = signal<CertificationStats[]>([]);
 
   searchTerm = signal<string>('');
   filterDifficulty = signal<string>('all');
@@ -83,19 +95,36 @@ export class AdminAcademyGovernanceComponent implements OnInit {
     return list;
   });
 
+  filteredVideos = computed(() => {
+    let list = this.videos();
+    const search = this.searchTerm().toLowerCase();
+    
+    if (search) {
+      list = list.filter(v => 
+        v.title.toLowerCase().includes(search) || 
+        v.description.toLowerCase().includes(search) || 
+        v.category.toLowerCase().includes(search)
+      );
+    }
+    return list;
+  });
+
   stats = signal({
     totalCourses: 0,
     totalCerts: 0,
     totalExperts: 0,
+    totalVideos: 0,
     enrolledStudents: 128 // Mock stat for UI
   });
   showForm = false;
   editingCourse: Course | null = null;
   editingCertification: Certification | null = null;
-  formType: 'course' | 'certification' = 'course';
+  editingVideo: Video | null = null;
+  formType: 'course' | 'certification' | 'video' = 'course';
   formErrors: { [key: string]: string } = {};
   courseForm: Partial<Course> = {};
   certForm: Partial<Certification> = {};
+  videoForm: Partial<Video> = {};
   successMessage = signal<string | null>(null);
   errorMessage = signal<string>('');
   isSubmitting = signal<boolean>(false);
@@ -106,19 +135,29 @@ export class AdminAcademyGovernanceComponent implements OnInit {
   confirmMessage = '';
   confirmAction: 'delete' | 'save' = 'delete';
   itemToDelete: string | null = null;
-  actionTarget: 'course' | 'cert' = 'course';
+  actionTarget: 'course' | 'cert' | 'video' = 'course';
 
-  constructor(private academyService: AcademyService) { }
+  constructor(private academyService: AcademyService, private authService: AuthService) { }
 
   ngOnInit(): void {
+    this.isAdmin = this.authService.hasRole('ADMIN');
     this.loadCourses();
     this.loadExperts();
     this.loadCertifications();
+    this.loadVideos();
   }
 
   loadCourses() {
     this.academyService.getCourses().subscribe(courses => {
       this.courses.set(courses);
+      this.updateStats();
+    });
+  }
+
+  loadVideos() {
+    this.academyService.getVideos().subscribe(videos => {
+      this.videos.set(videos);
+      this.updateStats();
     });
   }
 
@@ -131,6 +170,13 @@ export class AdminAcademyGovernanceComponent implements OnInit {
   loadCertifications() {
     this.academyService.getCertifications().subscribe(certs => {
       this.certifications.set(certs);
+      this.loadCertStats();
+    });
+  }
+
+  loadCertStats() {
+    this.academyService.getCertificationStats().subscribe(stats => {
+      this.certStats.set(stats);
       this.updateStats();
     });
   }
@@ -141,17 +187,18 @@ export class AdminAcademyGovernanceComponent implements OnInit {
     this.loadCourses();
     this.loadCertifications();
     this.loadExperts();
+    this.loadVideos();
   }
 
   updateStats() {
-    const courseData = this.courses();
-    this.stats.set({
-      ...this.stats(),
-      totalCourses: courseData.length,
+    this.stats.update(s => ({
+      ...s,
+      totalCourses: this.courses().length,
       totalCerts: this.certifications().length,
       totalExperts: this.experts().length,
-      enrolledStudents: courseData.reduce((acc, curr) => acc + (curr.enrolledCount || 0), 0)
-    });
+      totalVideos: this.videos().length,
+      enrolledStudents: this.certStats().reduce((acc, curr) => acc + curr.totalIssued, 0)
+    }));
   }
 
   openAddForm() {
@@ -199,6 +246,32 @@ export class AdminAcademyGovernanceComponent implements OnInit {
     this.showForm = true;
   }
 
+  openVideoForm() {
+    this.formType = 'video';
+    this.editingVideo = null;
+    this.videoForm = {
+      title: '',
+      description: '',
+      videoUrl: '',
+      thumbnailUrl: '',
+      category: 'SURVIVAL',
+      type: 'TUTORIAL',
+      takeaways: []
+    };
+    this.successMessage.set(null);
+    this.errorMessage.set('');
+    this.showForm = true;
+  }
+
+  openEditVideoForm(video: Video) {
+    this.formType = 'video';
+    this.editingVideo = video;
+    this.videoForm = { ...video };
+    this.successMessage.set(null);
+    this.errorMessage.set('');
+    this.showForm = true;
+  }
+
   onFileSelected(event: any, type: 'image' | 'pdf') {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -212,10 +285,10 @@ export class AdminAcademyGovernanceComponent implements OnInit {
     this.academyService.uploadFile(file).subscribe({
       next: (response) => {
         if (type === 'image') {
-          this.courseForm.imageUrl = response.url;
+          this.courseForm.imageUrl = this.academyService.normalizeUrl(response.url);
           this.isUploadingImage.set(false);
         } else {
-          this.courseForm.documentUrl = response.url;
+          this.courseForm.documentUrl = this.academyService.normalizeUrl(response.url);
           this.isUploadingPdf.set(false);
         }
       },
@@ -230,6 +303,25 @@ export class AdminAcademyGovernanceComponent implements OnInit {
       }
     });
   }
+
+  onVideoThumbnailSelected(event: any) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    this.isUploadingVideoThumbnail.set(true);
+    this.academyService.uploadFile(file).subscribe({
+      next: (res) => {
+        this.videoForm.thumbnailUrl = this.academyService.normalizeUrl(res.url);
+        this.isUploadingVideoThumbnail.set(false);
+      },
+      error: (err) => {
+        console.error('Upload failed', err);
+        this.errorMessage.set('Failed to upload thumbnail asset.');
+        this.isUploadingVideoThumbnail.set(false);
+      }
+    });
+  }
+
 
   onCourseToggle(courseId: string, event: any) {
     if (!this.certForm.requiredCourseIds) {
@@ -316,6 +408,61 @@ export class AdminAcademyGovernanceComponent implements OnInit {
     }
   }
 
+  saveVideo() {
+    this.successMessage.set(null);
+    this.errorMessage.set('');
+    this.actionTarget = 'video';
+    this.confirmAction = 'save';
+    this.confirmTitle = this.editingVideo ? 'Confirm Update' : 'Confirm Creation';
+    this.confirmMessage = this.editingVideo 
+        ? 'Update this video library asset?'
+        : 'Publish this new video to the knowledge library?';
+    this.showConfirmModal = true;
+  }
+
+  executeVideoSave() {
+    this.isSubmitting.set(true);
+    this.showConfirmModal = false;
+
+    if (this.editingVideo) {
+      this.academyService.updateVideo(this.editingVideo.id, this.videoForm as Video).subscribe({
+        next: () => {
+          this.isSubmitting.set(false);
+          this.successMessage.set('Video updated successfully!');
+          this.loadVideos();
+          setTimeout(() => this.closeForm(), 2000);
+        },
+        error: (err) => {
+          this.isSubmitting.set(false);
+          this.errorMessage.set(err.error?.message || 'Failed to update video');
+        }
+      });
+    } else {
+      this.academyService.createVideo(this.videoForm as Video).subscribe({
+        next: () => {
+          this.isSubmitting.set(false);
+          this.successMessage.set('New video published!');
+          this.loadVideos();
+          setTimeout(() => this.closeForm(), 2000);
+        },
+        error: (err) => {
+          this.isSubmitting.set(false);
+          this.errorMessage.set(err.error?.message || 'Failed to publish video');
+        }
+      });
+    }
+  }
+
+  deleteVideo(id: string) {
+    if (!id) return;
+    this.itemToDelete = id;
+    this.actionTarget = 'video';
+    this.confirmAction = 'delete';
+    this.confirmTitle = 'Confirm Deletion';
+    this.confirmMessage = 'Remove this video from the knowledge library?';
+    this.showConfirmModal = true;
+  }
+
   deleteCertification(id: string) {
     if (!id) return;
     this.itemToDelete = id;
@@ -340,6 +487,7 @@ export class AdminAcademyGovernanceComponent implements OnInit {
     this.showForm = false;
     this.editingCourse = null;
     this.editingCertification = null;
+    this.editingVideo = null;
     this.formErrors = {};
     this.errorMessage.set('');
     this.successMessage.set(null);
@@ -388,8 +536,8 @@ export class AdminAcademyGovernanceComponent implements OnInit {
     this.confirmAction = 'save';
     this.confirmTitle = this.editingCourse ? 'Confirm Update' : 'Confirm Creation';
     this.confirmMessage = this.editingCourse 
-        ? 'Are you sure you want to update this course details? This will overwrite the current program data.'
-        : 'Are you sure you want to deploy this new course?';
+        ? 'Are you sure you want to update this expert content? This will overwrite the current program data.'
+        : 'Are you sure you want to deploy this course as an Expert?';
     this.showConfirmModal = true;
   }
 
@@ -401,7 +549,7 @@ export class AdminAcademyGovernanceComponent implements OnInit {
       this.academyService.updateCourse(this.editingCourse.id!, this.courseForm as Course).subscribe({
         next: () => {
           this.isSubmitting.set(false); // Reset submitting state
-          this.successMessage.set('Course updated successfully!');
+          this.successMessage.set('Expert content updated!');
           this.loadCourses();
           setTimeout(() => this.closeForm(), 2000);
         },
@@ -426,9 +574,9 @@ export class AdminAcademyGovernanceComponent implements OnInit {
       this.academyService.createCourse(submission as any).subscribe({
         next: (response) => {
           this.isSubmitting.set(false);
-          this.successMessage.set('Course created successfully!');
+          this.successMessage.set('Expert course created! It will be visible after Admin approval.');
           this.loadData();
-          this.closeForm();
+          setTimeout(() => this.closeForm(), 3000);
         },
         error: (err) => {
           this.isSubmitting.set(false);
@@ -458,8 +606,10 @@ export class AdminAcademyGovernanceComponent implements OnInit {
     } else {
       if (this.actionTarget === 'course') {
         this.executeCourseSave();
-      } else {
+      } else if (this.actionTarget === 'cert') {
         this.executeCertificationSave();
+      } else {
+        this.executeVideoSave();
       }
     }
   }
@@ -479,7 +629,7 @@ export class AdminAcademyGovernanceComponent implements OnInit {
         },
         error: (err) => this.errorMessage.set('Failed to delete course')
       });
-    } else {
+    } else if (this.actionTarget === 'cert') {
       this.academyService.deleteCertification(id).subscribe({
         next: () => {
           this.successMessage.set('Certification deleted.');
@@ -488,7 +638,38 @@ export class AdminAcademyGovernanceComponent implements OnInit {
         },
         error: (err) => this.errorMessage.set('Failed to delete certification')
       });
+    } else {
+      this.academyService.deleteVideo(id).subscribe({
+        next: () => {
+          this.successMessage.set('Video removed.');
+          this.loadVideos();
+          setTimeout(() => this.successMessage.set(null), 3000);
+        },
+        error: (err) => this.errorMessage.set('Failed to delete video')
+      });
     }
+  }
+
+  approveCourse(id: string) {
+    this.academyService.updateCourseStatus(id, 'APPROVED').subscribe({
+      next: () => {
+        this.successMessage.set('Course approved and launched!');
+        this.loadCourses();
+        setTimeout(() => this.successMessage.set(null), 3000);
+      },
+      error: () => this.errorMessage.set('Failed to approve course')
+    });
+  }
+
+  rejectCourse(id: string) {
+    this.academyService.updateCourseStatus(id, 'REJECTED').subscribe({
+      next: () => {
+        this.successMessage.set('Course deployment rejected.');
+        this.loadCourses();
+        setTimeout(() => this.successMessage.set(null), 3000);
+      },
+      error: () => this.errorMessage.set('Failed to reject course')
+    });
   }
 
   cancelDelete() {

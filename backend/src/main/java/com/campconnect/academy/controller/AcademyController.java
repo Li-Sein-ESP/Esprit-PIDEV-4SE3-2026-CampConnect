@@ -21,6 +21,9 @@ import java.util.List;
 import com.campconnect.academy.dto.UserCertificationDTO;
 import com.campconnect.dto.CertificationStatsDTO;
 import com.campconnect.dto.CommentDTO;
+import com.campconnect.service.AiIntegrationService;
+import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/academy")
@@ -37,6 +40,9 @@ public class AcademyController {
 
     @Autowired
     private IVideoServices videoService;
+
+    @Autowired
+    private AiIntegrationService aiIntegrationService;
 
     // Courses
     @GetMapping("/courses")
@@ -56,15 +62,22 @@ public class AcademyController {
     }
 
     @PostMapping("/courses")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('EXPERT')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EXPERT') or hasRole('ORGANIZER')")
     public ResponseEntity<CourseDTO> createCourse(@Valid @RequestBody CourseDTO courseDTO) {
         return ResponseEntity.ok(courseService.createCourse(courseDTO));
     }
 
     @PutMapping("/courses/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('EXPERT')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EXPERT') or hasRole('ORGANIZER')")
     public ResponseEntity<CourseDTO> updateCourse(@PathVariable String id, @Valid @RequestBody CourseDTO courseDTO) {
         CourseDTO updated = courseService.updateCourse(id, courseDTO);
+        return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+    }
+
+    @PatchMapping("/courses/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CourseDTO> updateCourseStatus(@PathVariable String id, @RequestParam com.campconnect.enums.CourseStatus status) {
+        CourseDTO updated = courseService.updateCourseStatus(id, status);
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
 
@@ -73,6 +86,24 @@ public class AcademyController {
     public ResponseEntity<Void> deleteCourse(@PathVariable String id) {
         courseService.deleteCourse(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/courses/{id}/generate-quiz")
+    public ResponseEntity<Map<String, Object>> generateCourseQuiz(@PathVariable String id) {
+        CourseDTO course = courseService.getCourseById(id);
+        if (course == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        Map<String, Object> quizResponse = aiIntegrationService.generateQuizForCourse(course.getTitle(), course.getDescription());
+        if (quizResponse == null || !quizResponse.containsKey("questions")) {
+            // Fallback en cas d'erreur de l'IA
+            Map<String, Object> fallback = new HashMap<>();
+            fallback.put("status", "error");
+            fallback.put("message", "Le service IA est indisponible. Veuillez réessayer plus tard.");
+            return ResponseEntity.status(503).body(fallback);
+        }
+        return ResponseEntity.ok(quizResponse);
     }
 
     // Badges
@@ -151,6 +182,11 @@ public class AcademyController {
         return cert != null ? ResponseEntity.ok(cert) : ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/certifications/search")
+    public ResponseEntity<List<CertificationDTO>> searchCertifications(@RequestParam String q) {
+        return ResponseEntity.ok(certificationService.searchCertifications(q));
+    }
+
     /**
      * TÂCHE 2 – Endpoint for complex MongoDB aggregation (equivalent to JPQL JOIN).
      * Accessible to ADMIN only for dashboard analytics.
@@ -189,13 +225,13 @@ public class AcademyController {
     }
 
     @PostMapping("/videos")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('EXPERT')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EXPERT') or hasRole('ORGANIZER')")
     public ResponseEntity<VideoDTO> createVideo(@Valid @RequestBody VideoDTO videoDTO) {
         return ResponseEntity.ok(videoService.createVideo(videoDTO));
     }
 
     @PutMapping("/videos/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('EXPERT')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EXPERT') or hasRole('ORGANIZER')")
     public ResponseEntity<VideoDTO> updateVideo(@PathVariable String id, @Valid @RequestBody VideoDTO videoDTO) {
         VideoDTO updated = videoService.updateVideo(id, videoDTO);
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();

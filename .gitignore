@@ -30,3 +30,9 @@ CONSTITUTION.md
 PATTERNS.md
 PROJECT_OVERVIEW.txt
 PROJECT_STATE.md
+
+# Agent and AI
+brain/
+**/venv/
+__pycache__/
+*.pyc

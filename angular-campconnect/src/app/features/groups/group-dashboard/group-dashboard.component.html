@@ -48,9 +48,9 @@
                 <div class="flex -space-x-2 overflow-hidden">
                     <img *ngFor="let member of (group.members || []) | slice:0:4" [src]="getMemberAvatar(member.id)"
                         class="inline-block h-8 w-8 rounded-full ring-2 ring-white">
-                    <div *ngIf="(group.members?.length || 0) > 4"
+                    <div *ngIf="(group.members.length || 0) > 4"
                         class="h-8 w-8 rounded-full bg-[var(--color-bg-muted)] flex items-center justify-center text-xs font-medium text-[var(--color-text-secondary)] ring-2 ring-white">
-                        +{{(group.members?.length || 0) - 4}}
+                        +{{(group.members.length || 0) - 4}}
                     </div>
                 </div>
                 <button class="text-[var(--color-primary-600)] text-xs font-semibold hover:underline bg-transparent"

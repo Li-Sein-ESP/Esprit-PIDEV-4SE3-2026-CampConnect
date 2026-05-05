@@ -2,6 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
+/* --- MAGNIFICENT CYBER-OUTDOOR ANIMATIONS --- */
+@keyframes scan-line {
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+@keyframes neural-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+  50% { transform: scale(1.05); opacity: 1; box-shadow: 0 0 25px rgba(16, 185, 129, 0.4); }
+}
+
+@keyframes glass-shine {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes scan-horizontal {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-scan { animation: scan-horizontal 3s linear infinite; }
+.animate-neural { animation: neural-pulse 4s ease-in-out infinite; }
+.animate-float { animation: float-y 6s ease-in-out infinite; }
+
+.glass-card-premium {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card-premium:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(16, 185, 129, 0.3);
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
 /* ===================================
    CAMPCONNECT DESIGN SYSTEM
    Earth-Inspired Nature Theme
@@ -473,4 +519,63 @@ html {
   visibility: hidden;
   transform: translateY(10px);
   transition: all 0.2s ease-in-out;
+}
+/* ===================================
+   GLOBAL PRINT SYSTEM (A4 LANDSCAPE)
+   Isolates certificate on a single page
+   =================================== */
+@media print {
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+  }
+
+  /* Hide ALL root children */
+  body > * {
+    display: none !important;
+  }
+
+  /* Force the certificate container to show */
+  .certificate-container.print-only {
+    display: flex !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: white !important;
+    z-index: 2147483647 !important;
+    visibility: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .certificate-container.print-only * {
+    visibility: visible !important;
+  }
+
+  .certificate-paper {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 297mm !important;
+    max-height: 210mm !important;
+    border: 15px double #2D5016 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+  }
+
+  nav, footer, header, .no-print {
+    display: none !important;
+  }
+
+  @page {
+    size: landscape;
+    margin: 0mm !important;
+  }
 }

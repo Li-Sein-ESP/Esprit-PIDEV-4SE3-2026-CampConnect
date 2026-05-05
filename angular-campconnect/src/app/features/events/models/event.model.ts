@@ -16,7 +16,7 @@ export interface Event {
     startDate: string;
     endDate: string;
     duration: number;
-    organizer: {
+    organizer?: {
         id: string;
         name: string;
         avatar?: string;
@@ -29,11 +29,9 @@ export interface Event {
     tags: string[];
     imageUrl: string;
     status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
-    whatToExpect?: string[];
-    whatToBring?: string[];
-    whatsIncluded?: string[];
-    safetyNotes?: string[];
-    cancellationPolicy?: string;
+    sdgs?: string[];
+    sustainabilityScore?: number;
+    activities?: string[];
 }
 
 export interface EventRegistration {

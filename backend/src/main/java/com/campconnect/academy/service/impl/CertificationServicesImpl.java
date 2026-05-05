@@ -38,6 +38,9 @@ public class CertificationServicesImpl implements ICertificationServices {
     @Autowired
     private CourseRepository courseRepository;
 
+    @Autowired
+    private org.springframework.data.mongodb.core.MongoTemplate mongoTemplate;
+
     @Override
     public List<CertificationDTO> getAllCertificationPrograms() {
         return certificationRepository.findAll().stream()
@@ -73,7 +76,7 @@ public class CertificationServicesImpl implements ICertificationServices {
 
     @Override
     public List<UserCertificationDTO> getUserCertifications(String userId) {
-        return userCertificationRepository.findByUserId(userId).stream()
+        return userCertificationRepository.findByUser_Id(userId).stream()
                 .map(this::convertToUserDTO)
                 .collect(Collectors.toList());
     }
@@ -82,8 +85,18 @@ public class CertificationServicesImpl implements ICertificationServices {
     public UserCertificationDTO earnCertification(UserCertificationDTO dto) {
         UserCertification userCert = new UserCertification();
         
-        certificationRepository.findById(dto.getCertificationId())
-            .ifPresent(userCert::setCertification);
+        Certification cert = certificationRepository.findById(dto.getCertificationId())
+            .orElseGet(() -> {
+                Certification newCert = new Certification();
+                newCert.setId(dto.getCertificationId());
+                newCert.setName(dto.getCertificationName());
+                newCert.setDescription("Tactical Masterclass Certification");
+                newCert.setIssuer("Wilderness Academy AI");
+                newCert.setValidityPeriod(1);
+                return certificationRepository.save(newCert);
+            });
+            
+        userCert.setCertification(cert);
             
         userRepository.findById(dto.getUserId())
             .ifPresent(userCert::setUser);
@@ -150,6 +163,7 @@ public class CertificationServicesImpl implements ICertificationServices {
     
     private UserCertificationDTO convertToUserDTO(UserCertification cert) {
         UserCertificationDTO dto = new UserCertificationDTO();
+        dto.setId(cert.getId());
         if (cert.getCertification() != null) {
             dto.setCertificationId(cert.getCertification().getId());
             dto.setCertificationName(cert.getCertification().getName());
@@ -177,31 +191,34 @@ public class CertificationServicesImpl implements ICertificationServices {
      */
     @Override
     public List<CertificationStatsDTO> getCertificationStats() {
-        List<UserCertification> allUserCerts = userCertificationRepository.findAll();
+        // Requirement: Complex query equivalent to JPQL with Join
+        // Using MongoDB Aggregation Pipeline to join 'userCertification' with 'certification'
+        
+        org.springframework.data.mongodb.core.aggregation.Aggregation aggregation = org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation(
+            // Join with certification collection
+            org.springframework.data.mongodb.core.aggregation.Aggregation.lookup("certification", "certification.$id", "_id", "certInfo"),
+            // Unwind the joined array
+            org.springframework.data.mongodb.core.aggregation.Aggregation.unwind("certInfo"),
+            // Group by certification name and count statuses
+            org.springframework.data.mongodb.core.aggregation.Aggregation.group("certInfo.name")
+                .first("_id").as("certificationId")
+                .first("certInfo.name").as("certificationName")
+                .count().as("totalIssued")
+                .sum(org.springframework.data.mongodb.core.aggregation.ConditionalOperators.when(
+                    org.springframework.data.mongodb.core.query.Criteria.where("status").is("ACTIVE")).then(1).otherwise(0)).as("activeCount")
+                .sum(org.springframework.data.mongodb.core.aggregation.ConditionalOperators.when(
+                    org.springframework.data.mongodb.core.query.Criteria.where("status").is("EXPIRED")).then(1).otherwise(0)).as("expiredCount")
+        );
 
-        Map<String, List<UserCertification>> groupedByCertification = allUserCerts.stream()
-            .filter(uc -> uc.getCertification() != null)
-            .collect(Collectors.groupingBy(uc -> uc.getCertification().getId()));
+        return mongoTemplate.aggregate(aggregation, "userCertification", CertificationStatsDTO.class).getMappedResults();
+    }
 
-        List<CertificationStatsDTO> stats = new ArrayList<>();
-        for (Map.Entry<String, List<UserCertification>> entry : groupedByCertification.entrySet()) {
-            String certId = entry.getKey();
-            List<UserCertification> certsForProgram = entry.getValue();
-
-            long total = certsForProgram.size();
-            long activeCount = certsForProgram.stream()
-                .filter(uc -> CertificationStatus.ACTIVE.equals(uc.getStatus()))
-                .count();
-            long expiredCount = certsForProgram.stream()
-                .filter(uc -> CertificationStatus.EXPIRED.equals(uc.getStatus()))
-                .count();
-
-            String certName = certsForProgram.get(0).getCertification().getName();
-
-            stats.add(new CertificationStatsDTO(certId, certName, total, activeCount, expiredCount));
-        }
-
-        return stats;
+    @Override
+    public List<CertificationDTO> searchCertifications(String keyword) {
+        // Requirement: Keyword-based query involving multiple fields
+        return certificationRepository.searchByKeyword(keyword).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     /**

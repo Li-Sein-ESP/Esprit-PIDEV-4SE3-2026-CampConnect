@@ -6,19 +6,24 @@
       <header class="mb-12">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
           <div>
-            <h2 class="text-4xl font-bold text-[var(--color-text-heading)] mb-2 tracking-tight">Academy Governance</h2>
-            <p class="text-[var(--color-text-secondary)] text-lg">Orchestrate your education programs and certification flows.</p>
+            <h2 class="text-2xl font-bold text-[var(--color-text-heading)] mb-1 tracking-tight">Academy Expert Space</h2>
+            <p class="text-[var(--color-text-secondary)] text-sm">Curate educational excellence and certification pathways.</p>
           </div>
           <div class="flex gap-4">
-            <app-button *ngIf="formType === 'course'" variant="primary" (click)="openAddForm()"
+            <app-button *ngIf="formType === 'course' && !isAdmin" variant="primary" (click)="openAddForm()"
               customClass="shadow-xl shadow-[var(--color-primary-500)]/20 px-6">
               <lucide-icon [img]="PlusIcon" [size]="18" class="mr-2"></lucide-icon>
-              Deploy Course
+              Expert Course Launch
             </app-button>
-            <app-button *ngIf="formType === 'certification'" variant="primary" (click)="openAddCertForm()"
+            <app-button *ngIf="formType === 'certification' && !isAdmin" variant="primary" (click)="openAddCertForm()"
               customClass="shadow-xl shadow-[var(--color-primary-500)]/20 px-6">
               <lucide-icon [img]="PlusIcon" [size]="18" class="mr-2"></lucide-icon>
               Create Certification
+            </app-button>
+            <app-button *ngIf="formType === 'video' && !isAdmin" variant="primary" (click)="openVideoForm()"
+              customClass="shadow-xl shadow-[var(--color-primary-500)]/20 px-6">
+              <lucide-icon [img]="PlusIcon" [size]="18" class="mr-2"></lucide-icon>
+              Add Video Asset
             </app-button>
           </div>
         </div>
@@ -49,59 +54,112 @@
               Certifications
             </div>
           </button>
+          <button (click)="formType = 'video'; showForm = false" 
+            class="px-8 py-3 outline-none text-sm font-black uppercase tracking-widest rounded-xl transition-all duration-300"
+            [class.bg-white]="formType === 'video'"
+            [class.text-[var(--color-primary-600)]]="formType === 'video'"
+            [class.shadow-sm]="formType === 'video'"
+            [class.text-[var(--color-text-tertiary)]]="formType !== 'video'"
+            [class.hover:bg-white/50]="formType !== 'video'">
+            <div class="flex items-center justify-center gap-2">
+              <lucide-icon [img]="DashboardIcon" [size]="18"></lucide-icon>
+              Library
+            </div>
+          </button>
         </div>
       </header>
 
       <!-- Stats Overview -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <app-card variant="elevated" customClass="border-0 shadow-lg group hover:scale-[1.02] transition-transform">
-          <app-card-content class="p-8 relative z-10">
-            <div class="flex justify-between items-start mb-6">
-              <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center">
-                <lucide-icon [img]="BookIcon" [size]="24" class="text-emerald-500"></lucide-icon>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <!-- ... existing cards ... -->
+        <app-card variant="elevated" customClass="border-0 shadow-lg group hover:scale-[1.01] transition-transform">
+          <app-card-content class="p-6 relative z-10">
+            <div class="flex justify-between items-start mb-4">
+              <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center">
+                <lucide-icon [img]="BookIcon" [size]="20" class="text-emerald-500"></lucide-icon>
               </div>
-              <span class="text-[10px] font-black bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full uppercase tracking-tighter">LIVE</span>
+              <span class="text-xs font-bold bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full uppercase tracking-wide">Live</span>
             </div>
-            <h4 class="text-4xl font-bold text-[var(--color-text-heading)] mb-2">{{ stats().totalCourses }}</h4>
-            <p class="text-[10px] text-[var(--color-text-tertiary)] uppercase font-black tracking-widest">Active Courses</p>
+            <h4 class="text-4xl font-bold text-[#1A1A1A] mb-1">{{ stats().totalCourses }}</h4>
+            <p class="text-xs text-[#5C5C5C] uppercase font-bold tracking-wider">Active Courses</p>
           </app-card-content>
         </app-card>
 
-        <app-card variant="elevated" customClass="border-0 shadow-lg group hover:scale-[1.02] transition-transform">
-          <app-card-content class="p-8">
-            <div class="flex justify-between items-start mb-6">
-              <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center">
-                <lucide-icon [img]="CapIcon" [size]="24" class="text-amber-500"></lucide-icon>
+        <app-card variant="elevated" customClass="border-0 shadow-lg group hover:scale-[1.01] transition-transform">
+          <app-card-content class="p-6">
+            <div class="flex justify-between items-start mb-4">
+              <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center">
+                <lucide-icon [img]="CapIcon" [size]="20" class="text-amber-500"></lucide-icon>
               </div>
             </div>
-            <h4 class="text-4xl font-bold text-[var(--color-text-heading)] mb-2">{{ stats().totalCerts }}</h4>
-            <p class="text-[10px] text-[var(--color-text-tertiary)] uppercase font-black tracking-widest">Certifications</p>
+            <h4 class="text-4xl font-bold text-[#1A1A1A] mb-1">{{ stats().totalCerts }}</h4>
+            <p class="text-xs text-[#5C5C5C] uppercase font-bold tracking-wider">Certifications</p>
           </app-card-content>
         </app-card>
 
-        <app-card variant="elevated" customClass="border-0 shadow-lg group hover:scale-[1.02] transition-transform">
-          <app-card-content class="p-8">
-            <div class="flex justify-between items-start mb-6">
-              <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center">
-                <lucide-icon [img]="UsersIcon" [size]="24" class="text-blue-500"></lucide-icon>
+        <app-card variant="elevated" customClass="border-0 shadow-lg group hover:scale-[1.01] transition-transform">
+          <app-card-content class="p-6">
+            <div class="flex justify-between items-start mb-4">
+              <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center">
+                <lucide-icon [img]="DashboardIcon" [size]="20" class="text-purple-500"></lucide-icon>
               </div>
             </div>
-            <h4 class="text-4xl font-bold text-[var(--color-text-heading)] mb-2">{{ stats().totalExperts }}</h4>
-            <p class="text-[10px] text-[var(--color-text-tertiary)] uppercase font-black tracking-widest">Active Experts</p>
+            <h4 class="text-4xl font-bold text-[#1A1A1A] mb-1">{{ stats().totalVideos }}</h4>
+            <p class="text-xs text-[#5C5C5C] uppercase font-bold tracking-wider">Library Assets</p>
           </app-card-content>
         </app-card>
 
-        <app-card variant="elevated" customClass="border-0 shadow-lg group hover:scale-[1.02] transition-transform">
-          <app-card-content class="p-8">
-            <div class="flex justify-between items-start mb-6">
-              <div class="w-12 h-12 bg-[var(--color-primary-50)] rounded-2xl flex items-center justify-center">
-                <lucide-icon [img]="TrendingUpIcon" [size]="24" class="text-[var(--color-primary-500)]"></lucide-icon>
+        <app-card variant="elevated" customClass="border-0 shadow-lg group hover:scale-[1.01] transition-transform">
+          <app-card-content class="p-6">
+            <div class="flex justify-between items-start mb-4">
+              <div class="w-10 h-10 bg-[var(--color-primary-50)] rounded-xl flex items-center justify-center">
+                <lucide-icon [img]="TrendingUpIcon" [size]="20" class="text-[var(--color-primary-500)]"></lucide-icon>
               </div>
             </div>
-            <h4 class="text-4xl font-bold text-[var(--color-text-heading)] mb-2">{{ stats().enrolledStudents }}</h4>
-            <p class="text-[10px] text-[var(--color-text-tertiary)] uppercase font-black tracking-widest">Students Enrolled</p>
+            <h4 class="text-4xl font-bold text-[#1A1A1A] mb-1">{{ stats().enrolledStudents }}</h4>
+            <p class="text-xs text-[#5C5C5C] uppercase font-bold tracking-wider">Certificates Issued</p>
           </app-card-content>
         </app-card>
+      </div>
+
+      <!-- Certification Insights (Requirement: Complex Query Consumption) -->
+      <div *ngIf="isAdmin && certStats().length > 0" class="mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div class="bg-white rounded-[2.5rem] border border-[var(--color-neutral-100)] shadow-xl overflow-hidden">
+          <div class="p-8 border-b border-[var(--color-neutral-100)] flex items-center justify-between bg-[var(--color-background)]/50">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shadow-inner">
+                <lucide-icon [img]="PieChartIcon" [size]="24"></lucide-icon>
+              </div>
+              <div>
+                <h3 class="text-lg font-black text-[#1A1A1A] italic uppercase tracking-tight">Certification Insights</h3>
+                <p class="text-xs text-[#5C5C5C] font-bold">Real-time performance analytics from complex database aggregation.</p>
+              </div>
+            </div>
+            <span class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-4 py-2 rounded-xl uppercase tracking-widest border border-emerald-100">Live Aggregation</span>
+          </div>
+          <div class="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div *ngFor="let item of certStats()" class="bg-[var(--color-background)] p-6 rounded-[2rem] border border-[var(--color-neutral-50)] hover:border-emerald-200 transition-all group">
+              <h4 class="font-black text-[var(--color-text-heading)] mb-4 flex items-center justify-between">
+                {{ item.certificationName }}
+                <lucide-icon [img]="BadgeCheckIcon" [size]="16" class="text-emerald-500"></lucide-icon>
+              </h4>
+              <div class="grid grid-cols-3 gap-2">
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm">
+                  <div class="text-xl font-black text-[#1A1A1A]">{{ item.totalIssued }}</div>
+                  <div class="text-[8px] font-bold text-[#5C5C5C] uppercase tracking-tighter">Issued</div>
+                </div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm border-b-4 border-emerald-500">
+                  <div class="text-xl font-black text-emerald-600">{{ item.activeCount }}</div>
+                  <div class="text-[8px] font-bold text-[#5C5C5C] uppercase tracking-tighter">Active</div>
+                </div>
+                <div class="bg-white p-3 rounded-2xl text-center shadow-sm border-b-4 border-red-500">
+                  <div class="text-xl font-black text-red-600">{{ item.expiredCount }}</div>
+                  <div class="text-[8px] font-bold text-[#5C5C5C] uppercase tracking-tighter">Expired</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Feedback Messages (Fixed Toast) -->
@@ -112,7 +170,7 @@
           <lucide-icon [img]="BadgeCheckIcon" [size]="20"></lucide-icon>
         </div>
         <div>
-          <h4 class="font-bold text-emerald-900">Operation Successful</h4>
+          <h4 class="font-bold text-emerald-900">Success</h4>
           <p class="text-sm text-emerald-700">{{ successMessage() }}</p>
         </div>
       </div>
@@ -141,10 +199,12 @@
           <div class="w-1.5 h-10 bg-[var(--color-primary-500)] rounded-full"></div>
           <div>
             <h3 class="text-xl font-black text-white italic tracking-tight leading-none mb-1">
-              {{ formType === 'course' ? (editingCourse ? 'Edit Course Details' : 'Launch New Course') : (editingCertification ? 'Refine Certification' : 'Architect New Path') }}
+            {{ formType === 'course' ? (editingCourse ? 'Edit Course' : 'New Course') : 
+               formType === 'certification' ? (editingCertification ? 'Edit Certification' : 'New Certification') :
+               (editingVideo ? 'Edit Video Asset' : 'New Video Asset') }}
             </h3>
-            <p class="text-[9px] text-[var(--color-primary-400)]/50 font-black uppercase tracking-widest">
-              Academy Operations
+            <p class="text-xs text-emerald-400/70 font-bold uppercase tracking-wide">
+              Academy Management
             </p>
           </div>
         </div>
@@ -293,7 +353,7 @@
                   Discard Changes
                 </button>
                 <app-button variant="primary" type="submit" [disabled]="!!courseF.invalid || isSubmitting()" customClass="px-12 py-3">
-                  {{ isSubmitting() ? 'Committing...' : 'Commit Course' }}
+                  {{ isSubmitting() ? 'Saving...' : 'Save Course' }}
                 </app-button>
               </div>
             </div>
@@ -362,7 +422,85 @@
             </div>
             <div class="md:col-span-2 flex justify-end gap-4 mt-4">
               <app-button variant="ghost" type="button" (click)="closeForm()">Cancel</app-button>
-              <app-button variant="primary" type="submit" [disabled]="!!certF.invalid" customClass="px-12 py-3">Seal Certification</app-button>
+              <app-button variant="primary" type="submit" [disabled]="!!certF.invalid" customClass="px-12 py-3">Save Certification</app-button>
+            </div>
+          </form>
+
+          <!-- Video Form -->
+          <form #videoF="ngForm" *ngIf="formType === 'video'" (ngSubmit)="videoF.form.valid && saveVideo()"
+            class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-6">
+              <div>
+                <label class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Video Title</label>
+                <input type="text" [(ngModel)]="videoForm.title" name="vTitle" required #vt="ngModel"
+                  class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all font-medium"
+                  placeholder="e.g. Navigation Basics" [class.ring-2]="vt.invalid && vt.touched" [class.ring-red-500]="vt.invalid && vt.touched">
+              </div>
+              <div>
+                <label class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">YouTube URL</label>
+                <input type="text" [(ngModel)]="videoForm.videoUrl" name="vUrl" required #vu="ngModel"
+                  class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all"
+                  placeholder="https://www.youtube.com/watch?v=..." [class.ring-2]="vu.invalid && vu.touched" [class.ring-red-500]="vu.invalid && vu.touched">
+                <p class="text-[10px] text-emerald-600 mt-1 font-bold italic">Standard links and embed links are both supported.</p>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Category</label>
+                  <select [(ngModel)]="videoForm.category" name="vCat" required
+                    class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all">
+                    <option value="SURVIVAL">Survival</option>
+                    <option value="NAVIGATION">Navigation</option>
+                    <option value="FIRST-AID">First Aid</option>
+                    <option value="WILDLIFE">Wildlife</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Asset Type</label>
+                  <select [(ngModel)]="videoForm.type" name="vType" required
+                    class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all">
+                    <option value="TUTORIAL">Tutorial</option>
+                    <option value="REEL">Reel</option>
+                    <option value="EXPERIENCE">Experience</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="space-y-6">
+              <div>
+                <label class="block text-sm font-bold mb-4 uppercase tracking-tight text-[var(--color-text-secondary)]">Asset Thumbnail</label>
+                <div class="relative group">
+                  <div *ngIf="videoForm.thumbnailUrl" class="relative w-full h-32 rounded-2xl overflow-hidden mb-4 border-2 border-[var(--color-primary-100)] shadow-lg">
+                    <img [src]="videoForm.thumbnailUrl" class="w-full h-full object-cover">
+                    <button type="button" (click)="videoForm.thumbnailUrl = ''" 
+                      class="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-xl shadow-xl hover:bg-red-600 transition-all scale-90 group-hover:scale-100">
+                      <lucide-icon [img]="TrashIcon" [size]="16"></lucide-icon>
+                    </button>
+                  </div>
+                  
+                  <div *ngIf="!videoForm.thumbnailUrl" 
+                    (click)="thumbInput.click()"
+                    class="w-full h-32 border-2 border-dashed border-[var(--color-neutral-200)] rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-[var(--color-primary-400)] hover:bg-[var(--color-primary-50)]/30 transition-all group">
+                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                      <lucide-icon *ngIf="!isUploadingVideoThumbnail()" [img]="UploadIcon" [size]="24" class="text-[var(--color-primary-500)]"></lucide-icon>
+                      <lucide-icon *ngIf="isUploadingVideoThumbnail()" [img]="LoaderIcon" [size]="24" class="text-[var(--color-primary-500)] animate-spin"></lucide-icon>
+                    </div>
+                    <span class="text-xs font-bold text-[var(--color-text-tertiary)] uppercase tracking-widest">
+                      {{ isUploadingVideoThumbnail() ? 'Uploading...' : 'Upload Thumbnail' }}
+                    </span>
+                    <input #thumbInput type="file" (change)="onVideoThumbnailSelected($event)" accept="image/*" class="hidden">
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-bold mb-2 uppercase tracking-tight text-[var(--color-text-secondary)]">Asset Description</label>
+                <textarea [(ngModel)]="videoForm.description" name="vDesc" rows="4"
+                  class="w-full px-5 py-3 bg-[var(--color-background)] rounded-xl border-0 transition-all"
+                  placeholder="Brief overview of the video content..."></textarea>
+              </div>
+            </div>
+            <div class="md:col-span-2 flex justify-end gap-4 mt-4">
+              <app-button variant="ghost" type="button" (click)="closeForm()">Cancel</app-button>
+              <app-button variant="primary" type="submit" [disabled]="!!videoF.invalid" customClass="px-12 py-3">Publish Asset</app-button>
             </div>
           </form>
         </div>
@@ -409,7 +547,11 @@
 
             <div class="flex items-center gap-2 text-[var(--color-text-tertiary)] px-4">
                 <lucide-icon [img]="FilterIcon" [size]="16"></lucide-icon>
-                <span class="text-[10px] font-black uppercase tracking-tighter">{{ formType === 'course' ? filteredCourses().length : filteredCertifications().length }} Results</span>
+                <span class="text-[10px] font-black uppercase tracking-tighter">
+                  {{ formType === 'course' ? filteredCourses().length : 
+                     formType === 'certification' ? filteredCertifications().length : 
+                     filteredVideos().length }} Results
+                </span>
             </div>
         </div>
 
@@ -420,10 +562,11 @@
             <table *ngIf="filteredCourses().length > 0" class="w-full text-left border-collapse">
               <thead>
                 <tr class="bg-[var(--color-background)] border-b border-[var(--color-neutral-100)]">
-                  <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] whitespace-nowrap">Course Program</th>
-                  <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] text-center whitespace-nowrap">Metrics</th>
-                  <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] whitespace-nowrap">Lead Instructor</th>
-                  <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] text-right px-10 whitespace-nowrap">Command</th>
+                  <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#5C5C5C] whitespace-nowrap">Course</th>
+                  <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#5C5C5C] text-center whitespace-nowrap">Duration / Enrolled</th>
+                  <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#5C5C5C] text-center whitespace-nowrap">Status</th>
+                  <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#5C5C5C] whitespace-nowrap">Instructor</th>
+                  <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#5C5C5C] text-right px-10 whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[var(--color-neutral-50)]">
@@ -448,6 +591,16 @@
                          <span class="text-[10px] font-bold text-[var(--color-primary-500)] uppercase tracking-widest mt-1">{{ course.enrolledCount || 0 }} Enrolled</span>
                        </div>
                     </td>
+                    <td class="px-8 py-5 text-center">
+                      <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider"
+                        [ngClass]="{
+                          'bg-amber-100 text-amber-600': course.status === 'PENDING',
+                          'bg-emerald-100 text-emerald-600': course.status === 'APPROVED',
+                          'bg-red-100 text-red-600': course.status === 'REJECTED'
+                        }">
+                        {{ course.status || 'PENDING' }}
+                      </span>
+                    </td>
                     <td class="px-8 py-5">
                       <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-[1rem] bg-[var(--color-primary-50)] flex items-center justify-center text-[var(--color-primary-600)] shadow-inner font-black text-sm">
@@ -457,15 +610,31 @@
                       </div>
                     </td>
                     <td class="px-8 py-5 text-right px-10">
-                      <div class="flex justify-end gap-2 opacity-40 group-hover:opacity-100 transition-all duration-300">
-                        <button (click)="openEditForm(course)" title="Edit Course"
-                          class="p-2.5 bg-white hover:bg-blue-50 hover:text-blue-600 hover:shadow-lg rounded-xl transition-all border border-solid hover:border-blue-100">
-                          <lucide-icon [img]="PencilIcon" [size]="18"></lucide-icon>
-                        </button>
-                        <button (click)="deleteCourse(course.id!)" title="Neutralize"
-                          class="p-2.5 bg-white hover:bg-red-50 hover:text-red-600 hover:shadow-lg rounded-xl transition-all border border-solid hover:border-red-100">
-                          <lucide-icon [img]="TrashIcon" [size]="18"></lucide-icon>
-                        </button>
+                      <div class="flex justify-end gap-3 transition-all duration-300">
+                        <!-- Admin Approval Controls -->
+                        <ng-container *ngIf="isAdmin && (course.status === 'PENDING' || !course.status)">
+                          <button (click)="approveCourse(course.id!)" title="Approve & Launch"
+                            class="p-2.5 bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg hover:shadow-emerald-500/30 rounded-xl transition-all scale-110">
+                            <lucide-icon [img]="CheckIcon" [size]="18"></lucide-icon>
+                          </button>
+                          <button (click)="rejectCourse(course.id!)" title="Reject Deployment"
+                            class="p-2.5 bg-red-500 text-white hover:bg-red-600 shadow-lg hover:shadow-red-500/30 rounded-xl transition-all scale-110">
+                            <lucide-icon [img]="XIcon" [size]="18"></lucide-icon>
+                          </button>
+                        </ng-container>
+                        
+                        <ng-container *ngIf="!isAdmin">
+                          <div class="flex gap-2 opacity-40 group-hover:opacity-100 transition-all">
+                            <button (click)="openEditForm(course)" title="Edit Course"
+                              class="p-2.5 bg-white hover:bg-blue-50 hover:text-blue-600 hover:shadow-lg rounded-xl transition-all border border-solid hover:border-blue-100">
+                              <lucide-icon [img]="PencilIcon" [size]="18"></lucide-icon>
+                            </button>
+                            <button (click)="deleteCourse(course.id!)" title="Neutralize"
+                              class="p-2.5 bg-white hover:bg-red-50 hover:text-red-600 hover:shadow-lg rounded-xl transition-all border border-solid hover:border-red-100">
+                              <lucide-icon [img]="TrashIcon" [size]="18"></lucide-icon>
+                            </button>
+                          </div>
+                        </ng-container>
                       </div>
                     </td>
                   </tr>
@@ -483,6 +652,84 @@
           </div>
         </div>
 
+        <!-- Videos List (Table Style) -->
+        <div *ngIf="formType === 'video'"
+          class="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-[var(--color-neutral-100)] transition-all">
+          <div class="overflow-x-auto">
+            <table *ngIf="filteredVideos().length > 0" class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-[var(--color-background)] border-b border-[var(--color-neutral-100)]">
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-wider text-[#5C5C5C] whitespace-nowrap">Video Asset</th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-wider text-[#5C5C5C] text-center whitespace-nowrap">Category / Type</th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-wider text-[#5C5C5C] whitespace-nowrap">Metrics</th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-wider text-[#5C5C5C] text-right px-10 whitespace-nowrap">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[var(--color-neutral-50)]">
+                <ng-container *ngFor="let vid of filteredVideos()">
+                  <tr *ngIf="vid" class="group hover:bg-[var(--color-primary-50)]/20 transition-all duration-300">
+                    <td class="px-8 py-7">
+                      <div class="flex items-center gap-4">
+                        <div class="w-20 h-12 bg-purple-50 rounded-xl overflow-hidden border border-purple-100 flex items-center justify-center shrink-0 shadow-sm relative">
+                          <img *ngIf="vid.thumbnailUrl" [src]="vid.thumbnailUrl" (error)="vid.thumbnailUrl = ''" class="w-full h-full object-cover">
+                          <lucide-icon *ngIf="!vid.thumbnailUrl" [img]="DashboardIcon" [size]="20" class="text-purple-400"></lucide-icon>
+                          <div class="absolute inset-0 bg-black/10 flex items-center justify-center">
+                            <lucide-icon [img]="PlayIcon" [size]="14" class="text-white fill-white"></lucide-icon>
+                          </div>
+                        </div>
+                        <div class="flex flex-col max-w-xs">
+                          <h4 class="font-bold text-[14px] text-[var(--color-text-heading)] mb-0.5 truncate">{{ vid.title }}</h4>
+                          <p class="text-[10px] text-[var(--color-text-tertiary)] truncate">{{ vid.videoUrl }}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-8 py-7 text-center">
+                      <div class="flex flex-col gap-1 items-center">
+                        <span class="text-[10px] font-black text-purple-600 bg-purple-50 px-2.5 py-1 rounded-lg uppercase tracking-widest">{{ vid.category }}</span>
+                        <span class="text-[9px] font-bold text-[#5C5C5C] uppercase opacity-60">{{ vid.type }}</span>
+                      </div>
+                    </td>
+                    <td class="px-8 py-7">
+                      <div class="flex items-center gap-4 text-[var(--color-text-secondary)]">
+                        <div class="flex items-center gap-1.5">
+                          <lucide-icon [img]="EyeIcon" [size]="14" class="opacity-40"></lucide-icon>
+                          <span class="text-xs font-bold">{{ vid.views || 0 }}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                          <lucide-icon [img]="ThumbsUpIcon" [size]="14" class="opacity-40"></lucide-icon>
+                          <span class="text-xs font-bold">{{ vid.helpfulCount || 0 }}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-8 py-7 text-right px-10">
+                      <div class="flex justify-end gap-2 opacity-40 group-hover:opacity-100 transition-all duration-300">
+                        <ng-container *ngIf="!isAdmin">
+                          <button (click)="openEditVideoForm(vid)" title="Edit Asset"
+                            class="p-2.5 bg-white hover:bg-blue-50 hover:text-blue-600 hover:shadow-lg rounded-xl transition-all border border-solid hover:border-blue-100">
+                            <lucide-icon [img]="PencilIcon" [size]="18"></lucide-icon>
+                          </button>
+                          <button (click)="deleteVideo(vid.id)" title="Remove"
+                            class="p-2.5 bg-white hover:bg-red-50 hover:text-red-600 hover:shadow-lg rounded-xl transition-all border border-solid hover:border-red-100">
+                            <lucide-icon [img]="TrashIcon" [size]="18"></lucide-icon>
+                          </button>
+                        </ng-container>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
+
+            <div *ngIf="filteredVideos().length === 0" class="py-32 text-center bg-gray-50/30">
+              <div class="w-20 h-20 bg-white rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-xl border border-[var(--color-neutral-100)] opacity-60">
+                <lucide-icon [img]="DashboardIcon" [size]="32" class="text-[var(--color-primary-400)]"></lucide-icon>
+              </div>
+              <h3 class="text-2xl font-black text-[var(--color-text-heading)] mb-2 italic tracking-tight">Library Empty</h3>
+              <p class="text-[#5C5C5C] text-sm max-w-sm mx-auto font-medium opacity-60">Add your first educational video asset to the library.</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Certifications List (Table Style) -->
         <div *ngIf="formType === 'certification'"
           class="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-[var(--color-neutral-100)] transition-all">
@@ -490,10 +737,10 @@
             <table *ngIf="filteredCertifications().length > 0" class="w-full text-left border-collapse">
               <thead>
                 <tr class="bg-[var(--color-background)] border-b border-[var(--color-neutral-100)]">
-                  <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] whitespace-nowrap">Certification Path</th>
-                  <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] text-center whitespace-nowrap">Requirements</th>
-                  <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] whitespace-nowrap">Authority</th>
-                  <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] text-right px-10 whitespace-nowrap">Command</th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-wider text-[#5C5C5C] whitespace-nowrap">Certification</th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-wider text-[#5C5C5C] text-center whitespace-nowrap">Required Courses</th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-wider text-[#5C5C5C] whitespace-nowrap">Issuer</th>
+                  <th class="px-8 py-6 text-xs font-bold uppercase tracking-wider text-[#5C5C5C] text-right px-10 whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[var(--color-neutral-50)]">
@@ -520,14 +767,16 @@
                     </td>
                     <td class="px-8 py-7 text-right px-10">
                       <div class="flex justify-end gap-2 opacity-40 group-hover:opacity-100 transition-all duration-300">
-                        <button (click)="openEditCertForm(cert)" title="Edit Specs"
-                          class="p-2.5 bg-white hover:bg-blue-50 hover:text-blue-600 hover:shadow-lg rounded-xl transition-all border border-solid hover:border-blue-100">
-                          <lucide-icon [img]="PencilIcon" [size]="18"></lucide-icon>
-                        </button>
-                        <button (click)="deleteCertification(cert?.id || '')" title="Neutralize"
-                          class="p-2.5 bg-white hover:bg-red-50 hover:text-red-600 hover:shadow-lg rounded-xl transition-all border border-solid hover:border-red-100">
-                          <lucide-icon [img]="TrashIcon" [size]="18"></lucide-icon>
-                        </button>
+                        <ng-container *ngIf="!isAdmin">
+                          <button (click)="openEditCertForm(cert)" title="Edit Specs"
+                            class="p-2.5 bg-white hover:bg-blue-50 hover:text-blue-600 hover:shadow-lg rounded-xl transition-all border border-solid hover:border-blue-100">
+                            <lucide-icon [img]="PencilIcon" [size]="18"></lucide-icon>
+                          </button>
+                          <button (click)="deleteCertification(cert?.id || '')" title="Neutralize"
+                            class="p-2.5 bg-white hover:bg-red-50 hover:text-red-600 hover:shadow-lg rounded-xl transition-all border border-solid hover:border-red-100">
+                            <lucide-icon [img]="TrashIcon" [size]="18"></lucide-icon>
+                          </button>
+                        </ng-container>
                       </div>
                     </td>
                   </tr>
@@ -540,10 +789,11 @@
                 <lucide-icon [img]="CapIcon" [size]="32" class="text-[var(--color-primary-400)]"></lucide-icon>
               </div>
               <h3 class="text-2xl font-black text-[var(--color-text-heading)] mb-2 italic tracking-tight">No Pathways Active</h3>
-              <p class="text-[var(--color-text-secondary)] text-sm max-w-sm mx-auto font-medium opacity-60">Authorize a new certification deployment.</p>
+              <p class="text-[#5C5C5C] text-sm max-w-sm mx-auto font-medium opacity-60">No certifications yet. Create your first one.</p>
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </main>
@@ -574,7 +824,7 @@
                 </button>
                 <button (click)="cancelDelete()" 
                     class="w-full py-4 text-[var(--color-text-tertiary)] hover:bg-[var(--color-background)] font-bold rounded-2xl transition-all">
-                    Abort
+                    Cancel
                 </button>
             </div>
         </div>

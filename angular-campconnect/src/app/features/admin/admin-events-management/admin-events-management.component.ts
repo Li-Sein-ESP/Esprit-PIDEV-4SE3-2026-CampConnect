@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { LucideAngularModule, Plus, Pencil, Trash2, Users, Calendar, LayoutDashboard, Settings, AlertTriangle, Search, Filter, SlidersHorizontal, ChevronRight, MapPin, BadgeCheck, Clock, Ban } from 'lucide-angular';
+import { LucideAngularModule, Plus, Pencil, Trash2, Users, Calendar, LayoutDashboard, Settings, AlertTriangle, Search, Filter, SlidersHorizontal, ChevronRight, MapPin, BadgeCheck, Clock, Ban, X, AlertCircle } from 'lucide-angular';
 import { ButtonComponent } from '../../../shared/components/button.component';
 import { CardComponent, CardContentComponent, CardHeaderComponent, CardTitleComponent } from '../../../shared/components/card.component';
 import { EventService } from '../../events/services/event.service';
@@ -34,6 +34,9 @@ export class AdminEventsManagementComponent implements OnInit {
     DashboardIcon = LayoutDashboard;
     SettingsIcon = Settings;
     AlertTriangle = AlertTriangle;
+    AlertCircleIcon = AlertCircle;
+    BanIcon = Ban;
+    XIcon = X;
     SearchIcon = Search;
     FilterIcon = Filter;
     SlidersHorizontalIcon = SlidersHorizontal;
@@ -41,7 +44,6 @@ export class AdminEventsManagementComponent implements OnInit {
     MapPinIcon = MapPin;
     BadgeCheckIcon = BadgeCheck;
     ClockIcon = Clock;
-    BanIcon = Ban;
 
     events = signal<Event[]>([]);
     searchTerm = signal<string>('');
@@ -82,12 +84,20 @@ export class AdminEventsManagementComponent implements OnInit {
 
     feedback = signal<{ message: string; type: 'success' | 'error' | null }>({ message: '', type: null });
 
+    isPredictingPopularity = signal<boolean>(false);
+    aiPopularitySuggestion = signal<{ expected: number, fillRate: number, recommendation: string, color: string } | null>(null);
+
+    isPredictingCategory = signal<boolean>(false);
+    aiCategorySuggestion = signal<{ categoryName: string, categoryId: number, confidence: number } | null>(null);
+
     // Confirmation Modal State
     showConfirmModal = false;
     confirmTitle = '';
     confirmMessage = '';
     confirmAction: 'delete' | 'save' = 'delete';
     eventToDelete: string | null = null;
+
+    activitiesInput = '';
 
     constructor(
         private eventService: EventService,
@@ -114,6 +124,133 @@ export class AdminEventsManagementComponent implements OnInit {
             availableCapacity: evts.reduce((acc, curr) => acc + (curr.capacity || 0), 0),
             totalRevenue: evts.reduce((acc, curr) => acc + ((curr.capacity || 0) * (curr.price || 0)), 0)
         });
+    }
+
+    predictPopularity() {
+        const capacity = this.eventForm.capacity || 10;
+        const difficulty = this.eventForm.difficulty || 'beginner';
+        const price = this.eventForm.price || 0;
+        
+        // Calculer la durée en jours
+        let durationDays = 1;
+        if (this.eventForm.startDate && this.eventForm.endDate) {
+            const start = new Date(this.eventForm.startDate);
+            const end = new Date(this.eventForm.endDate);
+            if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+                durationDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+            }
+            if (durationDays < 1) durationDays = 1;
+        }
+
+        // Déterminer la saison (basé sur le mois de début)
+        let season = 'ete';
+        if (this.eventForm.startDate) {
+            const date = new Date(this.eventForm.startDate);
+            if (!isNaN(date.getTime())) {
+                const month = date.getMonth(); // 0-11
+                if (month >= 2 && month <= 4) season = 'printemps';
+                else if (month >= 5 && month <= 7) season = 'ete';
+                else if (month >= 8 && month <= 10) season = 'automne';
+                else season = 'hiver';
+            }
+        }
+
+        // Si la catégorie n'est pas encore définie, on force le NLP à la deviner en arrière-plan
+        // Pour la démo, on s'attend à ce que l'organisateur ait cliqué sur "Prédire Catégorie" avant
+        let categoryId = 1; // Default: Workshop
+        if (this.eventForm.type === 'guided-hike') categoryId = 0;
+        else if (this.eventForm.type === 'group-camp') categoryId = 2;
+
+        this.isPredictingPopularity.set(true);
+        this.aiPopularitySuggestion.set(null);
+        this.feedback.set({ message: 'AI is analyzing parameters to predict attendance...', type: 'success' });
+
+        this.eventService.predictAiPopularity(categoryId, capacity, durationDays, difficulty, season).subscribe({
+            next: (res) => {
+                this.isPredictingPopularity.set(false);
+                
+                // --- VALUE ADDED: Decision Support Logic ---
+                let recommendation = "";
+                let color = "text-emerald-400";
+                const fillRate = res.fill_rate_percentage;
+
+                if (fillRate > 85) {
+                    recommendation = "High demand predicted! Consider increasing the price or capacity for maximum profit.";
+                    color = "text-emerald-400";
+                } else if (fillRate > 60) {
+                    recommendation = "Balanced popularity. Perfect for maintaining quality and a safe environment.";
+                    color = "text-blue-400";
+                } else if (fillRate > 30) {
+                    recommendation = "Low fill rate. Consider a small discount or moving the event to a more popular season like Summer.";
+                    color = "text-amber-400";
+                } else {
+                    recommendation = "Critical: Very low attendance predicted. Review your pricing or event type for this specific season.";
+                    color = "text-red-400";
+                }
+
+                this.aiPopularitySuggestion.set({
+                    expected: res.expected_attendees,
+                    fillRate: fillRate,
+                    recommendation: recommendation,
+                    color: color
+                });
+                
+                this.feedback.set({ message: 'Attendance prediction completed!', type: 'success' });
+                setTimeout(() => this.feedback.set({ message: '', type: null }), 3000);
+            },
+            error: (err) => {
+                this.isPredictingPopularity.set(false);
+                this.feedback.set({ message: 'Error during prediction calculation.', type: 'error' });
+                setTimeout(() => this.feedback.set({ message: '', type: null }), 5000);
+            }
+        });
+    }
+
+    predictCategory() {
+        const desc = this.eventForm.description;
+        if (!desc || desc.length < 10) {
+            this.feedback.set({ message: 'Veuillez entrer une description d\'au moins 10 caractères pour l\'analyse.', type: 'error' });
+            setTimeout(() => this.feedback.set({ message: '', type: null }), 3000);
+            return;
+        }
+
+        this.isPredictingCategory.set(true);
+        this.aiCategorySuggestion.set(null);
+        this.feedback.set({ message: 'L\'IA analyse la description...', type: 'success' });
+
+        this.eventService.predictAiCategory(desc).subscribe({
+            next: (res) => {
+                this.isPredictingCategory.set(false);
+                this.aiCategorySuggestion.set({
+                    categoryName: res.categoryName,
+                    categoryId: res.categoryId,
+                    confidence: res.confidenceScore
+                });
+                this.feedback.set({ message: 'Analyse IA terminée !', type: 'success' });
+                setTimeout(() => this.feedback.set({ message: '', type: null }), 3000);
+            },
+            error: (err) => {
+                this.isPredictingCategory.set(false);
+                this.feedback.set({ message: 'Erreur lors de la prédiction de la catégorie.', type: 'error' });
+                setTimeout(() => this.feedback.set({ message: '', type: null }), 3000);
+            }
+        });
+    }
+
+    applyAiCategory() {
+        const suggestion = this.aiCategorySuggestion();
+        if (suggestion) {
+            this.eventForm.categoryName = suggestion.categoryName;
+            
+            // Map the ID to the type enum
+            let newType: any = 'workshop';
+            if (suggestion.categoryId === 0) newType = 'guided-hike';
+            else if (suggestion.categoryId === 1) newType = 'workshop';
+            else if (suggestion.categoryId === 2) newType = 'group-camp';
+            
+            this.eventForm.type = newType;
+            this.aiCategorySuggestion.set(null);
+        }
     }
 
     loadUsers() {
@@ -186,11 +323,9 @@ export class AdminEventsManagementComponent implements OnInit {
             location: { name: '', address: '' },
             organizer: { id: 'admin', name: 'Admin', verified: true },
             tags: [],
-            whatToExpect: [],
-            whatToBring: [],
-            whatsIncluded: [],
-            safetyNotes: []
+            activities: []
         };
+        this.activitiesInput = '';
         this.showForm = true;
     }
 
@@ -253,6 +388,10 @@ export class AdminEventsManagementComponent implements OnInit {
         this.formErrors = {};
     }
 
+    /**
+     * AI Packing list logic
+     */
+
     saveEvent() {
         this.feedback.set({ message: '', type: null });
         this.formErrors = {};
@@ -285,6 +424,11 @@ export class AdminEventsManagementComponent implements OnInit {
             payload.creatorName = payload.organizer.name;
         }
 
+        // Parse Activities
+        if (this.activitiesInput) {
+            payload.activities = this.activitiesInput.split(',').map(a => a.trim()).filter(a => a);
+        }
+
         // Normalize Enums
         if (payload.type) payload.type = payload.type.toUpperCase().replace(/-/g, '_');
         if (payload.difficulty) payload.difficulty = payload.difficulty.toUpperCase().replace(/-/g, '_');
@@ -304,12 +448,6 @@ export class AdminEventsManagementComponent implements OnInit {
             const end = new Date(payload.endDate).getTime();
             payload.duration = Math.max(1, Math.round((end - start) / (1000 * 60 * 60)));
         }
-
-        // Scrub Tactical Lists (Remove empty entries)
-        const scrub = (arr: any) => Array.isArray(arr) ? arr.map(s => s.trim()).filter(s => s.length > 0) : [];
-        payload.whatToExpect = scrub(payload.whatToExpect);
-        payload.whatToBring = scrub(payload.whatToBring);
-        payload.whatsIncluded = scrub(payload.whatsIncluded);
 
         // Clean up ID for new missions
         if (!this.editingEvent) {

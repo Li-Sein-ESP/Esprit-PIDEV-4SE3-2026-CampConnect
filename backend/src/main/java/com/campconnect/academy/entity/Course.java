@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import com.campconnect.enums.DifficultyLevel;
 import org.springframework.data.mongodb.core.mapping.DBRef;
+import com.campconnect.enums.CourseStatus;
 import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -58,9 +59,12 @@ public class Course {
     private String documentUrl;
     private List<String> tags;
     private List<String> prerequisites;
+    private List<String> sdgs;
     
     @Min(value = 0, message = "Passing score must be at least 0")
     private int passingScore;
+
+    private CourseStatus status = CourseStatus.PENDING;
 
     @DBRef
     private User creator;

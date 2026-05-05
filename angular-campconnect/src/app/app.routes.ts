@@ -109,7 +109,7 @@ export const routes: Routes = [
         path: 'admin',
         loadComponent: () => import('./features/admin/admin-layout/admin-layout.component').then(m => m.AdminLayoutComponent),
         canActivate: [authGuard],
-        data: { roles: ['ROLE_ADMIN'] },
+        data: { roles: ['ROLE_ADMIN', 'ROLE_EXPERT', 'ROLE_ORGANIZER'] },
         children: [
             {
                 path: 'dashboard',
@@ -222,9 +222,8 @@ export const routes: Routes = [
             },
             {
                 path: 'organizer-dashboard',
-                component: RoleDashboardComponent,
-                canActivate: [authGuard],
-                data: { roles: ['ROLE_ORGANIZER'] }
+                redirectTo: '/admin/academy',
+                pathMatch: 'full'
             },
             // Profile
             {
@@ -382,8 +381,8 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/academy/academy.component').then(m => m.AcademyComponent)
             },
             {
-                path: 'academy/:id',
-                loadComponent: () => import('./features/academy/course-detail/course-detail.component').then(m => m.CourseDetailComponent)
+                path: 'academy/certificate/:id',
+                loadComponent: () => import('./features/academy/certificate-view/certificate-view.component').then(m => m.CertificateViewComponent)
             },
             {
                 path: 'academy/video/:videoId',
@@ -404,6 +403,10 @@ export const routes: Routes = [
             {
                 path: 'academy/my-badges',
                 loadComponent: () => import('./features/academy/my-badges/my-badges.component').then(m => m.MyBadgesComponent)
+            },
+            {
+                path: 'academy/:id',
+                loadComponent: () => import('./features/academy/course-detail/course-detail.component').then(m => m.CourseDetailComponent)
             },
             // Safety
             {

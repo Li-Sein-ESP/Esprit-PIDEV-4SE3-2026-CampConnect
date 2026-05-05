@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserCertificationDTO {
+    private String id;
     private String certificationId;
     private String certificationName;
     private String userId;

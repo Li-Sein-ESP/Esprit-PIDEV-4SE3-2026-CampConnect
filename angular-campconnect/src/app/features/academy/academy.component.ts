@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { LucideAngularModule, BookOpen, Clock, Users, Award, Search, Star, TrendingUp, Play, ChevronRight, CheckCircle, ShieldCheck, Medal, GraduationCap, Eye, ArrowRight, Compass, Plus, Video as VideoIcon, Upload, File as FileIcon, CheckSquare, AlertCircle, Pencil, Trash2 } from 'lucide-angular';
+import { LucideAngularModule, BookOpen, Clock, Users, Award, Search, Star, TrendingUp, Play, ChevronRight, CheckCircle, ShieldCheck, Medal, GraduationCap, Eye, ArrowRight, Compass, Plus, Video as VideoIcon, Upload, File as FileIcon, CheckSquare, AlertCircle, Pencil, Trash2, Library, X } from 'lucide-angular';
 import { ButtonComponent } from '../../shared/components/button.component';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -9,6 +9,7 @@ import { AcademyService } from './services/academy.service';
 import { Course, Certification, Video } from './models/academy.model';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
+import { EventService } from '../events/services/event.service';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -84,6 +85,7 @@ gsap.registerPlugin(ScrollTrigger);
 })
 export class AcademyComponent implements OnInit, AfterViewInit {
   // Icons
+  readonly X = X;
   readonly GraduationCap = GraduationCap;
   readonly ArrowRight = ArrowRight;
   readonly Play = Play;
@@ -97,17 +99,18 @@ export class AcademyComponent implements OnInit, AfterViewInit {
   readonly ChevronRight = ChevronRight;
   readonly Search = Search;
   readonly Compass = Compass;
+  readonly ShieldCheck = ShieldCheck;
+  readonly Users = Users;
   readonly Plus = Plus;
   readonly VideoIcon = VideoIcon;
   readonly BookOpen = BookOpen;
-  readonly Users = Users;
-  readonly ShieldCheck = ShieldCheck;
   readonly Upload = Upload;
   readonly FileIcon = FileIcon;
   readonly CheckSquare = CheckSquare;
   readonly AlertCircle = AlertCircle;
   readonly Pencil = Pencil;
   readonly Trash2 = Trash2;
+  readonly Library = Library;
 
   selectedCategory = 'all';
   searchQuery = '';
@@ -172,11 +175,14 @@ export class AcademyComponent implements OnInit, AfterViewInit {
     description: ''
   };
 
+  earnedCerts = signal<Map<string, string>>(new Map());
+
   constructor(
     private router: Router,
     private academyService: AcademyService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private eventService: EventService
   ) { }
 
   ngOnInit() {
@@ -187,9 +193,10 @@ export class AcademyComponent implements OnInit, AfterViewInit {
   private loadAcademyData() {
     this.academyService.getCourses().subscribe({
       next: (courses) => {
-        this.courses.set(courses);
-        this.stats[0].value = courses.length;
-        this.stats[0].target = courses.length;
+        const approvedCourses = courses.filter(c => !c.status || c.status === 'APPROVED');
+        this.courses.set(approvedCourses);
+        this.stats[0].value = approvedCourses.length;
+        this.stats[0].target = approvedCourses.length;
       },
       error: (err) => console.error('Failed to load courses:', err)
     });
@@ -202,10 +209,47 @@ export class AcademyComponent implements OnInit, AfterViewInit {
       error: (err) => console.error('Failed to load certifications:', err)
     });
     this.academyService.getVideos().subscribe({
-      next: (videos) => this.featuredVideos.set(videos),
+      next: (videos) => {
+        this.featuredVideos.set(videos);
+      },
       error: (err) => console.error('Failed to load videos:', err)
     });
+
+    const userId = (this.authService as any).currentUser$?.value?.id;
+    if (userId) {
+      this.academyService.getUserCertifications(userId).subscribe({
+        next: (certs) => {
+          const certMap = new Map<string, string>();
+          certs.forEach(c => {
+            if (c.id) {
+              if (c.certificationId) {
+                certMap.set(c.certificationId, c.id);
+                const stripped = c.certificationId.replace(/^CERT-/i, '');
+                if (stripped !== c.certificationId) certMap.set(stripped, c.id);
+              }
+              if (c.certificationName) certMap.set(c.certificationName, c.id);
+            }
+          });
+          // Also merge certs from localStorage (in case backend user linking failed)
+          try {
+            const local: any[] = JSON.parse(localStorage.getItem('academy_earned_certs') || '[]');
+            local.forEach(c => {
+              const fakeId = c.id || c.certificationId;
+              if (c.certificationId) {
+                certMap.set(c.certificationId, fakeId);
+                const stripped = c.certificationId.replace(/^CERT-/i, '');
+                if (stripped !== c.certificationId) certMap.set(stripped, fakeId);
+              }
+              if (c.certificationName) certMap.set(c.certificationName, fakeId);
+            });
+          } catch (e) {}
+          this.earnedCerts.set(certMap);
+        },
+        error: (err) => console.error('Failed to load user certifications:', err)
+      });
+    }
   }
+
 
   showToast(message: string, type: 'success' | 'error') {
     clearTimeout(this.toastTimeout);
@@ -229,7 +273,7 @@ export class AcademyComponent implements OnInit, AfterViewInit {
     this.showVideoModal = true;
   }
 
-  editVideo(video: Video, event: Event) {
+  editVideo(video: Video, event: any) {
     event.stopPropagation();
     this.isEditingVideo = true;
     this.editingVideoId = video.id || null;
@@ -246,7 +290,7 @@ export class AcademyComponent implements OnInit, AfterViewInit {
     this.showVideoModal = true;
   }
 
-  deleteVideo(id: string, event: Event) {
+  deleteVideo(id: string, event: any) {
     event.stopPropagation();
     if (confirm('Are you sure you want to delete this content?')) {
       this.academyService.deleteVideo(id).subscribe({
@@ -425,8 +469,19 @@ export class AcademyComponent implements OnInit, AfterViewInit {
     this.router.navigate(['/academy/certifications']);
   }
 
+  handleCertClick(cert: Certification) {
+    if (this.earnedCerts().has(cert.id) || this.earnedCerts().has(cert.name)) {
+      // Navigate to My Badges, pre-selecting this specific cert
+      const userCertId = this.earnedCerts().get(cert.id) || this.earnedCerts().get(cert.name);
+      this.router.navigate(['/academy/my-badges'], { queryParams: { certId: userCertId || cert.id } });
+    } else {
+      const courseId = (cert.requiredCourseIds && cert.requiredCourseIds.length > 0) ? cert.requiredCourseIds[0] : cert.id;
+      this.router.navigate(['/academy', courseId], { queryParams: { fastTrack: 'true' } });
+    }
+  }
+
   viewMyProgress() {
-    this.router.navigate(['/academy/my-progress']);
+    this.router.navigate(['/academy/my-badges']);
   }
 
   viewCourse(id: string) {

@@ -22,6 +22,7 @@ export interface Course {
     creatorName?: string;
     instructorId?: string;
     instructorName?: string;
+    status?: 'PENDING' | 'APPROVED' | 'REJECTED';
 }
 
 // ─── Video (mirrors VideoDTO.java) ───
@@ -87,6 +88,7 @@ export interface Certification {
 
 // ─── UserCertification (mirrors UserCertificationDTO.java) ───
 export interface UserCertification {
+    id?: string;
     certificationId: string;
     certificationName: string;
     userId: string;

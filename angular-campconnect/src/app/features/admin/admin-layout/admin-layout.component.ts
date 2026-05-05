@@ -13,11 +13,20 @@ import { AuthService } from '../../../core/services/auth.service';
 export class AdminLayoutComponent {
     userName: string = 'Admin User';
     userInitials: string = 'AU';
+    isAdmin: boolean = false;
+    isExpert: boolean = false;
+    isOrganizer: boolean = false;
+    portalName: string = 'Expert Portal';
 
     constructor(private router: Router, private authService: AuthService) {
         // Attempt to parse user info if available from standard mock auth flow
         this.authService.getCurrentUser().subscribe(currentUser => {
             if (currentUser) {
+                this.isAdmin = this.authService.hasRole('ADMIN');
+                this.isExpert = this.authService.hasRole('EXPERT');
+                this.isOrganizer = this.authService.hasRole('ORGANIZER');
+                const isExpertOrOrganizer = this.isExpert || this.isOrganizer;
+                this.portalName = this.isAdmin ? 'Admin Portal' : (isExpertOrOrganizer ? 'Expert Portal' : 'User Portal');
                 if (currentUser.username) {
                     this.userName = currentUser.username;
                     this.userInitials = currentUser.username.substring(0, 2).toUpperCase();
