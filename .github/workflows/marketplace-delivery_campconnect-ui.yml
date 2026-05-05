@@ -34,7 +34,7 @@ jobs:
         with:
           name: node-app
           # Pointing to the dist folder where Angular places the compiled integrated project
-          path: angular-campconnect/dist/angular-campconnect
+          path: angular-campconnect/dist/angular-campconnect/browser
 
   deploy:
     runs-on: ubuntu-latest
